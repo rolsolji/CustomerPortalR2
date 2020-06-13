@@ -1,0 +1,55 @@
+@import "~simplebar/dist/simplebar.css";
+@import "~highlight.js/styles/androidstudio.css";
+// Vex Core
+@import "./@vex/styles/core";
+
+/*
+  You can override any CSS Variable or style here
+  Example:
+
+  :root {
+   --sidenav-background: #333333;
+  }
+
+  All possible variables can be found in @vex/styles/core or by simply inspecting the element you want to change
+  in Chrome/Firefox DevTools
+*/
+
+/**
+  Uncomment the below code and adjust the values to fit your colors, the application will automatically adjust
+ */
+:root {
+    /*--color-primary: #B50D00;
+    --color-primary-contrast: white;
+    --color-accent: yellow;
+    --color-accent: yellow;
+    --color-accent-contrast: black;
+    --color-warn: yellow;
+    --color-warn-contrast: black;*/
+    --sidenav-item-background-active: #1f2449;
+    --sidenav-toolbar-background: #1f2449;
+    --sidenav-background: #363a56;
+    --sidenav-item-icon-color-active: #B50D00;
+    --sidenav-item-dropdown-background: #363a56;
+    --sidenav-item-dropdown-background-hover: #1f2449;
+}
+
+.item[_ngcontent-ckb-c109]:hover, .item.active[_ngcontent-ckb-c109] {
+    background: var(--sidenav-item-background-active);
+    border-left-color: var(--sidenav-item-border-color-active);
+}
+
+.dropdown-header {
+    background-color: #1f2449 !important;
+}
+
+.bg-app-bar.px-6.h-16.border-b.sticky.left-0.bg-app-bar-toolbar-search {
+    background-color: unset;
+}
+
+.mat-flat-button.mat-primary, .mat-raised-button.mat-primary, .mat-fab.mat-primary, .mat-mini-fab.mat-primary {
+    background-color: #1f2449;
+}
+/*.vex-page-layout-header {
+    background-color: #1f2449 !important;
+}*/

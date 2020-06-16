@@ -7,6 +7,11 @@ import { NavigationService } from '../@vex/services/navigation.service';
 import icLayers from '@iconify/icons-ic/twotone-layers';
 import icAssigment from '@iconify/icons-ic/twotone-assignment';
 import icContactSupport from '@iconify/icons-ic/twotone-contact-support';
+import icBaselinePostAdd from '@iconify/icons-ic/baseline-post-add';
+import icBaselineListAlt from '@iconify/icons-ic/baseline-list-alt';
+import icBaselineLocationOn from '@iconify/icons-ic/baseline-location-on';
+import icBaselineDvr from '@iconify/icons-ic/baseline-dvr';
+import icOutlineFeaturePlayList from '@iconify/icons-ic/outline-featured-play-list';
 import icDateRange from '@iconify/icons-ic/twotone-date-range';
 import icChat from '@iconify/icons-ic/twotone-chat';
 import icContacts from '@iconify/icons-ic/twotone-contacts';
@@ -121,7 +126,7 @@ export class AppComponent {
           {
             type: 'dropdown',
             label: 'Add Shipment',
-            icon: icContactSupport,
+            icon: icBaselinePostAdd,
             children: [
               {
                 type: 'link',
@@ -138,7 +143,7 @@ export class AppComponent {
             {
                 type: 'dropdown',
                 label: 'Shipment Board',
-                icon: icContactSupport,
+                icon: icBaselineListAlt,
                 children: [
                     {
                         type: 'link',
@@ -156,7 +161,7 @@ export class AppComponent {
             type: 'link',
             label: 'Location',
             route: '/apps/calendar',
-            icon: icDateRange,
+            icon: icBaselineLocationOn,
             badge: {
               value: '12',
               bgClass: 'bg-deep-purple',
@@ -167,7 +172,7 @@ export class AppComponent {
             type: 'link',
             label: 'Products',
             route: '/apps/chat',
-            icon: icChat,
+            icon: icBaselineDvr,
             badge: {
               value: '16',
               bgClass: 'bg-cyan',
@@ -177,7 +182,7 @@ export class AppComponent {
           {
             type: 'dropdown',
             label: 'Reports',
-            icon: icPersonOutline,
+            icon: icOutlineFeaturePlayList,
             children: [
               {
                 type: 'link',

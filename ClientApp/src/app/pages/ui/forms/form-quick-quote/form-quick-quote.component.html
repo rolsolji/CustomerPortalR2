@@ -7,8 +7,8 @@
 </vex-secondary-toolbar>
 
 
-<div [@stagger]="true" class="p-gutter" vexContainer>
-  <div class="mt-5" fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="10px">
+<div [@stagger]="true" class="p-gutter qcForms" vexContainer>
+  <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="10px">
     <div @fadeInUp class="card" fxFlex="50%">
       <div fxLayout="column">
         <mat-accordion class="example-headers-align" multi>
@@ -32,10 +32,10 @@
   
               <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="5px">
                 <div fxFlex="50%">
-                  <mat-form-field>
+                  <mat-form-field fxFlex="none">
                     <mat-label>Country</mat-label>
                     <mat-select>
-                      <mat-option>United States Of America</mat-option>
+                      <mat-option value="United States Of America">United States Of America</mat-option>                      
                     </mat-select>
                   </mat-form-field>
 
@@ -79,7 +79,7 @@
               </mat-panel-description>
             </mat-expansion-panel-header>
   
-            <div class="px-6 py-4" fxLayout="column">
+            <div fxLayout="column">
               <div class="py-2" fxLayout.sm="column" fxLayoutGap="16px">
                 <mat-checkbox [checked]="false" color="warn">Commercial</mat-checkbox>
                 <mat-checkbox [checked]="false" color="warn">Residential</mat-checkbox>
@@ -90,22 +90,31 @@
                 <mat-checkbox [checked]="false" color="warn">Guarantee</mat-checkbox>                
               </div>
 
-              <mat-form-field>
-                <mat-label>Country</mat-label>
-                <mat-select>
-                  <mat-option>United States Of America</mat-option>
-                </mat-select>
-              </mat-form-field>
-  
-              <mat-form-field>
-                <mat-label>Postal Code</mat-label>
-                <input matInput required>
-              </mat-form-field>
-  
-              <mat-form-field>
-                <mat-label>State</mat-label>
-                <input matInput>
-              </mat-form-field>
+              <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="5px">
+                <div fxFlex="50%">
+                  <mat-form-field fxFlex="none">
+                    <mat-label>Country</mat-label>
+                    <mat-select>
+                      <mat-option value="United States Of America">United States Of America</mat-option>                      
+                    </mat-select>
+                  </mat-form-field>
+
+                </div>
+                <div fxFlex="50%">
+                  <mat-form-field>
+                    <mat-label>Postal Code</mat-label>
+                    <input matInput required>
+                  </mat-form-field>
+                </div>                                 
+              </div>
+              <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="5px">                
+                <div fxFlex="50%">
+                  <mat-form-field>
+                    <mat-label>State</mat-label>
+                    <input matInput>
+                  </mat-form-field>
+                </div>                                 
+              </div>            
   
             </div>
           </mat-expansion-panel>
@@ -123,6 +132,11 @@
             
           </mat-expansion-panel>
         </mat-accordion>
+
+        <div fxLayout="row" fxLayoutAlign="end center" fxLayoutGap="8px" class="py-2 pr-5">
+          <button mat-button type="button">Clean</button>
+          <button color="warn" mat-raised-button type="button">Get Quote</button>
+        </div>
       </div>
       
 

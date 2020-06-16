@@ -23,7 +23,7 @@ export interface CountryState {
 @Component({
   selector: 'vex-form-quick-quote',
   templateUrl: './form-quick-quote.component.html',
-  styleUrls: ['./form-quick-quote.component.scss'],
+  styleUrls: ['./form-quick-quote.component.scss'], 
   changeDetection: ChangeDetectionStrategy.OnPush,
   animations: [
     stagger60ms,

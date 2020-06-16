@@ -1,0 +1,35 @@
+.example-action-buttons {
+    padding-bottom: 20px;
+  }
+  
+  .example-headers-align .mat-expansion-panel-header-title,
+  .example-headers-align .mat-expansion-panel-header-description {
+    flex-basis: 0;
+  }
+  
+  .example-headers-align .mat-expansion-panel-header-description {
+    justify-content: space-between;
+    align-items: center;    
+  } 
+  
+  #map {
+    height: 500px;
+    width: 100%;
+   }
+
+   .example-headers-align .mat-form-field {   
+        width: 100%;
+    }
+
+    // .example-headers-align .mat-form-field {
+    //     font: 400 14px/1.0 var(--font);
+    //     letter-spacing: normal;
+    //   }
+    
+    // .expansionHeader .mat-expansion-indicator::after {
+    //     border-color: red;
+    // }    
+
+    .qcForms{
+        padding: 0.5rem;
+    }    

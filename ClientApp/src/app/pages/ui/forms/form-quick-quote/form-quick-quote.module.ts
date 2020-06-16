@@ -20,6 +20,7 @@ import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { SecondaryToolbarModule } from '../../../../../@vex/components/secondary-toolbar/secondary-toolbar.module';
 import { BreadcrumbsModule } from '../../../../../@vex/components/breadcrumbs/breadcrumbs.module';
 import { ContainerModule } from '../../../../../@vex/directives/container/container.module';
+import { MatExpansionModule } from '@angular/material/expansion';
 
 
 @NgModule({
@@ -43,7 +44,8 @@ import { ContainerModule } from '../../../../../@vex/directives/container/contai
     MatSlideToggleModule,
     SecondaryToolbarModule,
     BreadcrumbsModule,
-    ContainerModule
+    ContainerModule,
+    MatExpansionModule
   ]
 })
 export class FormQuickQuoteModule {

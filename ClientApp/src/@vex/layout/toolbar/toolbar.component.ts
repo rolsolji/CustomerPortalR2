@@ -27,7 +27,7 @@ import { FormControl } from '@angular/forms';
   styleUrls: ['./toolbar.component.scss']
 })
 export class ToolbarComponent implements OnInit {
-
+  
   @Input() mobileQuery: boolean;
 
   @Input()
@@ -64,6 +64,7 @@ export class ToolbarComponent implements OnInit {
 
   ngOnInit() {
   }
+
 
   openQuickpanel() {
     this.layoutService.openQuickpanel();

@@ -1,11 +1,10 @@
-<vex-secondary-toolbar current="Quick Quote">
+<!-- <vex-secondary-toolbar current="Quick Quote">
   <vex-breadcrumbs [crumbs]="['Shipment', 'Quick Quote']" fxFlex="auto"></vex-breadcrumbs>
 
   <button class="ml-2" color="primary" mat-icon-button type="button">
     <mat-icon [icIcon]="icMoreVert"></mat-icon>
   </button>
-</vex-secondary-toolbar>
-
+</vex-secondary-toolbar> -->
 
 <div [@stagger]="true" class="p-gutter qcForms" vexContainer>
   <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="10px">
@@ -15,10 +14,10 @@
           <mat-expansion-panel [expanded]="true">
             <mat-expansion-panel-header class="expansionHeader">
               <mat-panel-title>
-                Origen
+                Origin
               </mat-panel-title>
               <mat-panel-description>
-                Origen details
+                Origin details
               </mat-panel-description>
             </mat-expansion-panel-header>
   
@@ -134,8 +133,8 @@
         </mat-accordion>
 
         <div fxLayout="row" fxLayoutAlign="end center" fxLayoutGap="8px" class="py-2 pr-5">
-          <button mat-button type="button">Clean</button>
-          <button color="warn" mat-raised-button type="button">Get Quote</button>
+          <button (click)="clearQuoteAndFields()" mat-button type="button">Clear</button>
+          <button (click)="getQuote()" color="warn" mat-raised-button type="button">Get Quote</button>
         </div>
       </div>
       
@@ -146,7 +145,8 @@
       <div fxLayout="column">
         <!-- <div #mapContainer id="map"></div> -->
         <div class="fill-current text-center">
-          <img src="../../../../../assets/img/demo/R2TestImage.png">
+          
+          <img [src]="rightPanelImage" >
         </div>
       </div>      
     </div>

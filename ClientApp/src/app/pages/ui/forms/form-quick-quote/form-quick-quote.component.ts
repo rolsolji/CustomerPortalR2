@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit, ViewChild, ElementRef } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit, ViewChild, ElementRef, Input } from '@angular/core';
 import icVisibility from '@iconify/icons-ic/twotone-visibility';
 import icVisibilityOff from '@iconify/icons-ic/twotone-visibility-off';
 import icSmartphone from '@iconify/icons-ic/twotone-smartphone';
@@ -31,7 +31,7 @@ export interface CountryState {
   ]
 })
 export class FormQuickQuoteComponent implements OnInit {
-
+  
   selectCtrl: FormControl = new FormControl();
   inputType = 'password';
   visible = false;
@@ -45,6 +45,8 @@ export class FormQuickQuoteComponent implements OnInit {
   icVisibility = icVisibility;
   icVisibilityOff = icVisibilityOff;
   icMoreVert = icMoreVert;
+
+  @Input() currentpage: string;
 
   stateCtrl = new FormControl();
   states: CountryState[] = [
@@ -107,6 +109,15 @@ export class FormQuickQuoteComponent implements OnInit {
   // ngAfterViewInit() {
   //   this.mapInitializer();
   // }
+  rightPanelImage: any = "../../../../../assets/img/demo/R2TestImage.png";
+
+  getQuote() {
+    this.rightPanelImage = "../../../../../assets/img/demo/TestImageRates.png";
+  }
+
+  clearQuoteAndFields(){
+    this.rightPanelImage = "../../../../../assets/img/demo/R2TestImage.png";
+  }
 
   togglePassword() {
     if (this.visible) {
@@ -123,6 +134,6 @@ export class FormQuickQuoteComponent implements OnInit {
   filterStates(name: string) {
     return this.states.filter(state => state.name.toLowerCase().indexOf(name.toLowerCase()) === 0);
   }
-
   
+
 }

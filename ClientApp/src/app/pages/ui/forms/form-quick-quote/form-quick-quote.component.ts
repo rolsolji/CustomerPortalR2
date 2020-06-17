@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit, ViewChild, ElementRef } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit, ViewChild, ElementRef, Input, Output, EventEmitter } from '@angular/core';
 import icVisibility from '@iconify/icons-ic/twotone-visibility';
 import icVisibilityOff from '@iconify/icons-ic/twotone-visibility-off';
 import icSmartphone from '@iconify/icons-ic/twotone-smartphone';
@@ -13,12 +13,32 @@ import { fadeInUp400ms } from '../../../../../@vex/animations/fade-in-up.animati
 import { stagger60ms } from '../../../../../@vex/animations/stagger.animation';
 import icMoreVert from '@iconify/icons-ic/twotone-more-vert';
 import {MatAccordion} from '@angular/material/expansion';
+//import {products,productFeatures} from './product';
 
 export interface CountryState {
   name: string;
   population: string;
   flag: string;
 }
+
+export interface productFeatures{
+  id: number | null;
+  pallet:string,
+  pieces:string,
+  package:string
+  description:string
+}
+
+
+export const products: productFeatures[] = [
+  {
+      id:1,
+      pallet: "",
+      pieces: "",
+      package:"",
+      description: ""
+  }
+];
 
 @Component({
   selector: 'vex-form-quick-quote',
@@ -30,6 +50,7 @@ export interface CountryState {
     fadeInUp400ms
   ]
 })
+
 export class FormQuickQuoteComponent implements OnInit {
 
   selectCtrl: FormControl = new FormControl();
@@ -124,5 +145,48 @@ export class FormQuickQuoteComponent implements OnInit {
     return this.states.filter(state => state.name.toLowerCase().indexOf(name.toLowerCase()) === 0);
   }
 
-  
+  @Input() childProductField: productFeatures;
+  @Output() parentProductFields = new EventEmitter<productFeatures>();
+
+  productField: productFeatures = {
+    id:1,
+    pallet: '',
+    pieces: '',
+    package:'',
+    description: ''
+  }
+
+  products: productFeatures[] = [
+    {
+      id:1,
+      pallet: '',
+      pieces: '',
+      package:'',
+      description: ''
+    }
+  ]
+
+  addNewProdField(index: number): void {
+    let prod: productFeatures =  {
+      "id":2,
+      "pallet": "",
+      "pieces": "",
+      "package": "",
+      "description":""
+    } ;
+    
+    this.products.push(prod);
+    console.log(`In method  addNewProdField field index is ${index} and field is ${JSON.stringify(JSON.stringify( this.productField))}`);
+    this.parentProductFields.emit(this.productField);
+
+  }
+
+  removeNewProdField(index: number): void {
+    if (index != 0)
+    {
+      this.products.splice(index, 1);
+      console.log(`In method  removeNewProdField field index is ${index}`);
+      this.parentProductFields.emit(this.productField);  
+    }
+  }
 }

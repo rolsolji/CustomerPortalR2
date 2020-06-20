@@ -131,20 +131,18 @@
             <ng-template ngFor let-prod [ngForOf]="products" let-i="index">
               <div fxLayout="column" class="pt-5">
                 <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="5px">
-                  <div fxFlex="30%">
+                  <div fxFlex="15%">
                     <mat-form-field fxFlex="none">
                       <mat-label>Pallet</mat-label>
-                      <input matInput>
+                      <input matInput type="number" maxlength="4">
                     </mat-form-field>
-  
                   </div>
-                  <div fxFlex="30%">
+                  <div fxFlex="15%">
                     <mat-form-field>
                       <mat-label>Pieces</mat-label>
-                      <input matInput>
+                      <input matInput type="number" maxlength="4">
                     </mat-form-field>
                   </div>   
-                  
                   <div fxFlex="40%">
                     <mat-form-field>
                       <mat-label>Packages</mat-label>
@@ -154,56 +152,7 @@
                       </mat-select>
                     </mat-form-field>
                   </div>
-                </div>
-  
-                <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="5px">
-                  <div fxFlex="70%">
-                    <mat-form-field>
-                      <mat-label>Description</mat-label>
-                      <input matInput>
-                    </mat-form-field>
-  
-                  </div>
                   <div fxFlex="30%">
-                    <mat-form-field>
-                      <mat-label>NMFC</mat-label>
-                      <input matInput>
-                    </mat-form-field>
-                  </div>   
-                </div>
-  
-                <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="5px">                
-                  <div fxFlex="20%">
-                    <mat-form-field>
-                      <mat-label>L</mat-label>
-                      <input matInput>
-                    </mat-form-field>
-                  </div>  
-                  
-                  <div fxFlex="20%">
-                    <mat-form-field>
-                      <mat-label>W</mat-label>
-                      <input matInput>
-                    </mat-form-field>
-                  </div>  
-  
-                  <div fxFlex="20%">
-                    <mat-form-field>
-                      <mat-label>H</mat-label>
-                      <input matInput>
-                    </mat-form-field>
-                  </div>
-                  
-                  <div fxFlex="40%">
-                    <mat-form-field>
-                      <mat-label>PFC</mat-label>
-                      <input matInput>
-                    </mat-form-field>
-                  </div>
-                </div>
-  
-                <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="5px">
-                  <div fxFlex="50%">
                     <mat-form-field>
                       <mat-label>Freight Class</mat-label>
                       <mat-select>
@@ -212,27 +161,70 @@
                       </mat-select>
                     </mat-form-field>
                   </div>
+                </div>
   
-                  <div fxFlex="50%">
+                <!--<div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="5px">
+                  <div fxFlex="70%">
                     <mat-form-field>
-                      <mat-label>Total Weight</mat-label>
+                      <mat-label>Description</mat-label>
                       <input matInput>
                     </mat-form-field>
                   </div>
+                </div>-->
+  
+                <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="5px">   
+                  <div fxFlex="15%">
+                    <mat-form-field>
+                      <mat-label>NMFC</mat-label>
+                      <input matInput>
+                    </mat-form-field>
+                  </div>              
+                  <div fxFlex="15%">
+                    <mat-form-field>
+                      <mat-label>L</mat-label>
+                      <input matInput type="number" maxlength="4">
+                    </mat-form-field>
+                  </div>  
+                  <div fxFlex="15%">
+                    <mat-form-field>
+                      <mat-label>W</mat-label>
+                      <input matInput type="number" maxlength="4">
+                    </mat-form-field>
+                  </div>  
+                  <div fxFlex="15%">
+                    <mat-form-field>
+                      <mat-label>H</mat-label>
+                      <input matInput type="number" maxlength="4">
+                    </mat-form-field>
+                  </div>
+                  <div fxFlex="15%">
+                    <mat-form-field>
+                      <mat-label>PFC</mat-label>
+                      <input matInput>
+                    </mat-form-field>
+                  </div>
+                  <div fxFlex="20%">
+                    <mat-form-field>
+                      <mat-label>Total Weight</mat-label>
+                      <input matInput type="number" maxlength="4" min="1">
+                    </mat-form-field>
+                  </div>
+                  
                 </div>
   
                 <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="5px">
-                  <div fxFlex="50%" class="py-2" fxLayout.sm="column" fxLayoutGap="16px">
+
+                  <div fxFlex="50%" class="py-2" fxLayout.sm="column" fxLayoutAlign="center" fxLayoutGap="16px">
                     <mat-checkbox [checked]="false" color="warn">Stackable</mat-checkbox>
                     <mat-checkbox [checked]="false" color="warn">Hazmat</mat-checkbox>
                   </div>
-                  <div fxFlex="50%" fxLayoutAlign="end center">
+                  <div fxLayoutAlign="end center">
                     <ng-container>
-                      <button id="{{'remoeMinus' +i}}" (click)="removeNewProdField(i)" 
+                      <button id="{{'remoeMinus'+i}}" (click)="removeNewProdField(i)" 
                               mat-button type="button">Remove</button>
                     </ng-container>
                     <ng-container>
-                      <button id="{{'addrec'+ i }}" (click)="addNewProdField(i)" 
+                      <button id="{{'addrec'+i}}" (click)="addNewProdField(i)" 
                               mat-raised-button type="button">Add New</button>
                     </ng-container>
                   </div>

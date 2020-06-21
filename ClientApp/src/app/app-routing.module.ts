@@ -6,11 +6,14 @@ import { CustomLayoutComponent } from './custom-layout/custom-layout.component';
 const childrenRoutes: VexRoutes = [   
   {
     path: 'dashboards/analytics',
-    redirectTo: '/'
+    loadChildren: () => import('./pages/dashboards/dashboard-analytics/dashboard-analytics.module').then(m => m.DashboardAnalyticsModule),
+    //redirectTo: '/'
   },
   {
+      // path: '',            
+      // loadChildren: () => import('./pages/dashboards/dashboard-analytics/dashboard-analytics.module').then(m => m.DashboardAnalyticsModule),
       path: '',            
-      loadChildren: () => import('./pages/dashboards/dashboard-analytics/dashboard-analytics.module').then(m => m.DashboardAnalyticsModule),
+      loadChildren: () => import('./pages/ui/forms/form-quick-quote/form-quick-quote.module').then(m => m.FormQuickQuoteModule),
   },
   {
     path: 'apps',

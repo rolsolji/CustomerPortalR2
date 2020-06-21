@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit, ViewChild, ElementRef, Input, Output, EventEmitter } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit, ViewChild, ElementRef, Input, Output, EventEmitter, HostListener } from '@angular/core';
 import icVisibility from '@iconify/icons-ic/twotone-visibility';
 import icVisibilityOff from '@iconify/icons-ic/twotone-visibility-off';
 import icSmartphone from '@iconify/icons-ic/twotone-smartphone';
@@ -13,6 +13,7 @@ import { fadeInUp400ms } from '../../../../../@vex/animations/fade-in-up.animati
 import { stagger60ms } from '../../../../../@vex/animations/stagger.animation';
 import icMoreVert from '@iconify/icons-ic/twotone-more-vert';
 import {MatAccordion} from '@angular/material/expansion';
+import { RatesService } from '../../../../rates.service';
 //import {products,productFeatures} from './product';
 
 export interface CountryState {
@@ -52,7 +53,7 @@ export const products: productFeatures[] = [
 })
 
 export class FormQuickQuoteComponent implements OnInit {
-  
+  @HostListener('window:scroll')
   selectCtrl: FormControl = new FormControl();
   inputType = 'password';
   visible = false;
@@ -118,24 +119,64 @@ export class FormQuickQuoteComponent implements OnInit {
     this.mapOptions);
    }  
 
-  
-  constructor(private cd: ChangeDetectorRef) { }
+   rates: Object;
+
+  constructor(private cd: ChangeDetectorRef, private _http: RatesService) { }
 
   ngOnInit() {
-    
+   
   }
 
   // ngAfterViewInit() {
   //   this.mapInitializer();
   // }
+  isShow: boolean;
+  topPosToStartShowing = 100;
+  checkScroll() {
+      
+    // window의 scroll top
+    // Both window.pageYOffset and document.documentElement.scrollTop returns the same result in all the cases. window.pageYOffset is not supported below IE 9.
+
+    const scrollPosition = window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop || 0;
+
+    console.log('[scroll]', scrollPosition);
+    
+    if (scrollPosition >= this.topPosToStartShowing) {
+      this.isShow = true;
+    } else {
+      this.isShow = false;
+    }
+  }
+
   rightPanelImage: any = "../../../../../assets/img/demo/R2TestImage.png";
 
   getQuote() {
     this.rightPanelImage = "../../../../../assets/img/demo/TestImageRates.png";
+
+    // this._http.getRates().subscribe(data => {
+    //   this.rates = data;
+    // });
+
+    this.rates = this._http.getRates();
+    console.log(this.rates);
+    // if (this.rates.propertyIsEnumerable.length > 0){
+
+    // }
+
+    window.scroll({ 
+      top: 0, 
+      left: 0, 
+      behavior: 'smooth' 
+    });
   }
 
   clearQuoteAndFields(){
     this.rightPanelImage = "../../../../../assets/img/demo/R2TestImage.png";
+    window.scroll({ 
+      top: 0, 
+      left: 0, 
+      behavior: 'smooth' 
+    });
   }
 
   togglePassword() {

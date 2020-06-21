@@ -68,7 +68,7 @@
   
           </mat-expansion-panel>
   
-          <mat-expansion-panel [expanded]="true">
+          <mat-expansion-panel [expanded]="false">
             <mat-expansion-panel-header>
               <mat-panel-title>
                 Destination
@@ -255,7 +255,13 @@
       <div fxLayout="column">
         <!-- <div #mapContainer id="map"></div> -->
         <div class="fill-current text-center">
-          
+          <!-- <ng-template [ngIf]="this.rates.propertyIsEnumerable.length > 0" [ngIfElse]="noRates" >
+            <p>Rates found = {{this.rates.propertyIsEnumerable.length}}</p>
+            <img [src]="rightPanelImage" >
+          </ng-template>
+          <ng-template #noRates >
+              <p>No rates found.</p>
+          </ng-template> -->
           <img [src]="rightPanelImage" >
         </div>
       </div>      

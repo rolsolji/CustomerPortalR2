@@ -109,7 +109,7 @@ export class AppComponent {
       {
         type: 'link',
         label: 'Dashboard',
-            route: '/',
+            route: '/dashboards/analytics',
         icon: icLayers,
         routerLinkActiveOptions: { exact: true }
       },
@@ -120,7 +120,7 @@ export class AppComponent {
           {
             type: 'link',
             label: 'Quick Quote',
-            route: '/ui/forms/form-quick-quote',
+            route: '/',
             icon: icAssigment
           },          
           {
@@ -131,12 +131,12 @@ export class AppComponent {
               {
                 type: 'link',
                 label: 'LTL/TL Shipment',
-                route: '/apps/help-center/getting-started'
+                route: '/apps/help-center/getting-started2'
               },
               {
                 type: 'link',
                 label: 'TL Spot Quote',
-                route: '/apps/help-center/pricing'
+                route: '/apps/help-center/pricing2'
               }             
             ]
             },           
@@ -148,19 +148,19 @@ export class AppComponent {
                     {
                         type: 'link',
                         label: 'LTL/TL Shipment Board',
-                        route: '/apps/help-center/getting-started'
+                        route: '/apps/help-center/getting-started2'
                     },
                     {
                         type: 'link',
                         label: 'TL Spot Quote Board',
-                        route: '/apps/help-center/pricing'
+                        route: '/apps/help-center/pricing2'
                     }
                 ]
             },
           {
             type: 'link',
             label: 'Location',
-            route: '/apps/calendar',
+            route: '/apps/calendar2',
             icon: icBaselineLocationOn,
             badge: {
               value: '12',
@@ -171,7 +171,7 @@ export class AppComponent {
           {
             type: 'link',
             label: 'Products',
-            route: '/apps/chat',
+            route: '/apps/chat2',
             icon: icBaselineDvr,
             badge: {
               value: '16',
@@ -187,23 +187,23 @@ export class AppComponent {
               {
                 type: 'link',
                 label: 'Key Performance Indicator',
-                route: '/apps/social',
+                route: '/apps/social2',
                 routerLinkActiveOptions: { exact: true }
               },
               {
                 type: 'link',
                 label: 'Carrier Performance',
-                route: '/apps/social/timeline'
+                route: '/apps/social/timeline2'
                 },
                 {
                     type: 'link',
                     label: 'Shiment History',
-                    route: '/apps/social/timeline'
+                    route: '/apps/social/timeline2'
                 },
                 {
                     type: 'link',
                     label: 'Daily Activity',
-                    route: '/apps/social/timeline'
+                    route: '/apps/social/timeline2'
                 }
             ]
           },

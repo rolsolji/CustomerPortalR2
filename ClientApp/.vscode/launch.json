@@ -5,16 +5,22 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "type": "node",
+            "type": "chrome",
             "request": "launch",
-            "name": "Iniciar el programa",
+            "name": "Launch Chrome against localhost",
+            "url": "http://localhost:4200",
+            "webRoot": "${workspaceFolder}",
             "skipFiles": [
                 "<node_internals>/**"
             ],
-            "program": "${C:\Desarrollo\Tests\CustomerPortalSaasR2\ClientApp}\\--verbose",
-            "outFiles": [
-                "${C:\Desarrollo\Tests\CustomerPortalSaasR2\ClientApp}/**/*.js"
-            ]
+            
+        },
+        {
+            "type": "chrome",
+            "request": "attach",
+            "name": "Attach to Chrome",
+            "port": 9222,
+            "webRoot": "${workspaceFolder}"
         }
     ]
 }

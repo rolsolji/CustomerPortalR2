@@ -13,8 +13,10 @@ import { fadeInUp400ms } from '../../../../../@vex/animations/fade-in-up.animati
 import { stagger60ms } from '../../../../../@vex/animations/stagger.animation';
 import icMoreVert from '@iconify/icons-ic/twotone-more-vert';
 import {MatAccordion} from '@angular/material/expansion';
+import { Observable } from 'rxjs/Observable';
+import { HttpErrorResponse } from '@angular/common/http';
 import { RatesService } from '../../../../rates.service';
-//import {products,productFeatures} from './product';
+
 
 export interface CountryState {
   name: string;
@@ -120,8 +122,12 @@ export class FormQuickQuoteComponent implements OnInit {
    }  
 
    rates: Object;
+   ratesFiltered = [];
+   countries: Object;
+   ratesCounter: number = 0;   
+   OriginPostalCode: string = 'Hello Test';
 
-  constructor(private cd: ChangeDetectorRef, private _http: RatesService) { }
+  constructor(private cd: ChangeDetectorRef, private ratesService: RatesService) { }
 
   ngOnInit() {
    
@@ -153,15 +159,39 @@ export class FormQuickQuoteComponent implements OnInit {
   getQuote() {
     this.rightPanelImage = "../../../../../assets/img/demo/TestImageRates.png";
 
-    // this._http.getRates().subscribe(data => {
-    //   this.rates = data;
-    // });
+    // let objRate: Object;
+    // this.ratesService.postRates(objRate).subscribe(res => { 
+    //   //let artcl: Article = res.body;
+    //   console.log(res.body);
+    //   console.log(res.headers.get('Content-Type'));		
+    //   //this.loadAllArticles();	  
+    // },
+    //   (err: HttpErrorResponse) => {
+    //         if (err.error instanceof Error) {
+    //           //A client-side or network error occurred.				 
+    //           console.log('An error occurred:', err.error.message);
+    //         } else {
+    //           //Backend returns unsuccessful response codes such as 404, 500 etc.				 
+    //           console.log('Backend returned status code: ', err.status);
+    //           console.log('Response body:', err.error);
+    //         }
+    //       }
+    //   );
 
-    this.rates = this._http.getRates();
-    console.log(this.rates);
-    // if (this.rates.propertyIsEnumerable.length > 0){
-
-    // }
+    
+    this.ratesService.getCountries().subscribe(data => 
+      {this.countries = data;
+      console.log(this.countries);
+    });
+     
+    
+    this.rates = this.ratesService.getRates();
+    if (this.rates != null && this.rates.length > 0){
+      this.ratesFiltered = this.rates.filter(rate => rate.CarrierCost > 0);
+    }
+    
+    this.ratesCounter = this.ratesFiltered.length;
+    console.log(this.rates);    
 
     window.scroll({ 
       top: 0, 

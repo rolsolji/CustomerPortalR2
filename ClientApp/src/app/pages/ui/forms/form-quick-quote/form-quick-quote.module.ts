@@ -11,7 +11,7 @@ import { IconModule } from '@visurel/iconify-angular';
 import { MatSelectModule } from '@angular/material/select';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
-import { ReactiveFormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { MatSliderModule } from '@angular/material/slider';
 import { MatCheckboxModule } from '@angular/material/checkbox';
@@ -36,6 +36,7 @@ import { MatExpansionModule } from '@angular/material/expansion';
     MatSelectModule,
     MatDatepickerModule,
     MatNativeDateModule,
+    FormsModule,
     ReactiveFormsModule,
     MatAutocompleteModule,
     MatSliderModule,
@@ -45,7 +46,7 @@ import { MatExpansionModule } from '@angular/material/expansion';
     SecondaryToolbarModule,
     BreadcrumbsModule,
     ContainerModule,
-    MatExpansionModule
+    MatExpansionModule    
   ]
 })
 export class FormQuickQuoteModule {

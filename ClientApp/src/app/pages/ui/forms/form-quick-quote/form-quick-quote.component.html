@@ -42,7 +42,7 @@
                 <div fxFlex="50%">
                   <mat-form-field>
                     <mat-label>Postal Code</mat-label>
-                    <input matInput required>
+                    <input [(ngModel)]="OriginPostalCode" name="postalcodetest" matInput required >
                   </mat-form-field>
                 </div>                                 
               </div>
@@ -247,14 +247,49 @@
       <div fxLayout="column">
         <!-- <div #mapContainer id="map"></div> -->
         <div class="fill-current text-center">
-          <!-- <ng-template [ngIf]="this.rates.propertyIsEnumerable.length > 0" [ngIfElse]="noRates" >
-            <p>Rates found = {{this.rates.propertyIsEnumerable.length}}</p>
-            <img [src]="rightPanelImage" >
+          <ng-template [ngIf]="ratesCounter > 0" [ngIfElse]="noRates" > 
+            <div fxLayout="row" fxLayoutGap="8px" class="py-2">
+
+            </div>                
+            <div *ngFor="let rate of ratesFiltered">
+              <div fxLayout="row" fxLayoutGap="8px" class="py-2">
+                <div fxFlex="10%" class="py-2 freightRate-carrierInfo" fxLayout.sm="column" fxLayoutAlign="center" fxLayoutGap="16px">
+                  logo
+                </div>
+                <div fxFlex="15%" class="py-2 freightRate-carrierInfo" fxLayout.sm="column" fxLayoutAlign="center" fxLayoutGap="16px">
+                  <div fxFlex="auto">
+                    <div class="px-6 py-4" fxLayout="column">
+                      <div class="CarrierName">
+                        {{rate.CarrierName}} 
+                      </div>
+                      <div class="inlineButton">
+                        {{rate.ServiceLevel}} 
+                      </div>
+                    </div>                    
+                  </div>                  
+                </div>
+                <div fxFlex="35%" class="py-2" fxLayout.sm="column" fxLayoutAlign="center" fxLayoutGap="16px">
+  
+                </div>
+                <div fxFlex="20%" class="py-2" fxLayout.sm="column" fxLayoutAlign="center" fxLayoutGap="16px">
+                    <span class="numeral numeral--large">
+                      <span class="numeral-affix numeral-affix--prefix">$</span>
+                      {{rate.CarrierCost}}
+                    </span>
+                </div>
+                <div fxFlex="20%" class="py-2" fxLayout.sm="column" fxLayoutAlign="center" fxLayoutGap="16px">
+                  <button color="warn" class="button--small" mat-raised-button type="button">Book</button>
+                </div>
+              </div>    
+                       
+              
+           </div>
           </ng-template>
           <ng-template #noRates >
               <p>No rates found.</p>
-          </ng-template> -->
-          <img [src]="rightPanelImage" >
+              <img [src]="rightPanelImage" >
+          </ng-template>
+         
         </div>
       </div>      
     </div>

@@ -244,21 +244,21 @@
     </div>
 
     <div @fadeInUp class="card" fxFlex="50%">
-      <div fxLayout="column">
+      <div>
         <!-- <div #mapContainer id="map"></div> -->
         <div class="fill-current text-center">
           <ng-template [ngIf]="ratesCounter > 0" [ngIfElse]="noRates" > 
-            <div fxLayout="row" fxLayoutGap="8px" class="py-2">
-
+            <div fxLayout="row" fxLayoutGap="8px" class="py-2 freightRatesView">
+                <div><h2 class="allRatesTab-labelText">ALL QUOTES ({{ratesCounter}})</h2></div>
             </div>                
             <div *ngFor="let rate of ratesFiltered">
-              <div fxLayout="row" fxLayoutGap="8px" class="py-2">
-                <div fxFlex="10%" class="py-2 freightRate-carrierInfo" fxLayout.sm="column" fxLayoutAlign="center" fxLayoutGap="16px">
-                  logo
+              <div class="call-outs-container">
+                <div class="call-out freightRate-carrierInfo">
+                  <mat-icon [icIcon]="icBaselineImageNotSupported"></mat-icon>
                 </div>
-                <div fxFlex="15%" class="py-2 freightRate-carrierInfo" fxLayout.sm="column" fxLayoutAlign="center" fxLayoutGap="16px">
-                  <div fxFlex="auto">
-                    <div class="px-6 py-4" fxLayout="column">
+                <div class="call-out freightRate-carrierInfo">
+                  <div>
+                    <div fxLayout="column">
                       <div class="CarrierName">
                         {{rate.CarrierName}} 
                       </div>
@@ -268,16 +268,21 @@
                     </div>                    
                   </div>                  
                 </div>
-                <div fxFlex="35%" class="py-2" fxLayout.sm="column" fxLayoutAlign="center" fxLayoutGap="16px">
-  
+                <div class="call-out freightRate-rateInfo">
+                  <div fxFlex="10%" class="freightRate-rateInfo-icon">
+                    <mat-icon [icIcon]="icTwotoneCalendarToday"></mat-icon>                     
+                  </div>
+                  <div fxFlex="90%" class="freightRate-rateInfo-text">                    
+                     Est. {{rate.TransitTime}} Transit Day(s)
+                  </div>
                 </div>
-                <div fxFlex="20%" class="py-2" fxLayout.sm="column" fxLayoutAlign="center" fxLayoutGap="16px">
+                <div class="call-out">
                     <span class="numeral numeral--large">
                       <span class="numeral-affix numeral-affix--prefix">$</span>
                       {{rate.CarrierCost}}
                     </span>
                 </div>
-                <div fxFlex="20%" class="py-2" fxLayout.sm="column" fxLayoutAlign="center" fxLayoutGap="16px">
+                <div class="call-out">
                   <button color="warn" class="button--small" mat-raised-button type="button">Book</button>
                 </div>
               </div>    
@@ -285,8 +290,7 @@
               
            </div>
           </ng-template>
-          <ng-template #noRates >
-              <p>No rates found.</p>
+          <ng-template #noRates >              
               <img [src]="rightPanelImage" >
           </ng-template>
          

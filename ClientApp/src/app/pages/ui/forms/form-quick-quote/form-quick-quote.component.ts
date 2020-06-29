@@ -19,6 +19,9 @@ import { RatesService } from '../../../../rates.service';
 import { HttpService } from '../../../../common/http.service';
 import { String, StringBuilder } from 'typescript-string-operations';
 import { strict } from 'assert';
+import icTwotoneCalendarToday from '@iconify/icons-ic/twotone-calendar-today';
+import icBaselineImageNotSupported from '@iconify/icons-ic/baseline-image-not-supported';
+
 
 export interface CountryState {
   name: string;
@@ -73,6 +76,8 @@ export class FormQuickQuoteComponent implements OnInit {
   icVisibility = icVisibility;
   icVisibilityOff = icVisibilityOff;
   icMoreVert = icMoreVert;
+  icTwotoneCalendarToday = icTwotoneCalendarToday;
+  icBaselineImageNotSupported = icBaselineImageNotSupported;
 
   stateCtrl = new FormControl();
   states: CountryState[] = [

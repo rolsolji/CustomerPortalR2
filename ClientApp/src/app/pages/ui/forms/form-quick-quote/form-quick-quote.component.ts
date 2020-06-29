@@ -13,10 +13,12 @@ import { fadeInUp400ms } from '../../../../../@vex/animations/fade-in-up.animati
 import { stagger60ms } from '../../../../../@vex/animations/stagger.animation';
 import icMoreVert from '@iconify/icons-ic/twotone-more-vert';
 import {MatAccordion} from '@angular/material/expansion';
-import { Observable } from 'rxjs/Observable';
+//import { Observable } from 'rxjs/Observable';
 import { HttpErrorResponse } from '@angular/common/http';
 import { RatesService } from '../../../../rates.service';
-
+import { HttpService } from '../../../../common/http.service';
+import { String, StringBuilder } from 'typescript-string-operations';
+import { strict } from 'assert';
 
 export interface CountryState {
   name: string;
@@ -59,6 +61,8 @@ export class FormQuickQuoteComponent implements OnInit {
   selectCtrl: FormControl = new FormControl();
   inputType = 'password';
   visible = false;
+
+  keyId: string = "1593399730488";
 
   icPhone = icPhone;
   icCamera = icCamera;
@@ -123,14 +127,18 @@ export class FormQuickQuoteComponent implements OnInit {
 
    rates: Object;
    ratesFiltered = [];
-   countries: Object;
+   Countries: ["USA","Canada","CR","MEX"];
+   Country:string = "USA";
    ratesCounter: number = 0;   
-   OriginPostalCode: string = 'Hello Test';
 
-  constructor(private cd: ChangeDetectorRef, private ratesService: RatesService) { }
+  constructor(
+    private cd: ChangeDetectorRef, 
+    private ratesService: RatesService,
+    private httpService : HttpService
+    ) { }
 
   ngOnInit() {
-   
+    
   }
 
   // ngAfterViewInit() {
@@ -178,17 +186,17 @@ export class FormQuickQuoteComponent implements OnInit {
     //       }
     //   );
 
-    
-    this.ratesService.getCountries().subscribe(data => 
-      {this.countries = data;
-      console.log(this.countries);
-    });
+
+    //this.httpService.getContryList(this.keyId).subscribe(data => 
+    //  {this.countries = data;
+    //  console.log(this.countries);
+    //});
      
     
     this.rates = this.ratesService.getRates();
-    if (this.rates != null && this.rates.length > 0){
-      this.ratesFiltered = this.rates.filter(rate => rate.CarrierCost > 0);
-    }
+    //if (this.rates != null && this.rates.length > 0){
+    //  this.ratesFiltered = this.rates.filter(rate => rate.CarrierCost > 0);
+    //}
     
     this.ratesCounter = this.ratesFiltered.length;
     console.log(this.rates);    
@@ -224,6 +232,51 @@ export class FormQuickQuoteComponent implements OnInit {
   filterStates(name: string) {
     return this.states.filter(state => state.name.toLowerCase().indexOf(name.toLowerCase()) === 0);
   }
+
+  //#region Origin Fields
+
+  postalData: Object;
+  OriginPostalCode: string;
+  OriginStateName: String;
+
+  validateOriginPostalCode(){
+    this.httpService.getPostalDataByPostalCode(this.OriginPostalCode,'1','1593058682293').subscribe(data => {
+      this.postalData = data;
+      console.log(this.postalData);
+      if (this.postalData != null)
+      {
+        this.OriginStateName = this.postalData[0].StateName;
+        this.OriginPostalCode = String.Format("{0}-{1}",this.OriginPostalCode,this.postalData[0].CityName);
+      }
+      else
+      {
+        this.OriginStateName = String.Empty;
+        this.OriginPostalCode = String.Empty;
+      }
+    });
+  }
+  //#endregion
+
+  //#region Destination Fields
+  DestinationPostalCode: string;
+  DestinationStateName: String;
+
+  validateDestinationPostalCode(){
+    this.httpService.getPostalDataByPostalCode(this.DestinationPostalCode,'1','1593058682293').subscribe(data => {
+      this.postalData = data;
+      if (this.postalData != null)
+      {
+        this.DestinationStateName = this.postalData[0].StateName;
+        this.DestinationPostalCode = String.Format("{0}-{1}",this.DestinationPostalCode,this.postalData[0].CityName);
+      }
+      else
+      {
+        this.DestinationStateName = String.Empty;
+        this.DestinationPostalCode = String.Empty;
+      }
+    });
+  }
+  //#endregion
 
   @Input() childProductField: productFeatures;
   @Output() parentProductFields = new EventEmitter<productFeatures>();

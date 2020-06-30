@@ -24,6 +24,7 @@ import icBaselineImageNotSupported from '@iconify/icons-ic/baseline-image-not-su
 import { StringifyOptions } from 'querystring';
 
 
+
 export interface CountryState {
   name: string;
   population: string;
@@ -152,6 +153,7 @@ export class FormQuickQuoteComponent implements OnInit {
    countries: Object;
    ratesCounter: number = 0;   
    selectedCountry: string;
+   OriginPickupDate: string;
 
   constructor(
     private cd: ChangeDetectorRef, 
@@ -189,44 +191,96 @@ export class FormQuickQuoteComponent implements OnInit {
 
   rightPanelImage: any = "../../../../../assets/img/demo/R2TestImage.png";
 
-  getQuote() {
-    this.rightPanelImage = "../../../../../assets/img/demo/TestImageRates.png";
+  async getQuote() {
+    //this.rightPanelImage = "../../../../../assets/img/demo/TestImageRates.png";
 
-    let objRate: Object;
-    objRate = {
-      "ClientID":27784,"ProfileID":41887,"Products":[{"Weight":"100","ProductClass":"50","Pieces":"1","Pallets":0,"PackageTypeID":4,"Length":"48","Height":"48","Width":"48","PCF":"1.56","Status":1}],"SourcePostalCode":"60001","SourceCityID":84846,"SourceStateID":63,"SourceCountryID":1,"SourceCountry":"USA","SourceStateCode":"IL ","SourceCityName":"ALDEN                         ","DestPostalCode":"30001","DestCityID":353249,"DestStateID":11,"DestCountryID":1,"DestCountry":"USA","DestStateCode":"GA ","DestCityName":"Austell","ShipmentDate":"/Date(1592784000000)/","Accessorials":[],"AccessorialCodes":[],"TopN":10,"ServiceLevelGrops":[],"ServiceLevels":[],"ServiceLevelCodes":[],"EquipmentList":[],"IsDebug":false,"IsSuperAdmin":false,"AccessorialIDs":[],"SkeepCalculatePPS":false,"Origin":"60001,ALDEN                         ,ILLINOIS                 ","Destination":"30001,Austell,GEORGIA                  "
-     };
-    this.ratesService.postRates(objRate).subscribe(res => { 
-      //let artcl: Article = res.body;
-      console.log(res.body);
-      console.log(res.headers.get('Content-Type'));		
-      //this.loadAllArticles();	  
-    },
-      (err: HttpErrorResponse) => {
-            if (err.error instanceof Error) {
-              //A client-side or network error occurred.				 
-              console.log('An error occurred:', err.error.message);
-            } else {
-              //Backend returns unsuccessful response codes such as 404, 500 etc.				 
-              console.log('Backend returned status code: ', err.status);
-              console.log('Response body:', err.error);
-            }
-          }
-      );
+    await this.getShipmentRates();
+    //let objRate: Object;
+    // objRate = {
+    //     "ClientID": 8473,
+    //     "ProfileID": 11868,
+    //     "Products": [
+    //       {
+    //         "Weight": "1000",
+    //         "ProductClass": "50",
+    //         "Pieces": "1",
+    //         "Pallets": "1",
+    //         "Length": "48",
+    //         "Height": "48",
+    //         "Width": 48,
+    //         "PCF": "15.63"
+    //       }
+    //     ],
+    //     "SourcePostalCode": "38138",
+    //     "SourceCityID": 96663,
+    //     "SourceStateID": 1,
+    //     "SourceCountryID": 1,
+    //     "SourceCountry": "USA",
+    //     "SourceStateCode": "TN ",
+    //     "SourceCityName": "GERMANTOWN                    ",
+    //     "DestPostalCode": "60606",
+    //     "DestCityID": 90453,
+    //     "DestStateID": 63,
+    //     "DestCountryID": 1,
+    //     "DestCountry": "USA",
+    //     "DestStateCode": "IL ",
+    //     "DestCityName": "CHICAGO                       ",
+    //     "ShipmentDate": "/Date(1593388800000)/",
+    //     "Accessorials": [],
+    //     "AccessorialCodes": [],
+    //     "TopN": 10,
+    //     "ServiceLevelGrops": [],
+    //     "ServiceLevels": [],
+    //     "ServiceLevelCodes": [],
+    //     "SCAC": null,
+    //     "EquipmentList": [],
+    //     "IsDebug": false,
+    //     "IsSuperAdmin": false,
+    //     "AccessorialIDs": [],
+    //     "SkeepCalculatePPS": false,
+    //     "ProfileDescription": "**R2 BUY",
+    //     "Origin": "38138,GERMANTOWN                    ,TENNESSEE",
+    //     "Destination": "60606,CHICAGO                       ,ILLINOIS                 ",
+    //     "ShipmentStopList": []
+    //   };
 
-
-    this.httpService.getContryList(this.keyId).subscribe(data => 
-      {this.countries = data;
-      console.log(this.countries);
-    });
-         
-    this.rates = this.ratesService.getRates();
-    if (this.rates != null && this.rates.length > 0){
-      this.ratesFiltered = this.rates.filter(rate => rate.CarrierCost > 0);
-    }
     
-    this.ratesCounter = this.ratesFiltered.length;
-    console.log(this.rates);    
+
+    // this.ratesService.postRates(objRate).subscribe(res => { 
+    //   //let artcl: Article = res.body;
+    //   console.log('test rates API...');
+    //   console.log(res.body);
+    //   console.log(res.headers.get('Content-Type'));		
+    //   this.rates = res.body;
+    //   if (this.rates != null && this.rates.length > 0){
+    //     this.ratesFiltered = this.rates.filter(rate => rate.CarrierCost > 0);
+    //   }
+      
+    //   this.ratesCounter = this.ratesFiltered.length; 
+    // },
+    //   (err: HttpErrorResponse) => {
+    //         if (err.error instanceof Error) {
+    //           //A client-side or network error occurred.				 
+    //           console.log('An error occurred:', err.error.message);
+    //         } else {
+    //           //Backend returns unsuccessful response codes such as 404, 500 etc.				 
+    //           console.log('Backend returned status code: ', err.status);
+    //           console.log('Response body:', err.error);
+    //         }
+    //       }
+    //   );
+
+    
+
+
+    // this.httpService.getContryList(this.keyId).subscribe(data => 
+    //   {this.countries = data;
+    //   console.log(this.countries);
+    // });
+         
+    // this.rates = this.ratesService.getRates();
+    
+    // console.log(this.rates);    
 
     window.scroll({ 
       top: 0, 
@@ -266,16 +320,19 @@ export class FormQuickQuoteComponent implements OnInit {
   postalData: Object; // PostalData[];
   OriginPostalCode: string;
   OriginStateName: String;
+  OriginPostalData: PostalData;
 
   validateOriginPostalCode(){
     console.log(this.selectedCountry);
     this.httpService.getPostalDataByPostalCode(this.OriginPostalCode,'1',this.keyId).subscribe(data => {
       this.postalData = data;
       console.log(this.postalData);
-      if (this.postalData != null || this.postalData.length > 0) 
+      if (this.postalData != null && this.postalData.length > 0) 
       {
         this.OriginStateName = this.postalData[0].StateName;
         this.OriginPostalCode = String.Format("{0}-{1}",this.OriginPostalCode,this.postalData[0].CityName);
+
+        this.OriginPostalData = this.postalData[0];
       }
       else
       {
@@ -351,4 +408,89 @@ export class FormQuickQuoteComponent implements OnInit {
       this.parentProductFields.emit(this.productField);  
     }
   }
+
+  async getShipmentRates()
+    {
+      let pickupDate = this.OriginPickupDate;
+
+      let objRate = {
+        "ClientID": 8473,
+        "ProfileID": 11868,
+        "Products": [
+          {
+            "Weight": "1000",
+            "ProductClass": "50",
+            "Pieces": "1",
+            "Pallets": "1",
+            "Length": "48",
+            "Height": "48",
+            "Width": 48,
+            "PCF": "15.63"
+          }
+        ],
+        "SourcePostalCode": this.OriginPostalData.PostalCode,
+        "SourceCityID": this.OriginPostalData.CityID,
+        "SourceStateID": this.OriginPostalData.StateId,
+        "SourceCountryID": this.OriginPostalData.CountryId,
+        "SourceCountry": this.OriginPostalData.CountryCode,
+        "SourceStateCode": this.OriginPostalData.StateCode,
+        "SourceCityName": this.OriginPostalData.CityName,
+        "DestPostalCode": "60606",
+        "DestCityID": 90453,
+        "DestStateID": 63,
+        "DestCountryID": 1,
+        "DestCountry": "USA",
+        "DestStateCode": "IL ",
+        "DestCityName": "CHICAGO                       ",
+        "ShipmentDate": "/Date(1593388800000)/",
+        "Accessorials": [],
+        "AccessorialCodes": [],
+        "TopN": 10,
+        "ServiceLevelGrops": [],
+        "ServiceLevels": [],
+        "ServiceLevelCodes": [],
+        "SCAC": null,
+        "EquipmentList": [],
+        "IsDebug": false,
+        "IsSuperAdmin": false,
+        "AccessorialIDs": [],
+        "SkeepCalculatePPS": false,
+        "ProfileDescription": "**R2 BUY",
+        "Origin":  this.OriginPostalData.PostalCode + ',' +  this.OriginPostalData.CityName + ',' + this.OriginPostalData.StateName,
+        "Destination": "60606,CHICAGO                       ,ILLINOIS                 ",
+        "ShipmentStopList": []
+      };
+
+      // await this.ratesService.postRates(objRate).subscribe(res => { 
+      //       //let artcl: Article = res.body;
+      //       console.log('test rates API...');
+      //       console.log(res.body);
+      //       console.log(res.headers.get('Content-Type'));		
+      //       this.rates = res.body;
+      //       if (this.rates != null && this.rates.length > 0){
+      //         this.ratesFiltered = this.rates.filter(rate => rate.CarrierCost > 0);
+      //       }
+            
+      //       this.ratesCounter = this.ratesFiltered.length; 
+      //     },
+      //       (err: HttpErrorResponse) => {
+      //             if (err.error instanceof Error) {
+      //               //A client-side or network error occurred.				 
+      //               console.log('An error occurred:', err.error.message);
+      //             } else {
+      //               //Backend returns unsuccessful response codes such as 404, 500 etc.				 
+      //               console.log('Backend returned status code: ', err.status);
+      //               console.log('Response body:', err.error);
+      //             }
+      //           }
+      //       );
+
+      this.rates = await this.ratesService.postRates(objRate);
+      console.log(this.rates); 
+      if (this.rates != null && this.rates.length > 0){
+            this.ratesFiltered = this.rates.filter(rate => rate.CarrierCost > 0);
+      }
+          
+      this.ratesCounter = this.ratesFiltered.length; 
+    }
 }

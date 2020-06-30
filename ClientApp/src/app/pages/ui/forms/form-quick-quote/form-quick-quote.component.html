@@ -56,7 +56,7 @@
                 <div fxFlex="50%">
                   <mat-form-field>
                     <mat-label>Pickup Date</mat-label>
-                    <input (click)="formDatepickerRef.open()" (focus)="formDatepickerRef.open()"
+                    <input (click)="formDatepickerRef.open()" (focus)="formDatepickerRef.open()" [(ngModel)]="OriginPickupDate" name="originpickupdate"
                       [matDatepicker]="formDatepickerRef" matInput readonly>
                     <mat-datepicker-toggle [for]="formDatepickerRef" matSuffix></mat-datepicker-toggle>
                     <mat-hint>Click on the input or the datepicker icon</mat-hint>

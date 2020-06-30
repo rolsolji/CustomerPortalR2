@@ -6,7 +6,7 @@ import { Observable } from 'rxjs/Observable';
   providedIn: 'root'
 })
 export class RatesService {
-  url = "https://customer.r2logistics.com/Services/RatingEngineService.svc/json/RateShipment";
+  url = "https://beta-customer.r2logistics.com/Services/RatingEngineService.svc/json/RateShipment";
   constructor(private http: HttpClient) { }
   
   // postRates(objRate: Object): Observable<HttpResponse<Object>> {
@@ -21,25 +21,28 @@ export class RatesService {
   //   );
   // }    
 
+  async postRates(objRate: Object)
+  {
+    return await this.http.post(this.url, objRate).toPromise();
+  }
 
-
-  postRates(objRate: Object): Observable<HttpResponse<Object>> {
-      let httpHeaders = new HttpHeaders({
-           'Content-Type' : 'application/json'
-           ,
-           'Access-Control-Allow-Origin' : '*'
-          //  ,
-          //   'Access-Control-Allow-Methods' : 'POST',
-          //   'Access-Control-Allow-Headers' : 'Content-Type',
-          //   'Access-Control-Allow-Credentials': 'true'
-      });    
-      return this.http.post<any>(this.url,objRate,
-          {
-            headers: httpHeaders,
-            observe: 'response'
-          }
-      );
-    }    
+  // async postRates(objRate: Object): Observable<HttpResponse<Object>> {
+  //     let httpHeaders = new HttpHeaders({
+  //          'Content-Type' : 'application/json'
+  //          ,
+  //          'Access-Control-Allow-Origin' : '*'
+  //         //  ,
+  //         //   'Access-Control-Allow-Methods' : 'POST',
+  //         //   'Access-Control-Allow-Headers' : 'Content-Type',
+  //         //   'Access-Control-Allow-Credentials': 'true'
+  //     });    
+  //     return await this.http.post<any>(this.url,objRate,
+  //         {
+  //           headers: httpHeaders,
+  //           observe: 'response'
+  //         }
+  //     ).toPromise();
+  //   }    
 
     getCountries(){
       return this.http.get('https://customer.r2logistics.com/Services/MASCityStatePostalService.svc/json/GetCountryList?_=1592973456198')

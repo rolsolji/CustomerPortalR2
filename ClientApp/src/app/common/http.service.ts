@@ -23,4 +23,8 @@ export class HttpService{
         return this.http.get(String.Format('https://customer.r2logistics.com/Services/MASCityStatePostalService.svc/json/GetPostalDataByPostalCode?MASPostalCode={0}&countryID={1}&_={2}',postalCode,countryId,keyId));
     }
     
+    getProductPackageType(keyId:string){
+        return this.http.get(String.Format('https://customer.r2logistics.com/Services/MasClientDefaultsService.svc/json/GetMasProductPackageType?_={0}',keyId))
+    }
+   
 }

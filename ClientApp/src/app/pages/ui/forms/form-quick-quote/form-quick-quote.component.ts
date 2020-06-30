@@ -16,14 +16,33 @@ import {MatAccordion} from '@angular/material/expansion';
 import { Observable } from 'rxjs/Observable';
 import { HttpErrorResponse } from '@angular/common/http';
 import { RatesService } from '../../../../rates.service';
+import { HttpService } from '../../../../common/http.service';
+import { String, StringBuilder } from 'typescript-string-operations';
+import { strict } from 'assert';
 import icTwotoneCalendarToday from '@iconify/icons-ic/twotone-calendar-today';
 import icBaselineImageNotSupported from '@iconify/icons-ic/baseline-image-not-supported';
+import { StringifyOptions } from 'querystring';
 
 
 export interface CountryState {
   name: string;
   population: string;
   flag: string;
+}
+
+export interface PostalData {
+  CityCode: string;
+  CityID: string;
+  CityName: string;
+  CountryCode: string;
+  CountryId: string;
+  CountryName: string;
+  IsActive: string;
+  PostalCode: string;
+  PostalID: string;
+  StateCode: string;
+  StateId: string;
+  StateName: string;
 }
 
 export interface productFeatures{
@@ -34,7 +53,6 @@ export interface productFeatures{
   description:string
 }
 
-
 export const products: productFeatures[] = [
   {
       id:1,
@@ -44,6 +62,8 @@ export const products: productFeatures[] = [
       description: ""
   }
 ];
+
+
 
 @Component({
   selector: 'vex-form-quick-quote',
@@ -61,6 +81,8 @@ export class FormQuickQuoteComponent implements OnInit {
   selectCtrl: FormControl = new FormControl();
   inputType = 'password';
   visible = false;
+
+  keyId: string = "1593399730488";
 
   icPhone = icPhone;
   icCamera = icCamera;
@@ -129,12 +151,19 @@ export class FormQuickQuoteComponent implements OnInit {
    ratesFiltered = [];
    countries: Object;
    ratesCounter: number = 0;   
-   OriginPostalCode: string = 'Hello Test';
+   selectedCountry: string;
 
-  constructor(private cd: ChangeDetectorRef, private ratesService: RatesService) { }
+  constructor(
+    private cd: ChangeDetectorRef, 
+    private ratesService: RatesService,
+    private httpService : HttpService
+    ) { }
 
   ngOnInit() {
-   
+    this.httpService.getContryList(this.keyId).subscribe(data => 
+      {this.countries = data;
+      console.log(this.countries);
+    });
   }
 
   // ngAfterViewInit() {
@@ -185,8 +214,8 @@ export class FormQuickQuoteComponent implements OnInit {
           }
       );
 
-    
-    this.ratesService.getCountries().subscribe(data => 
+
+    this.httpService.getContryList(this.keyId).subscribe(data => 
       {this.countries = data;
       console.log(this.countries);
     });
@@ -231,6 +260,52 @@ export class FormQuickQuoteComponent implements OnInit {
   filterStates(name: string) {
     return this.states.filter(state => state.name.toLowerCase().indexOf(name.toLowerCase()) === 0);
   }
+
+  //#region Origin Fields
+
+  postalData: Object; // PostalData[];
+  OriginPostalCode: string;
+  OriginStateName: String;
+
+  validateOriginPostalCode(){
+    console.log(this.selectedCountry);
+    this.httpService.getPostalDataByPostalCode(this.OriginPostalCode,'1',this.keyId).subscribe(data => {
+      this.postalData = data;
+      console.log(this.postalData);
+      if (this.postalData != null || this.postalData.length > 0) 
+      {
+        this.OriginStateName = this.postalData[0].StateName;
+        this.OriginPostalCode = String.Format("{0}-{1}",this.OriginPostalCode,this.postalData[0].CityName);
+      }
+      else
+      {
+        this.OriginStateName = String.Empty;
+        this.OriginPostalCode = String.Empty;
+      }
+    });
+  }
+  //#endregion
+
+  //#region Destination Fields
+  DestinationPostalCode: string;
+  DestinationStateName: String;
+
+  validateDestinationPostalCode(){
+    this.httpService.getPostalDataByPostalCode(this.DestinationPostalCode,'1',this.keyId).subscribe(data => {
+      this.postalData = data;
+      if (this.postalData != null)
+      {
+        this.DestinationStateName = this.postalData[0].StateName;
+        this.DestinationPostalCode = String.Format("{0}-{1}",this.DestinationPostalCode,this.postalData[0].CityName);
+      }
+      else
+      {
+        this.DestinationStateName = String.Empty;
+        this.DestinationPostalCode = String.Empty;
+      }
+    });
+  }
+  //#endregion
 
   @Input() childProductField: productFeatures;
   @Output() parentProductFields = new EventEmitter<productFeatures>();

@@ -13,7 +13,7 @@ import { fadeInUp400ms } from '../../../../../@vex/animations/fade-in-up.animati
 import { stagger60ms } from '../../../../../@vex/animations/stagger.animation';
 import icMoreVert from '@iconify/icons-ic/twotone-more-vert';
 import {MatAccordion} from '@angular/material/expansion';
-//import { Observable } from 'rxjs/Observable';
+import { Observable } from 'rxjs/Observable';
 import { HttpErrorResponse } from '@angular/common/http';
 import { RatesService } from '../../../../rates.service';
 import { HttpService } from '../../../../common/http.service';
@@ -21,12 +21,28 @@ import { String, StringBuilder } from 'typescript-string-operations';
 import { strict } from 'assert';
 import icTwotoneCalendarToday from '@iconify/icons-ic/twotone-calendar-today';
 import icBaselineImageNotSupported from '@iconify/icons-ic/baseline-image-not-supported';
+import { StringifyOptions } from 'querystring';
 
 
 export interface CountryState {
   name: string;
   population: string;
   flag: string;
+}
+
+export interface PostalData {
+  CityCode: string;
+  CityID: string;
+  CityName: string;
+  CountryCode: string;
+  CountryId: string;
+  CountryName: string;
+  IsActive: string;
+  PostalCode: string;
+  PostalID: string;
+  StateCode: string;
+  StateId: string;
+  StateName: string;
 }
 
 export interface productFeatures{
@@ -37,7 +53,6 @@ export interface productFeatures{
   description:string
 }
 
-
 export const products: productFeatures[] = [
   {
       id:1,
@@ -47,6 +62,8 @@ export const products: productFeatures[] = [
       description: ""
   }
 ];
+
+
 
 @Component({
   selector: 'vex-form-quick-quote',
@@ -132,9 +149,9 @@ export class FormQuickQuoteComponent implements OnInit {
 
    rates: Object;
    ratesFiltered = [];
-   Countries: ["USA","Canada","CR","MEX"];
-   Country:string = "USA";
+   countries: Object;
    ratesCounter: number = 0;   
+   selectedCountry: string;
 
   constructor(
     private cd: ChangeDetectorRef, 
@@ -143,7 +160,10 @@ export class FormQuickQuoteComponent implements OnInit {
     ) { }
 
   ngOnInit() {
-    
+    this.httpService.getContryList(this.keyId).subscribe(data => 
+      {this.countries = data;
+      console.log(this.countries);
+    });
   }
 
   // ngAfterViewInit() {
@@ -192,16 +212,16 @@ export class FormQuickQuoteComponent implements OnInit {
     //   );
 
 
-    //this.httpService.getContryList(this.keyId).subscribe(data => 
-    //  {this.countries = data;
-    //  console.log(this.countries);
-    //});
+    this.httpService.getContryList(this.keyId).subscribe(data => 
+      {this.countries = data;
+      console.log(this.countries);
+    });
      
     
     this.rates = this.ratesService.getRates();
-    //if (this.rates != null && this.rates.length > 0){
-    //  this.ratesFiltered = this.rates.filter(rate => rate.CarrierCost > 0);
-    //}
+    if (this.rates != null && this.rates.length > 0){
+      this.ratesFiltered = this.rates.filter(rate => rate.CarrierCost > 0);
+    }
     
     this.ratesCounter = this.ratesFiltered.length;
     console.log(this.rates);    
@@ -240,15 +260,16 @@ export class FormQuickQuoteComponent implements OnInit {
 
   //#region Origin Fields
 
-  postalData: Object;
+  postalData: Object; // PostalData[];
   OriginPostalCode: string;
   OriginStateName: String;
 
   validateOriginPostalCode(){
-    this.httpService.getPostalDataByPostalCode(this.OriginPostalCode,'1','1593058682293').subscribe(data => {
+    console.log(this.selectedCountry);
+    this.httpService.getPostalDataByPostalCode(this.OriginPostalCode,'1',this.keyId).subscribe(data => {
       this.postalData = data;
       console.log(this.postalData);
-      if (this.postalData != null)
+      if (this.postalData != null || this.postalData.length > 0) 
       {
         this.OriginStateName = this.postalData[0].StateName;
         this.OriginPostalCode = String.Format("{0}-{1}",this.OriginPostalCode,this.postalData[0].CityName);
@@ -267,7 +288,7 @@ export class FormQuickQuoteComponent implements OnInit {
   DestinationStateName: String;
 
   validateDestinationPostalCode(){
-    this.httpService.getPostalDataByPostalCode(this.DestinationPostalCode,'1','1593058682293').subscribe(data => {
+    this.httpService.getPostalDataByPostalCode(this.DestinationPostalCode,'1',this.keyId).subscribe(data => {
       this.postalData = data;
       if (this.postalData != null)
       {

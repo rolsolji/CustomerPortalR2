@@ -33,9 +33,7 @@ export class RatesService {
           //   'Access-Control-Allow-Headers' : 'Content-Type',
           //   'Access-Control-Allow-Credentials': 'true'
       });    
-      return this.http.post<Object>(this.url, {
-            "ClientID":27784,"ProfileID":41887,"Products":[{"Weight":"100","ProductClass":"50","Pieces":"1","Pallets":0,"PackageTypeID":4,"Length":"48","Height":"48","Width":"48","PCF":"1.56","Status":1}],"SourcePostalCode":"60001","SourceCityID":84846,"SourceStateID":63,"SourceCountryID":1,"SourceCountry":"USA","SourceStateCode":"IL ","SourceCityName":"ALDEN                         ","DestPostalCode":"30001","DestCityID":353249,"DestStateID":11,"DestCountryID":1,"DestCountry":"USA","DestStateCode":"GA ","DestCityName":"Austell","ShipmentDate":"/Date(1592784000000)/","Accessorials":[],"AccessorialCodes":[],"TopN":10,"ServiceLevelGrops":[],"ServiceLevels":[],"ServiceLevelCodes":[],"EquipmentList":[],"IsDebug":false,"IsSuperAdmin":false,"AccessorialIDs":[],"SkeepCalculatePPS":false,"Origin":"60001,ALDEN                         ,ILLINOIS                 ","Destination":"30001,Austell,GEORGIA                  "
-           },
+      return this.http.post<any>(this.url,objRate,
           {
             headers: httpHeaders,
             observe: 'response'

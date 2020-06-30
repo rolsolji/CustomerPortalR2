@@ -163,32 +163,34 @@ export class FormQuickQuoteComponent implements OnInit {
   getQuote() {
     this.rightPanelImage = "../../../../../assets/img/demo/TestImageRates.png";
 
-    // let objRate: Object;
-    // this.ratesService.postRates(objRate).subscribe(res => { 
-    //   //let artcl: Article = res.body;
-    //   console.log(res.body);
-    //   console.log(res.headers.get('Content-Type'));		
-    //   //this.loadAllArticles();	  
-    // },
-    //   (err: HttpErrorResponse) => {
-    //         if (err.error instanceof Error) {
-    //           //A client-side or network error occurred.				 
-    //           console.log('An error occurred:', err.error.message);
-    //         } else {
-    //           //Backend returns unsuccessful response codes such as 404, 500 etc.				 
-    //           console.log('Backend returned status code: ', err.status);
-    //           console.log('Response body:', err.error);
-    //         }
-    //       }
-    //   );
+    let objRate: Object;
+    objRate = {
+      "ClientID":27784,"ProfileID":41887,"Products":[{"Weight":"100","ProductClass":"50","Pieces":"1","Pallets":0,"PackageTypeID":4,"Length":"48","Height":"48","Width":"48","PCF":"1.56","Status":1}],"SourcePostalCode":"60001","SourceCityID":84846,"SourceStateID":63,"SourceCountryID":1,"SourceCountry":"USA","SourceStateCode":"IL ","SourceCityName":"ALDEN                         ","DestPostalCode":"30001","DestCityID":353249,"DestStateID":11,"DestCountryID":1,"DestCountry":"USA","DestStateCode":"GA ","DestCityName":"Austell","ShipmentDate":"/Date(1592784000000)/","Accessorials":[],"AccessorialCodes":[],"TopN":10,"ServiceLevelGrops":[],"ServiceLevels":[],"ServiceLevelCodes":[],"EquipmentList":[],"IsDebug":false,"IsSuperAdmin":false,"AccessorialIDs":[],"SkeepCalculatePPS":false,"Origin":"60001,ALDEN                         ,ILLINOIS                 ","Destination":"30001,Austell,GEORGIA                  "
+     };
+    this.ratesService.postRates(objRate).subscribe(res => { 
+      //let artcl: Article = res.body;
+      console.log(res.body);
+      console.log(res.headers.get('Content-Type'));		
+      //this.loadAllArticles();	  
+    },
+      (err: HttpErrorResponse) => {
+            if (err.error instanceof Error) {
+              //A client-side or network error occurred.				 
+              console.log('An error occurred:', err.error.message);
+            } else {
+              //Backend returns unsuccessful response codes such as 404, 500 etc.				 
+              console.log('Backend returned status code: ', err.status);
+              console.log('Response body:', err.error);
+            }
+          }
+      );
 
     
     this.ratesService.getCountries().subscribe(data => 
       {this.countries = data;
       console.log(this.countries);
     });
-     
-    
+         
     this.rates = this.ratesService.getRates();
     if (this.rates != null && this.rates.length > 0){
       this.ratesFiltered = this.rates.filter(rate => rate.CarrierCost > 0);
@@ -205,6 +207,7 @@ export class FormQuickQuoteComponent implements OnInit {
   }
 
   clearQuoteAndFields(){
+    this.ratesCounter = 0;
     this.rightPanelImage = "../../../../../assets/img/demo/R2TestImage.png";
     window.scroll({ 
       top: 0, 

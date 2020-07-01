@@ -205,93 +205,7 @@ export class FormQuickQuoteComponent implements OnInit {
   async getQuote() {
     //this.rightPanelImage = "../../../../../assets/img/demo/TestImageRates.png";
 
-    await this.getShipmentRates();
-    //let objRate: Object;
-    // objRate = {
-    //     "ClientID": 8473,
-    //     "ProfileID": 11868,
-    //     "Products": [
-    //       {
-    //         "Weight": "1000",
-    //         "ProductClass": "50",
-    //         "Pieces": "1",
-    //         "Pallets": "1",
-    //         "Length": "48",
-    //         "Height": "48",
-    //         "Width": 48,
-    //         "PCF": "15.63"
-    //       }
-    //     ],
-    //     "SourcePostalCode": "38138",
-    //     "SourceCityID": 96663,
-    //     "SourceStateID": 1,
-    //     "SourceCountryID": 1,
-    //     "SourceCountry": "USA",
-    //     "SourceStateCode": "TN ",
-    //     "SourceCityName": "GERMANTOWN                    ",
-    //     "DestPostalCode": "60606",
-    //     "DestCityID": 90453,
-    //     "DestStateID": 63,
-    //     "DestCountryID": 1,
-    //     "DestCountry": "USA",
-    //     "DestStateCode": "IL ",
-    //     "DestCityName": "CHICAGO                       ",
-    //     "ShipmentDate": "/Date(1593388800000)/",
-    //     "Accessorials": [],
-    //     "AccessorialCodes": [],
-    //     "TopN": 10,
-    //     "ServiceLevelGrops": [],
-    //     "ServiceLevels": [],
-    //     "ServiceLevelCodes": [],
-    //     "SCAC": null,
-    //     "EquipmentList": [],
-    //     "IsDebug": false,
-    //     "IsSuperAdmin": false,
-    //     "AccessorialIDs": [],
-    //     "SkeepCalculatePPS": false,
-    //     "ProfileDescription": "**R2 BUY",
-    //     "Origin": "38138,GERMANTOWN                    ,TENNESSEE",
-    //     "Destination": "60606,CHICAGO                       ,ILLINOIS                 ",
-    //     "ShipmentStopList": []
-    //   };
-
-    
-
-    // this.ratesService.postRates(objRate).subscribe(res => { 
-    //   //let artcl: Article = res.body;
-    //   console.log('test rates API...');
-    //   console.log(res.body);
-    //   console.log(res.headers.get('Content-Type'));		
-    //   this.rates = res.body;
-    //   if (this.rates != null && this.rates.length > 0){
-    //     this.ratesFiltered = this.rates.filter(rate => rate.CarrierCost > 0);
-    //   }
-      
-    //   this.ratesCounter = this.ratesFiltered.length; 
-    // },
-    //   (err: HttpErrorResponse) => {
-    //         if (err.error instanceof Error) {
-    //           //A client-side or network error occurred.				 
-    //           console.log('An error occurred:', err.error.message);
-    //         } else {
-    //           //Backend returns unsuccessful response codes such as 404, 500 etc.				 
-    //           console.log('Backend returned status code: ', err.status);
-    //           console.log('Response body:', err.error);
-    //         }
-    //       }
-    //   );
-
-    
-
-
-    // this.httpService.getContryList(this.keyId).subscribe(data => 
-    //   {this.countries = data;
-    //   console.log(this.countries);
-    // });
-         
-    // this.rates = this.ratesService.getRates();
-    
-    // console.log(this.rates);    
+    await this.getShipmentRates();       
 
     window.scroll({ 
       top: 0, 
@@ -332,26 +246,32 @@ export class FormQuickQuoteComponent implements OnInit {
   OriginPostalCode: string;
   OriginStateName: String;
   OriginPostalData: PostalData;
+  OriginPickupDate: string;
 
   validateOriginPostalCode(){
     console.log(this.originSelectedCountry);
-    this.httpService.getPostalDataByPostalCode(this.OriginPostalCode,this.originSelectedCountry,this.keyId).subscribe(data => {
-      this.postalData = data;
-      console.log(this.postalData);
-      if (this.postalData != null && this.postalData.length > 0) 
-      {
-        this.OriginStateName = this.postalData[0].StateName;
-        this.OriginPostalCode = String.Format("{0}-{1}",this.OriginPostalCode,this.postalData[0].CityName);
-
-        this.OriginPostalData = this.postalData[0];
-      }
-      else
-      {
-        this.OriginStateName = String.Empty;
-        this.OriginPostalCode = String.Empty;
-        this.originPostalData = null;
-      }
-    });
+    let CountryId = this.originSelectedCountry == null ? "1": this.originSelectedCountry;
+    if (this.OriginPostalCode != null && this.OriginPostalCode.trim().length > 0)
+    {
+      this.httpService.getPostalDataByPostalCode(this.OriginPostalCode,CountryId,this.keyId).subscribe(data => {
+        this.postalData = data;
+        console.log(this.postalData);      
+        if (this.postalData != null && this.postalData.length > 0) 
+        {
+          this.OriginStateName = this.postalData[0].StateName;
+          this.OriginPostalCode = String.Format("{0}-{1}",this.OriginPostalCode,this.postalData[0].CityName);
+  
+          this.OriginPostalData = this.postalData[0];
+        }
+        else
+        {
+          this.OriginStateName = String.Empty;
+          this.OriginPostalCode = String.Empty;
+          this.OriginPostalData = null;
+        }
+      });
+    }
+    
   }
   //#endregion
 
@@ -362,7 +282,9 @@ export class FormQuickQuoteComponent implements OnInit {
 
   validateDestinationPostalCode(){
     console.log(this.destinationSelectedCountry);
-    this.httpService.getPostalDataByPostalCode(this.DestinationPostalCode,this.destinationSelectedCountry,this.keyId).subscribe(data => {
+    let CountryId = this.destinationSelectedCountry == null ? "1": this.destinationSelectedCountry;
+    if (this.DestinationPostalCode != null && this.DestinationPostalCode.trim().length > 0)
+    this.httpService.getPostalDataByPostalCode(this.DestinationPostalCode,CountryId,this.keyId).subscribe(data => {
       this.postalData = data;
       if (this.postalData != null && this.postalData.length > 0)
       {
@@ -451,13 +373,13 @@ export class FormQuickQuoteComponent implements OnInit {
         "SourceCountry": this.OriginPostalData.CountryCode,
         "SourceStateCode": this.OriginPostalData.StateCode,
         "SourceCityName": this.OriginPostalData.CityName,
-        "DestPostalCode": "60606",
-        "DestCityID": 90453,
-        "DestStateID": 63,
-        "DestCountryID": 1,
-        "DestCountry": "USA",
-        "DestStateCode": "IL ",
-        "DestCityName": "CHICAGO                       ",
+        "DestPostalCode": this.destinationPostalData.PostalCode,
+        "DestCityID": this.destinationPostalData.CityID,
+        "DestStateID": this.destinationPostalData.StateId,
+        "DestCountryID": this.destinationPostalData.CountryId,
+        "DestCountry": this.destinationPostalData.CountryCode,
+        "DestStateCode": this.destinationPostalData.StateCode,
+        "DestCityName": this.destinationPostalData.CityName,
         "ShipmentDate": "/Date(1593388800000)/",
         "Accessorials": [],
         "AccessorialCodes": [],
@@ -473,7 +395,7 @@ export class FormQuickQuoteComponent implements OnInit {
         "SkeepCalculatePPS": false,
         "ProfileDescription": "**R2 BUY",
         "Origin":  this.OriginPostalData.PostalCode + ',' +  this.OriginPostalData.CityName + ',' + this.OriginPostalData.StateName,
-        "Destination": "60606,CHICAGO                       ,ILLINOIS                 ",
+        "Destination": this.destinationPostalData.PostalCode + ',' +  this.destinationPostalData.CityName + ',' + this.destinationPostalData.StateName,
         "ShipmentStopList": []
       };
 

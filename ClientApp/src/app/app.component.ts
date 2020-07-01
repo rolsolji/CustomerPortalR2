@@ -123,23 +123,23 @@ export class AppComponent {
             route: '/',
             icon: icAssigment
           },
-          {
-            type: 'dropdown',
-            label: 'Add Shipment',
-            icon: icBaselinePostAdd,
-            children: [
-              {
-                type: 'link',
-                label: 'LTL/TL Shipment',
-                route: '/apps/help-center/getting-started2'
-              },
-              {
-                type: 'link',
-                label: 'TL Spot Quote',
-                route: '/apps/help-center/pricing2'
-              }
-            ]
-          },
+          // {
+          //   type: 'dropdown',
+          //   label: 'Add Shipment',
+          //   icon: icBaselinePostAdd,
+          //   children: [
+          //     {
+          //       type: 'link',
+          //       label: 'LTL/TL Shipment',
+          //       route: '/apps/help-center/getting-started2'
+          //     },
+          //     {
+          //       type: 'link',
+          //       label: 'TL Spot Quote',
+          //       route: '/apps/help-center/pricing2'
+          //     }
+          //   ]
+          // },
           {
             type: 'dropdown',
             label: 'Shipment Board',

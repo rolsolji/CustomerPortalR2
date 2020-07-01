@@ -7,12 +7,12 @@
 </vex-secondary-toolbar> -->
 
 <div [@stagger]="true" class="p-gutter qcForms" vexContainer>
-  <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="10px">
+  <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="5px">
     <div @fadeInUp class="card" fxFlex="50%">
       <div fxLayout="column">
         <mat-accordion class="example-headers-align" multi>
           <mat-expansion-panel [expanded]="true">
-            <mat-expansion-panel-header class="expansionHeader">
+            <mat-expansion-panel-header class="expansionHeader" [collapsedHeight]="'42px'" [expandedHeight]="'42px'">
               <mat-panel-title>
                 Origin
               </mat-panel-title>
@@ -21,7 +21,7 @@
               </mat-panel-description>
             </mat-expansion-panel-header>
   
-            <div fxLayout="column">
+            <div fxLayout="column" class="expansion-panel-cont-style">
   
               <div class="py-2" fxLayout.sm="column" fxLayoutGap="16px">
                 <mat-checkbox [checked]="false" color="warn">Commercial</mat-checkbox>
@@ -69,7 +69,7 @@
           </mat-expansion-panel>
   
           <mat-expansion-panel [expanded]="true">
-            <mat-expansion-panel-header>
+            <mat-expansion-panel-header [collapsedHeight]="'42px'" [expandedHeight]="'42px'">
               <mat-panel-title>
                 Destination
               </mat-panel-title>
@@ -78,7 +78,7 @@
               </mat-panel-description>
             </mat-expansion-panel-header>
   
-            <div fxLayout="column">
+            <div fxLayout="column" class="expansion-panel-cont-style">
               <div class="py-2" fxLayout.sm="column" fxLayoutGap="16px">
                 <mat-checkbox [checked]="false" color="warn">Commercial</mat-checkbox>
                 <mat-checkbox [checked]="false" color="warn">Residential</mat-checkbox>
@@ -119,7 +119,7 @@
           </mat-expansion-panel>
 
           <mat-expansion-panel [expanded]="true">
-            <mat-expansion-panel-header>
+            <mat-expansion-panel-header [collapsedHeight]="'42px'" [expandedHeight]="'42px'">
               <mat-panel-title>
                 Products
               </mat-panel-title>
@@ -129,7 +129,7 @@
             </mat-expansion-panel-header>
             
             <ng-template ngFor let-prod [ngForOf]="products" let-i="index">
-              <div fxLayout="column" class="pt-5">
+              <div fxLayout="column" class="pt-5" class="expansion-panel-cont-style">
                 <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="5px">
                   <div fxFlex="15%">
                     <mat-form-field fxFlex="none">
@@ -214,7 +214,7 @@
                   </div>
                   <div fxFlex="15%">
                     <mat-form-field>
-                      <mat-label>PFC</mat-label>
+                      <mat-label>PCF</mat-label>
                       <input matInput>
                     </mat-form-field>
                   </div>

@@ -31,7 +31,7 @@
     // }    
 
     .qcForms{
-        padding: 0.5rem;
+        padding: 0.2rem;
     }    
 
     .freightRate-carrierInfo {
@@ -158,6 +158,35 @@
     justify-content: center;
     align-items: center;
   }
+
+  .expansion-panel-cont-style{
+        font-size: 12px;  
+        margin-bottom: -1%;      
+    }   
+
+  .mat-expansion-panel-header{
+      font-size: 12px;
+      font-weight: 600;
+  }
+
+  .mat-form-field {
+        font-size: 12px;
+        margin-bottom: -2%;
+  }
+
+  .mat-expansion-panel-header-description{
+    font-weight: 400;
+  }
+
+  .mat-expansion-panel{
+    font-size: 12px;
+  }
+
+  .mat-expansion-panel-spacing {
+    margin: 5px 0;
+    }
+    
+    
 
   @media (min-width: 900px) {
     .call-outs-container {

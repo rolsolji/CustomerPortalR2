@@ -13,7 +13,7 @@ import { fadeInUp400ms } from '../../../../../@vex/animations/fade-in-up.animati
 import { stagger60ms } from '../../../../../@vex/animations/stagger.animation';
 import icMoreVert from '@iconify/icons-ic/twotone-more-vert';
 import {MatAccordion} from '@angular/material/expansion';
-import { Observable } from 'rxjs/Observable';
+//import { Observable } from 'rxjs/Observable';
 import { HttpErrorResponse } from '@angular/common/http';
 import { RatesService } from '../../../../rates.service';
 import { HttpService } from '../../../../common/http.service';
@@ -22,6 +22,7 @@ import { strict } from 'assert';
 import icTwotoneCalendarToday from '@iconify/icons-ic/twotone-calendar-today';
 import icBaselineImageNotSupported from '@iconify/icons-ic/baseline-image-not-supported';
 import { StringifyOptions } from 'querystring';
+import { PostalData } from '../../../../models/shipment-model';
 import { ProductPackageType } from '../../../../Entities/ProductPackageType'
 import { getSupportedInputTypes } from '@angular/cdk/platform';
 
@@ -32,20 +33,20 @@ export interface CountryState {
   flag: string;
 }
 
-export interface PostalData {
-  CityCode: string;
-  CityID: string;
-  CityName: string;
-  CountryCode: string;
-  CountryId: string;
-  CountryName: string;
-  IsActive: string;
-  PostalCode: string;
-  PostalID: string;
-  StateCode: string;
-  StateId: string;
-  StateName: string;
-}
+// export interface PostalData {
+//   CityCode: string;
+//   CityID: string;
+//   CityName: string;
+//   CountryCode: string;
+//   CountryId: string;
+//   CountryName: string;
+//   IsActive: string;
+//   PostalCode: string;
+//   PostalID: string;
+//   StateCode: string;
+//   StateId: string;
+//   StateName: string;
+// }
 
 export interface CatalogItem{
   Code: string;
@@ -159,8 +160,8 @@ export class FormQuickQuoteComponent implements OnInit {
    originCountries: Object;
    destinationCountries: Object;
    ratesCounter: number = 0;   
-   originSelectedCountry: string;
-   destinationSelectedCountry: string;
+   originSelectedCountry: number;
+   destinationSelectedCountry: number;
    packageTypes: Object;
    productPackageType: ProductPackageType[];
 
@@ -170,22 +171,16 @@ export class FormQuickQuoteComponent implements OnInit {
     private httpService : HttpService
     ) { }
 
-  ngOnInit() {
-    this.httpService.getContryList(this.keyId).subscribe(data => 
-      {this.originCountries = data;
-        this.destinationCountries = data;
-    });
+  async ngOnInit() {    
+    let responseData = await this.httpService.getContryList(this.keyId);   
+    this.originCountries = responseData;
+    this.destinationCountries = responseData;
+    this.originSelectedCountry = 1; // US as default     
+    this.destinationSelectedCountry = 1; // US as default      
 
-    //this.httpService.getProductPackageType(this.keyId).subscribe(date =>
-    //  {this.packageTypes = date;
-    //});
-  
-
-    //this.productPackageType.push(this.httpService.getProductPackageTypeN(this.keyId));
-
-  async getSupportedInputTypes(): Promise<void> {
-    let ppt = await this.httpService.getProductPackageTypeN(this.keyId);
-    this.productPackageType = ppt;
+    this.httpService.getProductPackageType(this.keyId).subscribe(date =>
+      {this.packageTypes = date;
+    });    
   }
 
   // ngAfterViewInit() {
@@ -213,9 +208,11 @@ export class FormQuickQuoteComponent implements OnInit {
 
   async getQuote() {
     //this.rightPanelImage = "../../../../../assets/img/demo/TestImageRates.png";
+    console.log('print at start.')
+    let test = await this.getShipmentRates();       
 
-    await this.getShipmentRates();       
-
+    this.ratesCounter = this.ratesFiltered.length;
+    console.log('print at the end.')
     window.scroll({ 
       top: 0, 
       left: 0, 
@@ -251,34 +248,54 @@ export class FormQuickQuoteComponent implements OnInit {
 
   //#region Origin Fields
 
-  postalData: Object; // PostalData[];
+  postalData: PostalData[];
+  postalDataDest: PostalData[];
   OriginPostalCode: string;
   OriginStateName: String;
   OriginPostalData: PostalData;
   OriginPickupDate: string;
 
-  validateOriginPostalCode(){
+  async validateOriginPostalCode(){
     console.log(this.originSelectedCountry);
     let CountryId = this.originSelectedCountry == null ? "1": this.originSelectedCountry;
     if (this.OriginPostalCode != null && this.OriginPostalCode.trim().length > 0)
     {
-      this.httpService.getPostalDataByPostalCode(this.OriginPostalCode,CountryId,this.keyId).subscribe(data => {
-        this.postalData = data;
-        console.log(this.postalData);      
-        if (this.postalData != null) //&& this.postalData.length > 0) 
-        {
-          this.OriginStateName = this.postalData[0].StateName;
-          this.OriginPostalCode = String.Format("{0}-{1}",this.OriginPostalCode,this.postalData[0].CityName);
-  
-          this.OriginPostalData = this.postalData[0];
-        }
-        else
-        {
-          this.OriginStateName = String.Empty;
-          this.OriginPostalCode = String.Empty;
-          this.OriginPostalData = null;
-        }
-      });
+      console.log('before...')
+      let responseData = await this.httpService.getPostalDataByPostalCode(this.OriginPostalCode,CountryId.toString(),this.keyId);
+      console.log(responseData)     
+      this.postalData = responseData;
+      if (this.postalData != null && this.postalData.length > 0) 
+      {
+        this.OriginStateName = this.postalData[0].StateName;
+        this.OriginPostalCode = String.Format("{0}-{1}",this.OriginPostalCode,this.postalData[0].CityName);  
+        this.OriginPostalData = this.postalData[0];
+      }
+      else
+      {
+        this.OriginStateName = String.Empty;
+        this.OriginPostalCode = String.Empty;
+        this.OriginPostalData = null;
+      }
+      
+      // console.log('before...')
+      // this.httpService.getPostalDataByPostalCode(this.OriginPostalCode,CountryId,this.keyId).subscribe(data => {
+      //   console.log(data);
+      //   this.postalData = data;       
+      //   if (this.postalData != null && this.postalData.length > 0) 
+      //   {
+      //     this.OriginStateName = this.postalData[0].StateName;
+      //     this.OriginPostalCode = String.Format("{0}-{1}",this.OriginPostalCode,this.postalData[0].CityName);  
+      //     this.OriginPostalData = this.postalData[0];
+      //   }
+      //   else
+      //   {
+      //     this.OriginStateName = String.Empty;
+      //     this.OriginPostalCode = String.Empty;
+      //     this.OriginPostalData = null;
+      //   }
+      // });
+
+      console.log('after...')      
     }
     
   }
@@ -289,25 +306,42 @@ export class FormQuickQuoteComponent implements OnInit {
   DestinationStateName: String;
   destinationPostalData: PostalData;
 
-  validateDestinationPostalCode(){
+  async validateDestinationPostalCode(){
     console.log(this.destinationSelectedCountry);
     let CountryId = this.destinationSelectedCountry == null ? "1": this.destinationSelectedCountry;
-    if (this.DestinationPostalCode != null && this.DestinationPostalCode.trim().length > 0)
-    this.httpService.getPostalDataByPostalCode(this.DestinationPostalCode,CountryId,this.keyId).subscribe(data => {
-      this.postalData = data;
-      if (this.postalData != null) //&& this.postalData.length > 0)
+    if (this.DestinationPostalCode != null && this.DestinationPostalCode.trim().length > 0){
+
+      let responseData = await this.httpService.getPostalDataByPostalCode(this.DestinationPostalCode,CountryId.toString(),this.keyId);
+      this.postalDataDest = responseData;
+      if (this.postalDataDest != null && this.postalDataDest.length > 0) 
       {
-        this.DestinationStateName = this.postalData[0].StateName;
-        this.DestinationPostalCode = String.Format("{0}-{1}",this.DestinationPostalCode,this.postalData[0].CityName);
-        this.destinationPostalData = this.postalData[0];
+        this.OriginStateName = this.postalDataDest[0].StateName;
+        this.OriginPostalCode = String.Format("{0}-{1}",this.OriginPostalCode,this.postalDataDest[0].CityName);  
+        this.OriginPostalData = this.postalDataDest[0];
       }
       else
       {
-        this.DestinationStateName = String.Empty;
-        this.DestinationPostalCode = String.Empty;
-        this.destinationPostalData = null;
+        this.OriginStateName = String.Empty;
+        this.OriginPostalCode = String.Empty;
+        this.OriginPostalData = null;
       }
-    });
+
+      // this.httpService.getPostalDataByPostalCode(this.DestinationPostalCode,CountryId,this.keyId).subscribe(data => {
+      //   this.postalDataDest = data;       
+      //   if (this.postalDataDest != null && this.postalDataDest.length > 0)
+      //   {
+      //     this.DestinationStateName = this.postalDataDest[0].StateName;
+      //     this.DestinationPostalCode = String.Format("{0}-{1}",this.DestinationPostalCode,this.postalDataDest[0].CityName);
+      //     this.destinationPostalData = this.postalDataDest[0];
+      //   }
+      //   else
+      //   {
+      //     this.DestinationStateName = String.Empty;
+      //     this.DestinationPostalCode = String.Empty;
+      //     this.destinationPostalData = null;
+      //   }
+      // });
+    }         
   }
   //#endregion
 
@@ -434,9 +468,9 @@ export class FormQuickQuoteComponent implements OnInit {
 
       this.rates = await this.ratesService.postRates(objRate);
       console.log(this.rates); 
-      if (this.rates != null){ //&& this.rates.length > 0){
-            //this.ratesFiltered = this.rates.filter(rate => rate.CarrierCost > 0);
-      }
+      // if (this.rates != null && this.rates.length > 0){
+      //       this.ratesFiltered = this.rates.filter(rate => rate.CarrierCost > 0);
+      // }
           
       this.ratesCounter = this.ratesFiltered.length; 
     }

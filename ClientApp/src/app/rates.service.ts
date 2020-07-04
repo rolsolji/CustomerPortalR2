@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders, HttpResponse } from '@angular/common/http';
-import { Observable } from 'rxjs/Observable';
+//import { Observable } from 'rxjs/Observable';
  
 @Injectable({
   providedIn: 'root'
@@ -21,9 +21,9 @@ export class RatesService {
   //   );
   // }    
 
-  async postRates(objRate: Object)
+  postRates(objRate: Object)
   {
-    return await this.http.post(this.url, objRate).toPromise();
+    return this.http.post(this.url, objRate).toPromise();
   }
 
   // async postRates(objRate: Object): Observable<HttpResponse<Object>> {

@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http'; 
 import { strict } from 'assert';
 import { String, StringBuilder } from 'typescript-string-operations';
+import { PostalData } from '../models/shipment-model';
 
 @Injectable({
     providedIn: 'root'
@@ -12,7 +13,7 @@ export class HttpService{
     constructor(private http: HttpClient){}
 
     getContryList(keyId:string){
-        return this.http.get(String.Format('https://customer.r2logistics.com/Services/MASCityStatePostalService.svc/json/GetCountryList?_={0}',keyId));
+        return this.http.get(String.Format('https://beta-customer.r2logistics.com/Services/MASCityStatePostalService.svc/json/GetCountryList?_={0}',keyId)).toPromise();
     }
 
     getStateDataByCountryId(countryId:string, keyId:string){
@@ -20,7 +21,7 @@ export class HttpService{
     }
 
     getPostalDataByPostalCode(postalCode:string, countryId:string, keyId:string){
-        return this.http.get(String.Format('https://customer.r2logistics.com/Services/MASCityStatePostalService.svc/json/GetPostalDataByPostalCode?MASPostalCode={0}&countryID={1}&_={2}',postalCode,countryId,keyId));
+        return this.http.get<PostalData[]>(String.Format('https://customer.r2logistics.com/Services/MASCityStatePostalService.svc/json/GetPostalDataByPostalCode?MASPostalCode={0}&countryID={1}&_={2}',postalCode,countryId,keyId)).toPromise();
     }
     
     getProductPackageType(keyId:string){

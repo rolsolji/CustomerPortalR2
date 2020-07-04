@@ -22,7 +22,8 @@ import { strict } from 'assert';
 import icTwotoneCalendarToday from '@iconify/icons-ic/twotone-calendar-today';
 import icBaselineImageNotSupported from '@iconify/icons-ic/baseline-image-not-supported';
 import { StringifyOptions } from 'querystring';
-
+import { ProductPackageType } from '../../../../Entities/ProductPackageType'
+import { getSupportedInputTypes } from '@angular/cdk/platform';
 
 
 export interface CountryState {
@@ -161,6 +162,7 @@ export class FormQuickQuoteComponent implements OnInit {
    originSelectedCountry: string;
    destinationSelectedCountry: string;
    packageTypes: Object;
+   productPackageType: ProductPackageType[];
 
   constructor(
     private cd: ChangeDetectorRef, 
@@ -174,9 +176,16 @@ export class FormQuickQuoteComponent implements OnInit {
         this.destinationCountries = data;
     });
 
-    this.httpService.getProductPackageType(this.keyId).subscribe(date =>
-      {this.packageTypes = date;
-    });
+    //this.httpService.getProductPackageType(this.keyId).subscribe(date =>
+    //  {this.packageTypes = date;
+    //});
+  
+
+    //this.productPackageType.push(this.httpService.getProductPackageTypeN(this.keyId));
+
+  async getSupportedInputTypes(): Promise<void> {
+    let ppt = await this.httpService.getProductPackageTypeN(this.keyId);
+    this.productPackageType = ppt;
   }
 
   // ngAfterViewInit() {
@@ -256,7 +265,7 @@ export class FormQuickQuoteComponent implements OnInit {
       this.httpService.getPostalDataByPostalCode(this.OriginPostalCode,CountryId,this.keyId).subscribe(data => {
         this.postalData = data;
         console.log(this.postalData);      
-        if (this.postalData != null && this.postalData.length > 0) 
+        if (this.postalData != null) //&& this.postalData.length > 0) 
         {
           this.OriginStateName = this.postalData[0].StateName;
           this.OriginPostalCode = String.Format("{0}-{1}",this.OriginPostalCode,this.postalData[0].CityName);
@@ -286,7 +295,7 @@ export class FormQuickQuoteComponent implements OnInit {
     if (this.DestinationPostalCode != null && this.DestinationPostalCode.trim().length > 0)
     this.httpService.getPostalDataByPostalCode(this.DestinationPostalCode,CountryId,this.keyId).subscribe(data => {
       this.postalData = data;
-      if (this.postalData != null && this.postalData.length > 0)
+      if (this.postalData != null) //&& this.postalData.length > 0)
       {
         this.DestinationStateName = this.postalData[0].StateName;
         this.DestinationPostalCode = String.Format("{0}-{1}",this.DestinationPostalCode,this.postalData[0].CityName);
@@ -425,8 +434,8 @@ export class FormQuickQuoteComponent implements OnInit {
 
       this.rates = await this.ratesService.postRates(objRate);
       console.log(this.rates); 
-      if (this.rates != null && this.rates.length > 0){
-            this.ratesFiltered = this.rates.filter(rate => rate.CarrierCost > 0);
+      if (this.rates != null){ //&& this.rates.length > 0){
+            //this.ratesFiltered = this.rates.filter(rate => rate.CarrierCost > 0);
       }
           
       this.ratesCounter = this.ratesFiltered.length; 

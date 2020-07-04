@@ -1,7 +1,11 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http'; 
-import { strict } from 'assert';
+
+import { Observable, of } from 'rxjs';
+import { catchError, map, tap } from 'rxjs/operators';
+
 import { String, StringBuilder } from 'typescript-string-operations';
+import { ProductPackageType } from '../Entities/ProductPackageType'
 
 @Injectable({
     providedIn: 'root'
@@ -25,6 +29,17 @@ export class HttpService{
     
     getProductPackageType(keyId:string){
         return this.http.get(String.Format('https://customer.r2logistics.com/Services/MasClientDefaultsService.svc/json/GetMasProductPackageType?_={0}',keyId))
+    }
+
+    async getProductPackageTypeN(keyId:string): Promise<ProductPackageType[]>{
+        try{
+            let response = await this.http.get(String.Format('https://customer.r2logistics.com/Services/MasClientDefaultsService.svc/json/GetMasProductPackageType?_={0}',keyId))
+                .toPromise();
+            return response.json().data as ProductPackageType[];
+        } catch (error) {
+            //await this.handleError(error);
+        }
+
     }
    
 }

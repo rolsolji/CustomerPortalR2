@@ -33,7 +33,7 @@
                 <div fxFlex="50%">
                   <mat-form-field fxFlex="none">
                     <mat-label>Country</mat-label>                   
-AO                    <mat-select [(ngModel)]="originSelectedCountry.CountryId" name="countrySelectOrigin">
+                      <mat-select [(ngModel)]="originSelectedCountry.CountryId" name="countrySelectOrigin">
                       <mat-option *ngFor="let country of originCountries" [value]="country.CountryId">{{country.CountryName}}</mat-option>                      
                     </mat-select>
                   </mat-form-field>

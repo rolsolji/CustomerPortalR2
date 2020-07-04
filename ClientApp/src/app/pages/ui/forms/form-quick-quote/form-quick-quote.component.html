@@ -33,7 +33,7 @@
                 <div fxFlex="50%">
                   <mat-form-field fxFlex="none">
                     <mat-label>Country</mat-label>                   
-                    <mat-select [(ngModel)]="originSelectedCountry" name="countrySelectOrigin">
+AO                    <mat-select [(ngModel)]="originSelectedCountry.CountryId" name="countrySelectOrigin">
                       <mat-option *ngFor="let country of originCountries" [value]="country.CountryId">{{country.CountryName}}</mat-option>                      
                     </mat-select>
                   </mat-form-field>
@@ -41,7 +41,7 @@
                 <div fxFlex="50%">
                   <mat-form-field>
                     <mat-label>Postal Code</mat-label>
-                    <input [(ngModel)]="OriginPostalCode" name="originpostalcode" 
+                    <input [(ngModel)]="OriginPostalCode" name="originpostalcode" [formControl]="originpostalcodeControl"
                             (blur)="validateOriginPostalCode()" matInput required >
                   </mat-form-field>
                 </div>                                 
@@ -93,7 +93,7 @@
                 <div fxFlex="50%">
                   <mat-form-field fxFlex="none">
                     <mat-label>Country</mat-label>
-                    <mat-select [(ngModel)]="destinationSelectedCountry" name="countrySelectDestination">
+                    <mat-select [(ngModel)]="destinationSelectedCountry.CountryId" name="countrySelectDestination">
                       <mat-option *ngFor="let country of destinationCountries" [value]="country.CountryId">{{country.CountryName}}</mat-option>                      
                     </mat-select>
                   </mat-form-field>
@@ -102,7 +102,7 @@
                 <div fxFlex="50%">
                   <mat-form-field>
                     <mat-label>Postal Code</mat-label>
-                    <input [(ngModel)]="DestinationPostalCode" name="destinationpostalcode" 
+                    <input [(ngModel)]="DestinationPostalCode" name="destinationpostalcode" [formControl]="destinationpostalcodeControl" 
                             (blur)="validateDestinationPostalCode()" matInput required >
                   </mat-form-field>
                 </div>                                 
@@ -146,7 +146,7 @@
                   <div fxFlex="40%">
                     <mat-form-field>
                       <mat-label>Packages</mat-label>
-                      <mat-select [(ngModel)]="selectedPackage" name="package">
+                      <mat-select name="package">
                         <mat-option *ngFor="let package of packageTypes" [value]="package.PackageTypeID">{{package.PackageType}}</mat-option>
                       </mat-select>
                     </mat-form-field>
@@ -227,7 +227,7 @@
                   
                 </div>
   
-                <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="5px">
+                <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="5px" class="pb-5">
 
                   <div fxFlex="50%" class="py-2" fxLayout.sm="column" fxLayoutAlign="center" fxLayoutGap="16px">
                     <mat-checkbox [checked]="false" color="warn">Stackable</mat-checkbox>

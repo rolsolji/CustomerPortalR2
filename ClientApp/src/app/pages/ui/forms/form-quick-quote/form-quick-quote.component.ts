@@ -25,6 +25,7 @@ import { StringifyOptions } from 'querystring';
 import { PostalData } from '../../../../models/shipment-model';
 import { ProductPackageType } from '../../../../Entities/ProductPackageType'
 import { getSupportedInputTypes } from '@angular/cdk/platform';
+import { Console } from 'console';
 
 
 export interface CountryState {
@@ -160,10 +161,13 @@ export class FormQuickQuoteComponent implements OnInit {
    originCountries: Object;
    destinationCountries: Object;
    ratesCounter: number = 0;   
-   originSelectedCountry: number;
-   destinationSelectedCountry: number;
+   originSelectedCountry: PostalData;
+   destinationSelectedCountry: PostalData;
    packageTypes: Object;
    productPackageType: ProductPackageType[];
+   originpostalcodeControl = new FormControl('');
+   destinationpostalcodeControl = new FormControl('');
+
 
   constructor(
     private cd: ChangeDetectorRef, 
@@ -175,8 +179,12 @@ export class FormQuickQuoteComponent implements OnInit {
     let responseData = await this.httpService.getContryList(this.keyId);   
     this.originCountries = responseData;
     this.destinationCountries = responseData;
-    this.originSelectedCountry = 1; // US as default     
-    this.destinationSelectedCountry = 1; // US as default      
+    this.originSelectedCountry = responseData[0]; // US as default     
+    this.destinationSelectedCountry = responseData[0]; // US as default      
+
+    console.log(this.originSelectedCountry);
+
+    console.log(this.destinationSelectedCountry);
 
     this.httpService.getProductPackageType(this.keyId).subscribe(date =>
       {this.packageTypes = date;
@@ -255,13 +263,15 @@ export class FormQuickQuoteComponent implements OnInit {
   OriginPostalData: PostalData;
   OriginPickupDate: string;
 
+
+
   async validateOriginPostalCode(){
     console.log(this.originSelectedCountry);
-    let CountryId = this.originSelectedCountry == null ? "1": this.originSelectedCountry;
+    let CountryId = this.originSelectedCountry == null ? "1": this.originSelectedCountry.CountryId.toString();
     if (this.OriginPostalCode != null && this.OriginPostalCode.trim().length > 0)
     {
       console.log('before...')
-      let responseData = await this.httpService.getPostalDataByPostalCode(this.OriginPostalCode,CountryId.toString(),this.keyId);
+      let responseData = await this.httpService.getPostalDataByPostalCode(this.OriginPostalCode,CountryId,this.keyId);
       console.log(responseData)     
       this.postalData = responseData;
       if (this.postalData != null && this.postalData.length > 0) 
@@ -269,6 +279,7 @@ export class FormQuickQuoteComponent implements OnInit {
         this.OriginStateName = this.postalData[0].StateName;
         this.OriginPostalCode = String.Format("{0}-{1}",this.OriginPostalCode,this.postalData[0].CityName);  
         this.OriginPostalData = this.postalData[0];
+        this.originpostalcodeControl.setValue(this.OriginPostalCode);
       }
       else
       {
@@ -304,26 +315,27 @@ export class FormQuickQuoteComponent implements OnInit {
   //#region Destination Fields
   DestinationPostalCode: string;
   DestinationStateName: String;
-  destinationPostalData: PostalData;
+  DestinationPostalData: PostalData;
 
   async validateDestinationPostalCode(){
     console.log(this.destinationSelectedCountry);
-    let CountryId = this.destinationSelectedCountry == null ? "1": this.destinationSelectedCountry;
+    let CountryId = this.destinationSelectedCountry == null ? "1": this.destinationSelectedCountry.CountryId.toString();
     if (this.DestinationPostalCode != null && this.DestinationPostalCode.trim().length > 0){
 
-      let responseData = await this.httpService.getPostalDataByPostalCode(this.DestinationPostalCode,CountryId.toString(),this.keyId);
+      let responseData = await this.httpService.getPostalDataByPostalCode(this.DestinationPostalCode,CountryId,this.keyId);
       this.postalDataDest = responseData;
       if (this.postalDataDest != null && this.postalDataDest.length > 0) 
       {
-        this.OriginStateName = this.postalDataDest[0].StateName;
-        this.OriginPostalCode = String.Format("{0}-{1}",this.OriginPostalCode,this.postalDataDest[0].CityName);  
-        this.OriginPostalData = this.postalDataDest[0];
+        this.DestinationStateName = this.postalDataDest[0].StateName;
+        this.DestinationPostalCode = String.Format("{0}-{1}",this.DestinationPostalCode,this.postalDataDest[0].CityName);  
+        this.DestinationPostalData = this.postalDataDest[0];
+        this.destinationpostalcodeControl.setValue(this.DestinationPostalCode);
       }
       else
       {
-        this.OriginStateName = String.Empty;
-        this.OriginPostalCode = String.Empty;
-        this.OriginPostalData = null;
+        this.DestinationStateName = String.Empty;
+        this.DestinationPostalCode = String.Empty;
+        this.DestinationPostalData = null;
       }
 
       // this.httpService.getPostalDataByPostalCode(this.DestinationPostalCode,CountryId,this.keyId).subscribe(data => {

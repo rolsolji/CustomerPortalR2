@@ -22,8 +22,11 @@ import { strict } from 'assert';
 import icTwotoneCalendarToday from '@iconify/icons-ic/twotone-calendar-today';
 import icBaselineImageNotSupported from '@iconify/icons-ic/baseline-image-not-supported';
 import { StringifyOptions } from 'querystring';
-import { PostalData } from '../../../../models/shipment-model';
+//import { PostalData } from '../../../../models/shipment-model';
+import { PostalData } from '../../../../Entities/PostalData'
 import { ProductPackageType } from '../../../../Entities/ProductPackageType'
+import { ProductFeatures } from '../../../../Entities/ProductFeatures'
+import { CatalogItem } from '../../../../Entities/CatalogItem'
 import { getSupportedInputTypes } from '@angular/cdk/platform';
 import { Console } from 'console';
 
@@ -33,46 +36,6 @@ export interface CountryState {
   population: string;
   flag: string;
 }
-
-// export interface PostalData {
-//   CityCode: string;
-//   CityID: string;
-//   CityName: string;
-//   CountryCode: string;
-//   CountryId: string;
-//   CountryName: string;
-//   IsActive: string;
-//   PostalCode: string;
-//   PostalID: string;
-//   StateCode: string;
-//   StateId: string;
-//   StateName: string;
-// }
-
-export interface CatalogItem{
-  Code: string;
-  Description: string;
-}
-
-export interface productFeatures{
-  id: number | null;
-  pallet:string,
-  pieces:string,
-  package:string
-  description:string
-}
-
-export const products: productFeatures[] = [
-  {
-      id:1,
-      pallet: "",
-      pieces: "",
-      package:"",
-      description: ""
-  }
-];
-
-
 
 @Component({
   selector: 'vex-form-quick-quote',
@@ -160,14 +123,62 @@ export class FormQuickQuoteComponent implements OnInit {
    ratesFiltered = [];
    originCountries: Object;
    destinationCountries: Object;
-   ratesCounter: number = 0;   
-   originSelectedCountry: PostalData;
-   destinationSelectedCountry: PostalData;
+   ratesCounter: number = 0;
+
+   originSelectedCountry: PostalData = {
+    CityCode: '',
+    CityID: '',
+    CityName: '',
+    CountryCode: '',
+    CountryId: '',
+    CountryName: '',
+    IsActive: '',
+    PostalCode: '',
+    PostalID: '',
+    StateCode: '',
+    StateId: '',
+    StateName: '',
+   };
+
+   destinationSelectedCountry: PostalData = {
+    CityCode: '',
+    CityID: '',
+    CityName: '',
+    CountryCode: '',
+    CountryId: '',
+    CountryName: '',
+    IsActive: '',
+    PostalCode: '',
+    PostalID: '',
+    StateCode: '',
+    StateId: '',
+    StateName: '',
+   };
+
    packageTypes: Object;
    productPackageType: ProductPackageType[];
    originpostalcodeControl = new FormControl('');
    destinationpostalcodeControl = new FormControl('');
 
+
+
+   products: ProductFeatures[] = [
+    {
+      id:1,
+      pallet: 0,
+      pieces: 0,
+      package: 0,
+      freightClass: 0,
+      nmfc: 0,
+      large: 0,
+      width: 0,
+      height: 0,
+      pcf: 0,
+      totalWeight: 0,
+      stackable: false,
+      hazmat: false,
+    }
+  ]
 
   constructor(
     private cd: ChangeDetectorRef, 
@@ -182,9 +193,9 @@ export class FormQuickQuoteComponent implements OnInit {
     this.originSelectedCountry = responseData[0]; // US as default     
     this.destinationSelectedCountry = responseData[0]; // US as default      
 
-    console.log(this.originSelectedCountry);
+    //console.log(this.originSelectedCountry);
 
-    console.log(this.destinationSelectedCountry);
+    //console.log(this.destinationSelectedCountry);
 
     this.httpService.getProductPackageType(this.keyId).subscribe(date =>
       {this.packageTypes = date;
@@ -216,7 +227,10 @@ export class FormQuickQuoteComponent implements OnInit {
 
   async getQuote() {
     //this.rightPanelImage = "../../../../../assets/img/demo/TestImageRates.png";
-    console.log('print at start.')
+    console.log('print at start.');
+
+    console.log(this.products);
+
     let test = await this.getShipmentRates();       
 
     this.ratesCounter = this.ratesFiltered.length;
@@ -357,39 +371,30 @@ export class FormQuickQuoteComponent implements OnInit {
   }
   //#endregion
 
-  @Input() childProductField: productFeatures;
-  @Output() parentProductFields = new EventEmitter<productFeatures>();
+  @Input() childProductField: ProductFeatures;
+  @Output() parentProductFields = new EventEmitter<ProductFeatures>();
 
-  productField: productFeatures = {
-    id:1,
-    pallet: '',
-    pieces: '',
-    package:'',
-    description: ''
-  }
-
-  products: productFeatures[] = [
-    {
-      id:1,
-      pallet: '',
-      pieces: '',
-      package:'',
-      description: ''
-    }
-  ]
 
   addNewProdField(index: number): void {
-    let prod: productFeatures =  {
-      "id":2,
-      "pallet": "",
-      "pieces": "",
-      "package": "",
-      "description":""
+    let prod: ProductFeatures =  {
+      id:this.products.length + 1,
+      pallet: 0,
+      pieces: 0,
+      package: 0,
+      freightClass: 0,
+      nmfc: 0,
+      large: 0,
+      width: 0,
+      height: 0,
+      pcf: 0,
+      totalWeight: 0,
+      stackable: false,
+      hazmat: false,
     } ;
     
     this.products.push(prod);
-    console.log(`In method  addNewProdField field index is ${index} and field is ${JSON.stringify(JSON.stringify( this.productField))}`);
-    this.parentProductFields.emit(this.productField);
+    console.log(`In method  addNewProdField field index is ${index} and field is ${JSON.stringify(JSON.stringify(prod))}`);
+    //this.parentProductFields.emit(this.productField);
 
   }
 
@@ -398,7 +403,7 @@ export class FormQuickQuoteComponent implements OnInit {
     {
       this.products.splice(index, 1);
       console.log(`In method  removeNewProdField field index is ${index}`);
-      this.parentProductFields.emit(this.productField);  
+      //this.parentProductFields.emit(this.productField);  
     }
   }
 
@@ -428,13 +433,13 @@ export class FormQuickQuoteComponent implements OnInit {
         "SourceCountry": this.OriginPostalData.CountryCode,
         "SourceStateCode": this.OriginPostalData.StateCode,
         "SourceCityName": this.OriginPostalData.CityName,
-        "DestPostalCode": this.destinationPostalData.PostalCode,
-        "DestCityID": this.destinationPostalData.CityID,
-        "DestStateID": this.destinationPostalData.StateId,
-        "DestCountryID": this.destinationPostalData.CountryId,
-        "DestCountry": this.destinationPostalData.CountryCode,
-        "DestStateCode": this.destinationPostalData.StateCode,
-        "DestCityName": this.destinationPostalData.CityName,
+        "DestPostalCode": this.DestinationPostalData.PostalCode,
+        "DestCityID": this.DestinationPostalData.CityID,
+        "DestStateID": this.DestinationPostalData.StateId,
+        "DestCountryID": this.DestinationPostalData.CountryId,
+        "DestCountry": this.DestinationPostalData.CountryCode,
+        "DestStateCode": this.DestinationPostalData.StateCode,
+        "DestCityName": this.DestinationPostalData.CityName,
         "ShipmentDate": "/Date(1593388800000)/",
         "Accessorials": [],
         "AccessorialCodes": [],
@@ -450,7 +455,7 @@ export class FormQuickQuoteComponent implements OnInit {
         "SkeepCalculatePPS": false,
         "ProfileDescription": "**R2 BUY",
         "Origin":  this.OriginPostalData.PostalCode + ',' +  this.OriginPostalData.CityName + ',' + this.OriginPostalData.StateName,
-        "Destination": this.destinationPostalData.PostalCode + ',' +  this.destinationPostalData.CityName + ',' + this.destinationPostalData.StateName,
+        "Destination": this.DestinationPostalData.PostalCode + ',' +  this.DestinationPostalData.CityName + ',' + this.DestinationPostalData.StateName,
         "ShipmentStopList": []
       };
 

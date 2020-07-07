@@ -119,35 +119,35 @@
               </div>
             </mat-expansion-panel>
 
-            <mat-expansion-panel [expanded]="true">
-              <mat-expansion-panel-header [collapsedHeight]="'42px'" [expandedHeight]="'42px'">
-                <mat-panel-title>
-                  Products
-                </mat-panel-title>
-                <mat-panel-description>
-                  Enter products
-                </mat-panel-description>
-              </mat-expansion-panel-header>
-              
-              <ng-template ngFor let-prod [ngForOf]="products" let-i="index">
+          <mat-expansion-panel [expanded]="true">
+            <mat-expansion-panel-header [collapsedHeight]="'42px'" [expandedHeight]="'42px'">
+              <mat-panel-title>
+                Products
+              </mat-panel-title>
+              <mat-panel-description>
+                Enter products
+              </mat-panel-description>
+            </mat-expansion-panel-header>
+            
+            <ng-template ngFor let-prod [ngForOf]="products" let-i="index">
                 <div fxLayout="column" class="pt-5" class="expansion-panel-cont-style">
                   <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="5px">
                     <div fxFlex="15%">
                       <mat-form-field fxFlex="none">
                         <mat-label>Pallet</mat-label>
-                        <input matInput type="number" maxlength="4">
+                        <input matInput type="number" maxlength="4" min="0" [(ngModel)]="prod.pallet">
                       </mat-form-field>
                     </div>
                     <div fxFlex="15%">
                       <mat-form-field>
                         <mat-label>Pieces</mat-label>
-                        <input matInput type="number" maxlength="4">
+                        <input matInput type="number" maxlength="4" min="0" [(ngModel)]="prod.pieces">
                       </mat-form-field>
                     </div>   
                     <div fxFlex="40%">
                       <mat-form-field>
                         <mat-label>Packages</mat-label>
-                        <mat-select name="package">
+                        <mat-select name="package" [(ngModel)]="prod.package">
                           <mat-option *ngFor="let package of packageTypes" [value]="package.PackageTypeID">{{package.PackageType}}</mat-option>
                         </mat-select>
                       </mat-form-field>
@@ -155,7 +155,7 @@
                     <div fxFlex="30%">
                       <mat-form-field>
                         <mat-label>Freight Class</mat-label>
-                        <mat-select>
+                        <mat-select [(ngModel)]="prod.freightClass">
                           <mat-option value="50">50</mat-option>
                           <mat-option value="55">55</mat-option>
                           <mat-option value="50">60</mat-option>
@@ -179,60 +179,51 @@
                     </div>
                   </div>
     
-                  <!--<div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="5px">
-                    <div fxFlex="70%">
-                      <mat-form-field>
-                        <mat-label>Description</mat-label>
-                        <input matInput>
-                      </mat-form-field>
-                    </div>
-                  </div>-->
-    
                   <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="5px">   
                     <div fxFlex="15%">
                       <mat-form-field>
                         <mat-label>NMFC</mat-label>
-                        <input matInput>
+                        <input matInput type="number" maxlength="4" min="0" [(ngModel)]="prod.nmfc">
                       </mat-form-field>
                     </div>              
                     <div fxFlex="15%">
                       <mat-form-field>
                         <mat-label>L</mat-label>
-                        <input matInput type="number" maxlength="4">
+                        <input matInput type="number" maxlength="4" min="0" [(ngModel)]="prod.large">
                       </mat-form-field>
                     </div>  
                     <div fxFlex="15%">
                       <mat-form-field>
                         <mat-label>W</mat-label>
-                        <input matInput type="number" maxlength="4">
+                        <input matInput type="number" maxlength="4" min="0" [(ngModel)]="prod.width">
                       </mat-form-field>
                     </div>  
                     <div fxFlex="15%">
                       <mat-form-field>
                         <mat-label>H</mat-label>
-                        <input matInput type="number" maxlength="4">
+                        <input matInput type="number" maxlength="4" min="0" [(ngModel)]="prod.height">
                       </mat-form-field>
                     </div>
                     <div fxFlex="15%">
                       <mat-form-field>
                         <mat-label>PCF</mat-label>
-                        <input matInput>
+                        <input matInput type="number" maxlength="4" min="0" [(ngModel)]="prod.pcf">
                       </mat-form-field>
                     </div>
                     <div fxFlex="20%">
                       <mat-form-field>
                         <mat-label>Total Weight</mat-label>
-                        <input matInput type="number" maxlength="4" min="1">
+                        <input matInput type="number" maxlength="4" min="0" [(ngModel)]="prod.totalWeight">
                       </mat-form-field>
                     </div>
                     
                   </div>
     
                   <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="5px" class="pb-5">
-
+  
                     <div fxFlex="50%" class="py-2" fxLayout.sm="column" fxLayoutAlign="center" fxLayoutGap="16px">
-                      <mat-checkbox [checked]="false" color="warn">Stackable</mat-checkbox>
-                      <mat-checkbox [checked]="false" color="warn">Hazmat</mat-checkbox>
+                      <mat-checkbox [checked]="false" color="warn" [(ngModel)]="prod.stackable">Stackable</mat-checkbox>
+                      <mat-checkbox [checked]="false" color="warn" [(ngModel)]="prod.hazmat">Hazmat</mat-checkbox>
                     </div>
                     <div fxLayoutAlign="end center">
                       <ng-container>
@@ -246,9 +237,9 @@
                     </div>
                   </div>
                 </div>
-              </ng-template>  
-            </mat-expansion-panel>
-          </mat-accordion>
+            </ng-template>  
+          </mat-expansion-panel>
+        </mat-accordion>
 
           <div fxLayout="row" fxLayoutAlign="end center" fxLayoutGap="8px" class="py-2 pr-5">
             <button (click)="clearQuoteAndFields()" mat-button type="button">Clear</button>

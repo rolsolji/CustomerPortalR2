@@ -9,260 +9,269 @@
 <div [@stagger]="true" class="p-gutter qcForms" vexContainer>
   <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="5px">
     <div @fadeInUp class="card" fxFlex="50%">
-      <div fxLayout="column">
-        <mat-accordion class="example-headers-align" multi>
-          <mat-expansion-panel [expanded]="true">
-            <mat-expansion-panel-header class="expansionHeader" [collapsedHeight]="'42px'" [expandedHeight]="'42px'">
-              <mat-panel-title>
-                Origin
-              </mat-panel-title>
-              <mat-panel-description>
-                Origin details
-              </mat-panel-description>
-            </mat-expansion-panel-header>
-  
-            <div fxLayout="column" class="expansion-panel-cont-style">
-  
-              <div class="py-2" fxLayout.sm="column" fxLayoutGap="16px">
-                <mat-checkbox [checked]="false" color="warn">Commercial</mat-checkbox>
-                <mat-checkbox [checked]="false" color="warn">Residential</mat-checkbox>
-                <mat-checkbox [checked]="false" color="warn">Limited Access</mat-checkbox>
-              </div>
-  
-              <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="5px">
-                <div fxFlex="50%">
-                  <mat-form-field fxFlex="none">
-                    <mat-label>Country</mat-label>                   
-                      <mat-select [(ngModel)]="originSelectedCountry.CountryId" name="countrySelectOrigin">
-                      <mat-option *ngFor="let country of originCountries" [value]="country.CountryId">{{country.CountryName}}</mat-option>                      
-                    </mat-select>
-                  </mat-form-field>
+      <form>
+        <div fxLayout="column">
+          <mat-accordion class="example-headers-align" multi>
+            <mat-expansion-panel [expanded]="true">
+              <mat-expansion-panel-header class="expansionHeader" [collapsedHeight]="'42px'" [expandedHeight]="'42px'">
+                <mat-panel-title>
+                  Origin
+                </mat-panel-title>
+                <mat-panel-description>
+                  Origin details
+                </mat-panel-description>
+              </mat-expansion-panel-header>
+    
+              <div fxLayout="column" class="expansion-panel-cont-style">
+    
+                <div class="py-2" fxLayout.sm="column" fxLayoutGap="16px">
+                  <mat-checkbox [checked]="false" color="warn">Commercial</mat-checkbox>
+                  <mat-checkbox [checked]="false" color="warn">Residential</mat-checkbox>
+                  <mat-checkbox [checked]="false" color="warn">Limited Access</mat-checkbox>
                 </div>
-                <div fxFlex="50%">
-                  <mat-form-field>
-                    <mat-label>Postal Code</mat-label>
-                    <input [(ngModel)]="OriginPostalCode" name="originpostalcode" [formControl]="originpostalcodeControl"
-                            (blur)="validateOriginPostalCode()" matInput required >
-                  </mat-form-field>
-                </div>                                 
-              </div>
-              <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="5px">
-                <div fxFlex="50%">
-                  <mat-form-field>
-                    <mat-label>State</mat-label>
-                    <input [(ngModel)]="OriginStateName" name="originstatename" matInput >
-                  </mat-form-field>
-                </div>
-                <div fxFlex="50%">
-                  <mat-form-field>
-                    <mat-label>Pickup Date</mat-label>
-                    <input (click)="formDatepickerRef.open()" (focus)="formDatepickerRef.open()" [(ngModel)]="OriginPickupDate" name="originpickupdate"
-                      [matDatepicker]="formDatepickerRef" matInput readonly>
-                    <mat-datepicker-toggle [for]="formDatepickerRef" matSuffix></mat-datepicker-toggle>
-                    <mat-hint>Click on the input or the datepicker icon</mat-hint>
-                    <mat-datepicker #formDatepickerRef></mat-datepicker>
-                  </mat-form-field>
-                </div>                                 
-              </div>             
-            </div>
-  
-          </mat-expansion-panel>
-  
-          <mat-expansion-panel [expanded]="true">
-            <mat-expansion-panel-header [collapsedHeight]="'42px'" [expandedHeight]="'42px'">
-              <mat-panel-title>
-                Destination
-              </mat-panel-title>
-              <mat-panel-description>
-                Destination details
-              </mat-panel-description>
-            </mat-expansion-panel-header>
-  
-            <div fxLayout="column" class="expansion-panel-cont-style">
-              <div class="py-2" fxLayout.sm="column" fxLayoutGap="16px">
-                <mat-checkbox [checked]="false" color="warn">Commercial</mat-checkbox>
-                <mat-checkbox [checked]="false" color="warn">Residential</mat-checkbox>
-                <mat-checkbox [checked]="false" color="warn">Limited Access</mat-checkbox>
-              </div>
-              <div class="py-2" fxLayout.sm="column" fxLayoutGap="16px">
-                <mat-checkbox [checked]="false" color="warn">Standard</mat-checkbox>
-                <mat-checkbox [checked]="false" color="warn">Guarantee</mat-checkbox>                
-              </div>
-
-              <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="5px">
-                <div fxFlex="50%">
-                  <mat-form-field fxFlex="none">
-                    <mat-label>Country</mat-label>
-                    <mat-select [(ngModel)]="destinationSelectedCountry.CountryId" name="countrySelectDestination">
-                      <mat-option *ngFor="let country of destinationCountries" [value]="country.CountryId">{{country.CountryName}}</mat-option>                      
-                    </mat-select>
-                  </mat-form-field>
-
-                </div>
-                <div fxFlex="50%">
-                  <mat-form-field>
-                    <mat-label>Postal Code</mat-label>
-                    <input [(ngModel)]="DestinationPostalCode" name="destinationpostalcode" [formControl]="destinationpostalcodeControl" 
-                            (blur)="validateDestinationPostalCode()" matInput required >
-                  </mat-form-field>
-                </div>                                 
-              </div>
-              <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="5px">                
-                <div fxFlex="50%">
-                  <mat-form-field>
-                    <mat-label>State</mat-label>
-                    <input [(ngModel)]="DestinationStateName" name="destinationstatename" matInput >
-                  </mat-form-field>
-                </div>                                 
-              </div>              
-            </div>
-          </mat-expansion-panel>
-
-          <mat-expansion-panel [expanded]="true">
-            <mat-expansion-panel-header [collapsedHeight]="'42px'" [expandedHeight]="'42px'">
-              <mat-panel-title>
-                Products
-              </mat-panel-title>
-              <mat-panel-description>
-                Enter products
-              </mat-panel-description>
-            </mat-expansion-panel-header>
-            
-            <ng-template ngFor let-prod [ngForOf]="products" let-i="index">
-              <div fxLayout="column" class="pt-5" class="expansion-panel-cont-style">
+    
                 <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="5px">
-                  <div fxFlex="15%">
+                  <div fxFlex="50%">
                     <mat-form-field fxFlex="none">
-                      <mat-label>Pallet</mat-label>
-                      <input matInput type="number" maxlength="4">
-                    </mat-form-field>
-                  </div>
-                  <div fxFlex="15%">
-                    <mat-form-field>
-                      <mat-label>Pieces</mat-label>
-                      <input matInput type="number" maxlength="4">
-                    </mat-form-field>
-                  </div>   
-                  <div fxFlex="40%">
-                    <mat-form-field>
-                      <mat-label>Packages</mat-label>
-                      <mat-select name="package">
-                        <mat-option *ngFor="let package of packageTypes" [value]="package.PackageTypeID">{{package.PackageType}}</mat-option>
+                      <mat-label>Country</mat-label>                   
+                        <mat-select [(ngModel)]="originSelectedCountry.CountryId" name="countrySelectOrigin">
+                        <mat-option *ngFor="let country of originCountries" [value]="country.CountryId">{{country.CountryName}}</mat-option>                      
                       </mat-select>
                     </mat-form-field>
                   </div>
-                  <div fxFlex="30%">
+                  <div fxFlex="50%">
                     <mat-form-field>
-                      <mat-label>Freight Class</mat-label>
-                      <mat-select>
-                        <mat-option value="50">50</mat-option>
-                        <mat-option value="55">55</mat-option>
-                        <mat-option value="50">60</mat-option>
-                        <mat-option value="65">65</mat-option>
-                        <mat-option value="70">70</mat-option>
-                        <mat-option value="77.5">77.5</mat-option>
-                        <mat-option value="85">85</mat-option>
-                        <mat-option value="92.5">92.5</mat-option>
-                        <mat-option value="100">100</mat-option>
-                        <mat-option value="110">110</mat-option>
-                        <mat-option value="125">125</mat-option>
-                        <mat-option value="150">150</mat-option>
-                        <mat-option value="175">175</mat-option>
-                        <mat-option value="200">200</mat-option>
-                        <mat-option value="250">250</mat-option>
-                        <mat-option value="300">300</mat-option>
-                        <mat-option value="400">400</mat-option>
-                        <mat-option value="500">500</mat-option>
-                      </mat-select>
+                      <mat-label>Postal Code</mat-label>
+                      <input [(ngModel)]="OriginPostalCode" name="originpostalcode" [formControl]="originpostalcodeControl"
+                              (blur)="validateOriginPostalCode()" matInput required >
                     </mat-form-field>
-                  </div>
+                  </div>                                 
                 </div>
-  
-                <!--<div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="5px">
-                  <div fxFlex="70%">
+                <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="5px">
+                  <div fxFlex="50%">
                     <mat-form-field>
-                      <mat-label>Description</mat-label>
-                      <input matInput>
+                      <mat-label>State</mat-label>
+                      <input [(ngModel)]="OriginStateName" name="originstatename" matInput >
                     </mat-form-field>
                   </div>
-                </div>-->
-  
-                <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="5px">   
-                  <div fxFlex="15%">
+                  <div fxFlex="50%">
                     <mat-form-field>
-                      <mat-label>NMFC</mat-label>
-                      <input matInput>
+                      <mat-label>Pickup Date</mat-label>
+                      <input (click)="formDatepickerRef.open()" (focus)="formDatepickerRef.open()" [(ngModel)]="OriginPickupDate" name="originpickupdate"
+                        [matDatepicker]="formDatepickerRef" matInput readonly>
+                      <mat-datepicker-toggle [for]="formDatepickerRef" matSuffix></mat-datepicker-toggle>
+                      <mat-hint>Click on the input or the datepicker icon</mat-hint>
+                      <mat-datepicker #formDatepickerRef></mat-datepicker>
                     </mat-form-field>
-                  </div>              
-                  <div fxFlex="15%">
-                    <mat-form-field>
-                      <mat-label>L</mat-label>
-                      <input matInput type="number" maxlength="4">
-                    </mat-form-field>
-                  </div>  
-                  <div fxFlex="15%">
-                    <mat-form-field>
-                      <mat-label>W</mat-label>
-                      <input matInput type="number" maxlength="4">
-                    </mat-form-field>
-                  </div>  
-                  <div fxFlex="15%">
-                    <mat-form-field>
-                      <mat-label>H</mat-label>
-                      <input matInput type="number" maxlength="4">
-                    </mat-form-field>
-                  </div>
-                  <div fxFlex="15%">
-                    <mat-form-field>
-                      <mat-label>PCF</mat-label>
-                      <input matInput>
-                    </mat-form-field>
-                  </div>
-                  <div fxFlex="20%">
-                    <mat-form-field>
-                      <mat-label>Total Weight</mat-label>
-                      <input matInput type="number" maxlength="4" min="1">
-                    </mat-form-field>
-                  </div>
-                  
-                </div>
-  
-                <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="5px" class="pb-5">
-
-                  <div fxFlex="50%" class="py-2" fxLayout.sm="column" fxLayoutAlign="center" fxLayoutGap="16px">
-                    <mat-checkbox [checked]="false" color="warn">Stackable</mat-checkbox>
-                    <mat-checkbox [checked]="false" color="warn">Hazmat</mat-checkbox>
-                  </div>
-                  <div fxLayoutAlign="end center">
-                    <ng-container>
-                      <button id="{{'remoeMinus'+i}}" (click)="removeNewProdField(i)" 
-                              mat-button type="button">Remove</button>
-                    </ng-container>
-                    <ng-container>
-                      <button id="{{'addrec'+i}}" (click)="addNewProdField(i)" 
-                              mat-raised-button type="button">Add New</button>
-                    </ng-container>
-                  </div>
-                </div>
+                  </div>                                 
+                </div>             
               </div>
-            </ng-template>  
-          </mat-expansion-panel>
-        </mat-accordion>
+    
+            </mat-expansion-panel>
+    
+            <mat-expansion-panel [expanded]="true">
+              <mat-expansion-panel-header [collapsedHeight]="'42px'" [expandedHeight]="'42px'">
+                <mat-panel-title>
+                  Destination
+                </mat-panel-title>
+                <mat-panel-description>
+                  Destination details
+                </mat-panel-description>
+              </mat-expansion-panel-header>
+    
+              <div fxLayout="column" class="expansion-panel-cont-style">
+                <div class="py-2" fxLayout.sm="column" fxLayoutGap="16px">
+                  <mat-checkbox [checked]="false" color="warn">Commercial</mat-checkbox>
+                  <mat-checkbox [checked]="false" color="warn">Residential</mat-checkbox>
+                  <mat-checkbox [checked]="false" color="warn">Limited Access</mat-checkbox>
+                </div>
+                <div class="py-2" fxLayout.sm="column" fxLayoutGap="16px">
+                  <mat-checkbox [checked]="false" color="warn">Standard</mat-checkbox>
+                  <mat-checkbox [checked]="false" color="warn">Guarantee</mat-checkbox>                
+                </div>
 
-        <div fxLayout="row" fxLayoutAlign="end center" fxLayoutGap="8px" class="py-2 pr-5">
-          <button (click)="clearQuoteAndFields()" mat-button type="button">Clear</button>
-          <button (click)="getQuote()" color="warn" mat-raised-button type="button">Get Quote</button>
+                <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="5px">
+                  <div fxFlex="50%">
+                    <mat-form-field fxFlex="none">
+                      <mat-label>Country</mat-label>
+                      <mat-select [(ngModel)]="destinationSelectedCountry.CountryId" name="countrySelectDestination">
+                        <mat-option *ngFor="let country of destinationCountries" [value]="country.CountryId">{{country.CountryName}}</mat-option>                      
+                      </mat-select>
+                    </mat-form-field>
+
+                  </div>
+                  <div fxFlex="50%">
+                    <mat-form-field>
+                      <mat-label>Postal Code</mat-label>
+                      <input [(ngModel)]="DestinationPostalCode" name="destinationpostalcode" [formControl]="destinationpostalcodeControl" 
+                              (blur)="validateDestinationPostalCode()" matInput required >
+                    </mat-form-field>
+                  </div>                                 
+                </div>
+                <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="5px">                
+                  <div fxFlex="50%">
+                    <mat-form-field>
+                      <mat-label>State</mat-label>
+                      <input [(ngModel)]="DestinationStateName" name="destinationstatename" matInput >
+                    </mat-form-field>
+                  </div>                                 
+                </div>              
+              </div>
+            </mat-expansion-panel>
+
+            <mat-expansion-panel [expanded]="true">
+              <mat-expansion-panel-header [collapsedHeight]="'42px'" [expandedHeight]="'42px'">
+                <mat-panel-title>
+                  Products
+                </mat-panel-title>
+                <mat-panel-description>
+                  Enter products
+                </mat-panel-description>
+              </mat-expansion-panel-header>
+              
+              <ng-template ngFor let-prod [ngForOf]="products" let-i="index">
+                <div fxLayout="column" class="pt-5" class="expansion-panel-cont-style">
+                  <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="5px">
+                    <div fxFlex="15%">
+                      <mat-form-field fxFlex="none">
+                        <mat-label>Pallet</mat-label>
+                        <input matInput type="number" maxlength="4">
+                      </mat-form-field>
+                    </div>
+                    <div fxFlex="15%">
+                      <mat-form-field>
+                        <mat-label>Pieces</mat-label>
+                        <input matInput type="number" maxlength="4">
+                      </mat-form-field>
+                    </div>   
+                    <div fxFlex="40%">
+                      <mat-form-field>
+                        <mat-label>Packages</mat-label>
+                        <mat-select name="package">
+                          <mat-option *ngFor="let package of packageTypes" [value]="package.PackageTypeID">{{package.PackageType}}</mat-option>
+                        </mat-select>
+                      </mat-form-field>
+                    </div>
+                    <div fxFlex="30%">
+                      <mat-form-field>
+                        <mat-label>Freight Class</mat-label>
+                        <mat-select>
+                          <mat-option value="50">50</mat-option>
+                          <mat-option value="55">55</mat-option>
+                          <mat-option value="50">60</mat-option>
+                          <mat-option value="65">65</mat-option>
+                          <mat-option value="70">70</mat-option>
+                          <mat-option value="77.5">77.5</mat-option>
+                          <mat-option value="85">85</mat-option>
+                          <mat-option value="92.5">92.5</mat-option>
+                          <mat-option value="100">100</mat-option>
+                          <mat-option value="110">110</mat-option>
+                          <mat-option value="125">125</mat-option>
+                          <mat-option value="150">150</mat-option>
+                          <mat-option value="175">175</mat-option>
+                          <mat-option value="200">200</mat-option>
+                          <mat-option value="250">250</mat-option>
+                          <mat-option value="300">300</mat-option>
+                          <mat-option value="400">400</mat-option>
+                          <mat-option value="500">500</mat-option>
+                        </mat-select>
+                      </mat-form-field>
+                    </div>
+                  </div>
+    
+                  <!--<div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="5px">
+                    <div fxFlex="70%">
+                      <mat-form-field>
+                        <mat-label>Description</mat-label>
+                        <input matInput>
+                      </mat-form-field>
+                    </div>
+                  </div>-->
+    
+                  <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="5px">   
+                    <div fxFlex="15%">
+                      <mat-form-field>
+                        <mat-label>NMFC</mat-label>
+                        <input matInput>
+                      </mat-form-field>
+                    </div>              
+                    <div fxFlex="15%">
+                      <mat-form-field>
+                        <mat-label>L</mat-label>
+                        <input matInput type="number" maxlength="4">
+                      </mat-form-field>
+                    </div>  
+                    <div fxFlex="15%">
+                      <mat-form-field>
+                        <mat-label>W</mat-label>
+                        <input matInput type="number" maxlength="4">
+                      </mat-form-field>
+                    </div>  
+                    <div fxFlex="15%">
+                      <mat-form-field>
+                        <mat-label>H</mat-label>
+                        <input matInput type="number" maxlength="4">
+                      </mat-form-field>
+                    </div>
+                    <div fxFlex="15%">
+                      <mat-form-field>
+                        <mat-label>PCF</mat-label>
+                        <input matInput>
+                      </mat-form-field>
+                    </div>
+                    <div fxFlex="20%">
+                      <mat-form-field>
+                        <mat-label>Total Weight</mat-label>
+                        <input matInput type="number" maxlength="4" min="1">
+                      </mat-form-field>
+                    </div>
+                    
+                  </div>
+    
+                  <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="5px" class="pb-5">
+
+                    <div fxFlex="50%" class="py-2" fxLayout.sm="column" fxLayoutAlign="center" fxLayoutGap="16px">
+                      <mat-checkbox [checked]="false" color="warn">Stackable</mat-checkbox>
+                      <mat-checkbox [checked]="false" color="warn">Hazmat</mat-checkbox>
+                    </div>
+                    <div fxLayoutAlign="end center">
+                      <ng-container>
+                        <button id="{{'remoeMinus'+i}}" (click)="removeNewProdField(i)" 
+                                mat-button type="button">Remove</button>
+                      </ng-container>
+                      <ng-container>
+                        <button id="{{'addrec'+i}}" (click)="addNewProdField(i)" 
+                                mat-raised-button type="button">Add New</button>
+                      </ng-container>
+                    </div>
+                  </div>
+                </div>
+              </ng-template>  
+            </mat-expansion-panel>
+          </mat-accordion>
+
+          <div fxLayout="row" fxLayoutAlign="end center" fxLayoutGap="8px" class="py-2 pr-5">
+            <button (click)="clearQuoteAndFields()" mat-button type="button">Clear</button>
+            <button (click)="getQuote()" color="warn" mat-raised-button type="button">Get Quote</button>
+          </div>
         </div>
-      </div>
+      </form>
       
 
     </div>
 
-    <div @fadeInUp class="card" fxFlex="50%">
+    <div class="card" fxFlex="50%">
       <div>
         <!-- <div #mapContainer id="map"></div> -->
-        <div class="fill-current text-center">
-          <ng-template [ngIf]="ratesCounter > 0" [ngIfElse]="noRates" > 
+        <div class="fill-current text-center">         
+          <!-- <mat-progress-spinner  color="warn" mode="indeterminate"></mat-progress-spinner>                 -->
+          <div class="spinnerSection" *ngIf="getQuoteButtonClicked && showSpinner">
+            <div>
+              <mat-progress-spinner color="warn" mode="indeterminate"></mat-progress-spinner>
+            </div>
+          </div>    
+
+          <div *ngIf="getQuoteButtonClicked && ratesCounter > 0 && !showSpinner">
             <div fxLayout="row" fxLayoutGap="8px" class="py-2 freightRatesView">
                 <div><h2 class="allRatesTab-labelText">ALL QUOTES ({{ratesCounter}})</h2></div>
             </div>                
@@ -300,12 +309,11 @@
                 <div class="call-out">
                   <button color="warn" class="button--small" mat-raised-button type="button">Book</button>
                 </div>
-              </div>    
-                       
-              
+              </div>                                         
            </div>
-          </ng-template>
-          <ng-template #noRates >              
+          </div>
+          
+          <ng-template [ngIf]="!getQuoteButtonClicked">              
               <img [src]="rightPanelImage" >
           </ng-template>
          

@@ -7,7 +7,7 @@ import icArrowDropDown from '@iconify/icons-ic/twotone-arrow-drop-down';
 import icMenu from '@iconify/icons-ic/twotone-menu';
 import icCamera from '@iconify/icons-ic/twotone-camera';
 import icPhone from '@iconify/icons-ic/twotone-phone';
-import { FormControl } from '@angular/forms';
+import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { map, startWith } from 'rxjs/operators';
 import { fadeInUp400ms } from '../../../../../@vex/animations/fade-in-up.animation';
 import { stagger60ms } from '../../../../../@vex/animations/stagger.animation';
@@ -23,9 +23,11 @@ import icTwotoneCalendarToday from '@iconify/icons-ic/twotone-calendar-today';
 import icBaselineImageNotSupported from '@iconify/icons-ic/baseline-image-not-supported';
 import { StringifyOptions } from 'querystring';
 import { PostalData } from '../../../../models/shipment-model';
+import { Rate } from '../../../../models/rate';
 import { ProductPackageType } from '../../../../Entities/ProductPackageType'
 import { getSupportedInputTypes } from '@angular/cdk/platform';
 import { Console } from 'console';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 
 export interface CountryState {
@@ -78,7 +80,7 @@ export const products: productFeatures[] = [
   selector: 'vex-form-quick-quote',
   templateUrl: './form-quick-quote.component.html',
   styleUrls: ['./form-quick-quote.component.scss'], 
-  changeDetection: ChangeDetectionStrategy.OnPush,
+  changeDetection: ChangeDetectionStrategy.Default,
   animations: [
     stagger60ms,
     fadeInUp400ms
@@ -86,6 +88,10 @@ export const products: productFeatures[] = [
 })
 
 export class FormQuickQuoteComponent implements OnInit {
+  accountFormGroup: FormGroup;
+  showSpinner = false;
+  getQuoteButtonClicked = false;
+
   @HostListener('window:scroll')
   selectCtrl: FormControl = new FormControl();
   inputType = 'password';
@@ -156,8 +162,8 @@ export class FormQuickQuoteComponent implements OnInit {
     this.mapOptions);
    }  
 
-   rates: Object;
-   ratesFiltered = [];
+   rates: Rate[];
+   ratesFiltered: Rate[];
    originCountries: Object;
    destinationCountries: Object;
    ratesCounter: number = 0;   
@@ -167,12 +173,14 @@ export class FormQuickQuoteComponent implements OnInit {
    productPackageType: ProductPackageType[];
    originpostalcodeControl = new FormControl('');
    destinationpostalcodeControl = new FormControl('');
+   showLoadingPanel: boolean = false;
 
 
   constructor(
     private cd: ChangeDetectorRef, 
     private ratesService: RatesService,
-    private httpService : HttpService
+    private httpService : HttpService,
+    private snackbar: MatSnackBar
     ) { }
 
   async ngOnInit() {    
@@ -215,21 +223,25 @@ export class FormQuickQuoteComponent implements OnInit {
   rightPanelImage: any = "../../../../../assets/img/demo/R2TestImage.png";
 
   async getQuote() {
+    this.getQuoteButtonClicked = true;
     //this.rightPanelImage = "../../../../../assets/img/demo/TestImageRates.png";
-    console.log('print at start.')
+    console.log('print at start.');  
+    this.showSpinner = true;   
     let test = await this.getShipmentRates();       
-
-    this.ratesCounter = this.ratesFiltered.length;
-    console.log('print at the end.')
-    window.scroll({ 
-      top: 0, 
-      left: 0, 
-      behavior: 'smooth' 
-    });
+    this.showSpinner = false;
+    //this.cd.markForCheck(); 
+    
+    console.log('print at the end.');  
+    // window.scroll({ 
+    //   top: 0, 
+    //   left: 0, 
+    //   behavior: 'smooth' 
+    // });
   }
 
   clearQuoteAndFields(){
     this.ratesCounter = 0;
+    this.getQuoteButtonClicked = false;
     this.rightPanelImage = "../../../../../assets/img/demo/R2TestImage.png";
     window.scroll({ 
       top: 0, 
@@ -428,13 +440,13 @@ export class FormQuickQuoteComponent implements OnInit {
         "SourceCountry": this.OriginPostalData.CountryCode,
         "SourceStateCode": this.OriginPostalData.StateCode,
         "SourceCityName": this.OriginPostalData.CityName,
-        "DestPostalCode": this.destinationPostalData.PostalCode,
-        "DestCityID": this.destinationPostalData.CityID,
-        "DestStateID": this.destinationPostalData.StateId,
-        "DestCountryID": this.destinationPostalData.CountryId,
-        "DestCountry": this.destinationPostalData.CountryCode,
-        "DestStateCode": this.destinationPostalData.StateCode,
-        "DestCityName": this.destinationPostalData.CityName,
+        "DestPostalCode": this.DestinationPostalData.PostalCode,
+        "DestCityID": this.DestinationPostalData.CityID,
+        "DestStateID": this.DestinationPostalData.StateId,
+        "DestCountryID": this.DestinationPostalData.CountryId,
+        "DestCountry": this.DestinationPostalData.CountryCode,
+        "DestStateCode": this.DestinationPostalData.StateCode,
+        "DestCityName": this.DestinationPostalData.CityName,
         "ShipmentDate": "/Date(1593388800000)/",
         "Accessorials": [],
         "AccessorialCodes": [],
@@ -450,7 +462,7 @@ export class FormQuickQuoteComponent implements OnInit {
         "SkeepCalculatePPS": false,
         "ProfileDescription": "**R2 BUY",
         "Origin":  this.OriginPostalData.PostalCode + ',' +  this.OriginPostalData.CityName + ',' + this.OriginPostalData.StateName,
-        "Destination": this.destinationPostalData.PostalCode + ',' +  this.destinationPostalData.CityName + ',' + this.destinationPostalData.StateName,
+        "Destination": this.DestinationPostalData.PostalCode + ',' +  this.DestinationPostalData.CityName + ',' + this.DestinationPostalData.StateName,
         "ShipmentStopList": []
       };
 
@@ -467,7 +479,7 @@ export class FormQuickQuoteComponent implements OnInit {
       //       this.ratesCounter = this.ratesFiltered.length; 
       //     },
       //       (err: HttpErrorResponse) => {
-      //             if (err.error instanceof Error) {
+      //             if (err.error instanceof Error ) {
       //               //A client-side or network error occurred.				 
       //               console.log('An error occurred:', err.error.message);
       //             } else {
@@ -479,11 +491,23 @@ export class FormQuickQuoteComponent implements OnInit {
       //       );
 
       this.rates = await this.ratesService.postRates(objRate);
-      console.log(this.rates); 
-      // if (this.rates != null && this.rates.length > 0){
-      //       this.ratesFiltered = this.rates.filter(rate => rate.CarrierCost > 0);
-      // }
+         
+      // setTimeout(()=>{    //<<<---    using ()=> syntax       
+      //   this.ratesCounter = 8;
+      //   this.showSpinner = false;
+      //   this.cd.markForCheck();        
+      // }, 3000);
+      console.log( this.rates); 
+      if ( this.rates != null &&  this.rates.length > 0){
+            this.ratesFiltered =  this.rates.filter(rate => rate.CarrierCost > 0);
+            this.ratesCounter = this.ratesFiltered.length; 
+            this.snackbar.open(this.ratesCounter + ' rates found.', null, {
+              duration: 5000
+            });
+      }
+
+      
           
-      this.ratesCounter = this.ratesFiltered.length; 
+     
     }
 }

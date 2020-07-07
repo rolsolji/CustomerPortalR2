@@ -186,6 +186,14 @@
     margin: 5px 0;
     }
     
+  .spinnerSection{
+    display: flex;
+    justify-content: center;
+  }
+
+  .spinnerSection mat-progress-spinner{
+    flex: 1;
+  }
     
 
   @media (min-width: 900px) {

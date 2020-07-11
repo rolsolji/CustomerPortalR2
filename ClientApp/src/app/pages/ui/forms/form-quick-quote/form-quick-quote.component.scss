@@ -186,6 +186,25 @@
     margin: 5px 0;
     }
     
+  .spinnerSection{
+    display: flex;
+    justify-content: center;
+  }
+
+  .center-me{
+    margin-top: 50%;
+    margin-bottom: 50%;
+  }
+
+  .spinnerSection mat-progress-spinner{
+    flex: 1;
+  }
+
+  hr{
+    border: 0.5px solid silver; 
+    margin: 5px;   
+  }
+  
     
 
   @media (min-width: 900px) {

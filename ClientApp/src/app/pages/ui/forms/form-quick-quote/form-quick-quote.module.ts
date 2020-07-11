@@ -21,7 +21,9 @@ import { SecondaryToolbarModule } from '../../../../../@vex/components/secondary
 import { BreadcrumbsModule } from '../../../../../@vex/components/breadcrumbs/breadcrumbs.module';
 import { ContainerModule } from '../../../../../@vex/directives/container/container.module';
 import { MatExpansionModule } from '@angular/material/expansion';
-
+import { MatSnackBarModule } from '@angular/material/snack-bar';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+ 
 
 @NgModule({
   declarations: [FormQuickQuoteComponent],
@@ -46,7 +48,9 @@ import { MatExpansionModule } from '@angular/material/expansion';
     SecondaryToolbarModule,
     BreadcrumbsModule,
     ContainerModule,
-    MatExpansionModule    
+    MatExpansionModule,
+    MatSnackBarModule,
+    MatProgressSpinnerModule
   ]
 })
 export class FormQuickQuoteModule {

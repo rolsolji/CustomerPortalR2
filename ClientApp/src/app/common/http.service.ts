@@ -5,8 +5,7 @@ import { Observable, of } from 'rxjs';
 import { catchError, map, tap } from 'rxjs/operators';
 
 import { String, StringBuilder } from 'typescript-string-operations';
-//import { PostalData } from '../models/shipment-model';
-import { PostalData } from '../Entities/PostalData'
+import { PostalData } from '../Entities/PostalData';
 import { ProductPackageType } from '../Entities/ProductPackageType'
 
 @Injectable({

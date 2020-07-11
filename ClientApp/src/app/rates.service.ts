@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders, HttpResponse } from '@angular/common/http';
+import { Rate } from './Entities/rate';
 //import { Observable } from 'rxjs/Observable';
  
 @Injectable({
@@ -23,7 +24,7 @@ export class RatesService {
 
   postRates(objRate: Object)
   {
-    return this.http.post(this.url, objRate).toPromise();
+    return this.http.post<Rate[]>(this.url, objRate).toPromise();
   }
 
   // async postRates(objRate: Object): Observable<HttpResponse<Object>> {
@@ -42,11 +43,7 @@ export class RatesService {
   //           observe: 'response'
   //         }
   //     ).toPromise();
-  //   }    
-
-    getCountries(){
-      return this.http.get('https://customer.r2logistics.com/Services/MASCityStatePostalService.svc/json/GetCountryList?_=1592973456198')
-    }
+  //   }        
 
   getRates(){
 

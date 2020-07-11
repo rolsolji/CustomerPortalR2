@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders, HttpResponse } from '@angular/common/http';
-import { Rate } from '../app/models/rate';
+import { Rate } from './Entities/rate';
 //import { Observable } from 'rxjs/Observable';
  
 @Injectable({

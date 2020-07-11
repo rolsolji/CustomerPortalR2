@@ -19,6 +19,7 @@ import { PopoverService } from '../../components/popover/popover.service';
 import { MegaMenuComponent } from '../../components/mega-menu/mega-menu.component';
 import icSearch from '@iconify/icons-ic/twotone-search';
 import { FormControl } from '@angular/forms';
+import { HttpService } from '../../../app/common/http.service';
 
 
 @Component({
@@ -57,12 +58,17 @@ export class ToolbarComponent implements OnInit {
 
   searchCtrl = new FormControl();
 
+  keyId: string = "1593399730488";
+  toolBarMessage:string;
+
   constructor(private layoutService: LayoutService,
               private configService: ConfigService,
               private navigationService: NavigationService,
-              private popoverService: PopoverService) { }
+              private popoverService: PopoverService,
+              private httpService : HttpService) { }
 
   ngOnInit() {
+    this.toolBarMessage = this.httpService.getUserMessage(this.keyId);
   }
 
 

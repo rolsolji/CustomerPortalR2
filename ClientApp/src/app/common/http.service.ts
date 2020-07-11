@@ -32,15 +32,8 @@ export class HttpService{
         return this.http.get(String.Format('https://customer.r2logistics.com/Services/MasClientDefaultsService.svc/json/GetMasProductPackageType?_={0}',keyId))
     }
 
-    async getProductPackageTypeN(keyId:string): Promise<ProductPackageType[]>{
-        try{
-            let response = await this.http.get(String.Format('https://customer.r2logistics.com/Services/MasClientDefaultsService.svc/json/GetMasProductPackageType?_={0}',keyId))
-                .toPromise();
-            return response.json().data as ProductPackageType[];
-        } catch (error) {
-            //await this.handleError(error);
-        }
-
+    getUserMessage(keyId:string){
+        //return this.http.get(String.Format('https://beta-customer.r2logistics.com/Services/MASCityStatePostalService.svc/json/GetCountryList?_={0}',keyId)).toPromise();
+        return "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed consequat lectus nulla, ac scelerisque leo.";
     }
-   
 }

@@ -80,13 +80,25 @@
     <vex-navigation-item *ngFor="let item of navigationItems" [item]="item"></vex-navigation-item>
   </div>
 
-  <span fxFlex></span>
+  <span fxFlex>
+    <div fxLayout="row" fxLayoutGap="5px">
+      <div fxFlex="10%">
+        <img class="w-16" src="assets/img/demo/R2-Logistics_Logo.png">
+      </div>
+      <div fxFlex="90%" fxLayout="column" fxLayoutAlign="space-around center">
+        
+          <span><h2>R2 Logistics</h2></span>
+          <span fxHide.sm>{{toolBarMessage}}</span>
+        
+      </div>
+    </div>  
+  </span>
 
   <div class="-mx-1 flex items-center">
       <div class="px-1">
-          <!--<button (click)="openSearch()" mat-icon-button type="button">
-      <mat-icon [icIcon]="icSearch"></mat-icon>
-    </button>-->
+          <!-- <button (click)="openSearch()" mat-icon-button type="button">
+            <mat-icon [icIcon]="icSearch"></mat-icon>
+          </button> -->
 
           <!-- <div class="bg-app-bar px-6 h-16 border-b sticky left-0 bg-app-bar-toolbar-search" fxLayout="row" fxLayoutAlign="start center">
               <h2 class="body-1 font-medium leading-snug ltr:mr-3 rtl:ml-3" fxFlex="none" fxHide.xs>

@@ -80,19 +80,25 @@
     <vex-navigation-item *ngFor="let item of navigationItems" [item]="item"></vex-navigation-item>
   </div>
 
-  <span fxFlex>
-    <div fxLayout="row" fxLayoutGap="5px">
-      <div fxFlex="10%">
+  <!-- <span fxFlex> -->
+    <div fxFlex fxLayout="row" fxLayoutGap="5px">
+      <div fxFlex="10%" fxHide.lt-sm>
         <img class="w-16" src="assets/img/demo/R2-Logistics_Logo.png">
       </div>
-      <div fxFlex="90%" fxLayout="column" fxLayoutAlign="space-around center">
-        
-          <span><h2>R2 Logistics</h2></span>
-          <span fxHide.sm>{{toolBarMessage}}</span>
-        
+      <div fxFlex fxLayout="column" fxLayoutAlign="space-around center"> 
+        <div><h2>R2 Logistics</h2></div>
+        <div fxLayout="row">
+          <p style="font-style: normal;"
+              [ngStyle.xs]="{'font-size.px': 8}"
+              [ngStyle.sm]="{'font-size.px': 10}"
+              [ngStyle.md]="{'font-size.px': 12}"
+              [ngStyle.lg]="{'font-size.px': 14}">
+            {{toolBarMessage}}
+          </p>
+        </div> 
       </div>
     </div>  
-  </span>
+  <!-- </span> -->
 
   <div class="-mx-1 flex items-center">
       <div class="px-1">

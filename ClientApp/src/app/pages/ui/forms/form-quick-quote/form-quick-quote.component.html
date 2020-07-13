@@ -22,14 +22,12 @@
                 </mat-panel-description>
               </mat-expansion-panel-header>
     
-              <div fxLayout="column" class="expansion-panel-cont-style">
-    
+              <div fxLayout="column" class="expansion-panel-cont-style">    
                 <div class="py-2" fxLayout.sm="column" fxLayoutGap="16px">
                   <mat-checkbox [checked]="false" color="warn">Commercial</mat-checkbox>
                   <mat-checkbox [checked]="false" color="warn">Residential</mat-checkbox>
                   <mat-checkbox [checked]="false" color="warn">Limited Access</mat-checkbox>
                 </div>
-    
                 <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="5px">
                   <div fxFlex="50%">
                     <mat-form-field fxFlex="none">
@@ -64,9 +62,17 @@
                       <mat-datepicker #formDatepickerRef></mat-datepicker>
                     </mat-form-field>
                   </div>                                 
+                </div>
+                <div class="pt-5" fxLayout.sm="column" fxLayoutGap="8px">
+                  <div>
+                    <span>Collection Services</span>
+                  </div>
+                  <div fxLayoutGap="8px"> 
+                    <mat-checkbox [checked]="false" color="warn">Inside Pickup</mat-checkbox>
+                    <mat-checkbox [checked]="false" color="warn">Liftgate Required at Pickup</mat-checkbox>
+                  </div>
                 </div>             
               </div>
-    
             </mat-expansion-panel>
     
             <mat-expansion-panel [expanded]="true">
@@ -115,7 +121,53 @@
                       <input name="destinationstatename" matInput formControlName="destinationstatename" required>
                     </mat-form-field>
                   </div>                                 
-                </div>              
+                </div>
+     
+                <mat-expansion-panel [expanded]="false"
+                  (opened)="panelOpenState = true"
+                  (closed)="panelOpenState = false">
+                  <mat-expansion-panel-header [collapsedHeight]="'32px'" [expandedHeight]="'32px'">
+                    <mat-panel-title>
+                      <span matBadge="4" matBadgeOverlap="false">Delivery Services</span>
+                    </mat-panel-title>
+                    <mat-panel-description>
+                      Select Delivery Services
+                      <mat-icon>{{panelOpenState ? 'keyboard_arrow_up' : 'keyboard_arrow_down'}} </mat-icon>
+                    </mat-panel-description>
+                  </mat-expansion-panel-header>
+
+                  <div>
+                    <div class="py-2" fxLayout.lt-xs="column" fxLayout.gt-xs="row">
+                      <div fxFlex="50%">
+                        <mat-checkbox [checked]="false" color="warn">Call Before Delivery</mat-checkbox>
+                      </div> 
+                      <div fxFlex="50%">
+                        <mat-checkbox [checked]="false" color="warn">Appointment Required</mat-checkbox>
+                      </div>
+                    </div>
+                    <div class="py-2" fxLayout.lt-xs="column" fxLayout.gt-xs="row">
+                      <div fxFlex="50%">
+                        <mat-checkbox [checked]="false" color="warn">Protect from Freezing</mat-checkbox>
+                      </div>
+                      <div fxFlex="50%">
+                        <mat-checkbox [checked]="false" color="warn">Inside Delivery</mat-checkbox>
+                      </div>
+                    </div>
+                    <div class="py-2" fxLayout.lt-xs="column" fxLayout.gt-xs="row"> 
+                      <div fxFlex="50%">
+                        <mat-checkbox [checked]="false" color="warn">Sort & Segregate</mat-checkbox>
+                      </div>
+                      <div fxFlex="50%">
+                        <mat-checkbox [checked]="false" color="warn">Blind Shipment</mat-checkbox>
+                      </div>
+                    </div>
+                    <div class="py-2" fxLayout.lt-xs="column" fxLayout.gt-xs="row"> 
+                      <div fxFlex="50%">
+                        <mat-checkbox [checked]="false" color="warn">Liftgate Required at Delivery</mat-checkbox>
+                      </div>
+                    </div>
+                  </div>
+                </mat-expansion-panel>
               </div>
             </mat-expansion-panel>
 

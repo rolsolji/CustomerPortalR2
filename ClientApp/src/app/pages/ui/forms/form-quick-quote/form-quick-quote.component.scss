@@ -81,7 +81,7 @@
     }
 
     .numeral--large {
-        font-size: 1.38rem;
+        font-size: 1.25rem;
     }
 
     .numeral-affix {
@@ -126,38 +126,56 @@
         font-size: 1rem;
     }
 
-.call-outs-container {
-    max-width: 1400px;
-    // margin: 40px auto 0 auto;
-    border-block-end: 1px solid #ddd;
-    margin-top: 2%;
-  }
-
-  .call-out:nth-child(1) {
-    padding: 2px;
-    box-sizing: border-box;
-    margin-bottom: 20px;
-    flex-basis: 10%;
-    order: 0;
-  }
-
-  .call-out:nth-child(2) {
-    padding: 2px;
-    box-sizing: border-box;
-    margin-bottom: 20px;
-    flex-basis: 22.5%;
-    text-align: center;
-  }
-
-  .call-out {
-    padding: 2px;
-    box-sizing: border-box;
-    margin-bottom: 20px;
-    flex-basis: 22.5%;
-    overflow-wrap: anywhere;
-    justify-content: center;
-    align-items: center;
-  }
+    .call-outs-container {
+      max-width: 1400px;
+      // margin: 40px auto 0 auto;
+      border-block-end: 1px solid #ddd;
+      margin-top: 2%;
+    }
+  
+    .call-out:nth-child(1) {
+      padding: 2px;
+      box-sizing: border-box;
+      margin-bottom: 20px;
+      flex-basis: 10%;
+      order: 0;
+    }
+  
+    .call-out:nth-child(2) {
+      padding: 2px;
+      box-sizing: border-box;
+      margin-bottom: 20px;
+      flex-basis: 24%;
+      text-align: start;
+    }
+  
+    .call-out:nth-child(3) {
+      padding: 2px;
+      box-sizing: border-box;
+      margin-bottom: 20px;
+      flex-basis: 24.5%;
+      text-align: start;
+    }
+  
+    .call-out:nth-child(5) {
+      padding: 2px;
+      box-sizing: border-box;
+      margin-bottom: 20px;
+      flex-basis: 20%;
+      overflow-wrap: anywhere;
+      justify-content: center;
+      align-items: center;    
+    }
+  
+    .call-out {
+      padding: 2px;
+      box-sizing: border-box;
+      margin-bottom: 20px;    
+      flex-basis: 22%;
+      overflow-wrap: anywhere;
+      justify-content: center;
+      align-items: center;
+    }
 
   .expansion-panel-cont-style{
         font-size: 12px;  
@@ -203,6 +221,14 @@
   hr{
     border: 0.5px solid silver; 
     margin: 5px;   
+  }
+
+  .button-banner{
+    display: flex;
+  }
+
+  .button-center-me{
+    margin: auto;
   }
   
     

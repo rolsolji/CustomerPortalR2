@@ -238,18 +238,20 @@ export class FormQuickQuoteComponent implements OnInit {
 
   addProductFormGroup(): FormGroup{
     return this.fb.group({
-        pallet: [null, Validators.required],
-        pieces: [null, Validators.required],
-        package: [null, Validators.required],
-        freightClass: [null, Validators.required],
-        nmfc: [null],
-        large: [null, Validators.required],
-        width: [null, Validators.required],
-        height: [null, Validators.required],
-        pcf: [null],
-        totalWeight: [null, Validators.required]      
+      Pallets: [null, Validators.required],
+      Pieces: [null, Validators.required],
+        Package: [null],
+        ProductClass: [null, Validators.required],
+        NMFC: [null],
+        Length: [null, Validators.required],
+        Width: [null, Validators.required],
+        Height: [null, Validators.required],
+        PCF: [null],
+        Weight: [null, Validators.required]      
     })
-  }
+  }  
+
+  get formProducts() { return <FormArray>this.quickQuoteFormGroup.get('products'); }
 
   // ngAfterViewInit() {
   //   this.mapInitializer();
@@ -341,12 +343,11 @@ export class FormQuickQuoteComponent implements OnInit {
       console.log(responseData)     
       this.postalData = responseData;
       if (this.postalData != null && this.postalData.length > 0) 
-      {
-        //this.OriginStateName = this.postalData[0].StateName;
+      {        
         this.quickQuoteFormGroup.get('originstatename').setValue(this.postalData[0].StateName);
         this.OriginPostalCode = String.Format("{0}-{1}",this.OriginPostalCode,this.postalData[0].CityName);  
-        this.OriginPostalData = this.postalData[0];
-        this.originpostalcodeControl.setValue(this.OriginPostalCode);
+        this.OriginPostalData = this.postalData[0];        
+        this.quickQuoteFormGroup.get('originpostalcode').setValue(this.OriginPostalCode);
       }
       else
       {
@@ -393,12 +394,11 @@ export class FormQuickQuoteComponent implements OnInit {
       let responseData = await this.httpService.getPostalDataByPostalCode(this.DestinationPostalCode,CountryId,this.keyId);
       this.postalDataDest = responseData;
       if (this.postalDataDest != null && this.postalDataDest.length > 0) 
-      {
-        //this.DestinationStateName = this.postalDataDest[0].StateName;
+      {        
         this.quickQuoteFormGroup.get('destinationstatename').setValue(this.postalDataDest[0].StateName);
         this.DestinationPostalCode = String.Format("{0}-{1}",this.DestinationPostalCode,this.postalDataDest[0].CityName);  
-        this.DestinationPostalData = this.postalDataDest[0];        
-        this.destinationpostalcodeControl.setValue(this.DestinationPostalCode);
+        this.DestinationPostalData = this.postalDataDest[0];               
+        this.quickQuoteFormGroup.get('destinationpostalcode').setValue(this.DestinationPostalCode);
       }
       else
       {
@@ -461,22 +461,25 @@ export class FormQuickQuoteComponent implements OnInit {
   async getShipmentRates()
     {
       let pickupDate = this.OriginPickupDate;
+      let arrayProducts = this.quickQuoteFormGroup.get('products').value;
+
+      // "Products": [
+      //   {
+      //     "Weight": "1000",
+      //     "ProductClass": "50",
+      //     "Pieces": "1",
+      //     "Pallets": "1",
+      //     "Length": "48",
+      //     "Height": "48",
+      //     "Width": 48,
+      //     "PCF": "15.63"
+      //   }
+      // ],
 
       let objRate = {
         "ClientID": 8473,
         "ProfileID": 11868,
-        "Products": [
-          {
-            "Weight": "1000",
-            "ProductClass": "50",
-            "Pieces": "1",
-            "Pallets": "1",
-            "Length": "48",
-            "Height": "48",
-            "Width": 48,
-            "PCF": "15.63"
-          }
-        ],
+        "Products": arrayProducts,
         "SourcePostalCode": this.OriginPostalData.PostalCode,
         "SourceCityID": this.OriginPostalData.CityID,
         "SourceStateID": this.OriginPostalData.StateId,
@@ -543,9 +546,9 @@ export class FormQuickQuoteComponent implements OnInit {
       // }, 3000);
       console.log( this.rates); 
       if ( this.rates != null &&  this.rates.length > 0){
-            this.ratesFiltered =  this.rates.filter(rate => rate.CarrierCost > 0);
+            this.ratesFiltered =  this.rates.filter(rate => rate.CarrierCost > 0);            
             this.ratesCounter = this.ratesFiltered.length; 
-            this.snackbar.open(this.ratesCounter + ' rates found.', null, {
+            this.snackbar.open(this.ratesCounter + ' rates retuned.', null, {
               duration: 5000
             });
       }

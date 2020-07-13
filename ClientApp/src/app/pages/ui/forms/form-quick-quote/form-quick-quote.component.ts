@@ -13,7 +13,6 @@ import { fadeInUp400ms } from '../../../../../@vex/animations/fade-in-up.animati
 import { stagger60ms } from '../../../../../@vex/animations/stagger.animation';
 import icMoreVert from '@iconify/icons-ic/twotone-more-vert';
 import {MatAccordion} from '@angular/material/expansion';
-//import { Observable } from 'rxjs/Observable';
 import { HttpErrorResponse } from '@angular/common/http';
 import { RatesService } from '../../../../rates.service';
 import { HttpService } from '../../../../common/http.service';
@@ -29,6 +28,8 @@ import { ProductFeatures } from '../../../../Entities/ProductFeatures'
 import { CatalogItem } from '../../../../Entities/CatalogItem'
 import { getSupportedInputTypes } from '@angular/cdk/platform';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { MatIconModule } from '@angular/material/icon';
+import { MatBadgeModule } from '@angular/material/badge'
 
 
 export interface CountryState {
@@ -164,7 +165,7 @@ export class FormQuickQuoteComponent implements OnInit {
    originpostalcodeControl = new FormControl('');
    destinationpostalcodeControl = new FormControl('');
    showLoadingPanel: boolean = false;
-
+   panelOpenState = false;
 
 
   //  products: ProductFeatures[] = [

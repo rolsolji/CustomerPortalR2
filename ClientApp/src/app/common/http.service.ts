@@ -34,6 +34,6 @@ export class HttpService{
 
     getUserMessage(keyId:string){
         //return this.http.get(String.Format('https://beta-customer.r2logistics.com/Services/MASCityStatePostalService.svc/json/GetCountryList?_={0}',keyId)).toPromise();
-        return "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed consequat lectus nulla, ac scelerisque leo.";
+        return "It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout.";
     }
 }

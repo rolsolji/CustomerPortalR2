@@ -249,3 +249,9 @@
         text-align: start;
       }
   }
+
+  // ::ng-deep .expansion-panel-indicator > .mat-expansion-indicator:after {
+  //   color: red !important;
+  // }
+
+  // .mat-expansion-indicator::after, .mat-expansion-panel-header-description { color: red;}

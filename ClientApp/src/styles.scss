@@ -53,3 +53,7 @@
 /*.vex-page-layout-header {
     background-color: #1f2449 !important;
 }*/
+
+.mat-expansion-indicator::after {
+    border-color: unset !important;
+}

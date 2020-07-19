@@ -12,7 +12,7 @@ import { map, startWith } from 'rxjs/operators';
 import { fadeInUp400ms } from '../../../../../@vex/animations/fade-in-up.animation';
 import { stagger60ms } from '../../../../../@vex/animations/stagger.animation';
 import icMoreVert from '@iconify/icons-ic/twotone-more-vert';
-import {MatAccordion} from '@angular/material/expansion';
+import { MatAccordion } from '@angular/material/expansion';
 import { HttpErrorResponse } from '@angular/common/http';
 import { RatesService } from '../../../../rates.service';
 import { HttpService } from '../../../../common/http.service';
@@ -31,7 +31,6 @@ import { getSupportedInputTypes } from '@angular/cdk/platform';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatIconModule } from '@angular/material/icon';
 import { MatBadgeModule } from '@angular/material/badge'
-
 
 export interface CountryState {
   name: string;
@@ -169,8 +168,13 @@ export class FormQuickQuoteComponent implements OnInit {
    originpostalcodeControl = new FormControl('');
    destinationpostalcodeControl = new FormControl('');
    showLoadingPanel: boolean = false;
-   panelOpenState = false;
+   panelCollectionServiceState = false;
+   panelDeliveryServiceState = false;
 
+   collectionServicesSelected: number = 0;
+   collectionServicesDescription: string = "Select Collection Services";
+   deliveryServicesSelected: number = 0;
+   deliveryServicesDescription: string = "Select Delivery Services";
 
   //  products: ProductFeatures[] = [
   //   {
@@ -206,7 +210,31 @@ export class FormQuickQuoteComponent implements OnInit {
       originstatename: [null, Validators.required],
       originpickupdate: [null, Validators.required],
       destinationpostalcode: [null, Validators.required],
-      destinationstatename: [null, Validators.required],      
+      destinationstatename: [null, Validators.required],
+      //#region CollectionServices    
+      commercial:[null],
+      residential:[null],
+      limitedAccess:[null],
+      insidePickup:[null],
+      liftgateRequiredAtPickup:[null],
+      // collectionServices: this.fb.group({
+        
+      // }),
+      //#endregion
+      //#region Delivery Services
+      deliveryCommercial:[null],
+      deliveryResidential:[null],
+      deliveryLimitedAccess:[null],
+      standard:[null],
+      guarantee:[null],
+      callBeforeDelivery:[null],
+      appointmentRequired:[null],
+      protectfromFreezing:[null],
+      insideDelivery:[null],
+      sortAndSegregate:[null],
+      blindShipment:[null],
+      liftgateRequiredAtDelivery:[null],
+      //#endregion
       products: this.fb.array([
         this.addProductFormGroup()
       ])
@@ -337,7 +365,32 @@ export class FormQuickQuoteComponent implements OnInit {
   OriginPostalData: PostalData;
   OriginPickupDate: string;
 
+  validateCollectionServices(){
+    this.collectionServicesSelected = 0;
+    this.collectionServicesSelected += this.quickQuoteFormGroup.get('commercial').value ? 1 : 0;
+    this.collectionServicesSelected += this.quickQuoteFormGroup.get('residential').value ? 1 : 0;
+    this.collectionServicesSelected += this.quickQuoteFormGroup.get('limitedAccess').value ? 1 : 0;
+    this.collectionServicesSelected += this.quickQuoteFormGroup.get('insidePickup').value ? 1 : 0;
+    this.collectionServicesSelected += this.quickQuoteFormGroup.get('liftgateRequiredAtPickup').value ? 1 : 0;
+    this.collectionServicesDescription = this.collectionServicesSelected > 0 ? String.Format("Selected: {0}", this.collectionServicesSelected) : "Select Collection Services";
+  }
 
+  validateDeliveryServices(){
+    this.deliveryServicesSelected = 0;
+    this.deliveryServicesSelected += this.quickQuoteFormGroup.get('deliveryCommercial').value ? 1 : 0;
+    this.deliveryServicesSelected += this.quickQuoteFormGroup.get('deliveryResidential').value ? 1 : 0;
+    this.deliveryServicesSelected += this.quickQuoteFormGroup.get('deliveryLimitedAccess').value ? 1 : 0;
+    this.deliveryServicesSelected += this.quickQuoteFormGroup.get('standard').value ? 1 : 0;
+    this.deliveryServicesSelected += this.quickQuoteFormGroup.get('guarantee').value ? 1 : 0;
+    this.deliveryServicesSelected += this.quickQuoteFormGroup.get('callBeforeDelivery').value ? 1 : 0;
+    this.deliveryServicesSelected += this.quickQuoteFormGroup.get('appointmentRequired').value ? 1 : 0;
+    this.deliveryServicesSelected += this.quickQuoteFormGroup.get('protectfromFreezing').value ? 1 : 0;
+    this.deliveryServicesSelected += this.quickQuoteFormGroup.get('insideDelivery').value ? 1 : 0;
+    this.deliveryServicesSelected += this.quickQuoteFormGroup.get('sortAndSegregate').value ? 1 : 0;
+    this.deliveryServicesSelected += this.quickQuoteFormGroup.get('blindShipment').value ? 1 : 0;
+    this.deliveryServicesSelected += this.quickQuoteFormGroup.get('liftgateRequiredAtDelivery').value ? 1 : 0;
+    this.deliveryServicesDescription = this.deliveryServicesSelected > 0 ? String.Format("Selected: {0}", this.deliveryServicesSelected) : "Select Delivery Services";
+  }
 
   async validateOriginPostalCode(){
     console.log(this.originSelectedCountry);

@@ -6,6 +6,7 @@ import { catchError, map, tap } from 'rxjs/operators';
 
 import { String, StringBuilder } from 'typescript-string-operations';
 import { PostalData } from '../Entities/PostalData';
+import { ClientDefaultData } from '../Entities/ClientDefaultData';
 import { ProductPackageType } from '../Entities/ProductPackageType'
 
 @Injectable({
@@ -35,5 +36,9 @@ export class HttpService{
     getUserMessage(keyId:string){
         //return this.http.get(String.Format('https://beta-customer.r2logistics.com/Services/MASCityStatePostalService.svc/json/GetCountryList?_={0}',keyId)).toPromise();
         return "It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout.";
+    }
+
+    getClientDefaultsByClient(clientID:number, keyId:string){
+        return this.http.get<ClientDefaultData>(String.Format('https://customer.r2logistics.com/Services/MasClientDefaultsService.svc/json/GetClientDefaultsByClient?ClientID={0}&_={1}',clientID.toString(),keyId)).toPromise();
     }
 }

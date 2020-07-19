@@ -25,6 +25,7 @@ import { PostalData } from '../../../../Entities/PostalData';
 import { Rate } from '../../../../Entities/rate';
 import { ProductPackageType } from '../../../../Entities/ProductPackageType'
 import { ProductFeatures } from '../../../../Entities/ProductFeatures'
+import { ClientDefaultData } from '../../../../Entities/ClientDefaultData';
 import { CatalogItem } from '../../../../Entities/CatalogItem'
 import { getSupportedInputTypes } from '@angular/cdk/platform';
 import { MatSnackBar } from '@angular/material/snack-bar';
@@ -60,6 +61,9 @@ export class FormQuickQuoteComponent implements OnInit {
   visible = false;
 
   keyId: string = "1593399730488";
+  ClientID: number = 8473;
+  clientDefaultData: ClientDefaultData;
+  clientTLWeightLimit: string;
 
   icPhone = icPhone;
   icCamera = icCamera;
@@ -202,7 +206,7 @@ export class FormQuickQuoteComponent implements OnInit {
       originstatename: [null, Validators.required],
       originpickupdate: [null, Validators.required],
       destinationpostalcode: [null, Validators.required],
-      destinationstatename: [null, Validators.required],
+      destinationstatename: [null, Validators.required],      
       products: this.fb.array([
         this.addProductFormGroup()
       ])
@@ -223,6 +227,8 @@ export class FormQuickQuoteComponent implements OnInit {
     //--
 
     let responseData = await this.httpService.getContryList(this.keyId);   
+    this.clientDefaultData = await this.httpService.getClientDefaultsByClient(this.ClientID, this.keyId);    
+    console.log(this.clientDefaultData);
     this.originCountries = responseData;
     this.destinationCountries = responseData;
     this.originSelectedCountry = responseData[0]; // US as default     
@@ -478,7 +484,7 @@ export class FormQuickQuoteComponent implements OnInit {
       // ],
 
       let objRate = {
-        "ClientID": 8473,
+        "ClientID": this.ClientID,
         "ProfileID": 11868,
         "Products": arrayProducts,
         "SourcePostalCode": this.OriginPostalData.PostalCode,
@@ -552,6 +558,9 @@ export class FormQuickQuoteComponent implements OnInit {
             this.snackbar.open(this.ratesCounter + ' rates retuned.', null, {
               duration: 5000
             });
+
+            this.clientTLWeightLimit = (this.clientDefaultData.TLWeightLimit == null ? 0 : this.clientDefaultData.TLWeightLimit) + 'lb';
+            //console.log(this.clientDefaultData);            
       }
 
       

@@ -316,53 +316,100 @@
           <div *ngIf="getQuoteButtonClicked && ratesCounter > 0 && !showSpinner">
             <div fxLayout="row" fxLayoutGap="8px" class="py-2 freightRatesView">
                 <div><h2 class="allRatesTab-labelText">ALL QUOTES ({{ratesCounter}})</h2></div>
-            </div>                
-            <div *ngFor="let rate of ratesFiltered">
-              <div class="call-outs-container">
-                <div class="call-out freightRate-carrierInfo">
-                  <mat-icon [icIcon]="icBaselineImageNotSupported"></mat-icon>
-                </div>
-                <div class="call-out freightRate-carrierInfo">
-                  <div>
-                    <div fxLayout="column">
-                      <div class="CarrierName">
-                        {{rate.CarrierName}} 
-                      </div>
-                      <div class="inlineButton">
-                        {{rate.ServiceLevel}} 
-                      </div>
-                    </div>                    
-                  </div>                  
-                </div>
-                <div class="call-out freightRate-rateInfo">
-                  <div>
-                    <div fxLayout="column">
-                      <div>
-                        <div fxFlex="10%" class="freightRate-rateInfo-icon">
-                          <mat-icon [icIcon]="icTwotoneCalendarToday"></mat-icon>                     
+            </div>               
+            <mat-accordion class="rates-accordion" multi> 
+              <div *ngFor="let rate of ratesFiltered">              
+                <mat-expansion-panel [expanded]="false" >
+                  <mat-expansion-panel-header class="ratesAccordionExpansionHeader">
+                    <!-- <div class="main-rate-container"> -->
+                      <div class="call-outs-container">
+                        <div class="call-out freightRate-carrierInfo">
+                          <mat-icon [icIcon]="icBaselineImageNotSupported"></mat-icon>
                         </div>
-                        <div fxFlex="90%" class="freightRate-rateInfo-text">                    
-                           Est. {{rate.TransitTime}} Transit Day(s)
+                        <div class="call-out freightRate-carrierInfo">
+                          <div>
+                            <div fxLayout="column">
+                              <div class="CarrierName">
+                                {{rate.CarrierName}} 
+                              </div>
+                              <div class="inlineButton">
+                                {{rate.ServiceLevel}} 
+                              </div>
+                            </div>                    
+                          </div>                  
                         </div>
+                        <div class="call-out freightRate-rateInfo">
+                          <div>
+                            <div fxLayout="column">
+                              <div>
+                                <div fxFlex="10%" class="freightRate-rateInfo-icon">
+                                  <mat-icon [icIcon]="icTwotoneCalendarToday"></mat-icon>                     
+                                </div>
+                                <div fxFlex="90%" class="freightRate-rateInfo-text">                    
+                                   Est. {{rate.TransitTime}} Transit Day(s)
+                                </div>
+                              </div>
+                              <div>
+                                Carrier Type: {{rate.CarrierType}}
+                              </div>
+                              <div>
+                                <hr />
+                              </div>
+                              <div>
+                                Max Weight: {{clientTLWeightLimit}}
+                              </div>
+                              <div>
+                                {{rate.MaxLenghtShipmentLimit}}
+                              </div>
+                              <div>
+                                {{rate.MaxHeightShipmentLimit}} 
+                              </div>
+                            </div>                    
+                          </div>    
+                          
+                        </div>
+                        <div class="call-out">
+                          <div>
+                            <div fxLayout="column">
+                              <div>
+                                <span class="numeral numeral--large">
+                                  <span class="numeral-affix numeral-affix--prefix">$</span>
+                                  {{rate.CarrierCost}}
+                                </span>
+                              </div>
+                              <div>                 
+                                <button color="warn" class="button--small" mat-raised-button type="button" >Ship it now</button>           
+                              </div>
+                            </div>
+                          </div>                                          
+                        </div>
+                        <!--<div class="call-out">                 
+                           <button color="warn" class="button--small" mat-raised-button type="button" >Ship it now</button>            
+                        </div>-->
                       </div>
-                      <div>
-                        Carrier Type: {{rate.CarrierType}}
-                      </div>
-                    </div>                    
-                  </div>    
-                  
-                </div>
-                <div class="call-out">
-                    <span class="numeral numeral--large">
-                      <span class="numeral-affix numeral-affix--prefix">$</span>
-                      {{rate.CarrierCost}}
-                    </span>
-                </div>
-                <div class="call-out">                 
-                  <button color="warn" class="button--small" mat-raised-button type="button" >Book</button>           
-                </div>
-              </div>                                         
-           </div>
+                      <!-- <div>
+                        <hr />
+                      </div>              
+                      <div class="shipment-limitation-container">
+                        <div class="shipment-limitation-call-out freightRate-carrierShipLimitInfo">
+                          Max Weight: {{clientTLWeightLimit}}
+                        </div>
+                        <div class="shipment-limitation-call-out freightRate-carrierShipLimitInfo">
+                          {{rate.MaxLenghtShipmentLimit}}
+                        </div>
+                        <div class="shipment-limitation-call-out freightRate-carrierShipLimitInfo">
+                          {{rate.MaxHeightShipmentLimit}}
+                        </div> 
+                      </div>-->           
+                    <!-- </div> -->
+                  </mat-expansion-panel-header>
+                  <div>
+                    <p>content</p>
+                  </div>
+                </mat-expansion-panel>
+                                                     
+              </div>
+            </mat-accordion>    
           </div>
           
           <ng-template [ngIf]="!getQuoteButtonClicked">              

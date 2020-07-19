@@ -32,9 +32,7 @@
     //     letter-spacing: normal;
     //   }
     
-    // .expansionHeader .mat-expansion-indicator::after {
-    //     border-color: red;
-    // }    
+      
 
     .qcForms{
         padding: 0.2rem;
@@ -77,9 +75,11 @@
     }
     
 
-    // .CarrierName{
-    //     text-align: left;
-    // }
+    .freightRate-carrierShipLimitInfo {
+      //padding-left: .9375rem;
+      font-weight: 400;
+      font-size: 0.6rem;
+  }
 
     .numeral {
         font-weight: 900;
@@ -130,19 +130,21 @@
         font-weight: 500;
         text-transform: uppercase;
         font-size: 1rem;
-    }
+    }    
 
     .call-outs-container {
       max-width: 1400px;
       // margin: 40px auto 0 auto;
-      border-block-end: 1px solid #ddd;
+      //border-block-end: 1px solid #ddd;
       margin-top: 2%;
+      width: 100%;
+      padding-right: 3%;
     }
   
     .call-out:nth-child(1) {
       padding: 2px;
       box-sizing: border-box;
-      margin-bottom: 20px;
+      margin-bottom: 10px;
       flex-basis: 10%;
       order: 0;
     }
@@ -150,24 +152,24 @@
     .call-out:nth-child(2) {
       padding: 2px;
       box-sizing: border-box;
-      margin-bottom: 20px;
-      flex-basis: 24%;
+      margin-bottom: 10px;
+      flex-basis: 33%;
       text-align: start;
     }
   
     .call-out:nth-child(3) {
       padding: 2px;
       box-sizing: border-box;
-      margin-bottom: 20px;
-      flex-basis: 24.5%;
+      margin-bottom: 10px;
+      flex-basis: 33%;
       text-align: start;
     }
   
-    .call-out:nth-child(5) {
+    .call-out:nth-child(4) {
       padding: 2px;
       box-sizing: border-box;
-      margin-bottom: 20px;
-      flex-basis: 20%;
+      margin-bottom: 10px;
+      flex-basis: 24%;
       overflow-wrap: anywhere;
       justify-content: center;
       align-items: center;    
@@ -176,8 +178,25 @@
     .call-out {
       padding: 2px;
       box-sizing: border-box;
-      margin-bottom: 20px;    
+      margin-bottom: 10px;    
       flex-basis: 22%;
+      overflow-wrap: anywhere;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .shipment-limitation-container {
+      max-width: 1400px;
+      // margin: 40px auto 0 auto;
+      //border-block-end: 1px solid #ddd;
+      margin-top: 2%;
+    }
+
+    .shipment-limitation-call-out {
+      padding: 2px;
+      box-sizing: border-box;
+      margin-bottom: 10px;    
+      flex-basis: 33%;
       overflow-wrap: anywhere;
       justify-content: center;
       align-items: center;
@@ -204,6 +223,7 @@
 
   .mat-expansion-panel{
     font-size: 12px;
+    margin: 5px 0;
   }
 
   .mat-expansion-panel-spacing {
@@ -229,23 +249,40 @@
     margin: 5px;   
   }
 
+  .call-out hr{
+    border: 0.5px solid silver; 
+    margin-top: 2px;
+    margin-bottom: 2px;
+    margin-left: 0;
+    margin-right: 0;
+  }
+
   .button-banner{
     display: flex;
   }
 
   .button-center-me{
     margin: auto;
-  }
-  
-    
+  }      
 
   @media (min-width: 900px) {
     .call-outs-container {
       display: flex;
       justify-content: space-between;
-    }
+      width: 100%;
+      padding-right: 3%;
+    }   
 
     .call-out:nth-child(2) {       
         text-align: start;
       }
   }
+
+/* Rates Accordion expansion panels */
+
+.ratesAccordionExpansionHeader {
+    height: fit-content !important;
+    font-weight: 400;
+    padding-left: 0px;
+    padding-right: 15px;
+}  

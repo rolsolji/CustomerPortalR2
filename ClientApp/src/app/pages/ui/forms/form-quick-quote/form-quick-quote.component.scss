@@ -163,6 +163,7 @@
       margin-bottom: 10px;
       flex-basis: 33%;
       text-align: start;
+      justify-content: start;
     }
   
     .call-out:nth-child(4) {
@@ -271,11 +272,31 @@
       justify-content: space-between;
       width: 100%;
       padding-right: 3%;
+      line-height: 16px;
     }   
 
     .call-out:nth-child(2) {       
         text-align: start;
       }
+
+    .inner-rates-data-container {
+      display: flex;
+      justify-content: space-between;
+      width: 100%;
+      padding-right: 3%;
+    }    
+  }
+
+  @media (max-width: 900px) {
+    .inner-rate-column, .call-out {     
+      justify-content: center !important;
+      align-items: center  !important;
+      text-align: center;
+    }    
+  }
+
+  .origin-services-expansion-panel{
+    margin-top: 2%;
   }
 
 /* Rates Accordion expansion panels */
@@ -286,3 +307,60 @@
     padding-left: 0px;
     padding-right: 15px;
 }  
+
+.rates-accordion .mat-expansion-panel-content .mat-expansion-panel-body{
+  border-top: 1px solid #ddd;
+  line-height: 16px;
+}
+
+.CarrierCostDivStyle{  
+  font-size: 1.4rem;
+}
+
+/* Begin Inner rates data container*/
+.inner-rates-data-container {
+  max-width: 1400px;  
+  margin-top: 2%;
+  width: 100%;
+  padding-right: 3%;  
+  line-height: 16px;
+}
+
+.inner-rate-column {
+  padding: 2px;
+  box-sizing: border-box;
+  margin-bottom: 10px;    
+  flex-basis: 33.33%;
+  overflow-wrap: anywhere;
+  justify-content: start;
+  align-items: start;
+}
+
+.call-out:nth-child(2) {
+  padding: 2px;
+  box-sizing: border-box;
+  margin-bottom: 10px;
+  flex-basis: 33.33%;
+  overflow-wrap: anywhere;
+  justify-content: center;
+  align-items: start;    
+}
+/*End Inner rates data container*/
+
+/* Begin Inner rates options container*/
+.inner-rates-options-container {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  padding-right: 3%;
+}
+
+.inner-rate-options-column {  
+  flex-basis: 100%;
+  text-align: end;
+}
+/* End Inner rates options container*/
+
+.sendEmailClass{
+  cursor: pointer;
+}

@@ -20,9 +20,13 @@ import { String, StringBuilder } from 'typescript-string-operations';
 import { strict } from 'assert';
 import icTwotoneCalendarToday from '@iconify/icons-ic/twotone-calendar-today';
 import icBaselineImageNotSupported from '@iconify/icons-ic/baseline-image-not-supported';
+import outlineSave from '@iconify/icons-ic/outline-save';
+import outlinePrint from '@iconify/icons-ic/outline-print';
+import outlineEmail from '@iconify/icons-ic/outline-email';
+
 import { StringifyOptions } from 'querystring';
 import { PostalData } from '../../../../Entities/PostalData';
-import { Rate } from '../../../../Entities/rate';
+import { Rate, Accessorial } from '../../../../Entities/rate';
 import { ProductPackageType } from '../../../../Entities/ProductPackageType'
 import { ProductFeatures } from '../../../../Entities/ProductFeatures'
 import { ClientDefaultData } from '../../../../Entities/ClientDefaultData';
@@ -51,6 +55,7 @@ export interface CountryState {
 
 export class FormQuickQuoteComponent implements OnInit {
   quickQuoteFormGroup: FormGroup;
+  emailFormGroup: FormGroup;
   showSpinner = false;
   getQuoteButtonClicked = false;
 
@@ -75,6 +80,9 @@ export class FormQuickQuoteComponent implements OnInit {
   icMoreVert = icMoreVert;
   icTwotoneCalendarToday = icTwotoneCalendarToday;
   icBaselineImageNotSupported = icBaselineImageNotSupported;
+  outlineSave = outlineSave;
+  outlinePrint = outlinePrint;
+  outlineEmail = outlineEmail;
 
   stateCtrl = new FormControl();
   states: CountryState[] = [
@@ -170,29 +178,13 @@ export class FormQuickQuoteComponent implements OnInit {
    showLoadingPanel: boolean = false;
    panelCollectionServiceState = false;
    panelDeliveryServiceState = false;
+   ratesOpened: number[];
+   sendEmailClicked: boolean = false;
 
    collectionServicesSelected: number = 0;
    collectionServicesDescription: string = "Select Collection Services";
    deliveryServicesSelected: number = 0;
-   deliveryServicesDescription: string = "Select Delivery Services";
-
-  //  products: ProductFeatures[] = [
-  //   {
-  //     id:1,
-  //     pallet: 0,
-  //     pieces: 0,
-  //     package: 0,
-  //     freightClass: 0,
-  //     nmfc: 0,
-  //     large: 0,
-  //     width: 0,
-  //     height: 0,
-  //     pcf: 0,
-  //     totalWeight: 0,
-  //     stackable: false,
-  //     hazmat: false,
-  //   }
-  // ]
+   deliveryServicesDescription: string = "Select Delivery Services";  
 
   constructor(
     private fb: FormBuilder,
@@ -204,7 +196,7 @@ export class FormQuickQuoteComponent implements OnInit {
 
   async ngOnInit() {    
     
-    //-- Form Group fields
+    //-- Main Form Group fields
     this.quickQuoteFormGroup = this.fb.group({
       originpostalcode: [null, Validators.required],
       originstatename: [null, Validators.required],
@@ -237,20 +229,13 @@ export class FormQuickQuoteComponent implements OnInit {
       //#endregion
       products: this.fb.array([
         this.addProductFormGroup()
-      ])
+      ])    
+    });
+    //--
 
-      // products: this.fb.group({
-      //   pallet: [null, Validators.required],
-      //   pieces: [null, Validators.required],
-      //   package: [null, Validators.required],
-      //   freightClass: [null, Validators.required],
-      //   nmfc: [null],
-      //   large: [null, Validators.required],
-      //   width: [null, Validators.required],
-      //   height: [null, Validators.required],
-      //   pcf: [null],
-      //   totalWeight: [null, Validators.required]        
-      // })  
+    //-- emailFormGroup fields
+    this.emailFormGroup = this.fb.group({
+      emailToSendQuote: [null, Validators.required]
     });
     //--
 
@@ -269,6 +254,8 @@ export class FormQuickQuoteComponent implements OnInit {
     this.httpService.getProductPackageType(this.keyId).subscribe(date =>
       {this.packageTypes = date;
     });    
+
+    this.ratesOpened = []; //initiate ratesOpened array
   }
 
   addProductFormGroup(): FormGroup{
@@ -286,7 +273,7 @@ export class FormQuickQuoteComponent implements OnInit {
     })
   }  
 
-  get formProducts() { return <FormArray>this.quickQuoteFormGroup.get('products'); }
+  get formProducts() { return <FormArray>this.quickQuoteFormGroup.get('products'); }  
 
   // ngAfterViewInit() {
   //   this.mapInitializer();
@@ -555,7 +542,24 @@ export class FormQuickQuoteComponent implements OnInit {
         "DestStateCode": this.DestinationPostalData.StateCode,
         "DestCityName": this.DestinationPostalData.CityName,
         "ShipmentDate": "/Date(1593388800000)/",
-        "Accessorials": [],
+        "Accessorials": [
+          {
+            "AccessorialID": 37,
+            "AccesorialCode": "REP"
+          },
+          {
+            "AccessorialID": 4,
+            "AccesorialCode": "RES"
+          },
+          {
+            "AccessorialID": 1,
+            "AccesorialCode": "LFT"
+          },
+          {
+            "AccessorialID": 36,
+            "AccesorialCode": "LGD"
+          }
+        ],
         "AccessorialCodes": [],
         "TopN": 10,
         "ServiceLevelGrops": [],
@@ -565,7 +569,12 @@ export class FormQuickQuoteComponent implements OnInit {
         "EquipmentList": [],
         "IsDebug": false,
         "IsSuperAdmin": false,
-        "AccessorialIDs": [],
+        "AccessorialIDs": [
+          37,
+          4,
+          1,
+          36
+        ],
         "SkeepCalculatePPS": false,
         "ProfileDescription": "**R2 BUY",
         "Origin":  this.OriginPostalData.PostalCode + ',' +  this.OriginPostalData.CityName + ',' + this.OriginPostalData.StateName,
@@ -604,9 +613,10 @@ export class FormQuickQuoteComponent implements OnInit {
       //   this.showSpinner = false;
       //   this.cd.markForCheck();        
       // }, 3000);
-      console.log( this.rates); 
+      //console.log( this.rates); 
       if ( this.rates != null &&  this.rates.length > 0){
-            this.ratesFiltered =  this.rates.filter(rate => rate.CarrierCost > 0);            
+            this.ratesFiltered =  this.rates.filter(rate => rate.CarrierCost > 0);           
+            console.log(this.ratesFiltered);         
             this.ratesCounter = this.ratesFiltered.length; 
             this.snackbar.open(this.ratesCounter + ' rates retuned.', null, {
               duration: 5000
@@ -620,4 +630,28 @@ export class FormQuickQuoteComponent implements OnInit {
           
      
     }
+
+    //#region RatesOpened
+    addRateOpened(rateIndex: number): void{      
+      let index: number = this.ratesOpened.indexOf(rateIndex);
+      if (index == -1) {
+        this.ratesOpened.push(rateIndex)
+      }   
+      
+      this.sendEmailClicked = false;
+    }
+
+    removeRateClosed(rateIndex: number): void{     
+      let index: number = this.ratesOpened.indexOf(rateIndex);
+      if (index !== -1) {
+          this.ratesOpened.splice(index, 1);
+      }       
+      
+      this.sendEmailClicked = false;
+    }
+
+    isRateOpened(rateIndex: number): boolean{     
+      return this.ratesOpened.some(function(r){ return r === rateIndex});     
+    }
+    ////#endregion RatesOpened
 }

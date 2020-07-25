@@ -332,7 +332,7 @@
   margin-bottom: 10px;    
   flex-basis: 33.33%;
   overflow-wrap: anywhere;
-  justify-content: start;
+  justify-content: center;
   align-items: start;
 }
 
@@ -359,8 +359,22 @@
   flex-basis: 100%;
   text-align: end;
 }
+
+.inner-rate-options-column_with_email_input {  
+  flex-basis: 60%;
+  text-align: end;
+}
 /* End Inner rates options container*/
 
-.sendEmailClass{
-  cursor: pointer;
+.mat-stroked-sent-email-button {
+  border: 1px solid currentColor;
+  padding: 0 0px;
+  line-height: 25px;
+}
+
+.sendEmailInputStyle{
+  margin-top: -3%;
+  margin-left: -6%;
+  flex-basis: 60%;
+  text-align: end;
 }

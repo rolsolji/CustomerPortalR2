@@ -1,5 +1,9 @@
 @import '~@angular/material/prebuilt-themes/indigo-pink.css';
 
+.QuickQuoteMainDiv{
+  max-height: 750px;
+}
+
 .material-icons{
   font-family: 'Material Icons' !important;
 }
@@ -292,7 +296,16 @@
       justify-content: center !important;
       align-items: center  !important;
       text-align: center;
-    }    
+    }   
+    
+    .QuickQuoteMainDiv{
+      max-height: none;
+    }
+
+    .ratesAccordionSection{
+      max-height: none !important;      
+    }
+
   }
 
   .origin-services-expansion-panel{
@@ -377,4 +390,9 @@
   margin-left: -6%;
   flex-basis: 60%;
   text-align: end;
+}
+
+.ratesAccordionSection{
+  max-height: 660px;
+  overflow-y: auto;
 }

@@ -7,7 +7,7 @@
 </vex-secondary-toolbar> -->
 
 <div [@stagger]="true" class="p-gutter qcForms" vexContainer>
-  <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="5px">
+  <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="5px" class="QuickQuoteMainDiv">
     <div @fadeInUp class="card" fxFlex="50%">
       <form #myForm="ngForm" [formGroup]="quickQuoteFormGroup">
         <div fxLayout="column">
@@ -330,190 +330,193 @@
           <div *ngIf="getQuoteButtonClicked && ratesCounter > 0 && !showSpinner">
             <div fxLayout="row" fxLayoutGap="8px" class="py-2 freightRatesView">
                 <div><h2 class="allRatesTab-labelText">ALL QUOTES ({{ratesCounter}})</h2></div>
-            </div>               
-            <mat-accordion class="rates-accordion" multi> 
-              <div *ngFor="let rate of ratesFiltered; let j = index">              
-                <mat-expansion-panel [expanded]="false" (opened)="addRateOpened(j)" (closed)="removeRateClosed(j)">
-                  <mat-expansion-panel-header class="ratesAccordionExpansionHeader">
-                    <!-- <div class="main-rate-container"> -->
-                      <div class="call-outs-container">
-                        <div class="call-out freightRate-carrierInfo">
-                          <mat-icon [icIcon]="icBaselineImageNotSupported"></mat-icon>
-                        </div>
-                        <div class="call-out freightRate-carrierInfo">
-                          <div>
-                            <div fxLayout="column">
-                              <div class="CarrierName">
-                                {{rate.CarrierName}} 
-                              </div>
-                              <div class="inlineButton">
-                                {{rate.ServiceLevel}} 
-                              </div>
-                            </div>                    
-                          </div>                  
-                        </div>
-                        <div class="call-out freightRate-rateInfo">
-                          <div>
-                            <div fxLayout="column">
-                              <div>
-                                <div fxFlex="10%" class="freightRate-rateInfo-icon">
-                                  <mat-icon [icIcon]="icTwotoneCalendarToday"></mat-icon>                     
-                                </div>
-                                <div fxFlex="90%" class="freightRate-rateInfo-text">                    
-                                   Est. {{rate.TransitTime}} Transit Day(s)
-                                </div>
-                              </div>
-                              <div>
-                                Carrier Type: {{rate.CarrierType}}
-                              </div>
-                              <div>
-                                <hr />
-                              </div>
-                              <div>
-                                Max Weight: {{clientTLWeightLimit}}
-                              </div>
-                              <div>
-                                {{rate.MaxLenghtShipmentLimit}}
-                              </div>
-                              <div>
-                                {{rate.MaxHeightShipmentLimit}} 
-                              </div>
-                            </div>                    
-                          </div>    
-                          
-                        </div>
-                        <div class="call-out">
-                          <div>
-                            <div fxLayout="column">
-                              <div>
-                                <span id="{{'CarrierCostDiv'+ j}}" class="numeral numeral--large" [ngClass]="{'CarrierCostDivStyle': isRateOpened(j)}">
-                                  <span class="numeral-affix numeral-affix--prefix">$</span>
-                                  {{rate.TotalCostWithOutTrueCost}}
-                                </span>
-                              </div>
-                              <div>                 
-                                <button color="warn" class="button--small" mat-raised-button type="button" >Ship it now</button>           
-                              </div>
-                            </div>
-                          </div>                                          
-                        </div>
-                        <!--<div class="call-out">                 
-                           <button color="warn" class="button--small" mat-raised-button type="button" >Ship it now</button>            
-                        </div>-->
-                      </div>
-                      <!-- <div>
-                        <hr />
-                      </div>              
-                      <div class="shipment-limitation-container">
-                        <div class="shipment-limitation-call-out freightRate-carrierShipLimitInfo">
-                          Max Weight: {{clientTLWeightLimit}}
-                        </div>
-                        <div class="shipment-limitation-call-out freightRate-carrierShipLimitInfo">
-                          {{rate.MaxLenghtShipmentLimit}}
-                        </div>
-                        <div class="shipment-limitation-call-out freightRate-carrierShipLimitInfo">
-                          {{rate.MaxHeightShipmentLimit}}
-                        </div> 
-                      </div>-->           
-                    <!-- </div> -->
-                  </mat-expansion-panel-header>
-                  <div>
-                    <div class="inner-rates-data-container">
-                      <div class="inner-rate-column freightRate-rateInfo">
-                        <div fxLayout="column">
-                          <div>
-                            <b>Carrier Liability:</b> ${{rate.OldInsuranceCost}}/${{rate.NewInsuranceCost}} Max
+            </div>
+            <div class="ratesAccordionSection">
+              <mat-accordion class="rates-accordion" multi> 
+                <div *ngFor="let rate of ratesFiltered; let j = index">              
+                  <mat-expansion-panel [expanded]="false" (opened)="addRateOpened(j)" (closed)="removeRateClosed(j)">
+                    <mat-expansion-panel-header class="ratesAccordionExpansionHeader">
+                      <!-- <div class="main-rate-container"> -->
+                        <div class="call-outs-container">
+                          <div class="call-out freightRate-carrierInfo">
+                            <mat-icon [icIcon]="icBaselineImageNotSupported"></mat-icon>
                           </div>
-                          <div>
-                            Does Not Include Accessorial Restrictions or FAKS
-                          </div>
-                          <div>
-                            <hr />
-                          </div>
-                          <div>
-                            <b>Rate Type:</b> {{rate.RateType}}
-                          </div>
-                          <div>
-                            <b>Payment Type:</b> {{rate.PaymentType}}
-                          </div>                          
-                        </div>
-                      </div>                                           
-                      <div class="inner-rate-column freightRate-rateInfo">
-                        <div fxLayout="column">
-                          <div>
-                            <b>Discount:</b> ${{rate.Discount}}
-                          </div>
-                          <div>
-                            <b>Freight:</b> ${{rate.FreightCost}}
-                          </div>
-                          <div>
-                            <b>Fuel:</b> ${{rate.FuelCost}}
-                          </div>
-                        </div>                         
-                      </div>
-                      <div class="inner-rate-column freightRate-rateInfo"> 
-                        <div fxLayout="column">
-                          <div *ngFor="let accesorial of rate.Accessorials">
+                          <div class="call-out freightRate-carrierInfo">
                             <div>
-                              {{accesorial.AccessorialDescription}}: ${{accesorial.AccessorialCharge}}
-                            </div>                           
-                          </div> 
-                          <div>
-                            <b>Total Accesorial(s): ${{rate.TotalAccCostWithOutTrueCost}}</b>
-                          </div> 
-                        </div>                                                                         
-                      </div>                     
-                    </div>
-                    <div>
-                      <div class="inner-rates-options-container">
-                        <div class="inner-rate-options-column" [ngClass]="{'inner-rate-options-column_with_email_input': sendEmailClicked}">
-                          <button mat-icon-button matTooltip="Save Quote">
-                            <mat-icon [icIcon]="outlineSave"></mat-icon>
-                          </button>
-                          <button mat-icon-button matTooltip="Print">
-                            <mat-icon [icIcon]="outlinePrint"></mat-icon>
-                          </button>
-                          <button mat-icon-button matTooltip="Send Email" (click)="sendEmailClicked = true">
-                            <mat-icon [icIcon]="outlineEmail"></mat-icon>
-                          </button>
-                                                                                                         
-                        </div>
-                        <div class="inner-rate-options-column sendEmailInputStyle" *ngIf="sendEmailClicked">
-                          <form [formGroup]="emailFormGroup">
-                            <div >
-                              <mat-form-field appearance="standard" color="primary" >
-                                <mat-label>Email</mat-label>
-                                <input matInput name="emailToSendQuote" required formControlName="emailToSendQuote">
-                              </mat-form-field>
-                             
-                              <div>
-                                <button color="primary" class="mr-1 mat-stroked-sent-email-button" mat-stroked-button type="button"  [disabled]="emailFormGroup.invalid" (click)="sendEmailClicked = false">Send</button>
-                                <button color="primary"  class="mat-stroked-sent-email-button" mat-stroked-button type="button" (click)="sendEmailClicked = false">Cancel</button>
-
-                                <!-- <button mat-icon-button matTooltip="Send Email" [disabled]="emailFormGroup.invalid" (click)="sendEmailClicked = false">                                 
-                                  <label color="warn">Sent</label>
-                                </button>
-                                <button mat-icon-button (click)="sendEmailClicked = false">
-                                  <label>Cancel</label>
-                                </button> -->
-                                <!-- <a [disabled]="emailFormGroup.invalid" color="warn" href="#">Sent</a>       
-                                <a color="primary" href="#" (click)="sendEmailClicked = false">Cancel</a> -->
-                              </div>
-                            </div>
+                              <div fxLayout="column">
+                                <div class="CarrierName">
+                                  {{rate.CarrierName}} 
+                                </div>
+                                <div class="inlineButton">
+                                  {{rate.ServiceLevel}} 
+                                </div>
+                              </div>                    
+                            </div>                  
+                          </div>
+                          <div class="call-out freightRate-rateInfo">
+                            <div>
+                              <div fxLayout="column">
+                                <div>
+                                  <div fxFlex="10%" class="freightRate-rateInfo-icon">
+                                    <mat-icon [icIcon]="icTwotoneCalendarToday"></mat-icon>                     
+                                  </div>
+                                  <div fxFlex="90%" class="freightRate-rateInfo-text">                    
+                                     Est. {{rate.TransitTime}} Transit Day(s)
+                                  </div>
+                                </div>
+                                <div>
+                                  Carrier Type: {{rate.CarrierType}}
+                                </div>
+                                <div>
+                                  <hr />
+                                </div>
+                                <div>
+                                  Max Weight: {{clientTLWeightLimit}}
+                                </div>
+                                <div>
+                                  {{rate.MaxLenghtShipmentLimit}}
+                                </div>
+                                <div>
+                                  {{rate.MaxHeightShipmentLimit}} 
+                                </div>
+                              </div>                    
+                            </div>    
                             
-                            <!-- <div fxLayout="row" fxLayoutAlign="end center" fxLayoutGap="8px" class="py-2 pr-5">
-                              <button (click)="clearQuoteAndFields()" mat-button type="button">Clear</button>
-                              <button (click)="getQuote()" color="warn" mat-raised-button type="button" [disabled]="!myForm.valid" >Get Quote</button>
-                            </div> -->
-                          </form>
+                          </div>
+                          <div class="call-out">
+                            <div>
+                              <div fxLayout="column">
+                                <div>
+                                  <span id="{{'CarrierCostDiv'+ j}}" class="numeral numeral--large" [ngClass]="{'CarrierCostDivStyle': isRateOpened(j)}">
+                                    <span class="numeral-affix numeral-affix--prefix">$</span>
+                                    {{rate.TotalCostWithOutTrueCost}}
+                                  </span>
+                                </div>
+                                <div>                 
+                                  <button color="warn" class="button--small" mat-raised-button type="button" >Ship it now</button>           
+                                </div>
+                              </div>
+                            </div>                                          
+                          </div>
+                          <!--<div class="call-out">                 
+                             <button color="warn" class="button--small" mat-raised-button type="button" >Ship it now</button>            
+                          </div>-->
+                        </div>
+                        <!-- <div>
+                          <hr />
+                        </div>              
+                        <div class="shipment-limitation-container">
+                          <div class="shipment-limitation-call-out freightRate-carrierShipLimitInfo">
+                            Max Weight: {{clientTLWeightLimit}}
+                          </div>
+                          <div class="shipment-limitation-call-out freightRate-carrierShipLimitInfo">
+                            {{rate.MaxLenghtShipmentLimit}}
+                          </div>
+                          <div class="shipment-limitation-call-out freightRate-carrierShipLimitInfo">
+                            {{rate.MaxHeightShipmentLimit}}
+                          </div> 
+                        </div>-->           
+                      <!-- </div> -->
+                    </mat-expansion-panel-header>
+                    <div>
+                      <div class="inner-rates-data-container">
+                        <div class="inner-rate-column freightRate-rateInfo">
+                          <div fxLayout="column">
+                            <div>
+                              <b>Carrier Liability:</b> ${{rate.OldInsuranceCost}}/${{rate.NewInsuranceCost}} Max
+                            </div>
+                            <div>
+                              Does Not Include Accessorial Restrictions or FAKS
+                            </div>
+                            <div>
+                              <hr />
+                            </div>
+                            <div>
+                              <b>Rate Type:</b> {{rate.RateType}}
+                            </div>
+                            <div>
+                              <b>Payment Type:</b> {{rate.PaymentType}}
+                            </div>                          
+                          </div>
+                        </div>                                           
+                        <div class="inner-rate-column freightRate-rateInfo">
+                          <div fxLayout="column">
+                            <div>
+                              <b>Discount:</b> ${{rate.Discount}}
+                            </div>
+                            <div>
+                              <b>Freight:</b> ${{rate.FreightCost}}
+                            </div>
+                            <div>
+                              <b>Fuel:</b> ${{rate.FuelCost}}
+                            </div>
+                          </div>                         
+                        </div>
+                        <div class="inner-rate-column freightRate-rateInfo"> 
+                          <div fxLayout="column">
+                            <div *ngFor="let accesorial of rate.Accessorials">
+                              <div>
+                                {{accesorial.AccessorialDescription}}: ${{accesorial.AccessorialCharge}}
+                              </div>                           
+                            </div> 
+                            <div>
+                              <b>Total Accesorial(s): ${{rate.TotalAccCostWithOutTrueCost}}</b>
+                            </div> 
+                          </div>                                                                         
+                        </div>                     
+                      </div>
+                      <div>
+                        <div class="inner-rates-options-container">
+                          <div class="inner-rate-options-column" [ngClass]="{'inner-rate-options-column_with_email_input': sendEmailClicked}">
+                            <button mat-icon-button matTooltip="Save Quote">
+                              <mat-icon [icIcon]="outlineSave"></mat-icon>
+                            </button>
+                            <button mat-icon-button matTooltip="Print">
+                              <mat-icon [icIcon]="outlinePrint"></mat-icon>
+                            </button>
+                            <button mat-icon-button matTooltip="Send Email" (click)="sendEmailClicked = true">
+                              <mat-icon [icIcon]="outlineEmail"></mat-icon>
+                            </button>
+                                                                                                           
+                          </div>
+                          <div class="inner-rate-options-column sendEmailInputStyle" *ngIf="sendEmailClicked">
+                            <form [formGroup]="emailFormGroup">
+                              <div >
+                                <mat-form-field appearance="standard" color="primary" >
+                                  <mat-label>Email</mat-label>
+                                  <input matInput name="emailToSendQuote" required formControlName="emailToSendQuote">
+                                </mat-form-field>
+                               
+                                <div>
+                                  <button color="primary" class="mr-1 mat-stroked-sent-email-button" mat-stroked-button type="button"  [disabled]="emailFormGroup.invalid" (click)="sendEmailClicked = false">Send</button>
+                                  <button color="primary"  class="mat-stroked-sent-email-button" mat-stroked-button type="button" (click)="sendEmailClicked = false">Cancel</button>
+  
+                                  <!-- <button mat-icon-button matTooltip="Send Email" [disabled]="emailFormGroup.invalid" (click)="sendEmailClicked = false">                                 
+                                    <label color="warn">Sent</label>
+                                  </button>
+                                  <button mat-icon-button (click)="sendEmailClicked = false">
+                                    <label>Cancel</label>
+                                  </button> -->
+                                  <!-- <a [disabled]="emailFormGroup.invalid" color="warn" href="#">Sent</a>       
+                                  <a color="primary" href="#" (click)="sendEmailClicked = false">Cancel</a> -->
+                                </div>
+                              </div>
+                              
+                              <!-- <div fxLayout="row" fxLayoutAlign="end center" fxLayoutGap="8px" class="py-2 pr-5">
+                                <button (click)="clearQuoteAndFields()" mat-button type="button">Clear</button>
+                                <button (click)="getQuote()" color="warn" mat-raised-button type="button" [disabled]="!myForm.valid" >Get Quote</button>
+                              </div> -->
+                            </form>
+                          </div>
                         </div>
                       </div>
                     </div>
-                  </div>
-                </mat-expansion-panel>
-                                                     
-              </div>
-            </mat-accordion>    
+                  </mat-expansion-panel>
+                                                       
+                </div>
+              </mat-accordion>
+            </div>               
+                
           </div>
           
           <ng-template [ngIf]="!getQuoteButtonClicked">              
@@ -524,5 +527,7 @@
       </div>      
     </div>
   </div>
-
+  <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="5px">
+      <p>Quotes Grid</p>
+  </div>
 </div>

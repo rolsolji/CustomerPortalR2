@@ -149,23 +149,25 @@
       padding: 2px;
       box-sizing: border-box;
       margin-bottom: 10px;
-      flex-basis: 10%;
+      flex-basis: 15%;
       order: 0;
+      align-items: center;
     }
   
     .call-out:nth-child(2) {
       padding: 2px;
       box-sizing: border-box;
       margin-bottom: 10px;
-      flex-basis: 33%;
-      text-align: start;
+      flex-basis: 32%;
+      text-align: center;
+      align-items: start;
     }
   
     .call-out:nth-child(3) {
       padding: 2px;
       box-sizing: border-box;
       margin-bottom: 10px;
-      flex-basis: 33%;
+      flex-basis: 32%;
       text-align: start;
       justify-content: start;
     }
@@ -174,7 +176,7 @@
       padding: 2px;
       box-sizing: border-box;
       margin-bottom: 10px;
-      flex-basis: 24%;
+      flex-basis: 21%;
       overflow-wrap: anywhere;
       justify-content: center;
       align-items: center;    
@@ -281,6 +283,7 @@
 
     .call-out:nth-child(2) {       
         text-align: start;
+        flex-basis: 32%;
       }
 
     .inner-rates-data-container {
@@ -353,10 +356,10 @@
   padding: 2px;
   box-sizing: border-box;
   margin-bottom: 10px;
-  flex-basis: 33.33%;
+  flex-basis: 32%;
   overflow-wrap: anywhere;
   justify-content: center;
-  align-items: start;    
+  align-items: center;    
 }
 /*End Inner rates data container*/
 
@@ -379,6 +382,30 @@
 }
 /* End Inner rates options container*/
 
+/* Begin Inner rates addresses container*/
+.inner-rates-addresses-container {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  padding-right: 3%;
+}
+
+.inner-rate-addresses-column {  
+  flex-basis: 100%;
+  text-align: start;
+  font-size: 0.5rem;
+}
+
+.rateAddressesSplitLine{
+  margin-bottom: 5px;
+  margin-top: 5px;
+  margin-left: 0;
+  margin-right: 0;
+  border: 0.5px solid silver;
+}
+
+/* End Inner rates options container*/
+
 .mat-stroked-sent-email-button {
   border: 1px solid currentColor;
   padding: 0 0px;
@@ -386,8 +413,8 @@
 }
 
 .sendEmailInputStyle{
-  margin-top: -3%;
-  margin-left: -6%;
+  margin-top: -12px;
+  margin-left: -12%;
   flex-basis: 60%;
   text-align: end;
 }

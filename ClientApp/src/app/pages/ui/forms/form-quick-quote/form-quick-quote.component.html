@@ -339,7 +339,8 @@
                       <!-- <div class="main-rate-container"> -->
                         <div class="call-outs-container">
                           <div class="call-out freightRate-carrierInfo">
-                            <mat-icon [icIcon]="icBaselineImageNotSupported"></mat-icon>
+                            <img src="{{carrierImageUrl}}{{rate.CarrierID}}" alt="logo" width="80" height="40">
+                            <!-- <mat-icon [icIcon]="icBaselineImageNotSupported"></mat-icon> -->
                           </div>
                           <div class="call-out freightRate-carrierInfo">
                             <div>
@@ -464,9 +465,8 @@
                             </div> 
                           </div>                                                                         
                         </div>                     
-                      </div>
-                      <div>
-                        <div class="inner-rates-options-container">
+                      </div>                      
+                      <div class="inner-rates-options-container">
                           <div class="inner-rate-options-column" [ngClass]="{'inner-rate-options-column_with_email_input': sendEmailClicked}">
                             <button mat-icon-button matTooltip="Save Quote">
                               <mat-icon [icIcon]="outlineSave"></mat-icon>
@@ -482,34 +482,33 @@
                           <div class="inner-rate-options-column sendEmailInputStyle" *ngIf="sendEmailClicked">
                             <form [formGroup]="emailFormGroup">
                               <div >
-                                <mat-form-field appearance="standard" color="primary" >
+                                <mat-form-field appearance="standard" color="primary" style="width: 75%;" >
                                   <mat-label>Email</mat-label>
                                   <input matInput name="emailToSendQuote" required formControlName="emailToSendQuote">
                                 </mat-form-field>
                                
                                 <div>
                                   <button color="primary" class="mr-1 mat-stroked-sent-email-button" mat-stroked-button type="button"  [disabled]="emailFormGroup.invalid" (click)="sendEmailClicked = false">Send</button>
-                                  <button color="primary"  class="mat-stroked-sent-email-button" mat-stroked-button type="button" (click)="sendEmailClicked = false">Cancel</button>
-  
-                                  <!-- <button mat-icon-button matTooltip="Send Email" [disabled]="emailFormGroup.invalid" (click)="sendEmailClicked = false">                                 
-                                    <label color="warn">Sent</label>
-                                  </button>
-                                  <button mat-icon-button (click)="sendEmailClicked = false">
-                                    <label>Cancel</label>
-                                  </button> -->
-                                  <!-- <a [disabled]="emailFormGroup.invalid" color="warn" href="#">Sent</a>       
-                                  <a color="primary" href="#" (click)="sendEmailClicked = false">Cancel</a> -->
+                                  <button color="primary"  class="mat-stroked-sent-email-button" mat-stroked-button type="button" (click)="sendEmailClicked = false">Cancel</button>                                   
                                 </div>
-                              </div>
-                              
-                              <!-- <div fxLayout="row" fxLayoutAlign="end center" fxLayoutGap="8px" class="py-2 pr-5">
-                                <button (click)="clearQuoteAndFields()" mat-button type="button">Clear</button>
-                                <button (click)="getQuote()" color="warn" mat-raised-button type="button" [disabled]="!myForm.valid" >Get Quote</button>
-                              </div> -->
+                              </div>                                                            
                             </form>
                           </div>
-                        </div>
                       </div>
+                      <hr class="rateAddressesSplitLine" />
+                      <div class="inner-rates-addresses-container">                        
+                        <div class="inner-rate-addresses-column">
+                          <div fxLayout="column">
+                            <div>
+                              Origin Term: {{rate.OriginTerminalCity}} | {{rate.OriginTerminalAddress1}} | {{rate.OriginTerminalCity}} {{rate.OriginTerminalState}} {{rate.OriginTerminalZip}} | (Ph.) {{rate.OriginTerminalPhoneNo}} | (Free Ph.) {{rate.OriginTerminalFreePhone}} | (Fax) {{rate.OriginTerminalFaxNo}}
+                            </div>
+                            <div>
+                              Destination Term: {{rate.DestTerminalCity}} | {{rate.DestTerminalAddress1}} | {{rate.DestTerminalCity}} {{rate.DestTerminalState}} {{rate.DestTerminalZip}} | (Ph.) {{rate.DestTerminalPhoneNo}} | (Free Ph.) {{rate.DestTerminalFreePhone}}
+                            </div>
+                          </div>
+                          
+                        </div>  
+                      </div>   
                     </div>
                   </mat-expansion-panel>
                                                        
@@ -528,6 +527,6 @@
     </div>
   </div>
   <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="5px">
-      <p>Quotes Grid</p>
+      <!-- <p>Quotes Grid</p> -->
   </div>
 </div>

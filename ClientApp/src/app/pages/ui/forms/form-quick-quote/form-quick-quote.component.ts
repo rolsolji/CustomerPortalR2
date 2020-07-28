@@ -68,6 +68,7 @@ export class FormQuickQuoteComponent implements OnInit {
   ClientID: number = 8473;
   clientDefaultData: ClientDefaultData;
   clientTLWeightLimit: string;
+  carrierImageUrl = "https://beta-customer.r2logistics.com/Handlers/CarrierLogoHandler.ashx?carrierID=";
 
   icPhone = icPhone;
   icCamera = icCamera;

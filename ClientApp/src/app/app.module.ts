@@ -9,7 +9,6 @@ import { HttpClientModule } from '@angular/common/http';
 import { CustomLayoutModule } from './custom-layout/custom-layout.module';
 import { FormsModule } from '@angular/forms';
 
-
 @NgModule({
   declarations: [AppComponent],
   imports: [

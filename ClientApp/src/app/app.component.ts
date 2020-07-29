@@ -123,23 +123,6 @@ export class AppComponent {
             route: '/',
             icon: icAssigment
           },
-          // {
-          //   type: 'dropdown',
-          //   label: 'Add Shipment',
-          //   icon: icBaselinePostAdd,
-          //   children: [
-          //     {
-          //       type: 'link',
-          //       label: 'LTL/TL Shipment',
-          //       route: '/apps/help-center/getting-started2'
-          //     },
-          //     {
-          //       type: 'link',
-          //       label: 'TL Spot Quote',
-          //       route: '/apps/help-center/pricing2'
-          //     }
-          //   ]
-          // },
           {
             type: 'dropdown',
             label: 'Shipment Board',
@@ -148,13 +131,14 @@ export class AppComponent {
               {
                 type: 'link',
                 label: 'LTL/TL Shipment Board',
-                route: '/apps/help-center/getting-started2'
-              },
-              {
-                type: 'link',
-                label: 'TL Spot Quote Board',
-                route: '/apps/help-center/pricing2'
+                route: '/shipmentboard/LTLTL' 
               }
+              // ,
+              // {
+              //   type: 'link',
+              //   label: 'TL Spot Quote Board',
+              //   route: '/shipmentboard/TL'
+              // }
             ]
           },
           {
@@ -187,13 +171,13 @@ export class AppComponent {
               {
                 type: 'link',
                 label: 'Key Performance Indicator',
-                route: '/apps/social2',
+                route: '/apps/social',
                 routerLinkActiveOptions: { exact: true }
               },
               {
                 type: 'link',
                 label: 'Carrier Performance',
-                route: '/apps/social/timeline2'
+                route: '/apps/social/timeline'
               },
               {
                 type: 'link',

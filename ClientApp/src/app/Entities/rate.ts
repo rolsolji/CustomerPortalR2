@@ -28,8 +28,25 @@ export interface Product {
         MinRate: number;
     }
     
+    export interface Accessorial {
+        AccessorialCharge: number;
+        AccessorialCode: string;
+        AccessorialDescription: string;
+        AccessorialID: number;
+        AccessorialLevel?: string;
+        AccessorialRate: number;
+        AccessorialType: number;
+        IsIncluded: boolean;
+        IsNotRated: boolean;
+        IsSystem: boolean;
+        Message?: string;
+        ShowTrueCost: boolean;
+        WeightFrom: number;
+        WeightTo: number;
+    }
+    
     export interface Rate {
-        Accessorials: any[];
+        Accessorials: Accessorial[];
         ApiCallDuration: string;
         BenchMarkCost?: any;
         CarrierConnectRequestResponseString?: any;
@@ -127,5 +144,6 @@ export interface Product {
         ZoneID: number;
         ZoneRateID: number;
     }
+    
     
     

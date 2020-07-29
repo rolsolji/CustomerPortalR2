@@ -1,5 +1,9 @@
 @import '~@angular/material/prebuilt-themes/indigo-pink.css';
 
+.QuickQuoteMainDiv{
+  max-height: 750px;
+}
+
 .material-icons{
   font-family: 'Material Icons' !important;
 }
@@ -145,31 +149,34 @@
       padding: 2px;
       box-sizing: border-box;
       margin-bottom: 10px;
-      flex-basis: 10%;
+      flex-basis: 15%;
       order: 0;
+      align-items: center;
     }
   
     .call-out:nth-child(2) {
       padding: 2px;
       box-sizing: border-box;
       margin-bottom: 10px;
-      flex-basis: 33%;
-      text-align: start;
+      flex-basis: 32%;
+      text-align: center;
+      align-items: start;
     }
   
     .call-out:nth-child(3) {
       padding: 2px;
       box-sizing: border-box;
       margin-bottom: 10px;
-      flex-basis: 33%;
+      flex-basis: 32%;
       text-align: start;
+      justify-content: start;
     }
   
     .call-out:nth-child(4) {
       padding: 2px;
       box-sizing: border-box;
       margin-bottom: 10px;
-      flex-basis: 24%;
+      flex-basis: 21%;
       overflow-wrap: anywhere;
       justify-content: center;
       align-items: center;    
@@ -271,11 +278,41 @@
       justify-content: space-between;
       width: 100%;
       padding-right: 3%;
+      line-height: 16px;
     }   
 
     .call-out:nth-child(2) {       
         text-align: start;
+        flex-basis: 32%;
       }
+
+    .inner-rates-data-container {
+      display: flex;
+      justify-content: space-between;
+      width: 100%;
+      padding-right: 3%;
+    }    
+  }
+
+  @media (max-width: 900px) {
+    .inner-rate-column, .call-out {     
+      justify-content: center !important;
+      align-items: center  !important;
+      text-align: center;
+    }   
+    
+    .QuickQuoteMainDiv{
+      max-height: none;
+    }
+
+    .ratesAccordionSection{
+      max-height: none !important;      
+    }
+
+  }
+
+  .origin-services-expansion-panel{
+    margin-top: 2%;
   }
 
 /* Rates Accordion expansion panels */
@@ -286,3 +323,103 @@
     padding-left: 0px;
     padding-right: 15px;
 }  
+
+.rates-accordion .mat-expansion-panel-content .mat-expansion-panel-body{
+  border-top: 1px solid #ddd;
+  line-height: 16px;
+}
+
+.CarrierCostDivStyle{  
+  font-size: 1.4rem;
+}
+
+/* Begin Inner rates data container*/
+.inner-rates-data-container {
+  max-width: 1400px;  
+  margin-top: 2%;
+  width: 100%;
+  padding-right: 3%;  
+  line-height: 16px;
+}
+
+.inner-rate-column {
+  padding: 2px;
+  box-sizing: border-box;
+  margin-bottom: 10px;    
+  flex-basis: 33.33%;
+  overflow-wrap: anywhere;
+  justify-content: center;
+  align-items: start;
+}
+
+.call-out:nth-child(2) {
+  padding: 2px;
+  box-sizing: border-box;
+  margin-bottom: 10px;
+  flex-basis: 32%;
+  overflow-wrap: anywhere;
+  justify-content: center;
+  align-items: center;    
+}
+/*End Inner rates data container*/
+
+/* Begin Inner rates options container*/
+.inner-rates-options-container {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  padding-right: 3%;
+}
+
+.inner-rate-options-column {  
+  flex-basis: 100%;
+  text-align: end;
+}
+
+.inner-rate-options-column_with_email_input {  
+  flex-basis: 60%;
+  text-align: end;
+}
+/* End Inner rates options container*/
+
+/* Begin Inner rates addresses container*/
+.inner-rates-addresses-container {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  padding-right: 3%;
+}
+
+.inner-rate-addresses-column {  
+  flex-basis: 100%;
+  text-align: start;
+  font-size: 0.5rem;
+}
+
+.rateAddressesSplitLine{
+  margin-bottom: 5px;
+  margin-top: 5px;
+  margin-left: 0;
+  margin-right: 0;
+  border: 0.5px solid silver;
+}
+
+/* End Inner rates options container*/
+
+.mat-stroked-sent-email-button {
+  border: 1px solid currentColor;
+  padding: 0 0px;
+  line-height: 25px;
+}
+
+.sendEmailInputStyle{
+  margin-top: -12px;
+  margin-left: -12%;
+  flex-basis: 60%;
+  text-align: end;
+}
+
+.ratesAccordionSection{
+  max-height: 660px;
+  overflow-y: auto;
+}

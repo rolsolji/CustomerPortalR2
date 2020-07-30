@@ -588,30 +588,7 @@ export class FormQuickQuoteComponent implements OnInit {
         "ShipmentStopList": []
       };
 
-      // await this.ratesService.postRates(objRate).subscribe(res => { 
-      //       //let artcl: Article = res.body;
-      //       console.log('test rates API...');
-      //       console.log(res.body);
-      //       console.log(res.headers.get('Content-Type'));		
-      //       this.rates = res.body;
-      //       if (this.rates != null && this.rates.length > 0){
-      //         this.ratesFiltered = this.rates.filter(rate => rate.CarrierCost > 0);
-      //       }
-            
-      //       this.ratesCounter = this.ratesFiltered.length; 
-      //     },
-      //       (err: HttpErrorResponse) => {
-      //             if (err.error instanceof Error ) {
-      //               //A client-side or network error occurred.				 
-      //               console.log('An error occurred:', err.error.message);
-      //             } else {
-      //               //Backend returns unsuccessful response codes such as 404, 500 etc.				 
-      //               console.log('Backend returned status code: ', err.status);
-      //               console.log('Response body:', err.error);
-      //             }
-      //           }
-      //       );
-
+      
       this.rates = await this.ratesService.postRates(objRate);
          
       // setTimeout(()=>{    //<<<---    using ()=> syntax       
@@ -632,12 +609,7 @@ export class FormQuickQuoteComponent implements OnInit {
             //console.log(this.clientDefaultData);            
       }
     }
-
-      
-          
-     
-    }
-
+                        
     //#region RatesOpened
     addRateOpened(rateIndex: number): void{      
       let index: number = this.ratesOpened.indexOf(rateIndex);

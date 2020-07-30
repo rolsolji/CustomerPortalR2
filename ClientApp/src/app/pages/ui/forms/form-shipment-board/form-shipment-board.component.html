@@ -1,0 +1,30 @@
+<div [@stagger]="true" class="card overflow-auto">
+    <div fxLayout="column" fxLayout.lt-md="column" fxLayoutGap="5px" class="mt-5">
+        <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="5px">
+        <table @stagger [dataSource]="dataSource" class="w-full" mat-table matSort>
+            <!-- Text Columns -->
+            <ng-container *ngFor="let column of columns; trackBy: trackByProperty">
+            <ng-container *ngIf="column.type === 'text'" [matColumnDef]="column.property">
+                <th *matHeaderCellDef class="uppercase" mat-header-cell mat-sort-header> {{ column.label }}</th>
+                <td *matCellDef="let row" [ngClass]="column.cssClasses" mat-cell>{{ row[column.property] }}</td>
+            </ng-container>
+            </ng-container>
+
+            <!-- Text Columns -->
+            <ng-container *ngFor="let column of columns; trackBy: trackByProperty">
+            <ng-container *ngIf="column.type === 'dateformat'" [matColumnDef]="column.property">
+                <th *matHeaderCellDef class="uppercase" mat-header-cell mat-sort-header> {{ column.label }}</th>
+                <td *matCellDef="let row" [ngClass]="column.cssClasses" mat-cell>{{ row[column.property | date:'fullDate'] }}</td>
+            </ng-container>
+            </ng-container>
+
+            <tr *matHeaderRowDef="visibleColumns" mat-header-row></tr>
+            <tr 
+            *matRowDef="let row; columns: visibleColumns;"
+            @fadeInUp
+            class="hover:bg-hover trans-ease-out cursor-pointer"
+            mat-row></tr>
+        </table>
+        </div>
+    </div>
+</div>

@@ -10,7 +10,6 @@ import { CustomLayoutModule } from './custom-layout/custom-layout.module';
 import { FormsModule } from '@angular/forms';
 import { FormAddShipmentComponent } from './pages/ui/forms/form-add-shipment/form-add-shipment.component';
 
-
 @NgModule({
   declarations: [AppComponent, FormAddShipmentComponent],
   imports: [

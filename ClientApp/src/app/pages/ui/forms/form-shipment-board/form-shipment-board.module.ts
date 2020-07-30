@@ -1,9 +1,11 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
-import { FormQuickQuoteRoutingModule } from './form-quick-quote-routing.module';
-import { FormQuickQuoteComponent } from './form-quick-quote.component';
+import { FormShipmentBoardRoutingModule } from './form-shipment-board-routing.module';
+import { FormShipmentBoardComponent } from './form-shipment-board.component';
+import { PageLayoutModule } from '../../../../../@vex/components/page-layout/page-layout.module';
 import { FlexLayoutModule } from '@angular/flex-layout';
+
 import { MatInputModule } from '@angular/material/input';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
@@ -26,10 +28,11 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatTableModule } from '@angular/material/table';
 
 @NgModule({
-  declarations: [FormQuickQuoteComponent],
+  declarations: [FormShipmentBoardComponent],
   imports: [
     CommonModule,
-    FormQuickQuoteRoutingModule,
+    FormShipmentBoardRoutingModule,
+    PageLayoutModule,
     FlexLayoutModule,
     MatInputModule,
     MatIconModule,
@@ -54,5 +57,4 @@ import { MatTableModule } from '@angular/material/table';
     MatTableModule
   ]
 })
-export class FormQuickQuoteModule {
-}
+export class FormShipmentBoardModule { }

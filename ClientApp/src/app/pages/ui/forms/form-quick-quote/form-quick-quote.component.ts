@@ -1,4 +1,5 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit, ViewChild, ElementRef, Input, Output, EventEmitter, HostListener } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit, ViewChild, ElementRef, Input, 
+          Output, EventEmitter, HostListener, Pipe, PipeTransform } from '@angular/core';
 import icVisibility from '@iconify/icons-ic/twotone-visibility';
 import icVisibilityOff from '@iconify/icons-ic/twotone-visibility-off';
 import icSmartphone from '@iconify/icons-ic/twotone-smartphone';
@@ -35,6 +36,14 @@ import { getSupportedInputTypes } from '@angular/cdk/platform';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatIconModule } from '@angular/material/icon';
 import { MatBadgeModule } from '@angular/material/badge'
+import { GetQuotesParameters } from '../../../../Entities/GetQuotesParameters';
+import { Quote } from '../../../../Entities/Quote';
+import { TableColumn } from 'src/@vex/interfaces/table-column.interface';
+import { MatTableDataSource } from '@angular/material/table';
+import { Observable, of, ReplaySubject } from 'rxjs';
+import { SelectionModel } from '@angular/cdk/collections';
+import { MatSelectChange } from '@angular/material/select';
+import {MatTableModule} from '@angular/material/table';
 
 export interface CountryState {
   name: string;
@@ -171,7 +180,7 @@ export class FormQuickQuoteComponent implements OnInit {
     StateId: '',
     StateName: '',
    };
-
+  
    packageTypes: Object;
    productPackageType: ProductPackageType[];
    originpostalcodeControl = new FormControl('');
@@ -241,16 +250,12 @@ export class FormQuickQuoteComponent implements OnInit {
     //--
 
     let responseData = await this.httpService.getContryList(this.keyId);   
-    this.clientDefaultData = await this.httpService.getClientDefaultsByClient(this.ClientID, this.keyId);    
-    console.log(this.clientDefaultData);
+    this.clientDefaultData = await this.httpService.getClientDefaultsByClient(this.ClientID, this.keyId);
+
     this.originCountries = responseData;
     this.destinationCountries = responseData;
     this.originSelectedCountry = responseData[0]; // US as default     
     this.destinationSelectedCountry = responseData[0]; // US as default      
-
-    //console.log(this.originSelectedCountry);
-
-    //console.log(this.destinationSelectedCountry);
 
     this.httpService.getProductPackageType(this.keyId).subscribe(date =>
       {this.packageTypes = date;
@@ -626,6 +631,7 @@ export class FormQuickQuoteComponent implements OnInit {
             this.clientTLWeightLimit = (this.clientDefaultData.TLWeightLimit == null ? 0 : this.clientDefaultData.TLWeightLimit) + 'lb';
             //console.log(this.clientDefaultData);            
       }
+    }
 
       
           

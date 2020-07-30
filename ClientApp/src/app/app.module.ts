@@ -8,10 +8,10 @@ import { VexModule } from '../@vex/vex.module';
 import { HttpClientModule } from '@angular/common/http';
 import { CustomLayoutModule } from './custom-layout/custom-layout.module';
 import { FormsModule } from '@angular/forms';
-import { FormAddShipmentComponent } from './pages/ui/forms/form-add-shipment/form-add-shipment.component';
+//import { FormAddShipmentComponent } from './pages/ui/forms/form-add-shipment/form-add-shipment.component';
 
 @NgModule({
-  declarations: [AppComponent, FormAddShipmentComponent],
+  declarations: [AppComponent],
   imports: [
     BrowserModule,
     AppRoutingModule,

@@ -24,6 +24,7 @@ import { MatExpansionModule } from '@angular/material/expansion';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatTableModule } from '@angular/material/table';
+import { RouterModule } from '@angular/router';
 
 @NgModule({
   declarations: [FormQuickQuoteComponent],
@@ -51,7 +52,8 @@ import { MatTableModule } from '@angular/material/table';
     MatExpansionModule,
     MatSnackBarModule,
     MatProgressSpinnerModule,
-    MatTableModule
+    MatTableModule,
+    RouterModule
   ]
 })
 export class FormQuickQuoteModule {

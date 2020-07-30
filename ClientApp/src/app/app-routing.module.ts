@@ -15,6 +15,11 @@ const childrenRoutes: VexRoutes = [
       path: '',            
       loadChildren: () => import('./pages/ui/forms/form-quick-quote/form-quick-quote.module').then(m => m.FormQuickQuoteModule),
   },
+  {
+    path: 'ui/forms/form-add-shipment',
+    loadChildren: () => import('./pages/ui/forms/form-add-shipment/form-add-shipment-routing.module').then(m => m.FormAddShipmentRoutingModule),
+    //redirectTo: '/'
+  },
   // {
   //   // path: '',            
   //   // loadChildren: () => import('./pages/dashboards/dashboard-analytics/dashboard-analytics.module').then(m => m.DashboardAnalyticsModule),

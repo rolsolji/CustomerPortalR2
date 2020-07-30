@@ -1,8 +1,15 @@
 import { NgModule } from '@angular/core';
-import { Routes, RouterModule } from '@angular/router';
+import { RouterModule } from '@angular/router';
+import { FormAddShipmentComponent } from './form-add-shipment.component';
+import { VexRoutes } from '../../../../../@vex/interfaces/vex-route.interface';
 
 
-const routes: Routes = [];
+const routes: VexRoutes = [
+  {
+    path: '',
+    component: FormAddShipmentComponent
+  }
+];
 
 @NgModule({
   imports: [RouterModule.forChild(routes)],

@@ -95,50 +95,51 @@ export class FormQuickQuoteComponent implements OnInit {
   outlineEmail = outlineEmail;
 
   stateCtrl = new FormControl();
-  states: CountryState[] = [
-    {
-      name: 'Arkansas',
-      population: '2.978M',
-      // https://commons.wikimedia.org/wiki/File:Flag_of_Arkansas.svg
-      flag: 'https://upload.wikimedia.org/wikipedia/commons/9/9d/Flag_of_Arkansas.svg'
-    },
-    {
-      name: 'California',
-      population: '39.14M',
-      // https://commons.wikimedia.org/wiki/File:Flag_of_California.svg
-      flag: 'https://upload.wikimedia.org/wikipedia/commons/0/01/Flag_of_California.svg'
-    },
-    {
-      name: 'Florida',
-      population: '20.27M',
-      // https://commons.wikimedia.org/wiki/File:Flag_of_Florida.svg
-      flag: 'https://upload.wikimedia.org/wikipedia/commons/f/f7/Flag_of_Florida.svg'
-    },
-    {
-      name: 'Texas',
-      population: '27.47M',
-      // https://commons.wikimedia.org/wiki/File:Flag_of_Texas.svg
-      flag: 'https://upload.wikimedia.org/wikipedia/commons/f/f7/Flag_of_Texas.svg'
-    }
-  ];
-  filteredStates$ = this.stateCtrl.valueChanges.pipe(
-    startWith(''),
-    map(state => state ? this.filterStates(state) : this.states.slice())
-  );
+  // states: CountryState[] = [
+  //   {
+  //     name: 'Arkansas',
+  //     population: '2.978M',
+  //     // https://commons.wikimedia.org/wiki/File:Flag_of_Arkansas.svg
+  //     flag: 'https://upload.wikimedia.org/wikipedia/commons/9/9d/Flag_of_Arkansas.svg'
+  //   },
+  //   {
+  //     name: 'California',
+  //     population: '39.14M',
+  //     // https://commons.wikimedia.org/wiki/File:Flag_of_California.svg
+  //     flag: 'https://upload.wikimedia.org/wikipedia/commons/0/01/Flag_of_California.svg'
+  //   },
+  //   {
+  //     name: 'Florida',
+  //     population: '20.27M',
+  //     // https://commons.wikimedia.org/wiki/File:Flag_of_Florida.svg
+  //     flag: 'https://upload.wikimedia.org/wikipedia/commons/f/f7/Flag_of_Florida.svg'
+  //   },
+  //   {
+  //     name: 'Texas',
+  //     population: '27.47M',
+  //     // https://commons.wikimedia.org/wiki/File:Flag_of_Texas.svg
+  //     flag: 'https://upload.wikimedia.org/wikipedia/commons/f/f7/Flag_of_Texas.svg'
+  //   }
+  // ];
+
+  // filteredStates$ = this.stateCtrl.valueChanges.pipe(
+  //   startWith(''),
+  //   map(state => state ? this.filterStates(state) : this.states.slice())
+  // );
 
   @ViewChild(MatAccordion) accordion: MatAccordion;
   @ViewChild('mapContainer', {static: false}) gmap: ElementRef;
 
-  map: google.maps.Map;
-  lat = 40.730610;
-  lng = -73.935242;
+  // map: google.maps.Map;
+  // lat = 40.730610;
+  // lng = -73.935242;
 
-  coordinates = new google.maps.LatLng(this.lat, this.lng);
+  // coordinates = new google.maps.LatLng(this.lat, this.lng);
 
-  mapOptions: google.maps.MapOptions = {
-    center: this.coordinates,
-    zoom: 8,
-  };
+  // mapOptions: google.maps.MapOptions = {
+  //   center: this.coordinates,
+  //   zoom: 8,
+  // };
 
   // mapInitializer() {
   //   this.map = new google.maps.Map(this.gmap.nativeElement, 
@@ -345,9 +346,9 @@ export class FormQuickQuoteComponent implements OnInit {
     }
   }
 
-  filterStates(name: string) {
-    return this.states.filter(state => state.name.toLowerCase().indexOf(name.toLowerCase()) === 0);
-  }
+  // filterStates(name: string) {
+  //   return this.states.filter(state => state.name.toLowerCase().indexOf(name.toLowerCase()) === 0);
+  // }
 
   //#region Origin Fields
 
@@ -407,27 +408,7 @@ export class FormQuickQuoteComponent implements OnInit {
         this.OriginStateName = String.Empty;
         this.OriginPostalCode = String.Empty;
         this.OriginPostalData = null;
-      }
-      
-      // console.log('before...')
-      // this.httpService.getPostalDataByPostalCode(this.OriginPostalCode,CountryId,this.keyId).subscribe(data => {
-      //   console.log(data);
-      //   this.postalData = data;       
-      //   if (this.postalData != null && this.postalData.length > 0) 
-      //   {
-      //     this.OriginStateName = this.postalData[0].StateName;
-      //     this.OriginPostalCode = String.Format("{0}-{1}",this.OriginPostalCode,this.postalData[0].CityName);  
-      //     this.OriginPostalData = this.postalData[0];
-      //   }
-      //   else
-      //   {
-      //     this.OriginStateName = String.Empty;
-      //     this.OriginPostalCode = String.Empty;
-      //     this.OriginPostalData = null;
-      //   }
-      // });
-
-      console.log('after...')      
+      }            
     }
     
   }

@@ -14,12 +14,7 @@ const childrenRoutes: VexRoutes = [
       // loadChildren: () => import('./pages/dashboards/dashboard-analytics/dashboard-analytics.module').then(m => m.DashboardAnalyticsModule),
       path: '',            
       loadChildren: () => import('./pages/ui/forms/form-quick-quote/form-quick-quote.module').then(m => m.FormQuickQuoteModule),
-  },
-  {
-    path: 'ui/forms/form-add-shipment',
-    loadChildren: () => import('./pages/ui/forms/form-add-shipment/form-add-shipment-routing.module').then(m => m.FormAddShipmentRoutingModule),
-    //redirectTo: '/'
-  },
+  },  
   // {
   //   // path: '',            
   //   // loadChildren: () => import('./pages/dashboards/dashboard-analytics/dashboard-analytics.module').then(m => m.DashboardAnalyticsModule),
@@ -144,6 +139,13 @@ const childrenRoutes: VexRoutes = [
       {
         path: 'forms/form-wizard',
         loadChildren: () => import('./pages/ui/forms/form-wizard/form-wizard.module').then(m => m.FormWizardModule),
+        data: {
+          containerEnabled: true
+        }
+      },
+      {
+        path: 'forms/form-add-ship',
+        loadChildren: () => import('./pages/ui/forms/form-add-ship/form-add-ship.module').then(m => m.FormAddShipModule),
         data: {
           containerEnabled: true
         }

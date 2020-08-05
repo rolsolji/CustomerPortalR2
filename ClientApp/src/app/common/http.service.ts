@@ -20,7 +20,7 @@ export class HttpService{
     constructor(private http: HttpClient){}
 
     getContryList(keyId:string){
-        return this.http.get(String.Format('https://beta-customer.r2logistics.com/Services/MASCityStatePostalService.svc/json/GetCountryList?_={0}',keyId)).toPromise();
+        return this.http.get(String.Format('https://customer.r2logistics.com/Services/MASCityStatePostalService.svc/json/GetCountryList?_={0}',keyId)).toPromise();
     }
 
     getStateDataByCountryId(countryId:string, keyId:string){

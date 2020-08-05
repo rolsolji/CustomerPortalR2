@@ -40,6 +40,12 @@ import { Observable, of, ReplaySubject } from 'rxjs';
 import { SelectionModel } from '@angular/cdk/collections';
 import { MatSelectChange } from '@angular/material/select';
 import {MatTableModule} from '@angular/material/table';
+import { EquipmentType } from '../../../../Entities/EquipmentType';
+import { ShipmentMode } from '../../../../Entities/ShipmentMode'; 
+import { Status } from '../../../../Entities/Status';
+import {MatAutocompleteSelectedEvent, MatAutocomplete} from '@angular/material/autocomplete';
+import {MatChipInputEvent} from '@angular/material/chips';
+import {COMMA, ENTER} from '@angular/cdk/keycodes';
 
 @Component({
   selector: 'vex-form-shipment-board',
@@ -51,11 +57,14 @@ import {MatTableModule} from '@angular/material/table';
     fadeInUp400ms
   ]
 })
+
 export class FormShipmentBoardComponent implements OnInit {
 
+  rightPanelImage: any = "../../../../../assets/img/demo/R2TestImage.png";
+  
   //#region Quotes
   getQuotesParameters: GetQuotesParameters = {
-    ClientID: 1,
+    ClientID: 8473,
     PageNumber: 1,
     PageSize: 20,
     FromShipDate: null,
@@ -65,7 +74,7 @@ export class FormShipmentBoardComponent implements OnInit {
     ClientName: null,
     OrderBy: "LadingID",
     IsAccending: false,
-    UserRowID: 1,
+    UserRowID: 39249,
     LadingIDList: [],
     LoadNo: null,
     IsExpired: false,
@@ -89,8 +98,27 @@ export class FormShipmentBoardComponent implements OnInit {
     Mode: "LTL",
     FreeSearch: null,
     Ref4Value: null,
-    ShipmentType: ""
+    ShipmentType: null
   }
+
+  // shipperName: string;
+  // consigneeName: string;
+  fromShipDate: Date;
+  toShipDate: Date;
+  fromDeliveryDate: Date;
+  toDeliveryDate: Date;
+  // shipdateto: string;
+  // deliverydatefrom: string;
+  // deliverydateto: string;
+  // ponumber: string;
+  // bolnumber: string;
+  // pronumber: string;
+  // smallparcel: string;
+  // selectmode: string;
+  // shipmenttype: string;
+  // searchfilter: string;
+  // status: string;
+
 
   subject$: ReplaySubject<Quote[]> = new ReplaySubject<Quote[]>(1);
   data$: Observable<Quote[]> = this.subject$.asObservable();
@@ -117,42 +145,180 @@ export class FormShipmentBoardComponent implements OnInit {
   //displayedColumns: string[] = ['ClientLadingNo', 'ClientName', 'ActualShipDate', 'city'];
   //columnsToDisplay: string[] = this.displayedColumns.slice();
 
+  keyId: string = "1593399730488";
   pageSize = 10;
   pageSizeOptions: number[] = [5, 10, 20, 50];
   dataSource: MatTableDataSource<Quote> | null;
   selection = new SelectionModel<Quote>(true, []);
+  ShipmentModeOptions: object;
+  StatusOptions: Status[];
+  StatusOptionsString: string[] = [];
+  StatusSelectec: string[];
+  EquipmentOptions: object;
 
   get visibleColumns() {
     return this.columns.filter(column => column.visible).map(column => column.property);
   }
   //#endregion
 
+  // @ViewChild('statusInput') statusInput: ElementRef<HTMLInputElement>;
+  // @ViewChild('auto') matAutocomplete: MatAutocomplete;
+
+  @ViewChild('statusInput') statusInput: ElementRef<HTMLInputElement>;
+  @ViewChild('auto') matAutocomplete: MatAutocomplete;
+
   constructor(
     private httpService : HttpService
-  ) { }
+  ) { 
+    // this.filteredStatus = this.statusCtrl.valueChanges.pipe(
+    // startWith(null),
+    //   map((status: string | null) => status ? this._filter(status) : this.StatusOptionsString.slice()));
+
+    this.filteredStatus = this.statusCtrl.valueChanges.pipe(
+      startWith(null),
+      map((status: string | null) => status ? this._filter(status) : this.StatusOptionsString.slice()));
+
+  }
 
   async ngOnInit() {
-    this.quotes = await this.httpService.getBOLHDRForJason(this.getQuotesParameters);    
-    console.log(this.quotes);
-
-    this.quotes.forEach(element => {
-
-      //let d = element.ActualShipDate.replace(element.ActualShipDate,"\/Date\((\d+-\d+)\)\/",); // .test(element.ActualShipDate);  //.replace(/"\/Date\((\d+)\)\/"/g, 'new Date($1)');
-      let d = element.ActualShipDate.replace("/Date(","").replace("-0400)/","");
-      element.ActualShipDateWithFormat = new Date(parseInt(d)).toDateString();//  .toString("mm/dd/yyyy");
-    });
-
-    console.log(this.quotes[0].ActualShipDate );
-    console.log(this.quotes[0].ActualShipDateWithFormat);
-
-    this.dataSource = new MatTableDataSource();
-    this.dataSource.data = this.quotes;
-    console.log(this.dataSource.data); 
-
+    this.InitialLoadPage();
   }
 
   trackByProperty<T>(index: number, column: TableColumn<T>) {
     return column.property;
   }
 
+  async InitialLoadPage(){
+    this.ShipmentModeOptions = await this.httpService.getShipmentMode(this.keyId);
+    this.StatusOptions = await this.httpService.getBOLStatus(this.keyId);
+    this.EquipmentOptions = await this.httpService.getMasEquipment(this.keyId);
+    console.log(this.StatusOptionsString);
+    this.StatusOptions.forEach(s => this.StatusOptionsString.push(s.Status));
+    console.log(this.StatusOptionsString);
+    this.search();
+  }
+
+  async search(){
+    if (this.fromShipDate != null)
+      this.getQuotesParameters.FromShipDate = String.Format("/Date({0})/",this.fromShipDate.getTime());
+
+    if (this.toShipDate != null)
+      this.getQuotesParameters.ToShipDate = String.Format("/Date({0})/",this.toShipDate.getTime());
+
+    if (this.fromDeliveryDate != null)
+      this.getQuotesParameters.FromDeliveryDate = String.Format("/Date({0})/",this.fromDeliveryDate.getTime());
+
+    if (this.toDeliveryDate != null)
+      this.getQuotesParameters.ToDeliveryDate = String.Format("/Date({0})/",this.toDeliveryDate.getTime());
+
+    console.log(this.getQuotesParameters);
+    this.quotes = await this.httpService.searchBOLHDRForJason(this.getQuotesParameters);    
+    // console.log(this.quotes);
+    this.quotes.forEach(element => {
+      let d = element.ActualShipDate.replace("/Date(","").replace("-0400)/","");
+      element.ActualShipDateWithFormat = new Date(parseInt(d)).toDateString();//  .toString("mm/dd/yyyy");
+    });
+    // console.log(this.quotes[0].ActualShipDate );
+    // console.log(this.quotes[0].ActualShipDateWithFormat);
+    this.dataSource = new MatTableDataSource();
+    this.dataSource.data = this.quotes;
+    console.log(this.dataSource.data);
+  }
+
+  // visible = true;
+  // selectable = true;
+  // removable = true
+
+  // separatorKeysCodes: number[] = [ENTER, COMMA];
+  // statusCtrl = new FormControl();
+  // filteredStatus: Observable<string[]>;
+  // //this.StatusSelected: string[] = ['Lemon'];
+  // //StatusOptionsString: string[] = ['Apple', 'Lemon', 'Lime', 'Orange', 'Strawberry'];
+
+  // add(event: MatChipInputEvent): void {
+  //   const input = event.input;
+  //   const value = event.value;
+
+  //   // Add our fruit
+  //   if ((value || '').trim()) {
+  //     this.StatusSelectec.push(value.trim());
+  //   }
+
+  //   // Reset the input value
+  //   if (input) {
+  //     input.value = '';
+  //   }
+
+  //   this.statusCtrl.setValue(null);
+  // }
+
+  // remove(fruit: string): void {
+  //   const index = this.StatusSelectec.indexOf(fruit);
+
+  //   if (index >= 0) {
+  //     this.StatusSelectec.splice(index, 1);
+  //   }
+  // }
+
+  // selected(event: MatAutocompleteSelectedEvent): void {
+  //   this.StatusSelectec.push(event.option.viewValue);
+  //   this.statusInput.nativeElement.value = '';
+  //   this.statusCtrl.setValue(null);
+  // }
+
+  // private _filter(value: string): string[] {
+  //   const filterValue = value.toLowerCase();
+  //   return this.StatusOptionsString.filter(status => status.toLowerCase().indexOf(filterValue) === 0);
+  // }
+
+  visible = true;
+  selectable = true;
+  removable = true;
+  separatorKeysCodes: number[] = [ENTER, COMMA];
+  
+  statusCtrl = new FormControl();
+  filteredStatus: Observable<string[]>;
+  statusSelected: string[] = [];
+  //StatusOptionsString: string[] = ['Apple', 'Lemon', 'Lime', 'Orange', 'Strawberry'];
+
+  
+
+
+  add(event: MatChipInputEvent): void {
+    const input = event.input;
+    const value = event.value;
+
+    // Add our fruit
+    if ((value || '').trim()) {
+        if (!this.statusSelected.includes(value))
+          this.statusSelected.push(value.trim());
+    }
+
+    // Reset the input value
+    if (input) {
+      input.value = '';
+    }
+
+    this.statusCtrl.setValue(null);
+  }
+
+  remove(status: string): void {
+    const index = this.statusSelected.indexOf(status);
+
+    if (index >= 0) {
+      this.statusSelected.splice(index, 1);
+    }
+  }
+
+  selected(event: MatAutocompleteSelectedEvent): void {
+    this.statusSelected.push(event.option.viewValue);
+    this.statusInput.nativeElement.value = '';
+    this.statusCtrl.setValue(null);
+  }
+
+  private _filter(value: string): string[] {
+    const filterValue = value.toLowerCase();
+
+    return this.StatusOptionsString.filter(status => status.toLowerCase().indexOf(filterValue) === 0);
+  }
 }

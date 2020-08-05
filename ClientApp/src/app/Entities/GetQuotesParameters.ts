@@ -4,8 +4,8 @@ export interface GetQuotesParameters {
     ClientID:           number;
     PageNumber:         number;
     PageSize:           number;
-    FromShipDate:       null;
-    ToShipDate:         null;
+    FromShipDate:       string;
+    ToShipDate:         string;
     SCAC:               null;
     Status:             null;
     ClientName:         null;
@@ -28,8 +28,8 @@ export interface GetQuotesParameters {
     Ref3Value:          null;
     QuoteNo:            null;
     PONumber:           null;
-    FromDeliveryDate:   null;
-    ToDeliveryDate:     null;
+    FromDeliveryDate:   string;
+    ToDeliveryDate:     string;
     IsIncludeSubClient: boolean;
     EquipmentID:        number;
     Mode:               string;

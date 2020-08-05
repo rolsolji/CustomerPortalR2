@@ -10,6 +10,9 @@ import { ClientDefaultData } from '../Entities/ClientDefaultData';
 import { ProductPackageType } from '../Entities/ProductPackageType'
 import { GetQuotesParameters } from '../Entities/getQuotesParameters';
 import { Quote } from '../Entities/Quote';
+import { EquipmentType } from '../Entities/EquipmentType';
+import { ShipmentMode } from '../Entities/ShipmentMode'; 
+import { Status } from '../Entities/Status';
 
 @Injectable({
     providedIn: 'root'
@@ -44,7 +47,19 @@ export class HttpService{
         return this.http.get<ClientDefaultData>(String.Format('https://customer.r2logistics.com/Services/MasClientDefaultsService.svc/json/GetClientDefaultsByClient?ClientID={0}&_={1}',clientID.toString(),keyId)).toPromise();
     }
 
-    getBOLHDRForJason(parameters:GetQuotesParameters){
-        return this.http.post<Quote[]>('https://beta-customer.r2logistics.com/Services/BOLHDRService.svc/json/GetBOLHDRForJason', parameters).toPromise();
+    searchBOLHDRForJason(parameters:GetQuotesParameters){
+        return this.http.post<Quote[]>('https://beta-customer.r2logistics.com/Services/BOLHDRService.svc/json/SearchBOLHDRForJason', parameters).toPromise();
+    }
+
+    getMasEquipment(keyId:string){
+        return this.http.get<EquipmentType[]>(String.Format('https://customer.r2logistics.com/Services/BOLHDRService.svc/json/GetMasEquipment?_={0}',keyId)).toPromise();
+    }
+
+    getShipmentMode(keyId:string){
+        return this.http.get<ShipmentMode[]>(String.Format('https://customer.r2logistics.com/Services/BOLHDRService.svc/json/GetShipmentMode?_={0}',keyId)).toPromise();
+    }
+
+    getBOLStatus(keyId:string){
+        return this.http.get<Status[]>(String.Format('https://customer.r2logistics.com/Services/BOLHDRService.svc/json/GetBOLStatus?_={0}',keyId)).toPromise();
     }
 }

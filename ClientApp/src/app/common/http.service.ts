@@ -92,7 +92,7 @@ export class HttpService{
         let httpHeaders = new HttpHeaders({
             'Ticket' : this.token                           
         }); 
-        return this.http.get(String.Format('https://customer.r2logistics.com/Services/MASCityStatePostalService.svc/json//GetStateDataByCountryId?MASCountryId={0}&_={1}',countryId,keyId),{
+        return this.http.get(String.Format('https://beta-customer.r2logistics.com/Services/MASCityStatePostalService.svc/json//GetStateDataByCountryId?MASCountryId={0}&_={1}',countryId,keyId),{
             headers: httpHeaders
           });
     }
@@ -141,18 +141,58 @@ export class HttpService{
     }
 
     searchBOLHDRForJason(parameters:GetQuotesParameters){
-        return this.http.post<Quote[]>('https://beta-customer.r2logistics.com/Services/BOLHDRService.svc/json/SearchBOLHDRForJason', parameters).toPromise();
+        let ticket = this.token;
+        let httpHeaders = new HttpHeaders({                       
+            'Ticket' : ticket                            
+        }); 
+        return this.http.post<Quote[]>('https://beta-customer.r2logistics.com/Services/BOLHDRService.svc/json/SearchBOLHDRForJason', parameters
+        ,{
+            headers: httpHeaders
+          }
+          ).toPromise();  
+
+        //return this.http.post<Quote[]>('https://beta-customer.r2logistics.com/Services/BOLHDRService.svc/json/SearchBOLHDRForJason', parameters).toPromise();
     }
 
     getMasEquipment(keyId:string){
-        return this.http.get<EquipmentType[]>(String.Format('https://customer.r2logistics.com/Services/BOLHDRService.svc/json/GetMasEquipment?_={0}',keyId)).toPromise();
+        let ticket = this.token;
+        let httpHeaders = new HttpHeaders({                       
+            'Ticket' : ticket                            
+        }); 
+        return this.http.get<EquipmentType[]>(String.Format('https://beta-customer.r2logistics.com/Services/BOLHDRService.svc/json/GetMasEquipment?_={0}',keyId)
+        ,{
+            headers: httpHeaders
+          }
+          ).toPromise(); 
+
+        //return this.http.get<EquipmentType[]>(String.Format('https://customer.r2logistics.com/Services/BOLHDRService.svc/json/GetMasEquipment?_={0}',keyId)).toPromise();
     }
 
     getShipmentMode(keyId:string){
-        return this.http.get<ShipmentMode[]>(String.Format('https://customer.r2logistics.com/Services/BOLHDRService.svc/json/GetShipmentMode?_={0}',keyId)).toPromise();
+        let ticket = this.token;
+        let httpHeaders = new HttpHeaders({                       
+            'Ticket' : ticket                            
+        }); 
+        return this.http.get<ShipmentMode[]>(String.Format('https://beta-customer.r2logistics.com/Services/BOLHDRService.svc/json/GetShipmentMode?_={0}',keyId)
+        ,{
+            headers: httpHeaders
+          }
+          ).toPromise();    
+
+        //return this.http.get<ShipmentMode[]>(String.Format('https://beta-customer.r2logistics.com/Services/BOLHDRService.svc/json/GetShipmentMode?_={0}',keyId)).toPromise();
     }
 
     getBOLStatus(keyId:string){
-        return this.http.get<Status[]>(String.Format('https://customer.r2logistics.com/Services/BOLHDRService.svc/json/GetBOLStatus?_={0}',keyId)).toPromise();
+        let ticket = this.token;
+        let httpHeaders = new HttpHeaders({                       
+            'Ticket' : ticket                            
+        }); 
+        return this.http.get<Status[]>(String.Format('https://beta-customer.r2logistics.com/Services/BOLHDRService.svc/json/GetBOLStatus?_={0}',keyId)
+        ,{
+            headers: httpHeaders
+          }
+          ).toPromise(); 
+
+        //return this.http.get<Status[]>(String.Format('https://customer.r2logistics.com/Services/BOLHDRService.svc/json/GetBOLStatus?_={0}',keyId)).toPromise();
     }
 }

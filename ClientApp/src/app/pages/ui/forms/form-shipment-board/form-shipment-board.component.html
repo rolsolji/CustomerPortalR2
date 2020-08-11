@@ -1,23 +1,23 @@
 <div [@stagger]="true" class="card overflow-auto ml-5 mt-5">
-    <div fxLayout="row" fxLayout.lt-md="column" >
+    <div fxLayout="row" fxLayout.lt-sm="column" >
         <div class="card" fxFlex="70%">
-            <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="5px">
-                <div fxFlex="49%">
+            <div fxLayout="row" fxLayout.lt-sm="column" fxLayoutGap="5px">
+                <div fxFlex="50%">
                     <mat-form-field class="filterControl" >
                         <mat-label>Shipper Name</mat-label>
                         <input matInput [(ngModel)]="getQuotesParameters.OrgName" placeholder="">
                     </mat-form-field>
                 </div>
-                <div fxFlex="49%">
+                <div fxFlex="50%">
                     <mat-form-field class="filterControl">
                         <mat-label>Consignee Name</mat-label>
                         <input matInput [(ngModel)]="getQuotesParameters.DestName" placeholder="">
                     </mat-form-field>
                 </div>
             </div>
-            <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="5px">
-                <div fxFlex="24%">
-                    <mat-form-field >
+            <div fxLayout="row" fxLayout.lt-sm="column" fxLayoutGap="5px">
+                <div fxFlex="25%">
+                    <mat-form-field>
                         <mat-label>Ship Date</mat-label>
                         <input [(ngModel)]="fromShipDate" (click)="shipdatefromDatepickerRef.open()" (focus)="shipdatefromDatepickerRef.open()" name="shipdatefrom"
                             [matDatepicker]="shipdatefromDatepickerRef" matInput readonly>
@@ -26,7 +26,7 @@
                     </mat-form-field>
                 </div>
                 <div fxFlex="24%">
-                    <mat-form-field >
+                    <mat-form-field>
                         <mat-label>To</mat-label>
                         <input [(ngModel)]="toShipDate" (click)="shipdatetoDatepickerRef.open()" (focus)="shipdatetoDatepickerRef.open()" name="shipdateto"
                         [matDatepicker]="shipdatetoDatepickerRef" matInput readonly>
@@ -34,8 +34,8 @@
                         <mat-datepicker #shipdatetoDatepickerRef></mat-datepicker>
                     </mat-form-field>
                 </div>
-                <div fxFlex="24%">
-                    <mat-form-field >
+                <div fxFlex="25%">
+                    <mat-form-field>
                         <mat-label>Delivery Date</mat-label>
                         <input [(ngModel)]="fromDeliveryDate" (click)="deliverydatefromDatepickerRef.open()" (focus)="deliverydatefromDatepickerRef.open()" name="deliverydatefrom"
                             [matDatepicker]="deliverydatefromDatepickerRef" matInput readonly>
@@ -44,7 +44,7 @@
                     </mat-form-field>
                 </div>
                 <div fxFlex="24%">
-                    <mat-form-field >
+                    <mat-form-field>
                         <mat-label>To</mat-label>
                         <input [(ngModel)]="toDeliveryDate" (click)="deliverydatetoDatepickerRef.open()" (focus)="deliverydatetoDatepickerRef.open()" name="deliverydateto"
                         [matDatepicker]="deliverydatetoDatepickerRef" matInput readonly>
@@ -53,20 +53,20 @@
                     </mat-form-field>
                 </div>
             </div>
-            <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="5px">
+            <div fxLayout="row" fxLayout.lt-sm="column" fxLayoutGap="5px">
                 <div fxFlex="33%">
                     <mat-form-field >
                         <mat-label>PO Number</mat-label>
                         <input matInput [(ngModel)]="getQuotesParameters.PONumber" placeholder="">
                     </mat-form-field>
                 </div>
-                <div fxFlex="32%">
+                <div fxFlex="33%">
                     <mat-form-field >
                         <mat-label>BOL Number</mat-label>
                         <input matInput [(ngModel)]="getQuotesParameters.LoadNo" placeholder="">
                     </mat-form-field>
                 </div>
-                <div fxFlex="32%">
+                <div fxFlex="33%">
                     <mat-form-field >
                         <mat-label>Pro Number</mat-label>
                         <input matInput [(ngModel)]="getQuotesParameters.ProNumber" placeholder="">
@@ -74,8 +74,8 @@
                 </div>
             </div>
             
-            <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="5px">
-                <div fxFlex="49%">
+            <div fxLayout="row" fxLayout.lt-sm="column" fxLayoutGap="5px">
+                <div fxFlex="50%">
                     <mat-form-field >
                         <mat-label>Select Equipment</mat-label>
                         <mat-select [(ngModel)]="getQuotesParameters.EquipmentID">
@@ -83,7 +83,7 @@
                         </mat-select>
                     </mat-form-field>
                 </div>
-                <div fxFlex="49%">
+                <div fxFlex="50%">
                     <mat-form-field>
                         <mat-label>Select Mode</mat-label>
                         <mat-select [(ngModel)]="getQuotesParameters.Mode">
@@ -93,8 +93,8 @@
                 </div>
             </div>
 
-            <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="5px">
-                <div fxFlex="49%">
+            <div fxLayout="row" fxLayout.lt-sm="column" fxLayoutGap="5px">
+                <div fxFlex="50%">
                     <mat-form-field >
                         <mat-label>Select Shipment Type</mat-label>
                         <mat-select [(ngModel)]="getQuotesParameters.ShipmentType">
@@ -105,7 +105,7 @@
                         </mat-select>
                     </mat-form-field>
                 </div>
-                <div fxFlex="49%">
+                <div fxFlex="50%">
                     <mat-form-field >
                         <mat-label>Search in Client Lading No/PO Number/Carrier BC</mat-label>
                         <input matInput [(ngModel)]="getQuotesParameters.FreeSearch" placeholder="">
@@ -122,8 +122,8 @@
                     </mat-form-field>
                 </div>
             </div> -->
-            <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="5px">
-                <div fxFlex="99%">
+            <div fxLayout="row" fxLayout.lt-sm="column" fxLayoutGap="5px">
+                <div fxFlex="100%">
                     <mat-form-field class="example-chip-list">
                         <mat-label>Select Status</mat-label>
                         <mat-chip-list #chipList aria-label="Status selection">
@@ -131,7 +131,7 @@
                             *ngFor="let status of statusSelected"
                             [selectable]="selectable"
                             [removable]="removable"
-                            (removed)="remove(status)">
+                            (removed)="remove(status)"> 
                             {{status}}
                             <mat-icon matChipRemove *ngIf="removable">cancel</mat-icon>
                           </mat-chip>
@@ -151,7 +151,7 @@
                     </mat-form-field>
                 </div>
             </div>
-            <div fxLayout="row" fxLayoutAlign="end center" fxLayoutGap="8px" class="py-2 pr-5">
+            <div fxLayout="row" fxLayoutAlign="end center" fxLayoutGap="8px" class="py-5 pr-2">
                 <button (click)="search()" color="warn" mat-raised-button type="button">Search</button>
             </div>
         </div>

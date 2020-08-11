@@ -46,6 +46,7 @@ import { Status } from '../../../../Entities/Status';
 import {MatAutocompleteSelectedEvent, MatAutocomplete} from '@angular/material/autocomplete';
 import {MatChipInputEvent} from '@angular/material/chips';
 import {COMMA, ENTER} from '@angular/cdk/keycodes';
+//import {ThemePalette} from '@angular/material/core';
 
 @Component({
   selector: 'vex-form-shipment-board',
@@ -57,6 +58,12 @@ import {COMMA, ENTER} from '@angular/cdk/keycodes';
     fadeInUp400ms
   ]
 })
+
+
+// export interface ChipColor {
+//   name: string;
+//   color: ThemePalette;
+// }
 
 export class FormShipmentBoardComponent implements OnInit {
 
@@ -153,6 +160,7 @@ export class FormShipmentBoardComponent implements OnInit {
   ShipmentModeOptions: object;
   StatusOptions: Status[];
   StatusOptionsString: string[] = [];
+  //StatusOptionsChip: ChipColor[] = [];
   StatusSelectec: string[];
   EquipmentOptions: object;
 
@@ -194,11 +202,20 @@ export class FormShipmentBoardComponent implements OnInit {
     this.EquipmentOptions = await this.httpService.getMasEquipment(this.keyId);
     console.log(this.StatusOptionsString);
     this.StatusOptions.forEach(s => this.StatusOptionsString.push(s.Status));
+    // this.StatusOptions.forEach(s => {
+    //   let chip: ChipColor;
+    //   chip.name = s.Status;
+    //   chip.color = undefined;
+    //   this.StatusOptionsChip.push(chip);
+    // });
     console.log(this.StatusOptionsString);
     this.search();
   }
 
   async search(){
+    
+    this.cleanField()
+
     if (this.fromShipDate != null)
       this.getQuotesParameters.FromShipDate = String.Format("/Date({0})/",this.fromShipDate.getTime());
 
@@ -210,6 +227,13 @@ export class FormShipmentBoardComponent implements OnInit {
 
     if (this.toDeliveryDate != null)
       this.getQuotesParameters.ToDeliveryDate = String.Format("/Date({0})/",this.toDeliveryDate.getTime());
+
+    this.getQuotesParameters.BOlStatusIDList = [];
+    this.statusSelected.forEach(s => 
+      this.getQuotesParameters.BOlStatusIDList.push(
+        this.StatusOptions.find(so => so.Status == s).BOLStatusID
+      )
+    );
 
     console.log(this.getQuotesParameters);
     this.quotes = await this.httpService.searchBOLHDRForJason(this.getQuotesParameters);    
@@ -225,52 +249,6 @@ export class FormShipmentBoardComponent implements OnInit {
     console.log(this.dataSource.data);
   }
 
-  // visible = true;
-  // selectable = true;
-  // removable = true
-
-  // separatorKeysCodes: number[] = [ENTER, COMMA];
-  // statusCtrl = new FormControl();
-  // filteredStatus: Observable<string[]>;
-  // //this.StatusSelected: string[] = ['Lemon'];
-  // //StatusOptionsString: string[] = ['Apple', 'Lemon', 'Lime', 'Orange', 'Strawberry'];
-
-  // add(event: MatChipInputEvent): void {
-  //   const input = event.input;
-  //   const value = event.value;
-
-  //   // Add our fruit
-  //   if ((value || '').trim()) {
-  //     this.StatusSelectec.push(value.trim());
-  //   }
-
-  //   // Reset the input value
-  //   if (input) {
-  //     input.value = '';
-  //   }
-
-  //   this.statusCtrl.setValue(null);
-  // }
-
-  // remove(fruit: string): void {
-  //   const index = this.StatusSelectec.indexOf(fruit);
-
-  //   if (index >= 0) {
-  //     this.StatusSelectec.splice(index, 1);
-  //   }
-  // }
-
-  // selected(event: MatAutocompleteSelectedEvent): void {
-  //   this.StatusSelectec.push(event.option.viewValue);
-  //   this.statusInput.nativeElement.value = '';
-  //   this.statusCtrl.setValue(null);
-  // }
-
-  // private _filter(value: string): string[] {
-  //   const filterValue = value.toLowerCase();
-  //   return this.StatusOptionsString.filter(status => status.toLowerCase().indexOf(filterValue) === 0);
-  // }
-
   visible = true;
   selectable = true;
   removable = true;
@@ -279,19 +257,13 @@ export class FormShipmentBoardComponent implements OnInit {
   statusCtrl = new FormControl();
   filteredStatus: Observable<string[]>;
   statusSelected: string[] = [];
-  //StatusOptionsString: string[] = ['Apple', 'Lemon', 'Lime', 'Orange', 'Strawberry'];
-
-  
-
 
   add(event: MatChipInputEvent): void {
     const input = event.input;
     const value = event.value;
 
-    // Add our fruit
     if ((value || '').trim()) {
-        if (!this.statusSelected.includes(value))
-          this.statusSelected.push(value.trim());
+      this.statusSelected.push(value.trim());
     }
 
     // Reset the input value
@@ -311,6 +283,9 @@ export class FormShipmentBoardComponent implements OnInit {
   }
 
   selected(event: MatAutocompleteSelectedEvent): void {
+    if (this.statusSelected.find(s => s == event.option.viewValue))
+      return;
+
     this.statusSelected.push(event.option.viewValue);
     this.statusInput.nativeElement.value = '';
     this.statusCtrl.setValue(null);
@@ -318,7 +293,28 @@ export class FormShipmentBoardComponent implements OnInit {
 
   private _filter(value: string): string[] {
     const filterValue = value.toLowerCase();
-
     return this.StatusOptionsString.filter(status => status.toLowerCase().indexOf(filterValue) === 0);
   }
+
+  //(blur)="cleanField()"
+  cleanField(){
+    this.statusInput.nativeElement.value = '';
+    this.statusCtrl.setValue(null);
+  }
+
+  changeSelected(parameter: string, query: string) {
+
+    console.log(String.Format("Parameter: {0}",parameter));
+    console.log(String.Format("query: {0}", query));
+
+    // const index = this.selectedChips.indexOf(query);
+    // if (index >= 0) {
+    //   this.selectedChips.splice(index, 1);
+    // } else {
+    //   this.selectedChips.push(query);
+    // }
+    // console.log('this.selectedChips: ' + this.selectedChips);
+  }
+
+  
 }

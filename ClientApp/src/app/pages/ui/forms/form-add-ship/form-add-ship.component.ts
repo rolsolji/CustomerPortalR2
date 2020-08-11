@@ -124,7 +124,7 @@ export class FormAddShipComponent implements OnInit {
       terms: [null, Validators.requiredTrue]
     });
 
-    let responseData = await this.httpService.getContryList(this.keyId);   
+    let responseData = await this.httpService.getCountryList(this.keyId);   
     //this.clientDefaultData = await this.httpService.getClientDefaultsByClient(this.ClientID, this.keyId);
 
     this.originCountries = responseData;

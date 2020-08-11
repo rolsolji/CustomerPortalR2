@@ -78,6 +78,7 @@ export class FormQuickQuoteComponent implements OnInit {
   clientDefaultData: ClientDefaultData;
   clientTLWeightLimit: string;
   carrierImageUrl = "https://beta-customer.r2logistics.com/Handlers/CarrierLogoHandler.ashx?carrierID=";
+  securityToken: string;
 
   icPhone = icPhone;
   icCamera = icCamera;
@@ -205,8 +206,9 @@ export class FormQuickQuoteComponent implements OnInit {
     private snackbar: MatSnackBar
     ) { }
 
-  async ngOnInit() {    
+  async ngOnInit() {            
     
+
     //-- Main Form Group fields
     this.quickQuoteFormGroup = this.fb.group({
       originpostalcode: [null, Validators.required],
@@ -249,8 +251,17 @@ export class FormQuickQuoteComponent implements OnInit {
       emailToSendQuote: [null, Validators.required]
     });
     //--
+   
+    try{
+      this.securityToken = await this.httpService.getMainToken(); 
+    }
+    catch(ex){
+      console.log(ex);
+    }
 
-    let responseData = await this.httpService.getContryList(this.keyId);   
+    this.httpService.token = this.securityToken;
+
+    let responseData = await this.httpService.getCountryList(this.keyId);   
     this.clientDefaultData = await this.httpService.getClientDefaultsByClient(this.ClientID, this.keyId);
 
     this.originCountries = responseData;
@@ -258,9 +269,12 @@ export class FormQuickQuoteComponent implements OnInit {
     this.originSelectedCountry = responseData[0]; // US as default     
     this.destinationSelectedCountry = responseData[0]; // US as default      
 
-    this.httpService.getProductPackageType(this.keyId).subscribe(date =>
-      {this.packageTypes = date;
-    });    
+
+    this.packageTypes = await this.httpService.getProductPackageType(this.keyId);   
+
+    // this.httpService.getProductPackageType(this.keyId).subscribe(date =>
+    //   {this.packageTypes = date;
+    // });    
 
     this.ratesOpened = []; //initiate ratesOpened array
   }
@@ -392,7 +406,7 @@ export class FormQuickQuoteComponent implements OnInit {
     this.OriginPostalCode = this.quickQuoteFormGroup.get('originpostalcode').value;
     if (this.OriginPostalCode != null && this.OriginPostalCode.trim().length > 0)
     {
-      console.log('before...')
+      // console.log('before...')
       let responseData = await this.httpService.getPostalDataByPostalCode(this.OriginPostalCode,CountryId,this.keyId);
       console.log(responseData)     
       this.postalData = responseData;

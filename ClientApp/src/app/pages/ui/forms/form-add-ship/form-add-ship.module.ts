@@ -17,6 +17,7 @@ import { IconModule } from '@visurel/iconify-angular';
 import { BreadcrumbsModule } from '../../../../../@vex/components/breadcrumbs/breadcrumbs.module';
 import { ContainerModule } from '../../../../../@vex/directives/container/container.module';
 import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatNativeDateModule } from '@angular/material/core';
 
 
 @NgModule({
@@ -38,7 +39,8 @@ import { MatDatepickerModule } from '@angular/material/datepicker';
     IconModule,
     BreadcrumbsModule,
     ContainerModule,
-    MatDatepickerModule
+    MatDatepickerModule,
+    MatNativeDateModule
   ]
 })
 export class FormAddShipModule {

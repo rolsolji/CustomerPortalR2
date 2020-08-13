@@ -163,6 +163,7 @@ export class FormShipmentBoardComponent implements OnInit {
   //StatusOptionsChip: ChipColor[] = [];
   StatusSelectec: string[];
   EquipmentOptions: object;
+  securityToken: string;
 
   get visibleColumns() {
     return this.columns.filter(column => column.visible).map(column => column.property);
@@ -197,6 +198,16 @@ export class FormShipmentBoardComponent implements OnInit {
   }
 
   async InitialLoadPage(){
+    //-- Get security token
+    try{
+      this.securityToken = await this.httpService.getMainToken(); 
+    }
+    catch(ex){
+      console.log(ex);
+    }
+    //--
+
+    this.httpService.token = this.securityToken;
     this.ShipmentModeOptions = await this.httpService.getShipmentMode(this.keyId);
     this.StatusOptions = await this.httpService.getBOLStatus(this.keyId);
     this.EquipmentOptions = await this.httpService.getMasEquipment(this.keyId);

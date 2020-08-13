@@ -61,78 +61,87 @@
               </div>
             </div>
           </div> -->
-
-          <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="5px" class="QuickQuoteMainDiv">
+          <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="5px">
             <div @fadeInUp class="card" fxFlex="50%">
-              <div fxLayout="column" class="expansion-panel-cont-style">    
-                <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="5px">
-                  <div fxFlex="50%">
-                    <mat-form-field fxFlex="none">
-                      <mat-label>Country</mat-label>                   
-                        <mat-select  name="origincountry" formControlName="origincountry">
-                        <mat-option *ngFor="let country of originCountries" [value]="country.CountryId">{{country.CountryName}}</mat-option>                      
-                      </mat-select>
-                    </mat-form-field>
-                  </div>
-                  <div fxFlex="50%">
-                    <mat-form-field>
-                      <mat-label>Postal Code</mat-label>
-                      <input name="originpostalcode" formControlName="originpostalcode"
-                              (blur)="validateOriginPostalCode()" matInput required >
-                    </mat-form-field>
-                  </div>                                 
-                </div>
-                <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="5px">
-                  <div fxFlex="50%">
-                    <mat-form-field>
-                      <mat-label>State</mat-label>
-                      <input name="originstatename" matInput formControlName="originstatename" required>
-                    </mat-form-field>
-                  </div>
-                  <div fxFlex="50%">
-                    <mat-form-field>
-                      <mat-label>Pickup Date</mat-label>
-                      <input (click)="formDatepickerRef.open()" (focus)="formDatepickerRef.open()" name="originpickupdate"
-                        [matDatepicker]="formDatepickerRef" matInput readonly formControlName="originpickupdate">
-                      <mat-datepicker-toggle [for]="formDatepickerRef" matSuffix></mat-datepicker-toggle>
-                      <mat-hint>Click on the input or the datepicker icon</mat-hint>
-                      <mat-datepicker #formDatepickerRef></mat-datepicker>
-                    </mat-form-field>
-                  </div>                                 
-                </div>
-                <!-- <mat-expansion-panel [expanded]="false" class="origin-services-expansion-panel"  
-                  (opened)="panelCollectionServiceState = true"
-                  (closed)="panelCollectionServiceState = false">
-                  <mat-expansion-panel-header [collapsedHeight]="'32px'" [expandedHeight]="'32px'">
-                    <mat-panel-title>
-                      <span matBadge="4" matBadgeOverlap="false">Collection Services</span>
-                    </mat-panel-title>
-                    <mat-panel-description>
-                      {{collectionServicesDescription}}
-                    </mat-panel-description>
-                  </mat-expansion-panel-header>
-                  <div class="expansion-panel-cont-style">
-                    <div class="pt-1" fxLayout.lt-xs="column" fxLayout.gt-xs="row" fxLayoutGap="16px">
-                      <mat-checkbox fxFlex="33%" [checked]="false" formControlName="commercial" color="warn" (change)="validateCollectionServices()">Commercial</mat-checkbox>
-                      <mat-checkbox fxFlex="33%" [checked]="false" formControlName="residential" color="warn" (change)="validateCollectionServices()">Residential</mat-checkbox>
-                      <mat-checkbox fxFlex="34%" [checked]="false" formControlName="limitedAccess" color="warn" (change)="validateCollectionServices()">Limited Access</mat-checkbox>
+              <div fxLayout="row" fxLayoutGap="8px" class="py-2 ml-5">
+                <div><h2 class="OriginDestinationTitle">Origin</h2></div>
+              </div>
+              <div>
+                <div fxLayout="column" class="expansion-panel-cont-style">    
+                  <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="5px">
+                    <div fxFlex="50%">
+                      <mat-form-field fxFlex="none">
+                        <mat-label>Country</mat-label>                   
+                          <mat-select  name="origincountry" formControlName="origincountry">
+                          <mat-option *ngFor="let country of originCountries" [value]="country.CountryId">{{country.CountryName}}</mat-option>                      
+                        </mat-select>
+                      </mat-form-field>
                     </div>
-                    <hr style="margin: 1%;">
-                    <div class="pt-1" fxLayout.lt-xs="column" fxLayout.gt-xs="row">
-                      <div fxFlex="50%">
-                        <mat-checkbox [checked]="false" formControlName="insidePickup" color="warn" (change)="validateCollectionServices()">Inside Pickup</mat-checkbox>
-                      </div> 
-                      <div fxFlex="50%">
-                        <mat-checkbox [checked]="false" formControlName="liftgateRequiredAtPickup" color="warn" (change)="validateCollectionServices()">Liftgate Required at Pickup</mat-checkbox>
+                    <div fxFlex="50%">
+                      <mat-form-field>
+                        <mat-label>Postal Code</mat-label>
+                        <input name="originpostalcode" formControlName="originpostalcode"
+                                (blur)="validateOriginPostalCode()" matInput required >
+                      </mat-form-field>
+                    </div>                                 
+                  </div>
+                  <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="5px">
+                    <div fxFlex="50%">
+                      <mat-form-field>
+                        <mat-label>State</mat-label>
+                        <input name="originstatename" matInput formControlName="originstatename" required>
+                      </mat-form-field>
+                    </div>
+                    <div fxFlex="50%">
+                      <mat-form-field>
+                        <mat-label>Pickup Date</mat-label>
+                        <input (click)="formDatepickerRef.open()" (focus)="formDatepickerRef.open()" name="originpickupdate"
+                          [matDatepicker]="formDatepickerRef" matInput readonly formControlName="originpickupdate">
+                        <mat-datepicker-toggle [for]="formDatepickerRef" matSuffix></mat-datepicker-toggle>
+                        <mat-hint>Click on the input or the datepicker icon</mat-hint>
+                        <mat-datepicker #formDatepickerRef></mat-datepicker>
+                      </mat-form-field>
+                    </div>                                 
+                  </div>
+                  <!-- <mat-expansion-panel [expanded]="false" class="origin-services-expansion-panel"  
+                    (opened)="panelCollectionServiceState = true"
+                    (closed)="panelCollectionServiceState = false">
+                    <mat-expansion-panel-header [collapsedHeight]="'32px'" [expandedHeight]="'32px'">
+                      <mat-panel-title>
+                        <span matBadge="4" matBadgeOverlap="false">Collection Services</span>
+                      </mat-panel-title>
+                      <mat-panel-description>
+                        {{collectionServicesDescription}}
+                      </mat-panel-description>
+                    </mat-expansion-panel-header>
+                    <div class="expansion-panel-cont-style">
+                      <div class="pt-1" fxLayout.lt-xs="column" fxLayout.gt-xs="row" fxLayoutGap="16px">
+                        <mat-checkbox fxFlex="33%" [checked]="false" formControlName="commercial" color="warn" (change)="validateCollectionServices()">Commercial</mat-checkbox>
+                        <mat-checkbox fxFlex="33%" [checked]="false" formControlName="residential" color="warn" (change)="validateCollectionServices()">Residential</mat-checkbox>
+                        <mat-checkbox fxFlex="34%" [checked]="false" formControlName="limitedAccess" color="warn" (change)="validateCollectionServices()">Limited Access</mat-checkbox>
+                      </div>
+                      <hr style="margin: 1%;">
+                      <div class="pt-1" fxLayout.lt-xs="column" fxLayout.gt-xs="row">
+                        <div fxFlex="50%">
+                          <mat-checkbox [checked]="false" formControlName="insidePickup" color="warn" (change)="validateCollectionServices()">Inside Pickup</mat-checkbox>
+                        </div> 
+                        <div fxFlex="50%">
+                          <mat-checkbox [checked]="false" formControlName="liftgateRequiredAtPickup" color="warn" (change)="validateCollectionServices()">Liftgate Required at Pickup</mat-checkbox>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                </mat-expansion-panel> -->
+                  </mat-expansion-panel> -->
+                </div>
+              </div>
+            </div>
+            <div @fadeInUp class="card" fxFlex="50%">
+              <div fxLayout="row" fxLayoutGap="8px" class="py-2 ml-5">
+                <div><h2 class="OriginDestinationTitle">Destination</h2></div>
               </div>
             </div>
           </div>
-
-          <div class="actions" fxLayout="row" fxLayoutAlign="end center" fxLayoutGap="8px">
+                    
+          <div class="actions" fxLayout="row" fxLayout.lt-md="column" fxLayoutAlign="end center" fxLayoutGap="5px">
             <button (click)="stepper.reset()" [disabled]="originAndDestinationFormGroup.pristine" color="primary" mat-button
                     type="button">RESET
             </button>

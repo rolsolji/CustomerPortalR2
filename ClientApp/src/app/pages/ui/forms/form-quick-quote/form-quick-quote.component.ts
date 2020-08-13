@@ -51,6 +51,10 @@ export interface CountryState {
   flag: string;
 }
 
+export interface User {
+  name: string;
+}
+
 @Component({
   selector: 'vex-form-quick-quote',
   templateUrl: './form-quick-quote.component.html',
@@ -197,6 +201,17 @@ export class FormQuickQuoteComponent implements OnInit {
    deliveryServicesSelected: number = 0;
    deliveryServicesDescription: string = "Select Delivery Services";  
 
+  myControl = new FormControl();
+  //options: string[] = ['One', 'Two', 'Three'];
+  //filteredOptions: Observable<PostalData[]>;
+
+  options: User[] = [
+    {name: 'Mary'},
+    {name: 'Shelley'},
+    {name: 'Igor'}
+  ];
+  filteredOptions: Observable<PostalData[]>;
+
   constructor(
     private fb: FormBuilder,
     private cd: ChangeDetectorRef, 
@@ -205,8 +220,20 @@ export class FormQuickQuoteComponent implements OnInit {
     private snackbar: MatSnackBar
     ) { }
 
+
+  // formControlValueChanged() {
+  //   this.quickQuoteFormGroup.get('originpostalcode').valueChanges.subscribe(
+  //       (mode: string) => {
+  //           console.log(String.Format("Change: {0}", mode));
+  //       });
+  // }
+
   async ngOnInit() {    
     
+    
+
+    // this.formControlValueChanged();
+
     //-- Main Form Group fields
     this.quickQuoteFormGroup = this.fb.group({
       originpostalcode: [null, Validators.required],
@@ -242,6 +269,23 @@ export class FormQuickQuoteComponent implements OnInit {
         this.addProductFormGroup()
       ])    
     });
+
+    this.filteredOptions = this.quickQuoteFormGroup.get("originpostalcode").valueChanges.pipe(
+      startWith<string | PostalData>(''),
+        map(value => typeof value === 'string' ? value : value.PostalCode),
+        map(name => {
+          console.log('search', name);
+
+          if (name.length >= 5 && name.length <= 6 ){
+            console.log('search postal code: ', name)
+            this.getPostalCode(name);
+            console.log(this.postalData);
+            return name ? this._filter(name) : this.postalData.slice();
+          }
+        })
+    );
+
+
     //--
 
     //-- emailFormGroup fields
@@ -263,6 +307,20 @@ export class FormQuickQuoteComponent implements OnInit {
     });    
 
     this.ratesOpened = []; //initiate ratesOpened array
+
+    this.quickQuoteFormGroup.get("originpostalcode").valueChanges.subscribe(selectedValue => {
+      this.changeOriginPostalCode(selectedValue);
+    })
+  }
+
+  displayFn(user?: PostalData): string | undefined {
+    return user ? user.PostalCode : undefined;
+  }
+
+  private _filter(name: string): PostalData[] {
+    const filterValue = name.toLowerCase();
+
+    return this.postalData.filter(option => option.PostalCode.toLowerCase().indexOf(filterValue) === 0);
   }
 
   addProductFormGroup(): FormGroup{
@@ -352,8 +410,8 @@ export class FormQuickQuoteComponent implements OnInit {
 
   //#region Origin Fields
 
-  postalData: PostalData[];
-  postalDataDest: PostalData[];
+  postalData: PostalData[] = [];
+  postalDataDest: PostalData[] = [];
   OriginPostalCode: string;
   OriginStateName: String;
   OriginPostalData: PostalData;
@@ -386,13 +444,32 @@ export class FormQuickQuoteComponent implements OnInit {
     this.deliveryServicesDescription = this.deliveryServicesSelected > 0 ? String.Format("Selected: {0}", this.deliveryServicesSelected) : "Select Delivery Services";
   }
 
+  async changeOriginPostalCode(value:string){
+    if (value.length >= 5 && value.length <= 6 ){
+      this.getPostalCode(value);
+      // if (this.postalData != null && this.postalData.length > 0){
+
+      // }
+    }
+  }
+
+  async loadOriginalPostalCode(){
+    
+  }
+
+  async getPostalCode(postalCode: string){
+    let CountryId = this.originSelectedCountry == null ? "1": this.originSelectedCountry.CountryId.toString();
+    let responseData = await this.httpService.getPostalDataByPostalCode(this.OriginPostalCode,CountryId,this.keyId);
+      console.log(responseData)     
+      this.postalData = responseData;
+  }
+
   async validateOriginPostalCode(){
     console.log(this.originSelectedCountry);
     let CountryId = this.originSelectedCountry == null ? "1": this.originSelectedCountry.CountryId.toString();
     this.OriginPostalCode = this.quickQuoteFormGroup.get('originpostalcode').value;
     if (this.OriginPostalCode != null && this.OriginPostalCode.trim().length > 0)
     {
-      console.log('before...')
       let responseData = await this.httpService.getPostalDataByPostalCode(this.OriginPostalCode,CountryId,this.keyId);
       console.log(responseData)     
       this.postalData = responseData;
@@ -492,8 +569,7 @@ export class FormQuickQuoteComponent implements OnInit {
     (<FormArray>this.quickQuoteFormGroup.get('products')).removeAt(index);      
   }
 
-  async getShipmentRates()
-    {
+  async getShipmentRates() {
       let pickupDate = this.OriginPickupDate;
       let arrayProducts = this.quickQuoteFormGroup.get('products').value;
 
@@ -589,29 +665,30 @@ export class FormQuickQuoteComponent implements OnInit {
             this.clientTLWeightLimit = (this.clientDefaultData.TLWeightLimit == null ? 0 : this.clientDefaultData.TLWeightLimit) + 'lb';
             //console.log(this.clientDefaultData);            
       }
-    }
+  }
                         
-    //#region RatesOpened
-    addRateOpened(rateIndex: number): void{      
-      let index: number = this.ratesOpened.indexOf(rateIndex);
-      if (index == -1) {
-        this.ratesOpened.push(rateIndex)
-      }   
-      
-      this.sendEmailClicked = false;
-    }
+  //#region RatesOpened
+  addRateOpened(rateIndex: number): void{      
+    let index: number = this.ratesOpened.indexOf(rateIndex);
+    if (index == -1) {
+      this.ratesOpened.push(rateIndex)
+    }   
+    
+    this.sendEmailClicked = false;
+  }
 
-    removeRateClosed(rateIndex: number): void{     
-      let index: number = this.ratesOpened.indexOf(rateIndex);
-      if (index !== -1) {
-          this.ratesOpened.splice(index, 1);
-      }       
-      
-      this.sendEmailClicked = false;
-    }
+  removeRateClosed(rateIndex: number): void{     
+    let index: number = this.ratesOpened.indexOf(rateIndex);
+    if (index !== -1) {
+        this.ratesOpened.splice(index, 1);
+    }       
+    
+    this.sendEmailClicked = false;
+  }
 
-    isRateOpened(rateIndex: number): boolean{     
-      return this.ratesOpened.some(function(r){ return r === rateIndex});     
-    }
-    ////#endregion RatesOpened
+  isRateOpened(rateIndex: number): boolean{     
+    return this.ratesOpened.some(function(r){ return r === rateIndex});     
+  }
+  ////#endregion RatesOpened
+
 }

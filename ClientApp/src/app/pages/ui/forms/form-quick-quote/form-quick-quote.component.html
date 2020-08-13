@@ -35,8 +35,17 @@
                   <div fxFlex="50%">
                     <mat-form-field>
                       <mat-label>Postal Code</mat-label>
-                      <input name="originpostalcode" formControlName="originpostalcode"
-                              (blur)="validateOriginPostalCode()" matInput required >
+                      <input name="originpostalcode" 
+                              formControlName="originpostalcode"
+                              matInput required
+                              [formControl]="myControl"
+                              [matAutocomplete]="auto"
+                              (blur)="validateOriginPostalCode()">
+                      <mat-autocomplete #auto="matAutocomplete" [displayWith]="displayFn">
+                        <mat-option *ngFor="let option of filteredOptions | async" [value]="option">
+                          {{option.name}}
+                        </mat-option>
+                      </mat-autocomplete>
                     </mat-form-field>
                   </div>                                 
                 </div>

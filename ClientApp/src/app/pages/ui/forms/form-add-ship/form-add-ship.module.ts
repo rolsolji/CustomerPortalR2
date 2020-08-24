@@ -18,6 +18,8 @@ import { BreadcrumbsModule } from '../../../../../@vex/components/breadcrumbs/br
 import { ContainerModule } from '../../../../../@vex/directives/container/container.module';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
+import {MatListModule} from '@angular/material/list';
+
 
 
 @NgModule({
@@ -40,7 +42,8 @@ import { MatNativeDateModule } from '@angular/material/core';
     BreadcrumbsModule,
     ContainerModule,
     MatDatepickerModule,
-    MatNativeDateModule
+    MatNativeDateModule,
+    MatListModule
   ]
 })
 export class FormAddShipModule {

@@ -13,6 +13,7 @@ import { Quote } from '../Entities/Quote';
 import { EquipmentType } from '../Entities/EquipmentType';
 import { ShipmentMode } from '../Entities/ShipmentMode'; 
 import { Status } from '../Entities/Status';
+import { Accessorial } from '../Entities/Accessorial';
 
 @Injectable({
     providedIn: 'root'
@@ -57,36 +58,7 @@ export class HttpService{
      
      
        })
-    }
-
-    getToken(){
-        let headers;
-        let Ticket;
-        this.http
-        .get<Object>('https://beta-customer.r2logistics.com/Services/LoginService.svc/Json/DoLogin?Username=superadmin&Password=3500oaklawn&userType=C', {observe: 'response'})        
-        .subscribe(resp => {         
-            console.log(resp.headers.get('ticket'));
-            const keys = resp.headers.keys();            
-            headers = keys.map(key =>
-              `${key}: ${resp.headers.get(key)}`);
-            
-            console.log(headers);            
-            console.log(resp.body);
-        });        
-
-        return '';
-    }
-
-    // getToken(keyId:string){
-
-    //     // let ticket = '28C144FA064090885C764FCB47F56ADC4658ADCE6C59DF238F7C4390ACB367D861B9AD9CF860EA2D3FAC4D26A4E8E92C00676429C756AFD8CD84B034D1217E588DEECF639ED681E21B83B95B516FA477AF03351FA395A2DFDA95D276EB3841CFABDA9BE429757ED63AE8CABAE7BA1C9BA181DC33434DB05D067C0467B8F5C5A361877AF549410DAE56EF9960755C20D03018A1223834E08829A55469EDA30131';
-    //     // let httpHeaders = new HttpHeaders({
-    //     //     'Content-Type' : 'application/json',
-    //     //     'Access-Control-Allow-Origin' : '*',
-    //     //     'Ticket' : ticket                            
-    //     // }); 
-    //     return this.http.get(String.Format('https://beta-customer.r2logistics.com/Services/LoginService.svc/Json/DoLogin?Username=superadmin&Password=3500oaklawn&userType=C')).toPromise();
-    // }
+    }    
 
     getStateDataByCountryId(countryId:string, keyId:string){
         let httpHeaders = new HttpHeaders({
@@ -194,5 +166,17 @@ export class HttpService{
           ).toPromise(); 
 
         //return this.http.get<Status[]>(String.Format('https://customer.r2logistics.com/Services/BOLHDRService.svc/json/GetBOLStatus?_={0}',keyId)).toPromise();
+    }
+
+    getGetClientMappedAccessorials(clientID:number, keyId:string){
+        let ticket = this.token;
+        let httpHeaders = new HttpHeaders({                       
+            'Ticket' : ticket                            
+        }); 
+        return this.http.get<Accessorial[]>(String.Format('https://beta-customer.r2logistics.com/Services/BOLHDRService.svc/json//GetClientMappedAccesorial?ClientID={0}&IsIncludeSystem=false&_={1}',clientID.toString(),keyId)
+        ,{
+            headers: httpHeaders
+          }
+          ).toPromise();  
     }
 }

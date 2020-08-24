@@ -38,12 +38,11 @@
                       <input name="originpostalcode" 
                               formControlName="originpostalcode"
                               matInput required
-                              [formControl]="myControl"
-                              [matAutocomplete]="auto"
-                              (blur)="validateOriginPostalCode()">
-                      <mat-autocomplete #auto="matAutocomplete" [displayWith]="displayFn">
-                        <mat-option *ngFor="let option of filteredOptions | async" [value]="option">
-                          {{option.name}}
+                              [matAutocomplete]="pcoAutoComplete"
+                              (keydown.tab)="validateOriginPostalCode($event)">
+                      <mat-autocomplete #pcoAutoComplete="matAutocomplete" (optionSelected)="pcoAutoCompleteSelected($event)">
+                        <mat-option *ngFor="let option of pcoAutoCompleteOptions | async" [value]="option">
+                          {{option.PostalCode}} - {{option.CityName}}
                         </mat-option>
                       </mat-autocomplete>
                     </mat-form-field>
@@ -117,12 +116,20 @@
                         <mat-option *ngFor="let country of destinationCountries" [value]="country.CountryId">{{country.CountryName}}</mat-option>                      
                       </mat-select>
                     </mat-form-field>
-
                   </div>
                   <div fxFlex="50%">
                     <mat-form-field>
                       <mat-label>Postal Code</mat-label>
-                      <input name="destinationpostalcode" (blur)="validateDestinationPostalCode()" matInput required formControlName="destinationpostalcode">
+                      <input name="destinationpostalcode"
+                        formControlName="destinationpostalcode"
+                        matInput required 
+                        [matAutocomplete]="pcdAutoComplete"
+                        (keydown.tab)="validateDestinationPostalCode($event)">
+                        <mat-autocomplete #pcdAutoComplete="matAutocomplete" (optionSelected)="pcdAutoCompleteSelected($event)">
+                          <mat-option *ngFor="let option of pcdAutoCompleteOptions | async" [value]="option">
+                            {{option.PostalCode}} - {{option.CityName}}
+                          </mat-option>
+                        </mat-autocomplete>
                     </mat-form-field>
                   </div>                                 
                 </div>

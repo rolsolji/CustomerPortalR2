@@ -164,8 +164,17 @@ export class HttpService{
             headers: httpHeaders
           }
           ).toPromise(); 
+    }
 
-        //return this.http.get<Status[]>(String.Format('https://customer.r2logistics.com/Services/BOLHDRService.svc/json/GetBOLStatus?_={0}',keyId)).toPromise();
+    postalCodeAutocomplete(postalCode:string, countryId:string, keyId:string) {
+        let opts = [];
+        let ticket = this.token;
+        let httpHeaders = new HttpHeaders({ 'Ticket' : ticket });
+        return (postalCode.length < 5) ?
+            of(opts) :
+            this.http.get<PostalData[]>(String.Format('https://beta-customer.r2logistics.com/Services/MASCityStatePostalService.svc/json/GetPostalDataByPostalCode?MASPostalCode={0}&countryID={1}&_={2}',postalCode,countryId,keyId)
+                ,{headers: httpHeaders}
+            ).pipe(tap(data => opts = data))
     }
 
     getGetClientMappedAccessorials(clientID:number, keyId:string){

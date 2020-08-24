@@ -9,7 +9,6 @@ import icMenu from '@iconify/icons-ic/twotone-menu';
 import icCamera from '@iconify/icons-ic/twotone-camera';
 import icPhone from '@iconify/icons-ic/twotone-phone';
 import { FormBuilder, FormControl, FormGroup, Validators, FormArray } from '@angular/forms';
-import { map, startWith } from 'rxjs/operators';
 import { fadeInUp400ms } from '../../../../../@vex/animations/fade-in-up.animation';
 import { stagger60ms } from '../../../../../@vex/animations/stagger.animation';
 import icMoreVert from '@iconify/icons-ic/twotone-more-vert';
@@ -41,14 +40,21 @@ import { Quote } from '../../../../Entities/Quote';
 import { TableColumn } from 'src/@vex/interfaces/table-column.interface';
 import { MatTableDataSource } from '@angular/material/table';
 import { Observable, of, ReplaySubject } from 'rxjs';
+import { tap, startWith, debounceTime, distinctUntilChanged, switchMap, map } from 'rxjs/operators';
 import { SelectionModel } from '@angular/cdk/collections';
 import { MatSelectChange } from '@angular/material/select';
 import {MatTableModule} from '@angular/material/table';
+import {MatAutocompleteSelectedEvent, MatAutocomplete} from '@angular/material/autocomplete';
+import { async } from '@angular/core/testing';
 
 export interface CountryState {
   name: string;
   population: string;
   flag: string;
+}
+
+export interface User {
+  name: string;
 }
 
 @Component({
@@ -152,6 +158,8 @@ export class FormQuickQuoteComponent implements OnInit {
    originCountries: Object;
    destinationCountries: Object;
    ratesCounter: number = 0;
+   searchOriginPostalCode: boolean = true;
+   searchDestinationPostalCode: boolean = true;
 
    originSelectedCountry: PostalData = {
     CityCode: '',
@@ -198,6 +206,9 @@ export class FormQuickQuoteComponent implements OnInit {
    deliveryServicesSelected: number = 0;
    deliveryServicesDescription: string = "Select Delivery Services";  
 
+  pcoAutoCompleteOptions: Observable<PostalData[]>;
+  pcdAutoCompleteOptions: Observable<PostalData[]>;
+
   constructor(
     private fb: FormBuilder,
     private cd: ChangeDetectorRef, 
@@ -207,8 +218,6 @@ export class FormQuickQuoteComponent implements OnInit {
     ) { }
 
   async ngOnInit() {            
-    
-
     //-- Main Form Group fields
     this.quickQuoteFormGroup = this.fb.group({
       originpostalcode: [null, Validators.required],
@@ -244,7 +253,6 @@ export class FormQuickQuoteComponent implements OnInit {
         this.addProductFormGroup()
       ])    
     });
-    //--
 
     //-- emailFormGroup fields
     this.emailFormGroup = this.fb.group({
@@ -272,11 +280,52 @@ export class FormQuickQuoteComponent implements OnInit {
 
     this.packageTypes = await this.httpService.getProductPackageType(this.keyId);   
 
-    // this.httpService.getProductPackageType(this.keyId).subscribe(date =>
-    //   {this.packageTypes = date;
-    // });    
+    this.pcoAutoCompleteOptions = this.quickQuoteFormGroup.get("originpostalcode").valueChanges
+      .pipe(
+        startWith(''),
+        debounceTime(400),
+        distinctUntilChanged(),
+        switchMap(val => {
+            return this.pcoAutoCompleteFilter(val || '')
+       })
+      );
+      
+    this.pcdAutoCompleteOptions = this.quickQuoteFormGroup.get("destinationpostalcode").valueChanges
+      .pipe(
+        startWith(''),
+        debounceTime(400),
+        distinctUntilChanged(),
+        switchMap(val => {
+          return this.pcdAutoCompletefilter(val || '')             
+        })
+      );
 
     this.ratesOpened = []; //initiate ratesOpened array
+
+  } 
+
+  pcoAutoCompleteFilter(val: string): Observable<any[]> {
+    let CountryId = this.originSelectedCountry == null ? "1": this.originSelectedCountry.CountryId.toString();
+    return this.httpService.postalCodeAutocomplete(val, CountryId, this.keyId)
+  }  
+
+  pcoAutoCompleteSelected(event: MatAutocompleteSelectedEvent): void {
+    this.quickQuoteFormGroup.get('originstatename').setValue(event.option.value.StateName.trim());
+    this.OriginPostalCode = String.Format("{0}-{1}",event.option.value.PostalCode,event.option.value.CityName.trim());  
+    this.OriginPostalData = event.option.value;        
+    this.quickQuoteFormGroup.get('originpostalcode').setValue(this.OriginPostalCode);
+  }
+
+  pcdAutoCompletefilter(val: string): Observable<any[]> { 
+    let CountryId = this.destinationSelectedCountry == null ? "1": this.destinationSelectedCountry.CountryId.toString();
+    return this.httpService.postalCodeAutocomplete(val, CountryId, this.keyId)
+  }  
+
+  pcdAutoCompleteSelected(event: MatAutocompleteSelectedEvent): void {
+    this.quickQuoteFormGroup.get('destinationstatename').setValue(event.option.value.StateName.trim());
+    this.DestinationPostalCode = String.Format("{0}-{1}",event.option.value.PostalCode,event.option.value.CityName.trim());  
+    this.DestinationPostalData = event.option.value;        
+    this.quickQuoteFormGroup.get('destinationpostalcode').setValue(this.DestinationPostalCode);
   }
 
   addProductFormGroup(): FormGroup{
@@ -360,14 +409,10 @@ export class FormQuickQuoteComponent implements OnInit {
     }
   }
 
-  // filterStates(name: string) {
-  //   return this.states.filter(state => state.name.toLowerCase().indexOf(name.toLowerCase()) === 0);
-  // }
-
   //#region Origin Fields
 
-  postalData: PostalData[];
-  postalDataDest: PostalData[];
+  postalData: PostalData[] = [];
+  postalDataDest: PostalData[] = [];
   OriginPostalCode: string;
   OriginStateName: String;
   OriginPostalData: PostalData;
@@ -400,31 +445,31 @@ export class FormQuickQuoteComponent implements OnInit {
     this.deliveryServicesDescription = this.deliveryServicesSelected > 0 ? String.Format("Selected: {0}", this.deliveryServicesSelected) : "Select Delivery Services";
   }
 
-  async validateOriginPostalCode(){
-    console.log(this.originSelectedCountry);
+  async getPostalCode(postalCode: string){
+    let CountryId = this.originSelectedCountry == null ? "1": this.originSelectedCountry.CountryId.toString();
+    let responseData = await this.httpService.getPostalDataByPostalCode(postalCode,CountryId,this.keyId);
+    this.postalData = responseData;
+    return of (responseData);
+  }
+
+  async validateOriginPostalCode(event: KeyboardEvent){
     let CountryId = this.originSelectedCountry == null ? "1": this.originSelectedCountry.CountryId.toString();
     this.OriginPostalCode = this.quickQuoteFormGroup.get('originpostalcode').value;
-    if (this.OriginPostalCode != null && this.OriginPostalCode.trim().length > 0)
-    {
-      // console.log('before...')
-      let responseData = await this.httpService.getPostalDataByPostalCode(this.OriginPostalCode,CountryId,this.keyId);
-      console.log(responseData)     
+    if (this.OriginPostalCode != null && this.OriginPostalCode.trim().length == 5){
+      let responseData = await this.httpService.getPostalDataByPostalCode(this.OriginPostalCode,CountryId,this.keyId);  
       this.postalData = responseData;
-      if (this.postalData != null && this.postalData.length > 0) 
-      {        
-        this.quickQuoteFormGroup.get('originstatename').setValue(this.postalData[0].StateName);
-        this.OriginPostalCode = String.Format("{0}-{1}",this.OriginPostalCode,this.postalData[0].CityName);  
+      if (this.postalData != null && this.postalData.length > 0){        
+        this.quickQuoteFormGroup.get('originstatename').setValue(this.postalData[0].StateName.trim());
+        this.OriginPostalCode = String.Format("{0}-{1}",this.postalData[0].PostalCode,this.postalData[0].CityName.trim());  
         this.OriginPostalData = this.postalData[0];        
         this.quickQuoteFormGroup.get('originpostalcode').setValue(this.OriginPostalCode);
       }
-      else
-      {
+      else{
         this.OriginStateName = String.Empty;
         this.OriginPostalCode = String.Empty;
         this.OriginPostalData = null;
       }            
     }
-    
   }
   //#endregion
 
@@ -433,18 +478,16 @@ export class FormQuickQuoteComponent implements OnInit {
   DestinationStateName: String;
   DestinationPostalData: PostalData;
 
-  async validateDestinationPostalCode(){
-    console.log(this.destinationSelectedCountry);
+  async validateDestinationPostalCode(event: KeyboardEvent){
     let CountryId = this.destinationSelectedCountry == null ? "1": this.destinationSelectedCountry.CountryId.toString();
     this.DestinationPostalCode = this.quickQuoteFormGroup.get('destinationpostalcode').value;
-    if (this.DestinationPostalCode != null && this.DestinationPostalCode.trim().length > 0){
-
+    if (this.DestinationPostalCode != null && this.DestinationPostalCode.trim().length == 5){
       let responseData = await this.httpService.getPostalDataByPostalCode(this.DestinationPostalCode,CountryId,this.keyId);
       this.postalDataDest = responseData;
       if (this.postalDataDest != null && this.postalDataDest.length > 0) 
       {        
-        this.quickQuoteFormGroup.get('destinationstatename').setValue(this.postalDataDest[0].StateName);
-        this.DestinationPostalCode = String.Format("{0}-{1}",this.DestinationPostalCode,this.postalDataDest[0].CityName);  
+        this.quickQuoteFormGroup.get('destinationstatename').setValue(this.postalDataDest[0].StateName.trim());
+        this.DestinationPostalCode = String.Format("{0}-{1}",this.postalDataDest[0].PostalCode,this.postalDataDest[0].CityName.trim());  
         this.DestinationPostalData = this.postalDataDest[0];               
         this.quickQuoteFormGroup.get('destinationpostalcode').setValue(this.DestinationPostalCode);
       }
@@ -454,22 +497,6 @@ export class FormQuickQuoteComponent implements OnInit {
         this.DestinationPostalCode = String.Empty;
         this.DestinationPostalData = null;
       }
-
-      // this.httpService.getPostalDataByPostalCode(this.DestinationPostalCode,CountryId,this.keyId).subscribe(data => {
-      //   this.postalDataDest = data;       
-      //   if (this.postalDataDest != null && this.postalDataDest.length > 0)
-      //   {
-      //     this.DestinationStateName = this.postalDataDest[0].StateName;
-      //     this.DestinationPostalCode = String.Format("{0}-{1}",this.DestinationPostalCode,this.postalDataDest[0].CityName);
-      //     this.destinationPostalData = this.postalDataDest[0];
-      //   }
-      //   else
-      //   {
-      //     this.DestinationStateName = String.Empty;
-      //     this.DestinationPostalCode = String.Empty;
-      //     this.destinationPostalData = null;
-      //   }
-      // });
     }         
   }
   //#endregion
@@ -506,8 +533,7 @@ export class FormQuickQuoteComponent implements OnInit {
     (<FormArray>this.quickQuoteFormGroup.get('products')).removeAt(index);      
   }
 
-  async getShipmentRates()
-    {
+  async getShipmentRates() {
       let pickupDate = this.OriginPickupDate;
       let arrayProducts = this.quickQuoteFormGroup.get('products').value;
 
@@ -603,29 +629,30 @@ export class FormQuickQuoteComponent implements OnInit {
             this.clientTLWeightLimit = (this.clientDefaultData.TLWeightLimit == null ? 0 : this.clientDefaultData.TLWeightLimit) + 'lb';
             //console.log(this.clientDefaultData);            
       }
-    }
+  }
                         
-    //#region RatesOpened
-    addRateOpened(rateIndex: number): void{      
-      let index: number = this.ratesOpened.indexOf(rateIndex);
-      if (index == -1) {
-        this.ratesOpened.push(rateIndex)
-      }   
-      
-      this.sendEmailClicked = false;
-    }
+  //#region RatesOpened
+  addRateOpened(rateIndex: number): void{      
+    let index: number = this.ratesOpened.indexOf(rateIndex);
+    if (index == -1) {
+      this.ratesOpened.push(rateIndex)
+    }   
+    
+    this.sendEmailClicked = false;
+  }
 
-    removeRateClosed(rateIndex: number): void{     
-      let index: number = this.ratesOpened.indexOf(rateIndex);
-      if (index !== -1) {
-          this.ratesOpened.splice(index, 1);
-      }       
-      
-      this.sendEmailClicked = false;
-    }
+  removeRateClosed(rateIndex: number): void{     
+    let index: number = this.ratesOpened.indexOf(rateIndex);
+    if (index !== -1) {
+        this.ratesOpened.splice(index, 1);
+    }       
+    
+    this.sendEmailClicked = false;
+  }
 
-    isRateOpened(rateIndex: number): boolean{     
-      return this.ratesOpened.some(function(r){ return r === rateIndex});     
-    }
-    ////#endregion RatesOpened
+  isRateOpened(rateIndex: number): boolean{     
+    return this.ratesOpened.some(function(r){ return r === rateIndex});     
+  }
+  ////#endregion RatesOpened
+
 }

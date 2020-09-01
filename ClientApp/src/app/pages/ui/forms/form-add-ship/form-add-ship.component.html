@@ -419,13 +419,185 @@
         </form>
       </mat-step>
 
-      <mat-step [stepControl]="productsAndAccessorialsFormGroup">
-        <form [formGroup]="productsAndAccessorialsFormGroup">
+      <mat-step [stepControl]="shipmentInfoFormGroup">
+        <form [formGroup]="shipmentInfoFormGroup">
           <ng-template matStepLabel>
             <span class="stepTitleStyle">Shipment Information</span>
           </ng-template>
-
-          <!-- Step Content -->
+          <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="5px">
+            <div @fadeInUp class="card" fxFlex="50%">
+              <div fxLayout="row" fxLayoutGap="8px" class="ml-5">
+                <div><h2 class="OriginDestinationTitle">Shipment Information</h2></div>
+              </div>
+              <div>
+                <div fxLayout="column" class="expansion-panel-cont-style">
+                  <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="5px">
+                    <div fxFlex="50%">
+                      <mat-form-field fxFlex="none">
+                        <mat-label>Equipment</mat-label>                   
+                          <mat-select  name="equipment" formControlName="equipment">
+                          <!-- <mat-option *ngFor="let equipment of equipments" [value]="equipment.id">{{equipment.name}}</mat-option>                       -->
+                        </mat-select>
+                      </mat-form-field>
+                    </div>
+                    <div fxFlex="50%">
+                      <mat-form-field fxFlex="none">
+                        <mat-label>Priority</mat-label>                   
+                          <mat-select  name="priority" formControlName="priority">
+                          <!-- <mat-option *ngFor="let priority of priorities" [value]="priority.id">{{priority.name}}</mat-option>                       -->
+                        </mat-select>
+                      </mat-form-field>
+                    </div>                                 
+                  </div>
+                  <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="5px">
+                    <div fxFlex="50%">
+                      <mat-form-field>
+                        <mat-label>Customer Ref #</mat-label>
+                        <input name="customerref" formControlName="customerref" matInput >
+                      </mat-form-field>
+                    </div>
+                    <div fxFlex="50%">
+                      <mat-form-field>
+                        <mat-label>R2 Order #</mat-label>
+                        <input name="r2order" formControlName="r2order" matInput >
+                      </mat-form-field>
+                    </div>                                 
+                  </div>
+                  <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="5px">
+                    <div fxFlex="100%">
+                      <mat-form-field>
+                        <mat-label>R2 Pro number</mat-label>
+                        <input name="r2pronumber" formControlName="r2pronumber" matInput >
+                      </mat-form-field>
+                    </div>                                          
+                  </div>
+                  <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="5px">
+                    <div fxFlex="50%">
+                      <mat-form-field fxFlex="none">
+                        <mat-label>Payment Terms</mat-label>                   
+                          <mat-select  name="paymentterms" formControlName="paymentterms">
+                          <!-- <mat-option *ngFor="let paymentterm of paymentterms" [value]="paymentterm.id">{{paymentterm.name}}</mat-option>                       -->
+                        </mat-select>
+                      </mat-form-field>
+                    </div>
+                    <div fxFlex="50%">
+                      <mat-form-field>
+                        <mat-label>Shipment Info</mat-label>
+                        <input name="shipmentinfo" formControlName="shipmentinfo" matInput >
+                      </mat-form-field>
+                    </div>                                 
+                  </div>
+                  <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="5px">
+                    <div fxFlex="50%">
+                      <mat-form-field>
+                        <mat-label>Pro Number</mat-label>
+                        <input name="pronumber" formControlName="pronumber" matInput >
+                      </mat-form-field>
+                    </div>
+                    <div fxFlex="50%">
+                      <mat-form-field>
+                        <mat-label>Mode</mat-label>
+                        <input name="mode" formControlName="mode" matInput >
+                      </mat-form-field>
+                    </div>
+                  </div> 
+                  <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="5px">
+                      <div fxFlex="50%">
+                        <mat-form-field>
+                          <mat-label>Shipment Value</mat-label>
+                          <input name="shipmentvalue" type="number" maxlength="8" min="0" formControlName="shipmentvalue" matInput >
+                        </mat-form-field>
+                      </div>
+                      <div fxFlex="50%">
+                        <mat-form-field>
+                          <mat-label>Value Per Pound</mat-label>
+                          <input name="valueperpound" type="number" maxlength="8" min="0" formControlName="valueperpound" matInput >
+                        </mat-form-field>
+                      </div>
+                  </div>  
+                  <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="5px">
+                        <div fxFlex="50%">
+                          <mat-form-field fxFlex="none">
+                            <mat-label>OS & D</mat-label>                   
+                              <mat-select  name="os_d" formControlName="os_d">
+                              <!-- <mat-option *ngFor="let os_dItem of os_dList" [value]="os_dItem.id">{{os_dItem.name}}</mat-option>                       -->
+                            </mat-select>
+                          </mat-form-field>
+                        </div>
+                        <div fxFlex="50%">
+                          <mat-form-field fxFlex="none">
+                            <mat-label>Service Level</mat-label>                   
+                              <mat-select  name="servicelevel" formControlName="servicelevel">
+                              <!-- <mat-option *ngFor="let servicelevel of servicelevels" [value]="servicelevel.id">{{servicelevel.name}}</mat-option>                       -->
+                            </mat-select>
+                          </mat-form-field>
+                        </div>                                 
+                  </div>
+                  <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="5px">
+                        <div fxFlex="50%">
+                          <mat-form-field>
+                            <mat-label>R2 Ref No</mat-label>
+                            <input name="r2refno" formControlName="r2refno" matInput >
+                          </mat-form-field>
+                        </div>
+                        <div fxFlex="50%">
+                          <mat-form-field fxFlex="none">
+                            <mat-label>StatusCode</mat-label>                   
+                              <mat-select  name="statuscode" formControlName="statuscode">
+                              <!-- <mat-option *ngFor="let servicelevel of servicelevels" [value]="servicelevel.id">{{servicelevel.name}}</mat-option>                       -->
+                            </mat-select>
+                          </mat-form-field>
+                        </div>                                 
+                  </div>                                                        
+                </div>
+              </div>              
+            </div>
+            <div @fadeInUp class="card" fxFlex="50%">
+              <div fxLayout="row" fxLayoutGap="8px" class="ml-5 mt-8">
+                
+              </div>
+              <div>
+                <div fxLayout="column" class="expansion-panel-cont-style">
+                  <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="5px">
+                    <div fxFlex="100%">
+                      <mat-form-field>
+                        <mat-label>Special Instructions</mat-label>
+                        <textarea name="specialinstructions" formControlName="specialinstructions" matInput rows="4" maxlength="250"></textarea>
+                      </mat-form-field>
+                    </div> 
+                  </div>
+                  <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="5px">
+                    <div fxFlex="75%">
+                      <mat-form-field>
+                        <mat-label>Internal Note</mat-label>
+                        <textarea name="internalnote" matInput rows="3" formControlName="internalnote" maxlength="250"></textarea>
+                      </mat-form-field>
+                    </div> 
+                    <div fxFlex="25%" class="centeredDivButton">
+                      <button color="warn" class="button--small" mat-raised-button type="button" (click)="addNewInternalNote()">Add Note</button>                             
+                    </div> 
+                  </div>
+                  <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="5px">
+                    <div fxFlex="100%">
+                      <mat-list>
+                        <div mat-subheader>Notes</div>
+                        <div class="NotesListSection">
+                          <mat-list-item *ngFor="let note of internalNotes; let j = index">
+                            <button mat-icon-button matTooltip="Delete Note" (click)="removeInternalNote(j)">
+                              <mat-icon mat-list-icon color="warn">delete_forever</mat-icon>
+                            </button>     
+                            <mat-icon mat-list-icon>note</mat-icon>                     
+                            <div mat-line>{{note.NoteText}}</div>
+                            <div mat-line> {{note.Date | date}} - {{note.UserName}}</div>
+                          </mat-list-item>    
+                        </div>                                            
+                      </mat-list>
+                    </div>                     
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
 
           <div class="actions" fxLayout="row" fxLayoutAlign="end center" fxLayoutGap="8px">
             <button color="primary" mat-button matStepperPrevious type="button">Previous</button>

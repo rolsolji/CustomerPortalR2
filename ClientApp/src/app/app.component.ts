@@ -171,17 +171,17 @@ export class AppComponent {
               {
                 type: 'link',
                 label: 'Key Performance Indicator',
-                route: '/apps/social',
+                route: '/apps/social2',
                 routerLinkActiveOptions: { exact: true }
               },
               {
                 type: 'link',
                 label: 'Carrier Performance',
-                route: '/apps/social/timeline'
+                route: '/apps/social/timeline2'
               },
               {
                 type: 'link',
-                label: 'Shiment History',
+                label: 'Shipment History',
                 route: '/apps/social/timeline2'
               },
               {

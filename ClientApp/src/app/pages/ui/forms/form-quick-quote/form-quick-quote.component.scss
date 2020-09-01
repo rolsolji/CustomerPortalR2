@@ -1,8 +1,8 @@
 @import '~@angular/material/prebuilt-themes/indigo-pink.css';
 
-.QuickQuoteMainDiv{
-  max-height: 750px;
-}
+// .QuickQuoteMainDiv{
+//   max-height: 750px;
+// }
 
 .material-icons{
   font-family: 'Material Icons' !important;
@@ -422,4 +422,8 @@
 .ratesAccordionSection{
   max-height: 660px;
   overflow-y: auto;
+}
+
+.mat-option{
+  font-size: 12px;
 }

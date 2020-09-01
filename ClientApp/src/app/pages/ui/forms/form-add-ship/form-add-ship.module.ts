@@ -19,6 +19,7 @@ import { ContainerModule } from '../../../../../@vex/directives/container/contai
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
 import {MatListModule} from '@angular/material/list';
+import { MatTooltipModule } from '@angular/material/tooltip';
 
 
 
@@ -43,7 +44,8 @@ import {MatListModule} from '@angular/material/list';
     ContainerModule,
     MatDatepickerModule,
     MatNativeDateModule,
-    MatListModule
+    MatListModule,
+    MatTooltipModule
   ]
 })
 export class FormAddShipModule {

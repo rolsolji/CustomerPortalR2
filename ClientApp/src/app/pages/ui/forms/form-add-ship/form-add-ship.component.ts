@@ -16,6 +16,7 @@ import { PostalData } from '../../../../Entities/PostalData';
 import { HttpService } from '../../../../common/http.service';
 import { String, StringBuilder } from 'typescript-string-operations';
 import { Accessorial } from '../../../../Entities/Accessorial';
+import { InternalNote } from '../../../../Entities/InternalNote';
 
 @Component({
   selector: 'vex-form-add-ship',
@@ -39,8 +40,24 @@ export class FormAddShipComponent implements OnInit {
   destinationCountries: Object;  
   packageTypes: Object;
 
-  accesorials: Accessorial[];
-  typesOfShoes: string[] = ['Boots', 'Clogs', 'Loafers', 'Moccasins', 'Sneakers','Boots2', 'Clogs2', 'Loafers2', 'Moccasins2', 'Sneakers2'];
+  accesorials: Accessorial[];    
+  internalNotes: InternalNote[];
+  // internalNotes: InternalNote[] = [
+  //   {
+  //     NoteId: 1,
+  //     UserId: 1,
+  //     UserName: "Admin",
+  //     NoteText: "Test1",
+  //     Date: new Date()
+  //   },
+  //   {
+  //     NoteId: 2,
+  //     UserId: 1,
+  //     UserName: "Admin",
+  //     NoteText: "Test2",
+  //     Date: new Date()
+  //   }
+  // ];
 
   originSelectedCountry: PostalData = {
     CityCode: '',
@@ -74,11 +91,8 @@ export class FormAddShipComponent implements OnInit {
 
   originAndDestinationFormGroup: FormGroup;
   productsAndAccessorialsFormGroup: FormGroup;
-  confirmFormGroup: FormGroup; 
-
-  phonePrefixOptions = ['+1', '+27', '+44', '+49', '+61', '+91'];
-
-  passwordInputType = 'password';
+  shipmentInfoFormGroup: FormGroup;
+  confirmFormGroup: FormGroup;    
 
   icDoneAll = icDoneAll;
   icDescription = icDescription;
@@ -144,6 +158,7 @@ export class FormAddShipComponent implements OnInit {
       destdelapptfrom: [null],
       destdelapptto: [null],           
     });
+    //--
 
     //-- productsAndAccessorialsFormGroup fields
     this.productsAndAccessorialsFormGroup = this.fb.group({
@@ -153,13 +168,27 @@ export class FormAddShipComponent implements OnInit {
     });
     //--
 
-    // this.accountFormGroup = this.fb.group({
-    //   username: [null, Validators.required],
-    //   name: [null, Validators.required],
-    //   email: [null, Validators.required],
-    //   phonePrefix: [this.phonePrefixOptions[3]],
-    //   phone: [],
-    // });
+    //-- shipmentInfoFormGroup fields
+    this.shipmentInfoFormGroup = this.fb.group({
+      equipment: [null, Validators.required],
+      priority: [null],
+      customerref: [null],
+      r2order: [null],
+      r2pronumber: [null],
+      paymentterms: [null],
+      shipmentinfo: [null],
+      pronumber: [null],
+      mode: [null, Validators.required],
+      shipmentvalue: [null],
+      valueperpound: [null],
+      os_d: [null],
+      servicelevel: [null, Validators.required],
+      r2refno: [null],
+      statuscode: [null],
+      specialinstructions: [null],
+      internalnote: [null]
+    });
+    //--  
     
     this.confirmFormGroup = this.fb.group({
       terms: [null, Validators.requiredTrue]
@@ -183,7 +212,9 @@ export class FormAddShipComponent implements OnInit {
     this.originCountries = responseData;
     this.destinationCountries = responseData;
     this.originSelectedCountry = responseData[0]; // US as default     
-    this.destinationSelectedCountry = responseData[0]; // US as default      
+    this.destinationSelectedCountry = responseData[0]; // US as default    
+    
+    this.internalNotes = [];
   }
 
   postalData: PostalData[];
@@ -228,21 +259,27 @@ export class FormAddShipComponent implements OnInit {
     (<FormArray>this.productsAndAccessorialsFormGroup.get('products')).removeAt(index);      
   }
 
-  showPassword() {
-    this.passwordInputType = 'text';
-    this.cd.markForCheck();
-  }
-
-  hidePassword() {
-    this.passwordInputType = 'password';
-    this.cd.markForCheck();
-  }
-
   submit() {
     this.snackbar.open('Shipment booked.', null, {
       duration: 5000
     });
   }
 
+  addNewInternalNote(): void {  
+    let note = {
+      NoteId: (<InternalNote[]>this.internalNotes).length + 1,
+      UserId: 1,
+      UserName: "Admin",
+      NoteText: this.shipmentInfoFormGroup.get('internalnote').value.trim(),
+      Date: new Date()
+    };
+
+    this.internalNotes.push(note);
+    this.shipmentInfoFormGroup.get('internalnote').setValue("");
+  }
+
+  removeInternalNote(index: number): void {  
+    (<InternalNote[]>this.internalNotes).splice(index, 1);      
+  }
 
 }

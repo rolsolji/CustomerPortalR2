@@ -64,3 +64,33 @@ hr{
     max-height: 400px;
     overflow-y: auto;
 }
+
+.centeredDivButton{
+    margin: auto;
+}
+
+.mat-list-item .mat-line {
+    white-space: normal;
+    font-size: 12px;
+}
+
+.mat-line:nth-child(n+2) {    
+    font-weight: 500 !important;
+}
+
+.mat-list-icon {   
+    font-size: 20px !important;    
+}
+
+.mat-list-text{
+    padding-left: 0px !important;
+}
+
+.mat-list-item.mat-2-line{
+    height: 65px !important;
+}
+
+.NotesListSection{
+    max-height: 150px;
+    overflow-y: auto;
+}

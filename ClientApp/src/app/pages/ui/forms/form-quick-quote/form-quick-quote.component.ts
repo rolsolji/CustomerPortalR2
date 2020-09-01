@@ -366,12 +366,11 @@ export class FormQuickQuoteComponent implements OnInit {
     }
   }
 
-  rightPanelImage: any = "../../../../../assets/img/demo/R2TestImage.png";
+  rightPanelImage: any = "assets/img/demo/R2TestImage.png";
 
   async getQuote() {
     console.log(this.quickQuoteFormGroup.get('products').value);
-    this.getQuoteButtonClicked = true;
-    //this.rightPanelImage = "../../../../../assets/img/demo/TestImageRates.png";
+    this.getQuoteButtonClicked = true;    
     console.log('print at start.');  
     this.showSpinner = true;   
     let test = await this.getShipmentRates();       
@@ -389,7 +388,7 @@ export class FormQuickQuoteComponent implements OnInit {
   clearQuoteAndFields(){
     this.ratesCounter = 0;
     this.getQuoteButtonClicked = false;
-    this.rightPanelImage = "../../../../../assets/img/demo/R2TestImage.png";
+    this.rightPanelImage = "assets/img/demo/R2TestImage.png";
     window.scroll({ 
       top: 0, 
       left: 0, 

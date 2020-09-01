@@ -6,8 +6,7 @@
   </button>
 </vex-secondary-toolbar> -->
 
-<div @stagger class="qcForms p-gutter" vexContainer> 
-
+<div @stagger class="qcForms p-gutter" vexContainer>  
   <div @fadeInUp class="card overflow-hidden">
     <mat-horizontal-stepper #stepper="matHorizontalStepper" [linear]="false">
       <ng-template matStepperIcon="edit">
@@ -20,54 +19,39 @@
 
       <mat-step [stepControl]="originAndDestinationFormGroup">
         <form [formGroup]="originAndDestinationFormGroup">
-          <ng-template matStepLabel>Origin And Destination</ng-template>
-
-          <!-- <h2 class="title m-0">Create Account</h2>
-          <div class="subheading-1">Set up your account for testing purposes.</div>
-
-          <div class="mt-4" fxLayout="column" fxLayoutGap="8px">
-            <mat-form-field fxFlex="auto">
-              <mat-label>Account Username</mat-label>
-              <input formControlName="username" matInput required>
-              <mat-hint>This will be your unique login name.</mat-hint>
-            </mat-form-field>
-
-            <mat-form-field fxFlex="auto">
-              <mat-label>Name</mat-label>
-              <input formControlName="name" matInput required>
-              <mat-hint>How may we call you?</mat-hint>
-            </mat-form-field>
-
-            <div fxLayout="column" fxLayout.gt-xs="row" fxLayoutGap="8px" fxLayoutGap.gt-xs="24px">
-              <mat-form-field fxFlex="auto">
-                <mat-label>E-Mail</mat-label>
-                <input formControlName="email" matInput required>
-                <mat-hint align="end">example@example.com</mat-hint>
-              </mat-form-field>
-
-              <div fxFlex="auto" fxLayout="row" fxLayoutGap="8px">
-                <mat-form-field class="vex-flex-form-field" fxFlex="none">
-                  <mat-label>Code</mat-label>
-                  <mat-select formControlName="phonePrefix">
-                    <mat-option *ngFor="let option of phonePrefixOptions" [value]="option">{{ option }}</mat-option>
-                  </mat-select>
-                </mat-form-field>
-
-                <mat-form-field class="vex-flex-form-field" fxFlex="auto">
-                  <mat-label>Phone Number</mat-label>
-                  <input formControlName="phone" matInput>
-                  <mat-hint align="end"></mat-hint>
-                </mat-form-field>
-              </div>
-            </div>
-          </div> -->
+          <ng-template matStepLabel>
+            <span class="stepTitleStyle">Origin And Destination</span>
+          </ng-template>
+          
           <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="5px">
             <div @fadeInUp class="card" fxFlex="50%">
-              <div fxLayout="row" fxLayoutGap="8px" class="py-2 ml-5">
+              <div fxLayout="row" fxLayoutGap="8px" class="ml-5">
                 <div><h2 class="OriginDestinationTitle">Origin</h2></div>
               </div>
               <div>
-                <div fxLayout="column" class="expansion-panel-cont-style">    
+                <div fxLayout="column" class="expansion-panel-cont-style">
+                  <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="5px">                    
+                    <div fxFlex="100%">
+                      <mat-form-field>
+                        <mat-label>Name</mat-label>
+                        <input name="originname" formControlName="originname" matInput required >
+                      </mat-form-field>
+                    </div>                                 
+                  </div>
+                  <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="5px">                    
+                    <div fxFlex="50%">
+                      <mat-form-field>
+                        <mat-label>Address 1</mat-label>
+                        <textarea name="originadddress1" formControlName="originadddress1" matInput required rows="2" maxlength="250"></textarea>
+                      </mat-form-field>
+                    </div>  
+                    <div fxFlex="50%">
+                      <mat-form-field>
+                        <mat-label>Address 2</mat-label>
+                        <textarea name="originadddress2" formControlName="originadddress2" matInput rows="2" maxlength="250"></textarea>
+                      </mat-form-field>
+                    </div>                                 
+                  </div>     
                   <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="5px">
                     <div fxFlex="50%">
                       <mat-form-field fxFlex="none">
@@ -91,151 +75,361 @@
                         <mat-label>State</mat-label>
                         <input name="originstatename" matInput formControlName="originstatename" required>
                       </mat-form-field>
-                    </div>
+                    </div>                   
+                  </div>
+                  <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="5px">                    
                     <div fxFlex="50%">
                       <mat-form-field>
-                        <mat-label>Pickup Date</mat-label>
+                        <mat-label>Contact</mat-label>
+                        <input name="origincontact" formControlName="origincontact" matInput >
+                      </mat-form-field>
+                    </div>  
+                    <div fxFlex="50%">
+                      <mat-form-field>
+                        <mat-label>Phone</mat-label>
+                        <input name="originphone" formControlName="originphone" matInput required >
+                      </mat-form-field>
+                    </div>                                 
+                  </div>  
+                  <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="5px">                    
+                    <div fxFlex="50%">
+                      <mat-form-field>
+                        <mat-label>Email</mat-label>
+                        <input name="originemail" formControlName="originemail" matInput required >
+                      </mat-form-field>
+                    </div>                                                  
+                  </div>   
+                  <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="5px">                    
+                    <div fxFlex="100%">
+                      <mat-form-field>
+                        <mat-label>Notes</mat-label>
+                        <textarea name="originnotes" formControlName="originnotes" matInput rows="2" maxlength="250"></textarea>
+                      </mat-form-field>
+                    </div>                        
+                  </div>   
+                  <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="5px">                    
+                    <div fxFlex="34%">
+                      <mat-form-field>
+                        <mat-label>Exc Pickup Date</mat-label>
                         <input (click)="formDatepickerRef.open()" (focus)="formDatepickerRef.open()" name="originpickupdate"
                           [matDatepicker]="formDatepickerRef" matInput readonly formControlName="originpickupdate">
                         <mat-datepicker-toggle [for]="formDatepickerRef" matSuffix></mat-datepicker-toggle>
-                        <mat-hint>Click on the input or the datepicker icon</mat-hint>
+                        <!-- <mat-hint>Click on the input or the datepicker icon</mat-hint> -->
                         <mat-datepicker #formDatepickerRef></mat-datepicker>
+                      </mat-form-field>  
+                    </div>  
+                    <div fxFlex="32%">
+                      <mat-form-field fxFlex="none">
+                        <mat-label>Pickup Open</mat-label>                   
+                          <mat-select  name="originpickupopen" formControlName="originpickupopen">
+                            <!-- <mat-option *ngFor="let country of originCountries" [value]="country.CountryId">{{country.CountryName}}</mat-option>                       -->
+                          </mat-select>
+                      </mat-form-field>
+                    </div> 
+                    <div fxFlex="32%">
+                      <mat-form-field fxFlex="none">
+                        <mat-label>Pickup Close</mat-label>                   
+                          <mat-select  name="originpickupclose" formControlName="originpickupclose">
+                          <!-- <mat-option *ngFor="let country of originCountries" [value]="country.CountryId">{{country.CountryName}}</mat-option>                       -->
+                        </mat-select>
                       </mat-form-field>
                     </div>                                 
-                  </div>
-                  <!-- <mat-expansion-panel [expanded]="false" class="origin-services-expansion-panel"  
-                    (opened)="panelCollectionServiceState = true"
-                    (closed)="panelCollectionServiceState = false">
-                    <mat-expansion-panel-header [collapsedHeight]="'32px'" [expandedHeight]="'32px'">
-                      <mat-panel-title>
-                        <span matBadge="4" matBadgeOverlap="false">Collection Services</span>
-                      </mat-panel-title>
-                      <mat-panel-description>
-                        {{collectionServicesDescription}}
-                      </mat-panel-description>
-                    </mat-expansion-panel-header>
-                    <div class="expansion-panel-cont-style">
-                      <div class="pt-1" fxLayout.lt-xs="column" fxLayout.gt-xs="row" fxLayoutGap="16px">
-                        <mat-checkbox fxFlex="33%" [checked]="false" formControlName="commercial" color="warn" (change)="validateCollectionServices()">Commercial</mat-checkbox>
-                        <mat-checkbox fxFlex="33%" [checked]="false" formControlName="residential" color="warn" (change)="validateCollectionServices()">Residential</mat-checkbox>
-                        <mat-checkbox fxFlex="34%" [checked]="false" formControlName="limitedAccess" color="warn" (change)="validateCollectionServices()">Limited Access</mat-checkbox>
-                      </div>
-                      <hr style="margin: 1%;">
-                      <div class="pt-1" fxLayout.lt-xs="column" fxLayout.gt-xs="row">
-                        <div fxFlex="50%">
-                          <mat-checkbox [checked]="false" formControlName="insidePickup" color="warn" (change)="validateCollectionServices()">Inside Pickup</mat-checkbox>
-                        </div> 
-                        <div fxFlex="50%">
-                          <mat-checkbox [checked]="false" formControlName="liftgateRequiredAtPickup" color="warn" (change)="validateCollectionServices()">Liftgate Required at Pickup</mat-checkbox>
-                        </div>
-                      </div>
-                    </div>
-                  </mat-expansion-panel> -->
+                  </div>                                         
                 </div>
               </div>
             </div>
             <div @fadeInUp class="card" fxFlex="50%">
-              <div fxLayout="row" fxLayoutGap="8px" class="py-2 ml-5">
-                <div><h2 class="OriginDestinationTitle">Destination</h2></div>
+              <div fxLayout="row" fxLayoutGap="8px" class="ml-5">
+                <div><h2 class="OriginDestinationTitle">Destination</h2></div>                                
+              </div>
+              <div>
+                <div fxLayout="column" class="expansion-panel-cont-style">
+                  <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="5px">                    
+                    <div fxFlex="100%">
+                      <mat-form-field>
+                        <mat-label>Name</mat-label>
+                        <input name="destname" formControlName="destname" matInput required >
+                      </mat-form-field>
+                    </div>                                 
+                  </div>
+                  <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="5px">                    
+                    <div fxFlex="50%">
+                      <mat-form-field>
+                        <mat-label>Address 1</mat-label>
+                        <textarea name="destadddress1" formControlName="destadddress1" matInput required rows="2" maxlength="250"></textarea>
+                      </mat-form-field>
+                    </div>  
+                    <div fxFlex="50%">
+                      <mat-form-field>
+                        <mat-label>Address 2</mat-label>
+                        <textarea name="destadddress2" formControlName="destadddress2" matInput rows="2" maxlength="250"></textarea>
+                      </mat-form-field>
+                    </div>                                 
+                  </div>     
+                  <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="5px">
+                    <div fxFlex="50%">
+                      <mat-form-field fxFlex="none">
+                        <mat-label>Country</mat-label>                   
+                          <mat-select  name="destcountry" formControlName="destcountry">
+                          <mat-option *ngFor="let country of originCountries" [value]="country.CountryId">{{country.CountryName}}</mat-option>                      
+                        </mat-select>
+                      </mat-form-field>
+                    </div>
+                    <div fxFlex="50%">
+                      <mat-form-field>
+                        <mat-label>Postal Code</mat-label>
+                        <input name="destpostalcode" formControlName="destpostalcode"
+                                (blur)="validateOriginPostalCode()" matInput required >
+                      </mat-form-field>
+                    </div>                                 
+                  </div>
+                  <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="5px">
+                    <div fxFlex="50%">
+                      <mat-form-field>
+                        <mat-label>State</mat-label>
+                        <input name="deststatename" matInput formControlName="deststatename" required>
+                      </mat-form-field>
+                    </div>                   
+                  </div>
+                  <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="5px">                    
+                    <div fxFlex="50%">
+                      <mat-form-field>
+                        <mat-label>Contact</mat-label>
+                        <input name="destcontact" formControlName="destcontact" matInput >
+                      </mat-form-field>
+                    </div>  
+                    <div fxFlex="50%">
+                      <mat-form-field>
+                        <mat-label>Phone</mat-label>
+                        <input name="destphone" formControlName="destphone" matInput required >
+                      </mat-form-field>
+                    </div>                                 
+                  </div>  
+                  <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="5px">                    
+                    <div fxFlex="50%">
+                      <mat-form-field>
+                        <mat-label>Email</mat-label>
+                        <input name="destemail" formControlName="destemail" matInput required >
+                      </mat-form-field>
+                    </div>                                                  
+                  </div>   
+                  <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="5px">                    
+                    <div fxFlex="100%">
+                      <mat-form-field>
+                        <mat-label>Notes</mat-label>
+                        <textarea name="destnotes" formControlName="destnotes" matInput rows="2" maxlength="250"></textarea>
+                      </mat-form-field>
+                    </div>                        
+                  </div>   
+                  <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="5px">                    
+                    <div fxFlex="34%">
+                      <mat-form-field>
+                        <mat-label>Exp Del Date</mat-label>
+                        <input (click)="formDestDatepickerRef.open()" (focus)="formDestDatepickerRef.open()" name="destexpdeldate"
+                          [matDatepicker]="formDestDatepickerRef" matInput readonly formControlName="destexpdeldate">
+                        <mat-datepicker-toggle [for]="formDestDatepickerRef" matSuffix></mat-datepicker-toggle>
+                        <!-- <mat-hint>Click on the input or the datepicker icon</mat-hint> -->
+                        <mat-datepicker #formDestDatepickerRef></mat-datepicker>
+                      </mat-form-field>  
+                    </div>  
+                    <div fxFlex="32%">
+                      <mat-form-field>
+                        <mat-label>Del Appt From</mat-label>
+                        <input name="destdelapptfrom" formControlName="destdelapptfrom" matInput >
+                      </mat-form-field>
+                    </div> 
+                    <div fxFlex="32%">
+                      <mat-form-field>
+                        <mat-label>Del Appt To</mat-label>
+                        <input name="destdelapptto" formControlName="destdelapptto" matInput >
+                      </mat-form-field>
+                    </div>                                 
+                  </div>                                         
+                </div>
               </div>
             </div>
           </div>
                     
           <div class="actions" fxLayout="row" fxLayout.lt-md="column" fxLayoutAlign="end center" fxLayoutGap="5px">
             <button (click)="stepper.reset()" [disabled]="originAndDestinationFormGroup.pristine" color="primary" mat-button
-                    type="button">RESET
+                    type="button">Reset
             </button>
-            <button [disabled]="originAndDestinationFormGroup.invalid" color="primary" mat-raised-button matStepperNext>NEXT
-            </button>
-          </div>
-        </form>
-      </mat-step>
-
-      <mat-step [stepControl]="passwordFormGroup">
-        <form [formGroup]="passwordFormGroup">
-          <ng-template matStepLabel>Products and Accessorials</ng-template>
-
-          <h2 class="title m-0">Select a Password</h2>
-          <div class="subheading-1">Enter your password you will use to log in.</div>
-
-          <div class="mt-4" fxLayout="column" fxLayoutGap="8px">
-            <mat-form-field fxFlex="auto">
-              <mat-label>Password</mat-label>
-              <input [type]="passwordInputType" formControlName="password" matInput required>
-              <button (click)="showPassword()" *ngIf="passwordInputType === 'password'" mat-icon-button matSuffix
-                      type="button">
-                <mat-icon [icIcon]="icVisibility"></mat-icon>
-              </button>
-              <button (click)="hidePassword()" *ngIf="passwordInputType === 'text'" mat-icon-button matSuffix
-                      type="button">
-                <mat-icon [icIcon]="icVisibilityOff"></mat-icon>
-              </button>
-              <mat-hint>Your password should be atleast 6 characters long.</mat-hint>
-            </mat-form-field>
-
-            <mat-form-field fxFlex="auto">
-              <mat-label>Confirm Password</mat-label>
-              <input [type]="passwordInputType" formControlName="passwordConfirm" matInput required>
-              <button (click)="showPassword()" *ngIf="passwordInputType === 'password'" mat-icon-button matSuffix
-                      type="button">
-                <mat-icon [icIcon]="icVisibility"></mat-icon>
-              </button>
-              <button (click)="hidePassword()" *ngIf="passwordInputType === 'text'" mat-icon-button matSuffix
-                      type="button">
-                <mat-icon [icIcon]="icVisibilityOff"></mat-icon>
-              </button>
-              <mat-hint>Please type in your password again.</mat-hint>
-            </mat-form-field>
-          </div>
-
-          <div class="actions" fxLayout="row" fxLayoutAlign="end center" fxLayoutGap="8px">
-            <button color="primary" mat-button matStepperPrevious type="button">PREVIOUS</button>
-            <button [disabled]="passwordFormGroup.invalid" color="primary" mat-raised-button matStepperNext>NEXT
+            <button  color="primary" mat-raised-button matStepperNext>Next
             </button>
           </div>
         </form>
       </mat-step>
 
-      <mat-step [stepControl]="passwordFormGroup">
-        <form [formGroup]="passwordFormGroup">
-          <ng-template matStepLabel>Shipment Information</ng-template>
+      <mat-step [stepControl]="productsAndAccessorialsFormGroup">
+        <form [formGroup]="productsAndAccessorialsFormGroup">
+          <ng-template matStepLabel>
+            <span class="stepTitleStyle">Products and Accessorials</span>
+          </ng-template>
 
-          <h2 class="title m-0">Select a Password</h2>
-          <div class="subheading-1">Enter your password you will use to log in.</div>
-
-          <div class="mt-4" fxLayout="column" fxLayoutGap="8px">
-            <mat-form-field fxFlex="auto">
-              <mat-label>Password</mat-label>
-              <input [type]="passwordInputType" formControlName="password" matInput required>
-              <button (click)="showPassword()" *ngIf="passwordInputType === 'password'" mat-icon-button matSuffix
-                      type="button">
-                <mat-icon [icIcon]="icVisibility"></mat-icon>
-              </button>
-              <button (click)="hidePassword()" *ngIf="passwordInputType === 'text'" mat-icon-button matSuffix
-                      type="button">
-                <mat-icon [icIcon]="icVisibilityOff"></mat-icon>
-              </button>
-              <mat-hint>Your password should be atleast 6 characters long.</mat-hint>
-            </mat-form-field>
-
-            <mat-form-field fxFlex="auto">
-              <mat-label>Confirm Password</mat-label>
-              <input [type]="passwordInputType" formControlName="passwordConfirm" matInput required>
-              <button (click)="showPassword()" *ngIf="passwordInputType === 'password'" mat-icon-button matSuffix
-                      type="button">
-                <mat-icon [icIcon]="icVisibility"></mat-icon>
-              </button>
-              <button (click)="hidePassword()" *ngIf="passwordInputType === 'text'" mat-icon-button matSuffix
-                      type="button">
-                <mat-icon [icIcon]="icVisibilityOff"></mat-icon>
-              </button>
-              <mat-hint>Please type in your password again.</mat-hint>
-            </mat-form-field>
+          <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="5px">
+            <div @fadeInUp class="card" fxFlex="75%">
+              <div fxLayout="row" fxLayoutGap="8px" class="ml-5">
+                <div><h2 class="OriginDestinationTitle">Product(s) {{formProducts.length}}</h2></div>
+              </div>
+              <div  [ngClass]="{'ProductsSection': formProducts.length >= 3}">
+               <div formArrayName='products' *ngFor="let prod of formProducts.controls; let i = index" > 
+                  <hr *ngIf="i > 0" >
+                  <div [formGroupName]="i">
+                    <div fxLayout="column" class="pt-5" class="expansion-panel-cont-style">
+                      <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="5px">
+                        <div fxFlex="12%">
+                          <mat-form-field fxFlex="none">
+                            <mat-label>Pallet</mat-label>
+                            <input matInput type="number" maxlength="4" min="0" formControlName="Pallets" required>
+                          </mat-form-field>
+                        </div>
+                        <div fxFlex="12%">
+                          <mat-form-field>
+                            <mat-label>Pieces</mat-label>
+                            <input matInput type="number" maxlength="4" min="0" formControlName="Pieces" required>
+                          </mat-form-field>
+                        </div>   
+                        <div fxFlex="22%">
+                          <mat-form-field>
+                            <mat-label>Packages</mat-label>
+                            <mat-select name="package" formControlName="Package" required>
+                              <mat-option *ngFor="let package of packageTypes" [value]="package.PackageTypeID">{{package.PackageType}}</mat-option>
+                            </mat-select>
+                          </mat-form-field>
+                        </div>
+                        <div fxFlex="22%">
+                          <mat-form-field>
+                            <mat-label>Class</mat-label>
+                            <mat-select formControlName="ProductClass" required>
+                              <mat-option value="50">50</mat-option>
+                              <mat-option value="55">55</mat-option>
+                              <mat-option value="50">60</mat-option>
+                              <mat-option value="65">65</mat-option>
+                              <mat-option value="70">70</mat-option>
+                              <mat-option value="77.5">77.5</mat-option>
+                              <mat-option value="85">85</mat-option>
+                              <mat-option value="92.5">92.5</mat-option>
+                              <mat-option value="100">100</mat-option>
+                              <mat-option value="110">110</mat-option>
+                              <mat-option value="125">125</mat-option>
+                              <mat-option value="150">150</mat-option>
+                              <mat-option value="175">175</mat-option>
+                              <mat-option value="200">200</mat-option>
+                              <mat-option value="250">250</mat-option>
+                              <mat-option value="300">300</mat-option>
+                              <mat-option value="400">400</mat-option>
+                              <mat-option value="500">500</mat-option>
+                            </mat-select>
+                          </mat-form-field>
+                        </div>                         
+                        <div fxFlex="28%">
+                          <mat-form-field>
+                            <mat-label>Description</mat-label>
+                            <input matInput type="text" maxlength="50" formControlName="Description">
+                          </mat-form-field>
+                        </div>     
+                      </div>
+        
+                      <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="5px">   
+                        <div fxFlex="15%">
+                          <mat-form-field>
+                            <mat-label>NMFC</mat-label>
+                            <input matInput type="number" maxlength="4" min="0" formControlName="NMFC">
+                          </mat-form-field>
+                        </div>           
+                        <div fxFlex="15%">
+                          <mat-form-field>
+                            <mat-label>L</mat-label>
+                            <input matInput type="number" maxlength="4" min="0" formControlName="Length" required>
+                          </mat-form-field>
+                        </div>  
+                        <div fxFlex="15%">
+                          <mat-form-field>
+                            <mat-label>W</mat-label>
+                            <input matInput type="number" maxlength="4" min="0" formControlName="Width" required>
+                          </mat-form-field>
+                        </div>  
+                        <div fxFlex="15%">
+                          <mat-form-field>
+                            <mat-label>H</mat-label>
+                            <input matInput type="number" maxlength="4" min="0" formControlName="Height" required>
+                          </mat-form-field>
+                        </div>
+                        <div fxFlex="15%">
+                          <mat-form-field>
+                            <mat-label>PCF</mat-label>
+                            <input matInput type="number" maxlength="4" min="0" formControlName="PCF">
+                          </mat-form-field>
+                        </div>
+                        <div fxFlex="20%">
+                          <mat-form-field>
+                            <mat-label>Total Weight</mat-label>
+                            <input matInput type="number" maxlength="4" min="0" formControlName="Weight" required>
+                          </mat-form-field>
+                        </div>
+                        
+                      </div>
+                      <div fxLayout="row" fxLayout.lt-md="column">  
+                        <div fxFlex="15%">
+                          <mat-checkbox [checked]="false" formControlName="addToProductMaster" color="warn">Master</mat-checkbox>
+                        </div>
+                        <div fxFlex="15%">
+                          <mat-checkbox [checked]="false" formControlName="Stackable" color="warn">Stackable</mat-checkbox>
+                        </div>
+                        <div fxFlex="15%">
+                          <mat-checkbox [checked]="false" formControlName="Hazmat" color="warn">Hazmat</mat-checkbox>
+                        </div>
+                      </div> 
+                      <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="5px" class="pb-2 pt-2">                     
+                        <div fxLayoutAlign="end center">
+                          <ng-container *ngIf="formProducts.length > 1">
+                            <button id="{{'remoeMinus'+i}}" (click)="removeNewProdField(i)" 
+                                    mat-button type="button">Remove</button>
+                          </ng-container>
+                          <ng-container>
+                            <button id="{{'addrec'+i}}" (click)="addNewProdField()" 
+                                    mat-raised-button type="button" [disabled]="productsAndAccessorialsFormGroup.get('products').invalid" >Add New</button>
+                          </ng-container>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div @fadeInUp class="card" fxFlex="25%">
+              <div fxLayout="row" fxLayoutGap="8px" class="ml-5">
+                <div><h2 class="OriginDestinationTitle">Accessorial(s) {{accesorialsSelect.selectedOptions.selected.length}}</h2></div>
+              </div>
+              <div class="AccessorialsSection">
+                <mat-selection-list #accesorialsSelect class="accesorialsSelectionList">
+                  <mat-list-option color="warn" *ngFor="let accesorial of accesorials" checkboxPosition="before">
+                    {{accesorial.Description}}
+                  </mat-list-option>
+                </mat-selection-list>
+              </div>
+            </div>
           </div>
 
           <div class="actions" fxLayout="row" fxLayoutAlign="end center" fxLayoutGap="8px">
-            <button color="primary" mat-button matStepperPrevious type="button">PREVIOUS</button>
-            <button [disabled]="passwordFormGroup.invalid" color="primary" mat-raised-button matStepperNext>NEXT
+            <button color="primary" mat-button matStepperPrevious type="button">Previous</button>
+            <button  color="primary" mat-raised-button matStepperNext>Next
+            </button>
+          </div>
+        </form>
+      </mat-step>
+
+      <mat-step [stepControl]="productsAndAccessorialsFormGroup">
+        <form [formGroup]="productsAndAccessorialsFormGroup">
+          <ng-template matStepLabel>
+            <span class="stepTitleStyle">Shipment Information</span>
+          </ng-template>
+
+          <!-- Step Content -->
+
+          <div class="actions" fxLayout="row" fxLayoutAlign="end center" fxLayoutGap="8px">
+            <button color="primary" mat-button matStepperPrevious type="button">Previous</button>
+            <button  color="primary" mat-raised-button matStepperNext>Next
             </button>
           </div>
         </form>
@@ -243,23 +437,17 @@
 
       <mat-step [stepControl]="confirmFormGroup">
         <form [formGroup]="confirmFormGroup">
-          <ng-template matStepLabel>Rate total and Book Shipment</ng-template>
+          <ng-template matStepLabel>
+            <span class="stepTitleStyle">Rate total and Book Shipment</span>
+          </ng-template>
 
-          <div class="title m-0">You're almost there!</div>
-          <div class="subheading-1">To finish registration, accept our terms of service and click on "Create Account".
-          </div>
-
-          <div class="mt-4" fxLayout="column" fxLayoutGap="8px">
-            <mat-checkbox class="checkbox" formControlName="terms">
-              I agree to the terms of service and the usual stuff. *
-            </mat-checkbox>
-          </div>
+          <!-- Step Content -->
 
           <div class="actions" fxLayout="row" fxLayoutAlign="end center" fxLayoutGap="8px">
-            <button color="primary" mat-button matStepperPrevious type="button">PREVIOUS</button>
-            <button (click)="submit()" [disabled]="confirmFormGroup.invalid" color="primary" mat-raised-button
+            <button color="primary" mat-button matStepperPrevious type="button">Previous</button>
+            <button (click)="submit()"  color="warn" mat-raised-button
                     matStepperNext>
-              CREATE ACCOUNT
+              Book Shipment
             </button>
           </div>
         </form>

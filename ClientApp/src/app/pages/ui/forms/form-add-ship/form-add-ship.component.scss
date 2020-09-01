@@ -5,7 +5,7 @@
 .expansion-panel-cont-style{
     font-size: 12px;  
     margin-bottom: -1%; 
-    padding: 0 24px 16px;     
+    padding: 0 10px 10px;     
 }   
 
 .mat-expansion-panel-header{
@@ -15,7 +15,7 @@
 
 .mat-form-field {
     font-size: 12px;
-    margin-bottom: -2%;
+    margin-bottom: -12px;
     width: 100%;
 }
 
@@ -39,4 +39,28 @@ margin: 5px 0;
 .OriginDestinationTitle{
     font-size: 14px;
     font-weight: 500;
+}
+
+.stepTitleStyle{
+    font-size: 13px;    
+}
+
+.AccessorialsSection{
+    max-height: 400px;    
+    overflow-y: auto;
+}
+
+.accesorialsSelectionList .mat-list-option{
+    font-size: 12px;
+    height: 35px;
+}
+
+hr{
+    border: 0.5px solid silver; 
+    margin: 5px;   
+  }
+
+.ProductsSection{
+    max-height: 400px;
+    overflow-y: auto;
 }

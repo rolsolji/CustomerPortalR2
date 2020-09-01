@@ -15,6 +15,7 @@ import icMoreVert from '@iconify/icons-ic/twotone-more-vert';
 import { PostalData } from '../../../../Entities/PostalData';
 import { HttpService } from '../../../../common/http.service';
 import { String, StringBuilder } from 'typescript-string-operations';
+import { Accessorial } from '../../../../Entities/Accessorial';
 
 @Component({
   selector: 'vex-form-add-ship',
@@ -32,9 +33,14 @@ export class FormAddShipComponent implements OnInit {
 
   keyId: string = "1593399730488";
   ClientID: number = 8473;
+  securityToken: string;
 
   originCountries: Object;
   destinationCountries: Object;  
+  packageTypes: Object;
+
+  accesorials: Accessorial[];
+  typesOfShoes: string[] = ['Boots', 'Clogs', 'Loafers', 'Moccasins', 'Sneakers','Boots2', 'Clogs2', 'Loafers2', 'Moccasins2', 'Sneakers2'];
 
   originSelectedCountry: PostalData = {
     CityCode: '',
@@ -67,7 +73,7 @@ export class FormAddShipComponent implements OnInit {
   };
 
   originAndDestinationFormGroup: FormGroup;
-  passwordFormGroup: FormGroup;
+  productsAndAccessorialsFormGroup: FormGroup;
   confirmFormGroup: FormGroup; 
 
   phonePrefixOptions = ['+1', '+27', '+44', '+49', '+61', '+91'];
@@ -87,17 +93,65 @@ export class FormAddShipComponent implements OnInit {
               private httpService : HttpService) {
   }
 
+  addProductFormGroup(): FormGroup{
+    return this.fb.group({
+      Pallets: [null, Validators.required],
+      Pieces: [null, Validators.required],
+        Package: [null],
+        ProductClass: [null, Validators.required],
+        NMFC: [null],
+        Description: [null, Validators.required],
+        Length: [null, Validators.required],
+        Width: [null, Validators.required],
+        Height: [null, Validators.required],
+        PCF: [null],
+        Weight: [null, Validators.required],
+        addToProductMaster: [null],
+        Stackable: [null],
+        Hazmat: [null]
+    })
+  }  
+
+  get formProducts() { return <FormArray>this.productsAndAccessorialsFormGroup.get('products'); } 
+
   async ngOnInit() {
-    //-- Main Form Group fields
+    //-- originAndDestinationFormGroup fields
     this.originAndDestinationFormGroup = this.fb.group({
+      originname: [null, Validators.required],
+      originadddress1: [null, Validators.required],
+      originadddress2: [null],
       origincountry: [null, Validators.required],
       originpostalcode: [null, Validators.required],
       originstatename: [null, Validators.required],
+      origincontact: [null],
+      originphone: [null],
+      originemail: [null, Validators.required],
+      originnotes: [null],
       originpickupdate: [null, Validators.required],
-      destinationpostalcode: [null, Validators.required],
-      destinationstatename: [null, Validators.required]     
+      originpickupopen: [null],
+      originpickupclose: [null],
+      destname: [null, Validators.required],
+      destadddress1: [null, Validators.required],
+      destadddress2: [null],
+      destcountry: [null, Validators.required],
+      destpostalcode: [null, Validators.required],
+      deststatename: [null, Validators.required],
+      destcontact: [null],
+      destphone: [null],
+      destemail: [null, Validators.required],
+      destnotes: [null],
+      destexpdeldate: [null],
+      destdelapptfrom: [null],
+      destdelapptto: [null],           
     });
 
+    //-- productsAndAccessorialsFormGroup fields
+    this.productsAndAccessorialsFormGroup = this.fb.group({
+      products: this.fb.array([
+        this.addProductFormGroup()
+      ])   
+    });
+    //--
 
     // this.accountFormGroup = this.fb.group({
     //   username: [null, Validators.required],
@@ -106,26 +160,25 @@ export class FormAddShipComponent implements OnInit {
     //   phonePrefix: [this.phonePrefixOptions[3]],
     //   phone: [],
     // });
-
-    this.passwordFormGroup = this.fb.group({
-      password: [
-        null,
-        Validators.compose(
-          [
-            Validators.required,
-            Validators.minLength(6)
-          ]
-        )
-      ],
-      passwordConfirm: [null, Validators.required]
-    });
-
+    
     this.confirmFormGroup = this.fb.group({
       terms: [null, Validators.requiredTrue]
     });
 
+    try{
+      this.securityToken = await this.httpService.getMainToken(); 
+    }
+    catch(ex){
+      console.log(ex);
+    }
+
+    this.httpService.token = this.securityToken;
+
     let responseData = await this.httpService.getCountryList(this.keyId);   
+    this.accesorials = await this.httpService.getGetClientMappedAccessorials(this.ClientID, this.keyId);
     //this.clientDefaultData = await this.httpService.getClientDefaultsByClient(this.ClientID, this.keyId);
+
+    this.packageTypes = await this.httpService.getProductPackageType(this.keyId);   
 
     this.originCountries = responseData;
     this.destinationCountries = responseData;
@@ -167,6 +220,14 @@ export class FormAddShipComponent implements OnInit {
     
   }
 
+  addNewProdField(): void {        
+    (<FormArray>this.productsAndAccessorialsFormGroup.get('products')).push(this.addProductFormGroup());
+  }
+
+  removeNewProdField(index: number): void {  
+    (<FormArray>this.productsAndAccessorialsFormGroup.get('products')).removeAt(index);      
+  }
+
   showPassword() {
     this.passwordInputType = 'text';
     this.cd.markForCheck();
@@ -178,8 +239,10 @@ export class FormAddShipComponent implements OnInit {
   }
 
   submit() {
-    this.snackbar.open('Hooray! You successfully created your account.', null, {
+    this.snackbar.open('Shipment booked.', null, {
       duration: 5000
     });
   }
+
+
 }

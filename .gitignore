@@ -231,3 +231,4 @@ _Pvt_Extensions
 .fake/
 /ClientApp/node_modules
 /ClientApp/.vscode
+/ClientApp/dist/vex

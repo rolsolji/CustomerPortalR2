@@ -1,6 +1,7 @@
-<div [@stagger]="true" class="card overflow-auto ml-5 mt-5">
-    <div fxLayout="row" fxLayout.lt-sm="column" >
-        <div class="card" fxFlex="70%" class="filters-panel-cont-style">
+<div [@stagger]="true" class="overflow-auto">
+    <div fxLayout="row" fxLayout.lt-sm="column" class="ml-2 mt-1" >
+        <div fxFlex="70%" class="card filters-panel-cont-style">
+            
             <div fxLayout="row" fxLayout.lt-sm="column" fxLayoutGap="5px">
                 <div fxFlex="50%">
                     <mat-form-field class="filterControl" >
@@ -15,8 +16,9 @@
                     </mat-form-field>
                 </div>
             </div>
-            <div fxLayout="row" fxLayout.lt-sm="column" fxLayoutGap="5px">
-                <div fxFlex="25%">
+
+            <div fxflexfill fxLayout="row" fxLayout.lt-sm="column" fxLayoutGap="5px">
+                <div fxFlex="1 0 calc(25% - 5px)">
                     <mat-form-field>
                         <mat-label>Ship Date</mat-label>
                         <input [(ngModel)]="fromShipDate" (click)="shipdatefromDatepickerRef.open()" (focus)="shipdatefromDatepickerRef.open()" name="shipdatefrom"
@@ -25,7 +27,7 @@
                         <mat-datepicker #shipdatefromDatepickerRef></mat-datepicker>
                     </mat-form-field>
                 </div>
-                <div fxFlex="24%">
+                <div fxFlex="1 0 calc(25% - 5px)">
                     <mat-form-field>
                         <mat-label>To</mat-label>
                         <input [(ngModel)]="toShipDate" (click)="shipdatetoDatepickerRef.open()" (focus)="shipdatetoDatepickerRef.open()" name="shipdateto"
@@ -34,7 +36,7 @@
                         <mat-datepicker #shipdatetoDatepickerRef></mat-datepicker>
                     </mat-form-field>
                 </div>
-                <div fxFlex="25%">
+                <div fxFlex="1 0 calc(25% - 5px)">
                     <mat-form-field>
                         <mat-label>Delivery Date</mat-label>
                         <input [(ngModel)]="fromDeliveryDate" (click)="deliverydatefromDatepickerRef.open()" (focus)="deliverydatefromDatepickerRef.open()" name="deliverydatefrom"
@@ -43,7 +45,7 @@
                         <mat-datepicker #deliverydatefromDatepickerRef></mat-datepicker>
                     </mat-form-field>
                 </div>
-                <div fxFlex="24%">
+                <div fxFlex="1 0 calc(25% - 5px)">
                     <mat-form-field>
                         <mat-label>To</mat-label>
                         <input [(ngModel)]="toDeliveryDate" (click)="deliverydatetoDatepickerRef.open()" (focus)="deliverydatetoDatepickerRef.open()" name="deliverydateto"
@@ -53,6 +55,7 @@
                     </mat-form-field>
                 </div>
             </div>
+
             <div fxLayout="row" fxLayout.lt-sm="column" fxLayoutGap="5px">
                 <div fxFlex="33%">
                     <mat-form-field >
@@ -155,12 +158,10 @@
                 <button (click)="search()" color="warn" mat-raised-button type="button">Search</button>
             </div>
         </div>
-        <!-- <div class="card" fxFlex="50%">
-            <img [src]="rightPanelImage" >
-        </div> -->
     </div>
-    <div fxLayout="column" fxLayout.lt-md="column" fxLayoutGap="5px" class="mt-5">
-        <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="5px">
+
+    <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="5px" class="card ml-2 mt-5">
+        <div>
             <table @stagger [dataSource]="dataSource" class="w-full" mat-table matSort>
                 <!-- Text Columns -->
                 <ng-container *ngFor="let column of columns; trackBy: trackByProperty">
@@ -169,7 +170,7 @@
                     <td *matCellDef="let row" [ngClass]="column.cssClasses" mat-cell>{{ row[column.property] }}</td>
                 </ng-container>
                 </ng-container>
-
+    
                 <!-- Text Columns -->
                 <ng-container *ngFor="let column of columns; trackBy: trackByProperty">
                 <ng-container *ngIf="column.type === 'dateformat'" [matColumnDef]="column.property">
@@ -177,7 +178,7 @@
                     <td *matCellDef="let row" [ngClass]="column.cssClasses" mat-cell>{{ row[column.property | date:'fullDate'] }}</td>
                 </ng-container>
                 </ng-container>
-
+    
                 <tr *matHeaderRowDef="visibleColumns" mat-header-row></tr>
                 <tr 
                     *matRowDef="let row; columns: visibleColumns;"

@@ -8,7 +8,7 @@ import { String, StringBuilder } from 'typescript-string-operations';
 import { PostalData } from '../Entities/PostalData';
 import { ClientDefaultData } from '../Entities/ClientDefaultData';
 import { ProductPackageType } from '../Entities/ProductPackageType'
-import { GetQuotesParameters } from '../Entities/getQuotesParameters';
+import { GetQuotesParameters } from '../Entities/GetQuotesParameters';
 import { Quote } from '../Entities/Quote';
 import { EquipmentType } from '../Entities/EquipmentType';
 import { ShipmentMode } from '../Entities/ShipmentMode'; 

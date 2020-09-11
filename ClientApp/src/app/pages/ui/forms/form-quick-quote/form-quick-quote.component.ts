@@ -35,7 +35,6 @@ import { getSupportedInputTypes } from '@angular/cdk/platform';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatIconModule } from '@angular/material/icon';
 import { MatBadgeModule } from '@angular/material/badge'
-import { GetQuotesParameters } from '../../../../Entities/GetQuotesParameters';
 import { Quote } from '../../../../Entities/Quote';
 import { TableColumn } from 'src/@vex/interfaces/table-column.interface';
 import { MatTableDataSource } from '@angular/material/table';

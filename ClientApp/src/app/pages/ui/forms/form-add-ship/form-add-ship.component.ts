@@ -17,6 +17,7 @@ import { HttpService } from '../../../../common/http.service';
 import { String, StringBuilder } from 'typescript-string-operations';
 import { Accessorial } from '../../../../Entities/Accessorial';
 import { InternalNote } from '../../../../Entities/InternalNote';
+import { MessageService } from "../../../../common/message.service";
 
 @Component({
   selector: 'vex-form-add-ship',
@@ -35,6 +36,8 @@ export class FormAddShipComponent implements OnInit {
   keyId: string = "1593399730488";
   ClientID: number = 8473;
   securityToken: string;
+
+  quoteIdParameter: string;
 
   originCountries: Object;
   destinationCountries: Object;  
@@ -104,7 +107,8 @@ export class FormAddShipComponent implements OnInit {
   constructor(private fb: FormBuilder,
               private cd: ChangeDetectorRef,
               private snackbar: MatSnackBar,
-              private httpService : HttpService) {
+              private httpService : HttpService,
+              private messageService: MessageService) {
   }
 
   addProductFormGroup(): FormGroup{
@@ -129,6 +133,10 @@ export class FormAddShipComponent implements OnInit {
   get formProducts() { return <FormArray>this.productsAndAccessorialsFormGroup.get('products'); } 
 
   async ngOnInit() {
+
+    //Gets quotes parameter
+    this.messageService.SharedQuoteParameter.subscribe(message => this.quoteIdParameter = message)
+
     //-- originAndDestinationFormGroup fields
     this.originAndDestinationFormGroup = this.fb.group({
       originname: [null, Validators.required],

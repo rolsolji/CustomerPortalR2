@@ -46,6 +46,9 @@ import { Status } from '../../../../Entities/Status';
 import {MatAutocompleteSelectedEvent, MatAutocomplete} from '@angular/material/autocomplete';
 import {MatChipInputEvent} from '@angular/material/chips';
 import {COMMA, ENTER} from '@angular/cdk/keycodes';
+import { ActivatedRoute, Router, ParamMap } from '@angular/router';
+import { stringToKeyValue } from '@angular/flex-layout/extended/typings/style/style-transforms';
+import { MessageService } from "../../../../common/message.service";
 //import {ThemePalette} from '@angular/material/core';
 
 @Component({
@@ -67,8 +70,8 @@ import {COMMA, ENTER} from '@angular/cdk/keycodes';
 
 export class FormShipmentBoardComponent implements OnInit {
 
-  rightPanelImage: any = "../../../../../assets/img/demo/R2TestImage.png";
-  
+  showSpinner = false;
+
   //#region Quotes
   getQuotesParameters: GetQuotesParameters = {
     ClientID: 8473,
@@ -164,7 +167,7 @@ export class FormShipmentBoardComponent implements OnInit {
   StatusSelectec: string[];
   EquipmentOptions: object;
   securityToken: string;
-
+  quoteIdParameter: string;
   get visibleColumns() {
     return this.columns.filter(column => column.visible).map(column => column.property);
   }
@@ -177,11 +180,11 @@ export class FormShipmentBoardComponent implements OnInit {
   @ViewChild('auto') matAutocomplete: MatAutocomplete;
 
   constructor(
-    private httpService : HttpService
+    private httpService : HttpService,
+    private route: ActivatedRoute, 
+    private router: Router,
+    private messageService: MessageService 
   ) { 
-    // this.filteredStatus = this.statusCtrl.valueChanges.pipe(
-    // startWith(null),
-    //   map((status: string | null) => status ? this._filter(status) : this.StatusOptionsString.slice()));
 
     this.filteredStatus = this.statusCtrl.valueChanges.pipe(
       startWith(null),
@@ -190,6 +193,7 @@ export class FormShipmentBoardComponent implements OnInit {
   }
 
   async ngOnInit() {
+    this.showSpinner = true;
     this.InitialLoadPage();
   }
 
@@ -213,18 +217,13 @@ export class FormShipmentBoardComponent implements OnInit {
     this.EquipmentOptions = await this.httpService.getMasEquipment(this.keyId);
     console.log(this.StatusOptionsString);
     this.StatusOptions.forEach(s => this.StatusOptionsString.push(s.Status));
-    // this.StatusOptions.forEach(s => {
-    //   let chip: ChipColor;
-    //   chip.name = s.Status;
-    //   chip.color = undefined;
-    //   this.StatusOptionsChip.push(chip);
-    // });
-    console.log(this.StatusOptionsString);
     this.search();
   }
 
   async search(){
     
+    this.showSpinner = true;
+
     this.cleanField()
 
     if (this.fromShipDate != null)
@@ -246,6 +245,14 @@ export class FormShipmentBoardComponent implements OnInit {
       )
     );
 
+    this.messageService.SharedQuoteParameter.subscribe(message => this.quoteIdParameter = message)
+
+    if (!String.IsNullOrWhiteSpace(this.quoteIdParameter))
+    {
+      this.getQuotesParameters.FreeSearch = this.quoteIdParameter;
+      this.getQuotesParameters.Mode = String.Empty;
+    }
+
     console.log(this.getQuotesParameters);
     this.quotes = await this.httpService.searchBOLHDRForJason(this.getQuotesParameters);    
     // console.log(this.quotes);
@@ -258,6 +265,8 @@ export class FormShipmentBoardComponent implements OnInit {
     this.dataSource = new MatTableDataSource();
     this.dataSource.data = this.quotes;
     console.log(this.dataSource.data);
+
+    this.showSpinner = false;
   }
 
   visible = true;

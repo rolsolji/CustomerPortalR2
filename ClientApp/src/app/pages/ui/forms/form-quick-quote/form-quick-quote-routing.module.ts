@@ -1,14 +1,10 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-import { FormQuickQuoteComponent } from './form-quick-quote.component';
 import { VexRoutes } from '../../../../../@vex/interfaces/vex-route.interface';
-
+import { FormQuickQuoteComponent } from './form-quick-quote.component';
 
 const routes: VexRoutes = [
-  {
-    path: '',
-    component: FormQuickQuoteComponent
-  }
+  { path: '', component: FormQuickQuoteComponent }
 ];
 
 @NgModule({

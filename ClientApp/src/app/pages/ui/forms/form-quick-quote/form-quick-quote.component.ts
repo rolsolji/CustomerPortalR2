@@ -164,7 +164,7 @@ export class FormQuickQuoteComponent implements OnInit {
    deliveryServicesDescription: string = "Select Delivery Services";  
 
   pcoAutoCompleteOptions: Observable<PostalData[]>;
-  pcdAutoCompleteOptions: Observable<PostalData[]>;
+  pcdAutoCompleteOptions: Observable<PostalData[]>;  
 
   saveQuoteParameters: SaveQuoteParameters;
 
@@ -189,8 +189,7 @@ export class FormQuickQuoteComponent implements OnInit {
       originpickupdate: [null, Validators.required],
       destinationpostalcode: [null, Validators.required],
       destinationstatename: [null, Validators.required],
-      //#region CollectionServices    
-      commercial:[null],
+      //#region CollectionServices          
       residential:[null],
       limitedAccess:[null],
       insidePickup:[null],
@@ -199,8 +198,7 @@ export class FormQuickQuoteComponent implements OnInit {
         
       // }),
       //#endregion
-      //#region Delivery Services
-      deliveryCommercial:[null],
+      //#region Delivery Services    
       deliveryResidential:[null],
       deliveryLimitedAccess:[null],
       standard:[null],
@@ -239,10 +237,9 @@ export class FormQuickQuoteComponent implements OnInit {
     this.originCountries = responseData;
     this.destinationCountries = responseData;
     this.originSelectedCountry = responseData[0]; // US as default     
-    this.destinationSelectedCountry = responseData[0]; // US as default      
-
-
-    this.packageTypes = await this.httpService.getProductPackageType(this.keyId);   
+    this.destinationSelectedCountry = responseData[0]; // US as default    
+    
+    this.packageTypes = await this.httpService.getProductPackageType(this.keyId);    
 
     this.pcoAutoCompleteOptions = this.quickQuoteFormGroup.get("originpostalcode").valueChanges
       .pipe(
@@ -295,8 +292,8 @@ export class FormQuickQuoteComponent implements OnInit {
   addProductFormGroup(): FormGroup{
     return this.fb.group({
       Pallets: [null, Validators.required],
-      Pieces: [null, Validators.required],
-        Package: [null],
+      Pieces: [null],
+        Package: [3],
         ProductClass: [null, Validators.required],
         NMFC: [null],
         Length: [null, Validators.required],
@@ -332,14 +329,11 @@ export class FormQuickQuoteComponent implements OnInit {
 
   rightPanelImage: any = "assets/img/demo/R2TestImage.png";
 
-  async getQuote() {
-    console.log(this.quickQuoteFormGroup.get('products').value);
-    this.getQuoteButtonClicked = true;    
-    console.log('print at start.');  
+  async getQuote() {    
+    this.getQuoteButtonClicked = true;        
     this.showSpinner = true;   
     let test = await this.getShipmentRates();       
-    this.showSpinner = false;
-    //this.cd.markForCheck(); 
+    this.showSpinner = false;    
     
     console.log('print at the end.');  
     // window.scroll({ 
@@ -382,8 +376,7 @@ export class FormQuickQuoteComponent implements OnInit {
   OriginPickupDate: string;
 
   validateCollectionServices(){
-    this.collectionServicesSelected = 0;
-    this.collectionServicesSelected += this.quickQuoteFormGroup.get('commercial').value ? 1 : 0;
+    this.collectionServicesSelected = 0;    
     this.collectionServicesSelected += this.quickQuoteFormGroup.get('residential').value ? 1 : 0;
     this.collectionServicesSelected += this.quickQuoteFormGroup.get('limitedAccess').value ? 1 : 0;
     this.collectionServicesSelected += this.quickQuoteFormGroup.get('insidePickup').value ? 1 : 0;
@@ -392,8 +385,7 @@ export class FormQuickQuoteComponent implements OnInit {
   }
 
   validateDeliveryServices(){
-    this.deliveryServicesSelected = 0;
-    this.deliveryServicesSelected += this.quickQuoteFormGroup.get('deliveryCommercial').value ? 1 : 0;
+    this.deliveryServicesSelected = 0;    
     this.deliveryServicesSelected += this.quickQuoteFormGroup.get('deliveryResidential').value ? 1 : 0;
     this.deliveryServicesSelected += this.quickQuoteFormGroup.get('deliveryLimitedAccess').value ? 1 : 0;
     this.deliveryServicesSelected += this.quickQuoteFormGroup.get('standard').value ? 1 : 0;
@@ -468,28 +460,8 @@ export class FormQuickQuoteComponent implements OnInit {
   @Output() parentProductFields = new EventEmitter<ProductFeatures>();
 
 
-  addNewProdField(): void {
-    // let prod: ProductFeatures =  {
-    //   id:this.products.length + 1,
-    //   pallet: 0,
-    //   pieces: 0,
-    //   package: 0,
-    //   freightClass: 0,
-    //   nmfc: 0,
-    //   large: 0,
-    //   width: 0,
-    //   height: 0,
-    //   pcf: 0,
-    //   totalWeight: 0,
-    //   stackable: false,
-    //   hazmat: false,
-    // } ;
-    
-    // this.products.push(prod);
-    // console.log(`In method  addNewProdField field index is ${index} and field is ${JSON.stringify(JSON.stringify(prod))}`);
-    
+  addNewProdField(): void {        
     (<FormArray>this.quickQuoteFormGroup.get('products')).push(this.addProductFormGroup());
-
   }
 
   removeNewProdField(index: number): void {  
@@ -780,5 +752,49 @@ export class FormQuickQuoteComponent implements OnInit {
     }
     
     this.showSpinner = false;
+  }
+  onChangeProductWeight(index: number): void{
+    let product = this.quickQuoteFormGroup.get('products').value[index];     
+    let PCF = this.calculatePCF(product.Pallets, product.Length, product.Width, product.Height, product.Weight);
+    //this.quickQuoteFormGroup.get('destinationstatename').setValue(this.postalDataDest[0].StateName.trim());
+    //this.quickQuoteFormGroup.get('products')[index].setValue(product);
+    (<FormArray>this.quickQuoteFormGroup.controls['products']).at(index).get("PCF").setValue(PCF); 
+    //product.PCF = PCF;
+   }
+
+  calculatePCF(Pallets, Lenght, Width, Height, Weight): number {
+    var length;
+    var width;
+    var height;
+    var volum;
+    var density;
+    var perpallet;
+    var PCF;
+    if (Lenght != null && Lenght != "" && Width != null && Width != "" && Height != null && Height != "" &&
+     Weight != null && Weight != "" && Lenght != 0 && Width != 0 && Height != 0 && Weight != 0) {
+        length = parseInt(Lenght);
+        width = parseInt(Width);
+        height = parseInt(Height);
+        if (length != null && length != "" && width != null && width != "" && height != null && height != null) {
+            volum = (length * width * height) / 1728;
+        }
+        if (volum != null && volum != "" && volum != 0) {
+            if (Pallets != null && Pallets != "" && Pallets != 0) {
+                perpallet = parseFloat(Weight) / parseFloat(parseFloat(Pallets).toFixed(4));
+                if (perpallet != null && perpallet != "" && perpallet != 0) {
+                    density = parseFloat(perpallet) / parseFloat(parseFloat(volum).toFixed(4));
+                }
+            }
+            else {
+                density = parseFloat(Weight) / parseFloat(parseFloat(volum).toFixed(4));
+            }
+        }
+        if (density != null && density != "") {
+            PCF =  parseFloat(parseFloat(density).toFixed(2));
+        }
+    }
+
+
+    return PCF;
   }
 }

@@ -50,7 +50,7 @@ export class ToolbarUserDropdownComponent implements OnInit {
       label: 'Change password',
       description: '',
       colorClass: 'text-primary',
-      route: '/apps/chat'
+      route: '/apps/chat2'
       }      
   ];
 

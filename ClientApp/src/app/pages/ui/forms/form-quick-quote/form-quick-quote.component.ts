@@ -610,21 +610,17 @@ export class FormQuickQuoteComponent implements OnInit {
   ////#endregion RatesOpened
 
   async shipQuote(index: number){
-    let quoteId = await this.save(index);
-    
-    if (!String.IsNullOrWhiteSpace(quoteId))
-      this.router.navigate(['/ui/forms/form-add-ship/'], { relativeTo: this.route });
+    await this.save(index);
+    this.router.navigate(['/ui/forms/form-add-ship/'], { relativeTo: this.route });
     //routerLink="/ui/forms/form-add-ship"
   }
 
   async saveQuote(index: number){
-    let quoteId = await this.save(index);
-    
-    if (!String.IsNullOrWhiteSpace(quoteId))
-      this.router.navigate(['../shipmentboard/LTLTL/'], { relativeTo: this.route });
+    await this.save(index);
+    this.router.navigate(['../shipmentboard/LTLTL/'], { relativeTo: this.route });
   }
 
-  async save(index: number) : Promise<string>{
+  async save(index: number){
 
     this.spinnerMessage = "Saving quote";
     this.showSpinner = true;
@@ -776,13 +772,11 @@ export class FormQuickQuoteComponent implements OnInit {
       this.snackbar.open('Quote is saved successfully with LoadNo ' + responseData.ClientLadingNo, null, {
         duration: 5000
       });
-      return responseData.ClientLadingNo;
     }
     else{
       this.snackbar.open('There was an error, try again.', null, {
         duration: 5000
       });
-      return String.Empty;
     }
     
     this.showSpinner = false;

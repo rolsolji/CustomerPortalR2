@@ -19,6 +19,10 @@
     width: 100%;
 }
 
+.matAreaInputField {    
+    margin-bottom: 8px;   
+}
+
 .mat-expansion-panel-header-description{
 font-weight: 400;
 }
@@ -93,4 +97,16 @@ hr{
 .NotesListSection{
     max-height: 150px;
     overflow-y: auto;
+}
+
+/* Chrome, Safari, Edge, Opera */
+.removeArrowsNumberInput::-webkit-outer-spin-button,
+.removeArrowsNumberInput::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Firefox */
+input.removeArrowsNumberInput[type=number] {
+  -moz-appearance: textfield;
 }

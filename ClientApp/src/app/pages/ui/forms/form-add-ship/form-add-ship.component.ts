@@ -17,6 +17,7 @@ import { HttpService } from '../../../../common/http.service';
 import { String, StringBuilder } from 'typescript-string-operations';
 import { Accessorial } from '../../../../Entities/Accessorial';
 import { InternalNote } from '../../../../Entities/InternalNote';
+import { ShipmentCost } from '../../../../Entities/ShipmentCost';
 
 @Component({
   selector: 'vex-form-add-ship',
@@ -42,6 +43,7 @@ export class FormAddShipComponent implements OnInit {
 
   accesorials: Accessorial[];    
   internalNotes: InternalNote[];
+  showInternalNotesTitle: boolean = false;
   // internalNotes: InternalNote[] = [
   //   {
   //     NoteId: 1,
@@ -110,8 +112,8 @@ export class FormAddShipComponent implements OnInit {
   addProductFormGroup(): FormGroup{
     return this.fb.group({
       Pallets: [null, Validators.required],
-      Pieces: [null, Validators.required],
-        Package: [null],
+      Pieces: [null],
+        Package: [3],
         ProductClass: [null, Validators.required],
         NMFC: [null],
         Description: [null, Validators.required],
@@ -276,10 +278,18 @@ export class FormAddShipComponent implements OnInit {
 
     this.internalNotes.push(note);
     this.shipmentInfoFormGroup.get('internalnote').setValue("");
+    this.showInternalNotesTitle = true;
   }
 
   removeInternalNote(index: number): void {  
     (<InternalNote[]>this.internalNotes).splice(index, 1);      
+
+    if (this.internalNotes.length > 0){
+      this.showInternalNotesTitle = true;
+    }
+    else{
+      this.showInternalNotesTitle = false;
+    }
   }
 
 }

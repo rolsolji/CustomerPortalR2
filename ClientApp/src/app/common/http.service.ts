@@ -188,4 +188,16 @@ export class HttpService{
           }
           ).toPromise();  
     }
+
+    GetShipmentCostByLadingID(clientID:number, keyId:string){
+        let ticket = this.token;
+        let httpHeaders = new HttpHeaders({                       
+            'Ticket' : ticket                            
+        }); 
+        return this.http.get<Accessorial[]>(String.Format('https://beta-customer.r2logistics.com/Services/BOLHDRService.svc/json/GetShipmentCostByLadingID?LadingID=2386472&_=1599193487557')
+        ,{
+            headers: httpHeaders
+          }
+          ).toPromise();  
+    }
 }

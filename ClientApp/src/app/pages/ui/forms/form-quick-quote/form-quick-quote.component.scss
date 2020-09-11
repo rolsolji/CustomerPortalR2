@@ -427,3 +427,15 @@
 .mat-option{
   font-size: 12px;
 }
+
+/* Chrome, Safari, Edge, Opera */
+.removeArrowsNumberInput::-webkit-outer-spin-button,
+.removeArrowsNumberInput::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Firefox */
+input.removeArrowsNumberInput[type=number] {
+  -moz-appearance: textfield;
+}

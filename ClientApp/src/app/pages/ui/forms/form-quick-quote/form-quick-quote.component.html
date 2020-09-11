@@ -348,7 +348,7 @@
           <div class="spinnerSection" *ngIf="getQuoteButtonClicked && showSpinner">
             <div class="center-me">
               <mat-progress-spinner diameter="50" color="warn" mode="indeterminate"></mat-progress-spinner>
-              <p>Loading...</p>
+              <p>{{spinnerMessage}}</p>
             </div>
           </div>    
 
@@ -419,7 +419,7 @@
                                   </span>
                                 </div>
                                 <div>                 
-                                  <button color="warn" class="button--small" mat-raised-button type="button" routerLink="/ui/forms/form-add-ship">Ship it now</button>           
+                                  <button color="warn" class="button--small" mat-raised-button type="button" (click)="shipQuote(j)">Ship it now</button>           
                                 </div>
                               </div>
                             </div>                                          
@@ -476,7 +476,7 @@
                       </div>                      
                       <div class="inner-rates-options-container">
                           <div class="inner-rate-options-column" [ngClass]="{'inner-rate-options-column_with_email_input': sendEmailClicked}">
-                            <button mat-icon-button matTooltip="Save Quote">
+                            <button mat-icon-button matTooltip="Save Quote" (click)="saveQuote(j)">
                               <mat-icon [icIcon]="outlineSave"></mat-icon>
                             </button>
                             <button mat-icon-button matTooltip="Print">

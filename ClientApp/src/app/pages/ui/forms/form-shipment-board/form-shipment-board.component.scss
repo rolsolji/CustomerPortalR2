@@ -16,3 +16,17 @@ mat-chip {
 .filters-panel-cont-style{
   padding: 10px 10px 0px 10px;
 }
+
+.spinnerSection{
+  display: flex;
+  justify-content: center;
+}
+
+.center-me{
+  margin-top: 50%;
+  margin-bottom: 50%;
+}
+
+.spinnerSection mat-progress-spinner{
+  flex: 1;
+}

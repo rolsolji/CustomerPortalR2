@@ -35,7 +35,7 @@ import { getSupportedInputTypes } from '@angular/cdk/platform';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatIconModule } from '@angular/material/icon';
 import { MatBadgeModule } from '@angular/material/badge'
-import { GetQuotesParameters } from '../../../../Entities/GetQuotesParameters';
+import { SaveQuoteParameters,BOlProductsList } from '../../../../Entities/SaveQuoteParameters';
 import { Quote } from '../../../../Entities/Quote';
 import { TableColumn } from 'src/@vex/interfaces/table-column.interface';
 import { MatTableDataSource } from '@angular/material/table';
@@ -46,6 +46,10 @@ import { MatSelectChange } from '@angular/material/select';
 import {MatTableModule} from '@angular/material/table';
 import {MatAutocompleteSelectedEvent, MatAutocomplete} from '@angular/material/autocomplete';
 import { async } from '@angular/core/testing';
+import { Converter } from 'showdown';
+import { ValueConverter } from '@angular/compiler/src/render3/view/template';
+import { Router, ActivatedRoute, ParamMap } from '@angular/router';
+import { MessageService } from "../../../../common/message.service";
 
 export interface CountryState {
   name: string;
@@ -102,56 +106,9 @@ export class FormQuickQuoteComponent implements OnInit {
   outlineEmail = outlineEmail;
 
   stateCtrl = new FormControl();
-  // states: CountryState[] = [
-  //   {
-  //     name: 'Arkansas',
-  //     population: '2.978M',
-  //     // https://commons.wikimedia.org/wiki/File:Flag_of_Arkansas.svg
-  //     flag: 'https://upload.wikimedia.org/wikipedia/commons/9/9d/Flag_of_Arkansas.svg'
-  //   },
-  //   {
-  //     name: 'California',
-  //     population: '39.14M',
-  //     // https://commons.wikimedia.org/wiki/File:Flag_of_California.svg
-  //     flag: 'https://upload.wikimedia.org/wikipedia/commons/0/01/Flag_of_California.svg'
-  //   },
-  //   {
-  //     name: 'Florida',
-  //     population: '20.27M',
-  //     // https://commons.wikimedia.org/wiki/File:Flag_of_Florida.svg
-  //     flag: 'https://upload.wikimedia.org/wikipedia/commons/f/f7/Flag_of_Florida.svg'
-  //   },
-  //   {
-  //     name: 'Texas',
-  //     population: '27.47M',
-  //     // https://commons.wikimedia.org/wiki/File:Flag_of_Texas.svg
-  //     flag: 'https://upload.wikimedia.org/wikipedia/commons/f/f7/Flag_of_Texas.svg'
-  //   }
-  // ];
-
-  // filteredStates$ = this.stateCtrl.valueChanges.pipe(
-  //   startWith(''),
-  //   map(state => state ? this.filterStates(state) : this.states.slice())
-  // );
-
+  
   @ViewChild(MatAccordion) accordion: MatAccordion;
   @ViewChild('mapContainer', {static: false}) gmap: ElementRef;
-
-  // map: google.maps.Map;
-  // lat = 40.730610;
-  // lng = -73.935242;
-
-  // coordinates = new google.maps.LatLng(this.lat, this.lng);
-
-  // mapOptions: google.maps.MapOptions = {
-  //   center: this.coordinates,
-  //   zoom: 8,
-  // };
-
-  // mapInitializer() {
-  //   this.map = new google.maps.Map(this.gmap.nativeElement, 
-  //   this.mapOptions);
-  //  }  
 
    rates: Rate[];
    ratesFiltered: Rate[];
@@ -163,31 +120,31 @@ export class FormQuickQuoteComponent implements OnInit {
 
    originSelectedCountry: PostalData = {
     CityCode: '',
-    CityID: '',
+    CityID: null,
     CityName: '',
     CountryCode: '',
-    CountryId: '',
+    CountryId: null,
     CountryName: '',
     IsActive: '',
     PostalCode: '',
     PostalID: '',
     StateCode: '',
-    StateId: '',
+    StateId: null,
     StateName: '',
    };
 
    destinationSelectedCountry: PostalData = {
     CityCode: '',
-    CityID: '',
+    CityID: null,
     CityName: '',
     CountryCode: '',
-    CountryId: '',
+    CountryId: null,
     CountryName: '',
     IsActive: '',
     PostalCode: '',
     PostalID: '',
     StateCode: '',
-    StateId: '',
+    StateId: null,
     StateName: '',
    };
   
@@ -209,12 +166,19 @@ export class FormQuickQuoteComponent implements OnInit {
   pcoAutoCompleteOptions: Observable<PostalData[]>;
   pcdAutoCompleteOptions: Observable<PostalData[]>;  
 
+  saveQuoteParameters: SaveQuoteParameters;
+
+  spinnerMessage:string;
+
   constructor(
     private fb: FormBuilder,
     private cd: ChangeDetectorRef, 
     private ratesService: RatesService,
     private httpService : HttpService,
-    private snackbar: MatSnackBar
+    private snackbar: MatSnackBar,
+    private router: Router,
+    private route: ActivatedRoute,
+    private messageService: MessageService
     ) { }
 
   async ngOnInit() {            
@@ -505,21 +469,11 @@ export class FormQuickQuoteComponent implements OnInit {
   }
 
   async getShipmentRates() {
+
+      this.spinnerMessage = "Loading...";
+
       let pickupDate = this.OriginPickupDate;
       let arrayProducts = this.quickQuoteFormGroup.get('products').value;
-
-      // "Products": [
-      //   {
-      //     "Weight": "1000",
-      //     "ProductClass": "50",
-      //     "Pieces": "1",
-      //     "Pallets": "1",
-      //     "Length": "48",
-      //     "Height": "48",
-      //     "Width": 48,
-      //     "PCF": "15.63"
-      //   }
-      // ],
 
       let objRate = {
         "ClientID": this.ClientID,
@@ -580,6 +534,7 @@ export class FormQuickQuoteComponent implements OnInit {
         "ShipmentStopList": []
       };
 
+      console.log(objRate);
       
       this.rates = await this.ratesService.postRates(objRate);
          
@@ -626,6 +581,184 @@ export class FormQuickQuoteComponent implements OnInit {
   }
   ////#endregion RatesOpened
 
+  async shipQuote(index: number){
+    let quoteId = await this.save(index);
+    
+    if (!String.IsNullOrWhiteSpace(quoteId))
+      this.router.navigate(['/ui/forms/form-add-ship/'], { relativeTo: this.route });
+    //routerLink="/ui/forms/form-add-ship"
+  }
+
+  async saveQuote(index: number){
+    let quoteId = await this.save(index);
+    
+    if (!String.IsNullOrWhiteSpace(quoteId))
+      this.router.navigate(['../shipmentboard/LTLTL/'], { relativeTo: this.route });
+  }
+
+  async save(index: number) : Promise<string>{
+
+    this.spinnerMessage = "Saving quote";
+    this.showSpinner = true;
+
+    console.log(index);
+
+    let selectedRate = this.rates[index];
+
+    console.log("save quote start",selectedRate);
+
+    let arrayProducts = this.quickQuoteFormGroup.get('products').value;
+    let productList: BOlProductsList[] = [];
+    arrayProducts.forEach(p => {
+      let prod : BOlProductsList = {
+        // Hazmat: p.hazmat != null ? p.hazmat : false,
+        // Height: p.height,
+        // Lenght: p.large,
+        // PCF: p.pcf,
+        // PackageTypeID: p.package,
+        // Pallets: p.pallet,
+        // Pieces: p.pieces,
+        // SelectedProductClass: p.freightClass,
+        // Status: 0,
+        // Weight: p.totalWeight,
+        // Width: p.width,
+        // Description: String.Empty,
+        // Class: String.Empty,
+        // selectedProduct: String.Empty
+
+        Description: "NA",
+        Pallets: "1",
+        Pieces: "2",
+        Hazmat: true,
+        //NMFC: "nmfc",
+        Class: "50",
+        Weight: "5",
+        Height: "3",
+        Lenght: "1",
+        Width: "2",
+        PackageTypeID: 3,
+        PCF: "1428.57",
+        selectedProduct: {},
+        Status: 1,
+        SelectedProductClass: {}
+        //Stackable: true
+
+      }
+
+      console.log("p", p);
+
+      console.log("prod", prod);
+
+      // prod.Hazmat = p.hazmat != null ? p.hazmat : false;
+      // prod.Height = p.height;
+      // prod.Lenght = p.large;
+      // prod.PCF = p.pcf;
+      // prod.PackageTypeID = p.package;
+      // prod.Pallets = p.pallet;
+      // prod.Pieces = p.pieces;
+      // prod.SelectedProductClass = p.freightClass;
+      // //prod.Status =  
+      // prod.Weight = p.totalWeight;
+      // prod.Width = p.width;
+      // //prod.selectedProduct = 
+
+      productList.push(prod);
+    });
+
+    console.log("Prod", productList)
+
+    this.saveQuoteParameters = {
+        ClientId: this.ClientID,
+        PickupDate: String.Format("/Date({0})/",this.quickQuoteFormGroup.get('originpickupdate').value.getTime()),
+        OrgName: "NA",
+        OrgAdr1: "NA",
+        OrgCity: Number(this.OriginPostalData.CityID),
+        OrgState: Number(this.OriginPostalData.StateId),
+        OrgCountry: Number(this.OriginPostalData.CountryId),
+        DestName: "NA",
+        DestAdr1: "NA",
+        DestCity: Number(this.DestinationPostalData.CityID),
+        DestState: Number(this.DestinationPostalData.StateId),
+        DestCountry: Number(this.DestinationPostalData.CountryId),
+        CarrierCode: selectedRate.CarrierID,
+        CarrierName: selectedRate.CarrierName,
+        TransTime: selectedRate.TransitTime,
+        CarrierType: selectedRate.CarrierType,
+        OriginTerminalName: selectedRate.OriginTerminalName,
+        OriginTerminalAdd1: selectedRate.OriginTerminalAddress1,
+        OriginTerminalAdd2: selectedRate.OriginTerminalAddress2,
+        OriginTerminalCity: selectedRate.OriginTerminalCity,
+        OriginTerminalState: selectedRate.OriginTerminalState,
+        OriginTerminalZip: selectedRate.OriginTerminalZip,
+        OriginTerminalContactPerson: selectedRate.OriginTerminalContactName,
+        OriginTerminalFreePhone: selectedRate.OriginTerminalFreePhone,
+        OriginTerminalPhone: selectedRate.OriginTerminalPhoneNo,
+        OriginTerminalEmail: selectedRate.OriginTerminalEmail,
+        DestTerminalName: selectedRate.DestTerminalName,
+        DestTerminalAdd1: selectedRate.DestTerminalAddress1,
+        DestTerminalAdd2: selectedRate.DestTerminalAddress2,
+        DestTerminalCity: selectedRate.DestTerminalCity,
+        DestTerminalState: selectedRate.DestTerminalState,
+        DestTerminalZip: selectedRate.DestTerminalZip,
+        DestTerminalContactPerson: selectedRate.DestTerminalContactName,
+        DestTerminalFreePhone: selectedRate.DestTerminalFreePhone,
+        DestTerminalPhone: selectedRate.DestTerminalPhoneNo,
+        DestTerminalEmail: selectedRate.DestTerminalEmail,
+        OriginTerminalFax: selectedRate.OriginTerminalFaxNo,
+        DestTerminalFax: selectedRate.DestTerminalFaxNo,
+        ServiceLevelID: selectedRate.ServiceLevelCode,
+        BOlProductsList: productList,
+        BOLAccesorialList: [],
+        BOLDispatchNotesList: [],
+        BuyRates: null,
+        SellRates: null,
+  
+        LoggedInUserId: 1,
+        OrgCityName:this.OriginPostalData.CityName,
+        OrgStateCode:this.OriginPostalData.StateCode,
+        OrgCountryCode:this.OriginPostalData.CountryCode,
+        OrgZipCode:this.OriginPostalData.PostalCode,
+        DestCityName:this.DestinationPostalData.CityName,
+        DestStateCode:this.DestinationPostalData.StateCode,
+        DestCountryCode:this.DestinationPostalData.CountryCode,
+        DestZipCode:this.DestinationPostalData.PostalCode,
+        OrgLocation:String.Format("{0},{1},{2}",this.OriginPostalData.CountryName,this.OriginPostalData.StateCode,this.OriginPostalData.PostalCode),
+        DestLocation:String.Format("{0},{1},{2}",this.DestinationPostalData.CountryName,this.DestinationPostalData.StateCode,this.DestinationPostalData.PostalCode),
+        SalesPersonList: [],
+        BolDocumentsList: [],
+        TrackingDetailsList: [],
+        ServiceLevelName:selectedRate.ServiceLevel,
+        ServiceLevelCode:selectedRate.ServiceLevelCode,
+        RatingResultId:selectedRate.RatingResultId,
+        Mode:selectedRate.ModeType,
+        BOLStopLists: [],
+        CostWithCustomerPercentage: selectedRate.CostWithCustomerPercentage,
+        WaterfallList: [],
+        orgTerminalCityStateZipCode:String.Format("{0},{1},{2}",selectedRate.OriginTerminalCity,selectedRate.OriginTerminalState,selectedRate.OriginTerminalZipCode),
+        destTerminalCityStateZipCode:String.Format("{0},{1},{2}",selectedRate.DestTerminalCity,selectedRate.DestTerminalState,selectedRate.DestTerminalZipCode),
+        WaterfallDetailsList:null
+    };
+
+    //console.log("saveQuoteParameters",this.saveQuoteParameters)
+    
+    let responseData = await this.httpService.saveQuote(this.saveQuoteParameters);
+    if (!String.IsNullOrWhiteSpace(responseData.ClientLadingNo))
+    {
+      this.messageService.SendQuoteParameter(responseData.ClientLadingNo);
+      this.snackbar.open('Quote is saved successfully with LoadNo ' + responseData.ClientLadingNo, null, {
+        duration: 5000
+      });
+      return responseData.ClientLadingNo;
+    }
+    else{
+      this.snackbar.open('There was an error, try again.', null, {
+        duration: 5000
+      });
+      return String.Empty;
+    }
+    
+    this.showSpinner = false;
+  }
   onChangeProductWeight(index: number): void{
     let product = this.quickQuoteFormGroup.get('products').value[index];     
     let PCF = this.calculatePCF(product.Pallets, product.Length, product.Width, product.Height, product.Weight);

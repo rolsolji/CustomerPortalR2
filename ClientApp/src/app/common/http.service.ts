@@ -8,7 +8,9 @@ import { String, StringBuilder } from 'typescript-string-operations';
 import { PostalData } from '../Entities/PostalData';
 import { ClientDefaultData } from '../Entities/ClientDefaultData';
 import { ProductPackageType } from '../Entities/ProductPackageType'
-import { GetQuotesParameters } from '../Entities/getQuotesParameters';
+import { GetQuotesParameters } from '../Entities/GetQuotesParameters';
+import { SaveQuoteParameters } from '../Entities/SaveQuoteParameters';
+import { SaveQuoteResponse } from '../Entities/SaveQuoteResponse'
 import { Quote } from '../Entities/Quote';
 import { EquipmentType } from '../Entities/EquipmentType';
 import { ShipmentMode } from '../Entities/ShipmentMode'; 
@@ -199,5 +201,17 @@ export class HttpService{
             headers: httpHeaders
           }
           ).toPromise();  
+    }
+
+    saveQuote(parameters:SaveQuoteParameters){
+        let ticket = this.token;
+        let httpHeaders = new HttpHeaders({                       
+            'Ticket' : ticket                            
+        }); 
+        return this.http.post<SaveQuoteResponse>('https://beta-customer.r2logistics.com/Services/BOLHDRService.svc/json/SaveQuote',parameters
+        ,{
+            headers: httpHeaders
+        }
+        ).toPromise();
     }
 }

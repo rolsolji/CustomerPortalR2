@@ -33,7 +33,7 @@ export interface GetQuotesParameters {
     IsIncludeSubClient: boolean;
     EquipmentID:        number;
     Mode:               string;
-    FreeSearch:         null;
+    FreeSearch:         string;
     Ref4Value:          null;
     ShipmentType:       string;
 }

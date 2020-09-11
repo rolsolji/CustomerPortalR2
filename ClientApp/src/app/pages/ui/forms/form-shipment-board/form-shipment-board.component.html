@@ -155,13 +155,22 @@
                 </div>
             </div>
             <div fxLayout="row" fxLayoutAlign="end center" fxLayoutGap="8px" class="py-5 pr-2">
-                <button (click)="search()" color="warn" mat-raised-button type="button">Search</button>
+                
+                <div class="spinnerSection" *ngIf="showSpinner">
+                    <div class="center-me">
+                      <mat-progress-spinner diameter="50" color="warn" mode="indeterminate"></mat-progress-spinner>
+                      <p>Loading...</p>
+                    </div>
+                </div>
+                <div *ngIf=!showSpinner>
+                    <button (click)="search()" color="warn" mat-raised-button type="button">Search</button>
+                </div>
             </div>
         </div>
     </div>
 
     <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="5px" class="card ml-2 mt-5">
-        <div>
+        <div *ngIf=!showSpinner>
             <table @stagger [dataSource]="dataSource" class="w-full" mat-table matSort>
                 <!-- Text Columns -->
                 <ng-container *ngFor="let column of columns; trackBy: trackByProperty">

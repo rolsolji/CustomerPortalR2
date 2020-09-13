@@ -65,7 +65,14 @@
                       <mat-form-field>
                         <mat-label>Postal Code</mat-label>
                         <input name="originpostalcode" formControlName="originpostalcode"
-                                (blur)="validateOriginPostalCode()" matInput required >
+                                matInput required 
+                                [matAutocomplete]="pcoAutoComplete"
+                                (keydown.tab)="validateOriginPostalCode($event)">
+                          <mat-autocomplete #pcoAutoComplete="matAutocomplete" (optionSelected)="pcoAutoCompleteSelected($event)">
+                              <mat-option *ngFor="let option of pcoAutoCompleteOptions | async" [value]="option">
+                                {{option.PostalCode}} - {{option.CityName}}
+                                </mat-option>
+                          </mat-autocomplete>       
                       </mat-form-field>
                     </div>                                 
                   </div>
@@ -123,7 +130,7 @@
                       <mat-form-field fxFlex="none">
                         <mat-label>Pickup Open</mat-label>                   
                           <mat-select  name="originpickupopen" formControlName="originpickupopen">
-                            <!-- <mat-option *ngFor="let country of originCountries" [value]="country.CountryId">{{country.CountryName}}</mat-option>                       -->
+                            <mat-option *ngFor="let time of timesArray" [value]="time">{{time}}</mat-option>                      
                           </mat-select>
                       </mat-form-field>
                     </div> 
@@ -131,7 +138,7 @@
                       <mat-form-field fxFlex="none">
                         <mat-label>Pickup Close</mat-label>                   
                           <mat-select  name="originpickupclose" formControlName="originpickupclose">
-                          <!-- <mat-option *ngFor="let country of originCountries" [value]="country.CountryId">{{country.CountryName}}</mat-option>                       -->
+                            <mat-option *ngFor="let time of timesArray" [value]="time">{{time}}</mat-option>
                         </mat-select>
                       </mat-form-field>
                     </div>                                 
@@ -180,7 +187,13 @@
                       <mat-form-field>
                         <mat-label>Postal Code</mat-label>
                         <input name="destpostalcode" formControlName="destpostalcode"
-                                (blur)="validateOriginPostalCode()" matInput required >
+                                (blur)="validateOriginPostalCode()" matInput required [matAutocomplete]="pcdAutoComplete"
+                                (keydown.tab)="validateDestinationPostalCode($event)">
+                                <mat-autocomplete #pcdAutoComplete="matAutocomplete" (optionSelected)="pcdAutoCompleteSelected($event)">
+                                  <mat-option *ngFor="let option of pcdAutoCompleteOptions | async" [value]="option">
+                                    {{option.PostalCode}} - {{option.CityName}}
+                                  </mat-option>
+                                </mat-autocomplete>
                       </mat-form-field>
                     </div>                                 
                   </div>

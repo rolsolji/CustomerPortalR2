@@ -19,6 +19,10 @@ import { Accessorial } from '../../../../Entities/Accessorial';
 import { InternalNote } from '../../../../Entities/InternalNote';
 import { ShipmentCost } from '../../../../Entities/ShipmentCost';
 import { MessageService } from "../../../../common/message.service";
+import { Observable, of } from 'rxjs';
+import { startWith, debounceTime, distinctUntilChanged, switchMap } from 'rxjs/operators';
+import {MatAutocompleteSelectedEvent, MatAutocomplete} from '@angular/material/autocomplete';
+
 
 @Component({
   selector: 'vex-form-add-ship',
@@ -47,22 +51,7 @@ export class FormAddShipComponent implements OnInit {
   accesorials: Accessorial[];    
   internalNotes: InternalNote[];
   showInternalNotesTitle: boolean = false;
-  // internalNotes: InternalNote[] = [
-  //   {
-  //     NoteId: 1,
-  //     UserId: 1,
-  //     UserName: "Admin",
-  //     NoteText: "Test1",
-  //     Date: new Date()
-  //   },
-  //   {
-  //     NoteId: 2,
-  //     UserId: 1,
-  //     UserName: "Admin",
-  //     NoteText: "Test2",
-  //     Date: new Date()
-  //   }
-  // ];
+  timesArray = ["", "12:00 AM", "12:30 AM", "01:00 AM", "01:30 AM", "02:00 AM", "02:30 AM", "03:00 AM", "03:30 AM", "04:00 AM", "04:30 AM", "05:00 AM", "05:30 AM", "06:00 AM", "06:30 AM", "07:00 AM", "07:30 AM", "08:00 AM", "08:30 AM", "09:00 AM", "09:30 AM", "10:00 AM", "10:30 AM", "11:00 AM", "11:30 AM", "12:00 PM", "12:30 PM", "01:00 PM", "01:30 PM", "02:00 PM", "02:30 PM", "03:00 PM", "03:30 PM", "04:00 PM", "04:30 PM", "05:00 PM", "05:30 PM", "06:00 PM", "06:30 PM", "07:00 PM", "07:30 PM", "08:00 PM", "08:30 PM", "09:00 PM", "09:30 PM", "10:00 PM", "10:30 PM", "11:00 PM", "11:30 PM"]  
 
   originSelectedCountry: PostalData = {
     CityCode: '',
@@ -105,6 +94,9 @@ export class FormAddShipComponent implements OnInit {
   icVisibility = icVisiblity;
   icVisibilityOff = icVisibilityOff;
   icMoreVert = icMoreVert;
+
+  pcoAutoCompleteOptions: Observable<PostalData[]>;
+  pcdAutoCompleteOptions: Observable<PostalData[]>;  
 
   constructor(private fb: FormBuilder,
               private cd: ChangeDetectorRef,
@@ -223,8 +215,57 @@ export class FormAddShipComponent implements OnInit {
     this.destinationCountries = responseData;
     this.originSelectedCountry = responseData[0]; // US as default     
     this.destinationSelectedCountry = responseData[0]; // US as default    
+
+    //-- Set default country for both countries dropdowns
+    this.originAndDestinationFormGroup.controls['origincountry'].setValue(this.originSelectedCountry.CountryId, {onlySelf: false});
+    this.originAndDestinationFormGroup.controls['destcountry'].setValue(this.destinationSelectedCountry.CountryId, {onlySelf: false});
+    //--
     
+    this.pcoAutoCompleteOptions = this.originAndDestinationFormGroup.get("originpostalcode").valueChanges
+      .pipe(
+        startWith(''),
+        debounceTime(400),
+        distinctUntilChanged(),
+        switchMap(val => {
+            return this.pcoAutoCompleteFilter(val || '')
+       })
+      );
+
+      this.pcdAutoCompleteOptions = this.originAndDestinationFormGroup.get("destpostalcode").valueChanges
+      .pipe(
+        startWith(''),
+        debounceTime(400),
+        distinctUntilChanged(),
+        switchMap(val => {
+          return this.pcdAutoCompletefilter(val || '')             
+        })
+      );
+
     this.internalNotes = [];
+  }
+
+  pcoAutoCompleteFilter(val: string): Observable<any[]> {
+    let CountryId = this.originSelectedCountry == null ? "1": this.originSelectedCountry.CountryId.toString();
+    return this.httpService.postalCodeAutocomplete(val, CountryId, this.keyId)
+  }  
+
+  pcoAutoCompleteSelected(event: MatAutocompleteSelectedEvent): void {
+    this.originAndDestinationFormGroup.get('originstatename').setValue(event.option.value.StateName.trim());
+    this.OriginPostalCode = String.Format("{0}-{1}",event.option.value.PostalCode,event.option.value.CityName.trim());  
+    this.OriginPostalData = event.option.value;        
+    this.originAndDestinationFormGroup.get('originpostalcode').setValue(this.OriginPostalCode);
+  }
+
+  pcdAutoCompletefilter(val: string): Observable<any[]> { 
+    let CountryId = this.destinationSelectedCountry == null ? "1": this.destinationSelectedCountry.CountryId.toString();
+    return this.httpService.postalCodeAutocomplete(val, CountryId, this.keyId)
+  }  
+
+  pcdAutoCompleteSelected(event: MatAutocompleteSelectedEvent): void {
+    this.originAndDestinationFormGroup.get('deststatename').setValue(event.option.value.StateName.trim());
+    this.DestinationPostalCode = String.Format("{0}-{1}",event.option.value.PostalCode,event.option.value.CityName.trim());  
+    this.DestinationPostalData = event.option.value;        
+    this.originAndDestinationFormGroup.get('destpostalcode').setValue(this.DestinationPostalCode);
   }
 
   postalData: PostalData[];
@@ -232,34 +273,55 @@ export class FormAddShipComponent implements OnInit {
   OriginPostalCode: string;
   OriginStateName: String;
   OriginPostalData: PostalData;
-  OriginPickupDate: string;
+  OriginPickupDate: string;  
 
-  async validateOriginPostalCode(){
-    console.log(this.originSelectedCountry);
+  async validateOriginPostalCode(event: KeyboardEvent){
     let CountryId = this.originSelectedCountry == null ? "1": this.originSelectedCountry.CountryId.toString();
     this.OriginPostalCode = this.originAndDestinationFormGroup.get('originpostalcode').value;
-    if (this.OriginPostalCode != null && this.OriginPostalCode.trim().length > 0)
-    {
-      console.log('before...')
-      let responseData = await this.httpService.getPostalDataByPostalCode(this.OriginPostalCode,CountryId,this.keyId);
-      console.log(responseData)     
+    if (this.OriginPostalCode != null && this.OriginPostalCode.trim().length == 5){
+      let responseData = await this.httpService.getPostalDataByPostalCode(this.OriginPostalCode,CountryId,this.keyId);  
       this.postalData = responseData;
-      if (this.postalData != null && this.postalData.length > 0) 
-      {        
-        this.originAndDestinationFormGroup.get('originstatename').setValue(this.postalData[0].StateName);
-        this.OriginPostalCode = String.Format("{0}-{1}",this.OriginPostalCode,this.postalData[0].CityName);  
+      if (this.postalData != null && this.postalData.length > 0){        
+        this.originAndDestinationFormGroup.get('originstatename').setValue(this.postalData[0].StateName.trim());
+        this.OriginPostalCode = String.Format("{0}-{1}",this.postalData[0].PostalCode,this.postalData[0].CityName.trim());  
         this.OriginPostalData = this.postalData[0];        
         this.originAndDestinationFormGroup.get('originpostalcode').setValue(this.OriginPostalCode);
       }
-      else
-      {
+      else{
         this.OriginStateName = String.Empty;
         this.OriginPostalCode = String.Empty;
         this.OriginPostalData = null;
       }            
     }
-    
   }
+
+  //#region Destination Fields
+  DestinationPostalCode: string;
+  DestinationStateName: String;
+  DestinationPostalData: PostalData;
+
+  async validateDestinationPostalCode(event: KeyboardEvent){
+    let CountryId = this.destinationSelectedCountry == null ? "1": this.destinationSelectedCountry.CountryId.toString();
+    this.DestinationPostalCode = this.originAndDestinationFormGroup.get('destpostalcode').value;
+    if (this.DestinationPostalCode != null && this.DestinationPostalCode.trim().length == 5){
+      let responseData = await this.httpService.getPostalDataByPostalCode(this.DestinationPostalCode,CountryId,this.keyId);
+      this.postalDataDest = responseData;
+      if (this.postalDataDest != null && this.postalDataDest.length > 0) 
+      {        
+        this.originAndDestinationFormGroup.get('deststatename').setValue(this.postalDataDest[0].StateName.trim());
+        this.DestinationPostalCode = String.Format("{0}-{1}",this.postalDataDest[0].PostalCode,this.postalDataDest[0].CityName.trim());  
+        this.DestinationPostalData = this.postalDataDest[0];               
+        this.originAndDestinationFormGroup.get('destpostalcode').setValue(this.DestinationPostalCode);
+      }
+      else
+      {
+        this.DestinationStateName = String.Empty;
+        this.DestinationPostalCode = String.Empty;
+        this.DestinationPostalData = null;
+      }
+    }         
+  }
+  //#endregion
 
   addNewProdField(): void {        
     (<FormArray>this.productsAndAccessorialsFormGroup.get('products')).push(this.addProductFormGroup());

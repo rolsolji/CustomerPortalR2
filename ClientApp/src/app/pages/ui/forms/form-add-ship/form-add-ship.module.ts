@@ -6,6 +6,7 @@ import { FormAddShipComponent } from './form-add-ship.component';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatIconModule } from '@angular/material/icon';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { MatStepperModule } from '@angular/material/stepper';
 import { FlexLayoutModule } from '@angular/flex-layout';
 import { MatInputModule } from '@angular/material/input';
@@ -32,6 +33,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
     MatIconModule,
     FormsModule,
     ReactiveFormsModule,
+    MatAutocompleteModule,
     MatStepperModule,
     FlexLayoutModule,
     MatInputModule,

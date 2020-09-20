@@ -26,16 +26,16 @@ import outlineEmail from '@iconify/icons-ic/outline-email';
 
 import { StringifyOptions } from 'querystring';
 import { PostalData } from '../../../../Entities/PostalData';
-import { Rate, Accessorial } from '../../../../Entities/rate';
+import { Rate,Accessorial,AccessorialBase,ServiceLevel } from '../../../../Entities/rate';
 import { ProductPackageType } from '../../../../Entities/ProductPackageType'
 import { ProductFeatures } from '../../../../Entities/ProductFeatures'
 import { ClientDefaultData } from '../../../../Entities/ClientDefaultData';
-import { CatalogItem } from '../../../../Entities/CatalogItem'
+import { CatalogItem } from '../../../../Entities/CatalogItem';
 import { getSupportedInputTypes } from '@angular/cdk/platform';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatIconModule } from '@angular/material/icon';
 import { MatBadgeModule } from '@angular/material/badge'
-import { SaveQuoteParameters,BOlProductsList } from '../../../../Entities/SaveQuoteParameters';
+import { SaveQuoteParameters,BOlProductsList,BOLAccesorial,SellRate,AccountInvoiceCost } from '../../../../Entities/SaveQuoteParameters';
 import { Quote } from '../../../../Entities/Quote';
 import { TableColumn } from 'src/@vex/interfaces/table-column.interface';
 import { MatTableDataSource } from '@angular/material/table';
@@ -117,6 +117,10 @@ export class FormQuickQuoteComponent implements OnInit {
    ratesCounter: number = 0;
    searchOriginPostalCode: boolean = true;
    searchDestinationPostalCode: boolean = true;
+
+  accessorials: AccessorialBase[] = [];
+  accessorialIds: number[] = [];
+  serviceLevels: ServiceLevel[] = [];
 
    originSelectedCountry: PostalData = {
     CityCode: '',
@@ -375,7 +379,28 @@ export class FormQuickQuoteComponent implements OnInit {
   OriginPostalData: PostalData;
   OriginPickupDate: string;
 
-  validateCollectionServices(){
+  validateCollectionServices(event,code: string){
+    console.log("checked", code);
+    if(event.checked){
+      // Add a new control in the arrayForm
+      let accessorial: AccessorialBase = { 
+        AccessorialID: event.source.value, 
+        AccessorialCode: code
+      }
+
+      this.accessorials.push(accessorial);
+      this.accessorialIds.push(event.source.value);
+    }
+    /* unselected */
+    else{
+      console.log("unchecked", event.source.value);
+
+      this.accessorials = this.accessorials.filter(a => a.AccessorialID !== event.source.value);
+      this.accessorialIds = this.accessorialIds.filter(a => a !== event.source.value)
+    }
+
+    console.log(this.accessorials);
+
     this.collectionServicesSelected = 0;    
     this.collectionServicesSelected += this.quickQuoteFormGroup.get('residential').value ? 1 : 0;
     this.collectionServicesSelected += this.quickQuoteFormGroup.get('limitedAccess').value ? 1 : 0;
@@ -384,7 +409,43 @@ export class FormQuickQuoteComponent implements OnInit {
     this.collectionServicesDescription = this.collectionServicesSelected > 0 ? String.Format("Selected: {0}", this.collectionServicesSelected) : "Select Collection Services";
   }
 
-  validateDeliveryServices(){
+  validateDeliveryServices(event,code: string){
+
+    console.log("checked", code);
+    if(event.checked){
+      // Add a new control in the arrayForm
+      if (code == 'STD' || code == 'GTS') {
+        let serviceLevel: ServiceLevel = {
+          ServiceLevelID: event.source.value,
+          ServiceLevelCode: code 
+        }
+
+        this.serviceLevels.push(serviceLevel);
+      }
+      else {
+        let accessorial: AccessorialBase = { 
+          AccessorialID: event.source.value, 
+          AccessorialCode: code
+        }
+  
+        this.accessorials.push(accessorial);
+        this.accessorialIds.push(event.source.value);
+      }
+    }
+    /* unselected */
+    else{
+      console.log("unchecked", event.source.value);
+      if (code == 'STD' || code == 'GTS') {
+        this.serviceLevels = this.serviceLevels.filter(s => s.ServiceLevelID !== event.source.value)
+      }
+      else {
+        this.accessorials = this.accessorials.filter(a => a.AccessorialID !== event.source.value);
+        this.accessorialIds = this.accessorialIds.filter(a => a !== event.source.value)
+      }
+    }
+
+    console.log(this.accessorials);
+
     this.deliveryServicesSelected = 0;    
     this.deliveryServicesSelected += this.quickQuoteFormGroup.get('deliveryResidential').value ? 1 : 0;
     this.deliveryServicesSelected += this.quickQuoteFormGroup.get('deliveryLimitedAccess').value ? 1 : 0;
@@ -493,45 +554,26 @@ export class FormQuickQuoteComponent implements OnInit {
         "DestCountry": this.DestinationPostalData.CountryCode,
         "DestStateCode": this.DestinationPostalData.StateCode,
         "DestCityName": this.DestinationPostalData.CityName,
-        "ShipmentDate": "/Date(1593388800000)/",
-        "Accessorials": [
-          {
-            "AccessorialID": 37,
-            "AccesorialCode": "REP"
-          },
-          {
-            "AccessorialID": 4,
-            "AccesorialCode": "RES"
-          },
-          {
-            "AccessorialID": 1,
-            "AccesorialCode": "LFT"
-          },
-          {
-            "AccessorialID": 36,
-            "AccesorialCode": "LGD"
-          }
-        ],
+        "ShipmentDate": String.Format("/Date({0})/",this.quickQuoteFormGroup.get('originpickupdate').value.getTime()),
+        "Accessorials": this.accessorials,
         "AccessorialCodes": [],
         "TopN": 10,
         "ServiceLevelGrops": [],
-        "ServiceLevels": [],
+        "ServiceLevels": this.serviceLevels,
         "ServiceLevelCodes": [],
-        "SCAC": null,
+        //Ask
+        //"SCAC": null,
         "EquipmentList": [],
         "IsDebug": false,
         "IsSuperAdmin": false,
-        "AccessorialIDs": [
-          37,
-          4,
-          1,
-          36
-        ],
+        "AccessorialIDs": this.accessorialIds,
         "SkeepCalculatePPS": false,
-        "ProfileDescription": "**R2 BUY",
+        //Ask
+        //"ProfileDescription": "**R2 BUY",
         "Origin":  this.OriginPostalData.PostalCode + ',' +  this.OriginPostalData.CityName + ',' + this.OriginPostalData.StateName,
         "Destination": this.DestinationPostalData.PostalCode + ',' +  this.DestinationPostalData.CityName + ',' + this.DestinationPostalData.StateName,
-        "ShipmentStopList": []
+        //Ask
+        //"ShipmentStopList": []
       };
 
       console.log(objRate);
@@ -607,59 +649,89 @@ export class FormQuickQuoteComponent implements OnInit {
     let productList: BOlProductsList[] = [];
     arrayProducts.forEach(p => {
       let prod : BOlProductsList = {
-        // Hazmat: p.hazmat != null ? p.hazmat : false,
-        // Height: p.height,
-        // Lenght: p.large,
-        // PCF: p.pcf,
-        // PackageTypeID: p.package,
-        // Pallets: p.pallet,
-        // Pieces: p.pieces,
-        // SelectedProductClass: p.freightClass,
-        // Status: 0,
-        // Weight: p.totalWeight,
-        // Width: p.width,
-        // Description: String.Empty,
-        // Class: String.Empty,
-        // selectedProduct: String.Empty
-
         Description: "NA",
-        Pallets: "1",
-        Pieces: "2",
+        Pallets: p.Pallets,
+        Pieces: p.Pieces,
         Hazmat: true,
-        //NMFC: "nmfc",
-        Class: "50",
-        Weight: "5",
-        Height: "3",
-        Lenght: "1",
-        Width: "2",
-        PackageTypeID: 3,
-        PCF: "1428.57",
+        NMFC: p.NMFC,
+        Class: p.ProductClass,
+        Weight: p.Weight,
+        Height: p.Height,
+        Lenght: p.Lenght,
+        Width: p.Width,
+        PackageTypeID: p.Package,
+        PCF: p.PCF,
         selectedProduct: {},
         Status: 1,
-        SelectedProductClass: {}
-        //Stackable: true
-
+        SelectedProductClass: {},
+        Stackable: true
       }
 
       console.log("p", p);
 
       console.log("prod", prod);
 
-      // prod.Hazmat = p.hazmat != null ? p.hazmat : false;
-      // prod.Height = p.height;
-      // prod.Lenght = p.large;
-      // prod.PCF = p.pcf;
-      // prod.PackageTypeID = p.package;
-      // prod.Pallets = p.pallet;
-      // prod.Pieces = p.pieces;
-      // prod.SelectedProductClass = p.freightClass;
-      // //prod.Status =  
-      // prod.Weight = p.totalWeight;
-      // prod.Width = p.width;
-      // //prod.selectedProduct = 
-
       productList.push(prod);
     });
+
+    let accountInvoiceCostList: AccountInvoiceCost[] = [];
+    
+    selectedRate.Accessorials.forEach(a => {
+      let accountInvoiceCost: AccountInvoiceCost = {
+        AccessorialID: a.AccessorialID,
+        RatedCost: a.AccessorialCharge,
+        BilledCost: a.AccessorialCharge,
+        Description: a.AccessorialDescription,
+        CostStatus: 1 //Ask 
+      }
+      accountInvoiceCostList.push(accountInvoiceCost);
+    })
+
+    //Ask
+    //Freight
+    let accountInvoiceFreight: AccountInvoiceCost = {
+      AccessorialID: 22,
+      RatedCost: selectedRate.FreightCost,
+      BilledCost: selectedRate.FreightCost,
+      Description: "Freight",
+      CostStatus: 1
+    }
+    accountInvoiceCostList.push(accountInvoiceFreight);
+
+    //Fuel
+    let accountInvoiceFuel: AccountInvoiceCost = {
+      AccessorialID: 23,
+      RatedCost: selectedRate.FuelCost,
+      BilledCost: selectedRate.FuelCost,
+      Description: "Fuel",
+      CostStatus: 1
+    }
+    accountInvoiceCostList.push(accountInvoiceFuel);
+
+    //Discount
+    let accountInvoiceDiscount: AccountInvoiceCost = {
+      AccessorialID: 24,
+      RatedCost: selectedRate.DiscountRate,
+      BilledCost: selectedRate.DiscountRate,
+      Description: "Discount",
+      CostStatus: 1
+    }
+    accountInvoiceCostList.push(accountInvoiceFuel);
+
+    let sellRate: SellRate = {
+      SCAC: selectedRate.CarrierID,
+      CarrierName: selectedRate.CarrierName,
+      AccountInvoiceCostList: accountInvoiceCostList 
+    }
+
+    let bolAccesorials: BOLAccesorial[] = [];
+    this.accessorials.forEach(a => {
+      let acc: BOLAccesorial = {
+        AccesorialID: a.AccessorialID,
+        IsAccesorial: true
+      }
+      bolAccesorials.push(acc);
+    })
 
     console.log("Prod", productList)
 
@@ -702,12 +774,13 @@ export class FormQuickQuoteComponent implements OnInit {
         DestTerminalEmail: selectedRate.DestTerminalEmail,
         OriginTerminalFax: selectedRate.OriginTerminalFaxNo,
         DestTerminalFax: selectedRate.DestTerminalFaxNo,
-        ServiceLevelID: selectedRate.ServiceLevelCode,
+        //Ask
+        ServiceLevelID: 1, //ask selectedRate.ServiceLevelCode,
         BOlProductsList: productList,
-        BOLAccesorialList: [],
+        BOLAccesorialList: bolAccesorials,
         BOLDispatchNotesList: [],
         BuyRates: null,
-        SellRates: null,
+        SellRates: sellRate,
   
         LoggedInUserId: 1,
         OrgCityName:this.OriginPostalData.CityName,
@@ -724,9 +797,9 @@ export class FormQuickQuoteComponent implements OnInit {
         BolDocumentsList: [],
         TrackingDetailsList: [],
         ServiceLevelName:selectedRate.ServiceLevel,
-        ServiceLevelCode:selectedRate.ServiceLevelCode,
+        ServiceLevelCode:selectedRate.SaasServiceLevelCode,
         RatingResultId:selectedRate.RatingResultId,
-        Mode:selectedRate.ModeType,
+        Mode: "LTL", //Ask selectedRate.ModeType,
         BOLStopLists: [],
         CostWithCustomerPercentage: selectedRate.CostWithCustomerPercentage,
         WaterfallList: [],
@@ -735,7 +808,7 @@ export class FormQuickQuoteComponent implements OnInit {
         WaterfallDetailsList:null
     };
 
-    //console.log("saveQuoteParameters",this.saveQuoteParameters)
+    console.log("saveQuoteParameters",this.saveQuoteParameters)
     
     let responseData = await this.httpService.saveQuote(this.saveQuoteParameters);
     if (!String.IsNullOrWhiteSpace(responseData.ClientLadingNo))

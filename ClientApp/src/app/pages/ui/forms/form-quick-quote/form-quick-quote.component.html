@@ -80,19 +80,19 @@
                   <div class="expansion-panel-cont-style">
                     <div class="pt-1" fxLayout.lt-xs="column" fxLayout.gt-xs="row">
                       <div fxFlex="50%">
-                        <mat-checkbox fxFlex="50%" [checked]="false" formControlName="residential" color="warn" (change)="validateCollectionServices()">Residential</mat-checkbox>
+                        <mat-checkbox fxFlex="50%" [checked]="false" formControlName="residential" color="warn" (change)="validateCollectionServices($event,'REP')" value=37>Residential</mat-checkbox>
                       </div> 
                       <div fxFlex="50%">
-                        <mat-checkbox fxFlex="50%" [checked]="false" formControlName="limitedAccess" color="warn" (change)="validateCollectionServices()">Limited Access</mat-checkbox>
+                        <mat-checkbox fxFlex="50%" [checked]="false" formControlName="limitedAccess" color="warn" (change)="validateCollectionServices($event,'LAP')" value=449>Limited Access</mat-checkbox>
                       </div>
                     </div>                    
                     <hr style="margin: 1%;">
                     <div class="pt-1" fxLayout.lt-xs="column" fxLayout.gt-xs="row">
                       <div fxFlex="50%">
-                        <mat-checkbox [checked]="false" formControlName="insidePickup" color="warn" (change)="validateCollectionServices()">Inside Pickup</mat-checkbox>
+                        <mat-checkbox [checked]="false" formControlName="insidePickup" color="warn" (change)="validateCollectionServices($event,'INP')" value=35>Inside Pickup</mat-checkbox>
                       </div> 
                       <div fxFlex="50%">
-                        <mat-checkbox [checked]="false" formControlName="liftgateRequiredAtPickup" color="warn" (change)="validateCollectionServices()">Liftgate Required at Pickup</mat-checkbox>
+                        <mat-checkbox [checked]="false" formControlName="liftgateRequiredAtPickup" color="warn" (change)="validateCollectionServices($event,'LFT')" value=1>Liftgate Required at Pickup</mat-checkbox>
                       </div>
                     </div>
                   </div>
@@ -160,48 +160,48 @@
                   <div class="expansion-panel-cont-style">
                     <div class="pt-1" fxLayout.lt-xs="column" fxLayout.gt-xs="row">
                       <div fxFlex="50%">
-                        <mat-checkbox fxFlex="50%" [checked]="false" formControlName="deliveryResidential" color="warn" (change)="validateDeliveryServices()">Residential</mat-checkbox>
+                        <mat-checkbox fxFlex="50%" [checked]="false" formControlName="deliveryResidential" color="warn" (change)="validateDeliveryServices($event,'RES')" value=4>Residential</mat-checkbox>
                       </div> 
                       <div fxFlex="50%">
-                        <mat-checkbox fxFlex="50%" [checked]="false" formControlName="deliveryLimitedAccess" color="warn" (change)="validateDeliveryServices()">Limited Access</mat-checkbox>
+                        <mat-checkbox fxFlex="50%" [checked]="false" formControlName="deliveryLimitedAccess" color="warn" (change)="validateDeliveryServices($event,'LAD')" value=443>Limited Access</mat-checkbox>
                       </div>
                     </div>
                     <div class="pt-1" fxLayout.lt-xs="column" fxLayout.gt-xs="row">
                       <div fxFlex="50%">
-                        <mat-checkbox fxFlex="50%" [checked]="false" formControlName="standard" color="warn" (change)="validateDeliveryServices()">Standard</mat-checkbox>
+                        <mat-checkbox fxFlex="50%" [checked]="false" formControlName="standard" color="warn" (change)="validateDeliveryServices($event,'STD')" value=1>Standard</mat-checkbox>
                       </div> 
                       <div fxFlex="50%">
-                        <mat-checkbox fxFlex="50%" [checked]="false" formControlName="guarantee" color="warn" (change)="validateDeliveryServices()">Guarantee</mat-checkbox>                      
+                        <mat-checkbox fxFlex="50%" [checked]="false" formControlName="guarantee" color="warn" (change)="validateDeliveryServices($event,'GTS')" value=616>Guarantee</mat-checkbox>                      
                       </div>
                     </div>                    
                     <hr style="margin: 1%;">
                     <div class="pt-1" fxLayout.lt-xs="column" fxLayout.gt-xs="row">
                       <div fxFlex="50%">
-                        <mat-checkbox [checked]="false" formControlName="callBeforeDelivery" color="warn" (change)="validateDeliveryServices()">Call Before Delivery</mat-checkbox>
+                        <mat-checkbox [checked]="false" formControlName="callBeforeDelivery" color="warn" (change)="validateDeliveryServices($event,'CBD')" value=3396>Call Before Delivery</mat-checkbox>
                       </div> 
                       <div fxFlex="50%">
-                        <mat-checkbox [checked]="false" formControlName="appointmentRequired" color="warn" (change)="validateDeliveryServices()">Appointment Required</mat-checkbox>
+                        <mat-checkbox [checked]="false" formControlName="appointmentRequired" color="warn" (change)="validateDeliveryServices($event,'APT')" value=31>Appointment Required</mat-checkbox>
                       </div>
                     </div>
                     <div class="pt-1" fxLayout.lt-xs="column" fxLayout.gt-xs="row">
                       <div fxFlex="50%">
-                        <mat-checkbox [checked]="false" formControlName="protectfromFreezing" color="warn" (change)="validateDeliveryServices()">Protect from Freezing</mat-checkbox>
+                        <mat-checkbox [checked]="false" formControlName="protectfromFreezing" color="warn" (change)="validateDeliveryServices($event,'PFF')" value=813>Protect from Freezing</mat-checkbox>
                       </div>
                       <div fxFlex="50%">
-                        <mat-checkbox [checked]="false" formControlName="insideDelivery" color="warn" (change)="validateDeliveryServices()">Inside Delivery</mat-checkbox>
-                      </div>
-                    </div>
-                    <div class="pt-1" fxLayout.lt-xs="column" fxLayout.gt-xs="row"> 
-                      <div fxFlex="50%">
-                        <mat-checkbox [checked]="false" formControlName="sortAndSegregate" color="warn" (change)="validateDeliveryServices()">Sort & Segregate</mat-checkbox>
-                      </div>
-                      <div fxFlex="50%">
-                        <mat-checkbox [checked]="false" formControlName="blindShipment" color="warn" (change)="validateDeliveryServices()">Blind Shipment</mat-checkbox>
+                        <mat-checkbox [checked]="false" formControlName="insideDelivery" color="warn" (change)="validateDeliveryServices($event,'INS')" value=3>Inside Delivery</mat-checkbox>
                       </div>
                     </div>
                     <div class="pt-1" fxLayout.lt-xs="column" fxLayout.gt-xs="row"> 
                       <div fxFlex="50%">
-                        <mat-checkbox [checked]="false" formControlName="liftgateRequiredAtDelivery" color="warn" (change)="validateDeliveryServices()">Liftgate Required at Delivery</mat-checkbox>
+                        <mat-checkbox [checked]="false" formControlName="sortAndSegregate" color="warn" (change)="validateDeliveryServices($event,'SOD')" value=39>Sort & Segregate</mat-checkbox>
+                      </div>
+                      <div fxFlex="50%">
+                        <mat-checkbox [checked]="false" formControlName="blindShipment" color="warn" (change)="validateDeliveryServices($event,'BLS')" value=794>Blind Shipment</mat-checkbox>
+                      </div>
+                    </div>
+                    <div class="pt-1" fxLayout.lt-xs="column" fxLayout.gt-xs="row"> 
+                      <div fxFlex="50%">
+                        <mat-checkbox [checked]="false" formControlName="liftgateRequiredAtDelivery" color="warn" (change)="validateDeliveryServices($event,'LGD')" value=36>Liftgate Required at Delivery</mat-checkbox>
                       </div>
                     </div>
                   </div>

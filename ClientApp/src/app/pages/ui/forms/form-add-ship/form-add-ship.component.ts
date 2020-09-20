@@ -142,7 +142,7 @@ export class FormAddShipComponent implements OnInit {
       origincontact: [null],
       originphone: [null],
       originemail: [null, Validators.required],
-      originnotes: [null],
+      // originnotes: [null],
       originpickupdate: [null, Validators.required],
       originpickupopen: [null],
       originpickupclose: [null],
@@ -155,10 +155,12 @@ export class FormAddShipComponent implements OnInit {
       destcontact: [null],
       destphone: [null],
       destemail: [null, Validators.required],
-      destnotes: [null],
+      // destnotes: [null],
       destexpdeldate: [null],
       destdelapptfrom: [null],
-      destdelapptto: [null],           
+      destdelapptto: [null],  
+      addToLocationsOrigin: [null],
+      addToLocationsDest: [null]   
     });
     //--
 

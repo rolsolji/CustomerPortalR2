@@ -26,7 +26,16 @@
           <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="5px">
             <div @fadeInUp class="card" fxFlex="50%">
               <div fxLayout="row" fxLayoutGap="8px" class="ml-5">
-                <div><h2 class="OriginDestinationTitle">Origin</h2></div>
+                <div fxFlex="50%">
+                  <div>
+                    <h2 class="OriginDestinationTitle">Origin</h2>
+                  </div>
+                </div>
+                <div fxFlex="50%" class="AddSaveToLocatonsSection">
+                  <div>
+                    <mat-checkbox [checked]="false" formControlName="addToLocationsOrigin" color="primary">Add to saved locations</mat-checkbox>
+                  </div>
+                </div>
               </div>
               <div>
                 <div fxLayout="column" class="expansion-panel-cont-style">
@@ -106,7 +115,7 @@
                       </mat-form-field>
                     </div>                                                  
                   </div>   
-                  <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="5px">                    
+                  <!-- <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="5px">                    
                     <div fxFlex="100%">
                       <mat-form-field class="matAreaInputField">
                         <mat-label>Notes</mat-label>                        
@@ -114,7 +123,7 @@
                         <textarea #originnotes name="originnotes" formControlName="originnotes" matInput rows="2" maxlength="250"></textarea>                        
                       </mat-form-field>
                     </div>                        
-                  </div>   
+                  </div>    -->
                   <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="5px">                    
                     <div fxFlex="34%">
                       <mat-form-field>
@@ -148,7 +157,14 @@
             </div>
             <div @fadeInUp class="card" fxFlex="50%">
               <div fxLayout="row" fxLayoutGap="8px" class="ml-5">
-                <div><h2 class="OriginDestinationTitle">Destination</h2></div>                                
+                <div fxFlex="50%" class="AddSaveToLocatonsSection">
+                  <div><h2 class="OriginDestinationTitle">Destination</h2></div> 
+                </div>                       
+                <div fxFlex="50%" class="AddSaveToLocatonsSection">
+                  <div>
+                    <mat-checkbox [checked]="false" formControlName="addToLocationsDest" color="primary">Add to saved locations</mat-checkbox>
+                  </div>
+                </div>                        
               </div>
               <div>
                 <div fxLayout="column" class="expansion-panel-cont-style">
@@ -227,7 +243,7 @@
                       </mat-form-field>
                     </div>                                                  
                   </div>   
-                  <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="5px">                    
+                  <!-- <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="5px">                    
                     <div fxFlex="100%">
                       <mat-form-field class="matAreaInputField">
                         <mat-label>Notes</mat-label>
@@ -235,7 +251,7 @@
                         <textarea #destnotes name="destnotes" formControlName="destnotes" matInput rows="2" maxlength="250"></textarea>
                       </mat-form-field>
                     </div>                        
-                  </div>   
+                  </div>    -->
                   <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="5px">                    
                     <div fxFlex="34%">
                       <mat-form-field>
@@ -385,8 +401,8 @@
                         
                       </div>
                       <div fxLayout="row" fxLayout.lt-md="column">  
-                        <div fxFlex="15%">
-                          <mat-checkbox [checked]="false" formControlName="addToProductMaster" color="warn">Master</mat-checkbox>
+                        <div fxFlex="27%" class="addToProductMaster">
+                          <mat-checkbox [checked]="false" formControlName="addToProductMaster" color="primary">Add to my saved products</mat-checkbox>
                         </div>
                         <div fxFlex="15%">
                           <mat-checkbox [checked]="false" formControlName="Stackable" color="warn">Stackable</mat-checkbox>
@@ -479,13 +495,53 @@
                     </div>                                 
                   </div>
                   <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="5px">
-                    <div fxFlex="100%">
+                    <div fxFlex="50%">
                       <mat-form-field>
                         <mat-label>R2 Pro number</mat-label>
                         <input name="r2pronumber" formControlName="r2pronumber" matInput >
                       </mat-form-field>
-                    </div>                                          
-                  </div>
+                    </div>  
+                    <div fxFlex="50%">
+                      <mat-form-field>
+                        <mat-label>Shipment Value</mat-label>
+                        <input name="shipmentvalue" type="number" maxlength="8" min="0" formControlName="shipmentvalue" matInput >
+                      </mat-form-field>
+                    </div>                                        
+                  </div>                 
+                  <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="5px">                      
+                      <div fxFlex="50%">
+                        <mat-form-field>
+                          <mat-label>Value Per Pound</mat-label>
+                          <input name="valueperpound" type="number" maxlength="8" min="0" formControlName="valueperpound" matInput >
+                        </mat-form-field>
+                      </div>
+                      <div fxFlex="50%">
+                        <mat-form-field fxFlex="none">
+                          <mat-label>Service Level</mat-label>                   
+                            <mat-select  name="servicelevel" formControlName="servicelevel">
+                            <!-- <mat-option *ngFor="let servicelevel of servicelevels" [value]="servicelevel.id">{{servicelevel.name}}</mat-option>                       -->
+                          </mat-select>
+                        </mat-form-field>
+                      </div> 
+                  </div> 
+                  <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="5px">
+                    <div fxFlex="100%">
+                      <mat-form-field>
+                        <mat-label>Special Instructions (to print in BOL)</mat-label>
+                        <textarea name="specialinstructions" formControlName="specialinstructions" matInput rows="4" maxlength="250"></textarea>
+                      </mat-form-field>
+                    </div> 
+                  </div> 
+                                                                       
+                </div>
+              </div>              
+            </div>
+            <div @fadeInUp class="card" fxFlex="50%">
+              <div fxLayout="row" fxLayoutGap="8px" class="ml-5 mt-8">
+                
+              </div>
+              <div>
+                <div fxLayout="column" class="expansion-panel-cont-style"> 
                   <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="5px">
                     <div fxFlex="50%">
                       <mat-form-field fxFlex="none">
@@ -515,72 +571,33 @@
                         <input name="mode" formControlName="mode" matInput >
                       </mat-form-field>
                     </div>
-                  </div> 
-                  <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="5px">
-                      <div fxFlex="50%">
-                        <mat-form-field>
-                          <mat-label>Shipment Value</mat-label>
-                          <input name="shipmentvalue" type="number" maxlength="8" min="0" formControlName="shipmentvalue" matInput >
-                        </mat-form-field>
-                      </div>
-                      <div fxFlex="50%">
-                        <mat-form-field>
-                          <mat-label>Value Per Pound</mat-label>
-                          <input name="valueperpound" type="number" maxlength="8" min="0" formControlName="valueperpound" matInput >
-                        </mat-form-field>
-                      </div>
-                  </div>  
-                  <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="5px">
-                        <div fxFlex="50%">
-                          <mat-form-field fxFlex="none">
-                            <mat-label>OS & D</mat-label>                   
-                              <mat-select  name="os_d" formControlName="os_d">
-                              <!-- <mat-option *ngFor="let os_dItem of os_dList" [value]="os_dItem.id">{{os_dItem.name}}</mat-option>                       -->
-                            </mat-select>
-                          </mat-form-field>
-                        </div>
-                        <div fxFlex="50%">
-                          <mat-form-field fxFlex="none">
-                            <mat-label>Service Level</mat-label>                   
-                              <mat-select  name="servicelevel" formControlName="servicelevel">
-                              <!-- <mat-option *ngFor="let servicelevel of servicelevels" [value]="servicelevel.id">{{servicelevel.name}}</mat-option>                       -->
-                            </mat-select>
-                          </mat-form-field>
-                        </div>                                 
                   </div>
                   <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="5px">
-                        <div fxFlex="50%">
-                          <mat-form-field>
-                            <mat-label>R2 Ref No</mat-label>
-                            <input name="r2refno" formControlName="r2refno" matInput >
-                          </mat-form-field>
-                        </div>
-                        <div fxFlex="50%">
-                          <mat-form-field fxFlex="none">
-                            <mat-label>StatusCode</mat-label>                   
-                              <mat-select  name="statuscode" formControlName="statuscode">
-                              <!-- <mat-option *ngFor="let servicelevel of servicelevels" [value]="servicelevel.id">{{servicelevel.name}}</mat-option>                       -->
-                            </mat-select>
-                          </mat-form-field>
-                        </div>                                 
-                  </div>                                                        
-                </div>
-              </div>              
-            </div>
-            <div @fadeInUp class="card" fxFlex="50%">
-              <div fxLayout="row" fxLayoutGap="8px" class="ml-5 mt-8">
-                
-              </div>
-              <div>
-                <div fxLayout="column" class="expansion-panel-cont-style">
-                  <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="5px">
-                    <div fxFlex="100%">
-                      <mat-form-field>
-                        <mat-label>Special Instructions</mat-label>
-                        <textarea name="specialinstructions" formControlName="specialinstructions" matInput rows="4" maxlength="250"></textarea>
+                    <div fxFlex="50%">
+                      <mat-form-field fxFlex="none">
+                        <mat-label>OS & D</mat-label>                   
+                          <mat-select  name="os_d" formControlName="os_d">
+                          <!-- <mat-option *ngFor="let os_dItem of os_dList" [value]="os_dItem.id">{{os_dItem.name}}</mat-option>                       -->
+                        </mat-select>
                       </mat-form-field>
-                    </div> 
-                  </div>
+                    </div>                                                        
+                </div>
+                <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="5px">
+                    <div fxFlex="50%">
+                      <mat-form-field>
+                        <mat-label>R2 Ref No</mat-label>
+                        <input name="r2refno" formControlName="r2refno" matInput >
+                      </mat-form-field>
+                    </div>
+                    <div fxFlex="50%">
+                      <mat-form-field fxFlex="none">
+                        <mat-label>StatusCode</mat-label>                   
+                          <mat-select  name="statuscode" formControlName="statuscode">
+                          <!-- <mat-option *ngFor="let servicelevel of servicelevels" [value]="servicelevel.id">{{servicelevel.name}}</mat-option>                       -->
+                        </mat-select>
+                      </mat-form-field>
+                    </div>                                 
+                  </div>                    
                   <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="5px">
                     <div fxFlex="75%">
                       <mat-form-field>

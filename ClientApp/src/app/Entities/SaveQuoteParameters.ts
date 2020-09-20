@@ -39,10 +39,10 @@ export interface SaveQuoteParameters {
   DestTerminalFax:              string;
   ServiceLevelID:               number;
   BOlProductsList:              BOlProductsList[];
-  BOLAccesorialList:            any[];
+  BOLAccesorialList:            BOLAccesorial[];
   BOLDispatchNotesList:         any[];
   BuyRates:                     null;
-  SellRates:                    SellRates;
+  SellRates:                    SellRate;
   LoggedInUserId:               number;
   OrgCityName:                  string;
   OrgStateCode:                 string;
@@ -74,6 +74,7 @@ export interface BOlProductsList {
   Pallets:              string;
   Pieces:               string;
   Hazmat?:              boolean;
+  NMFC:                 string;
   Class:                string;
   Weight:               string;
   Height:               string;
@@ -84,21 +85,27 @@ export interface BOlProductsList {
   selectedProduct:      SelectedProduct;
   Status:               number;
   SelectedProductClass: SelectedProduct;
+  Stackable:            boolean;
 }
 
 export interface SelectedProduct {
 }
 
-export interface SellRates {
+export interface SellRate {
   SCAC:                   string;
   CarrierName:            string;
-  AccountInvoiceCostList: AccountInvoiceCostList[];
+  AccountInvoiceCostList: AccountInvoiceCost[];
 }
 
-export interface AccountInvoiceCostList {
+export interface AccountInvoiceCost {
   AccessorialID: number;
   RatedCost:     number;
   BilledCost:    number;
   Description:   string;
   CostStatus:    number;
+}
+
+export interface BOLAccesorial {
+  AccesorialID: number;
+  IsAccesorial: true;
 }

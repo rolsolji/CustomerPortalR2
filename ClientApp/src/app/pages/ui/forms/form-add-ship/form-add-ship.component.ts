@@ -22,6 +22,12 @@ import { MessageService } from "../../../../common/message.service";
 import { Observable, of } from 'rxjs';
 import { startWith, debounceTime, distinctUntilChanged, switchMap } from 'rxjs/operators';
 import {MatAutocompleteSelectedEvent, MatAutocomplete} from '@angular/material/autocomplete';
+import { EquipmentType } from '../../../../Entities/EquipmentType';
+import { ShipmentPriority } from '../../../../Entities/ShipmentPriority';
+import { ServiceLevel } from '../../../../Entities/ServiceLevel';
+import { PaymentTerm } from '../../../../Entities/PaymentTerm';
+import { ShipmentMode } from '../../../../Entities/ShipmentMode';
+import { ShipmentError } from '../../../../Entities/ShipmentError';
 
 
 @Component({
@@ -52,6 +58,12 @@ export class FormAddShipComponent implements OnInit {
   internalNotes: InternalNote[];
   showInternalNotesTitle: boolean = false;
   timesArray = ["", "12:00 AM", "12:30 AM", "01:00 AM", "01:30 AM", "02:00 AM", "02:30 AM", "03:00 AM", "03:30 AM", "04:00 AM", "04:30 AM", "05:00 AM", "05:30 AM", "06:00 AM", "06:30 AM", "07:00 AM", "07:30 AM", "08:00 AM", "08:30 AM", "09:00 AM", "09:30 AM", "10:00 AM", "10:30 AM", "11:00 AM", "11:30 AM", "12:00 PM", "12:30 PM", "01:00 PM", "01:30 PM", "02:00 PM", "02:30 PM", "03:00 PM", "03:30 PM", "04:00 PM", "04:30 PM", "05:00 PM", "05:30 PM", "06:00 PM", "06:30 PM", "07:00 PM", "07:30 PM", "08:00 PM", "08:30 PM", "09:00 PM", "09:30 PM", "10:00 PM", "10:30 PM", "11:00 PM", "11:30 PM"]  
+  EquipmentOptions: EquipmentType[];
+  PriorityOptions: ShipmentPriority[];
+  ServiceLevelOptions: ServiceLevel[];
+  PaymentTerms: PaymentTerm[];
+  ShipmentModeOptions: ShipmentMode[];
+  ShipmentErrorOptions: ShipmentError[];
 
   originSelectedCountry: PostalData = {
     CityCode: '',
@@ -111,7 +123,7 @@ export class FormAddShipComponent implements OnInit {
       Pieces: [null],
         Package: [3],
         ProductClass: [null, Validators.required],
-        NMFC: [null],
+        NMFC: [null, Validators.required],
         Description: [null, Validators.required],
         Length: [null, Validators.required],
         Width: [null, Validators.required],
@@ -174,15 +186,15 @@ export class FormAddShipComponent implements OnInit {
 
     //-- shipmentInfoFormGroup fields
     this.shipmentInfoFormGroup = this.fb.group({
-      equipment: [null, Validators.required],
+      equipment: [7, Validators.required],
       priority: [null],
       customerref: [null],
       r2order: [null],
       r2pronumber: [null],
-      paymentterms: [null],
+      paymentterms: [5],
       shipmentinfo: [null],
       pronumber: [null],
-      mode: [null, Validators.required],
+      mode: ["LTL", Validators.required],
       shipmentvalue: [null],
       valueperpound: [null],
       os_d: [null],
@@ -244,6 +256,25 @@ export class FormAddShipComponent implements OnInit {
       );
 
     this.internalNotes = [];
+
+    //-- Get Equipment Options
+    this.EquipmentOptions = await this.httpService.getMasEquipment(this.keyId);
+
+    //-- Get Priority Options
+    this.PriorityOptions = await this.httpService.getMasShipmentPriority();
+
+    //-- Get Service Level Options
+    this.ServiceLevelOptions = await this.httpService.getMasServiceLevel(this.ClientID, this.keyId);
+
+    //-- Get Payment Terms
+    this.PaymentTerms = await this.httpService.getMasPaymentTerms();
+
+    //-- Get Shipment Modes
+    this.ShipmentModeOptions = await this.httpService.getShipmentMode(this.keyId);
+
+    //-- Get Shipment Errors
+    this.ShipmentErrorOptions = await this.httpService.getShipmentError(this.keyId);
+        
   }
 
   pcoAutoCompleteFilter(val: string): Observable<any[]> {
@@ -362,6 +393,6 @@ export class FormAddShipComponent implements OnInit {
     else{
       this.showInternalNotesTitle = false;
     }
-  }
+  } 
 
 }

@@ -365,7 +365,7 @@
                         <div fxFlex="15%">
                           <mat-form-field>
                             <mat-label>NMFC</mat-label>
-                            <input matInput type="number" maxlength="4" min="0" formControlName="NMFC" class="removeArrowsNumberInput">
+                            <input matInput maxlength="50" formControlName="NMFC" required>                            
                           </mat-form-field>
                         </div>           
                         <div fxFlex="15%">
@@ -444,8 +444,7 @@
 
           <div class="actions" fxLayout="row" fxLayoutAlign="end center" fxLayoutGap="8px">
             <button color="primary" mat-button matStepperPrevious type="button">Previous</button>
-            <button  color="primary" mat-raised-button matStepperNext>Next
-            </button>
+            <button  color="primary" mat-raised-button matStepperNext>Next</button>
           </div>
         </form>
       </mat-step>
@@ -467,15 +466,15 @@
                       <mat-form-field fxFlex="none">
                         <mat-label>Equipment</mat-label>                   
                           <mat-select  name="equipment" formControlName="equipment">
-                          <!-- <mat-option *ngFor="let equipment of equipments" [value]="equipment.id">{{equipment.name}}</mat-option>                       -->
-                        </mat-select>
+                            <mat-option *ngFor="let equipment of EquipmentOptions" [value]="equipment.EquipmentID">{{equipment.Description}}</mat-option>
+                        </mat-select>                        
                       </mat-form-field>
                     </div>
                     <div fxFlex="50%">
                       <mat-form-field fxFlex="none">
                         <mat-label>Priority</mat-label>                   
                           <mat-select  name="priority" formControlName="priority">
-                          <!-- <mat-option *ngFor="let priority of priorities" [value]="priority.id">{{priority.name}}</mat-option>                       -->
+                          <mat-option *ngFor="let priority of PriorityOptions" [value]="priority.PriorityID">{{priority.Description}}</mat-option>                      
                         </mat-select>
                       </mat-form-field>
                     </div>                                 
@@ -504,7 +503,7 @@
                     <div fxFlex="50%">
                       <mat-form-field>
                         <mat-label>Shipment Value</mat-label>
-                        <input name="shipmentvalue" type="number" maxlength="8" min="0" formControlName="shipmentvalue" matInput >
+                        <input name="shipmentvalue" maxlength="7" formControlName="shipmentvalue" matInput >
                       </mat-form-field>
                     </div>                                        
                   </div>                 
@@ -519,7 +518,7 @@
                         <mat-form-field fxFlex="none">
                           <mat-label>Service Level</mat-label>                   
                             <mat-select  name="servicelevel" formControlName="servicelevel">
-                            <!-- <mat-option *ngFor="let servicelevel of servicelevels" [value]="servicelevel.id">{{servicelevel.name}}</mat-option>                       -->
+                            <mat-option *ngFor="let servicelevel of ServiceLevelOptions" [value]="servicelevel.ServiceLevelID">{{servicelevel.Description}}</mat-option>                      
                           </mat-select>
                         </mat-form-field>
                       </div> 
@@ -547,7 +546,7 @@
                       <mat-form-field fxFlex="none">
                         <mat-label>Payment Terms</mat-label>                   
                           <mat-select  name="paymentterms" formControlName="paymentterms">
-                          <!-- <mat-option *ngFor="let paymentterm of paymentterms" [value]="paymentterm.id">{{paymentterm.name}}</mat-option>                       -->
+                          <mat-option *ngFor="let paymentterm of PaymentTerms" [value]="paymentterm.PaymentTermID">{{paymentterm.Description}}</mat-option>                      
                         </mat-select>
                       </mat-form-field>
                     </div>
@@ -566,10 +565,12 @@
                       </mat-form-field>
                     </div>
                     <div fxFlex="50%">
-                      <mat-form-field>
-                        <mat-label>Mode</mat-label>
-                        <input name="mode" formControlName="mode" matInput >
-                      </mat-form-field>
+                      <mat-form-field fxFlex="none">
+                        <mat-label>Mode</mat-label>                   
+                          <mat-select  name="mode" formControlName="mode">
+                          <mat-option *ngFor="let modeItem of ShipmentModeOptions" [value]="modeItem.ModeCode">{{modeItem.Mode}}</mat-option>                      
+                        </mat-select>
+                      </mat-form-field>                     
                     </div>
                   </div>
                   <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="5px">
@@ -577,27 +578,27 @@
                       <mat-form-field fxFlex="none">
                         <mat-label>OS & D</mat-label>                   
                           <mat-select  name="os_d" formControlName="os_d">
-                          <!-- <mat-option *ngFor="let os_dItem of os_dList" [value]="os_dItem.id">{{os_dItem.name}}</mat-option>                       -->
+                          <mat-option *ngFor="let os_dItem of ShipmentErrorOptions" [value]="os_dItem.ShipmentErrorId">{{os_dItem.ErrorDescription}}</mat-option>                      
                         </mat-select>
                       </mat-form-field>
-                    </div>                                                        
-                </div>
-                <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="5px">
+                    </div>  
                     <div fxFlex="50%">
                       <mat-form-field>
                         <mat-label>R2 Ref No</mat-label>
                         <input name="r2refno" formControlName="r2refno" matInput >
                       </mat-form-field>
-                    </div>
+                    </div>                                                      
+                </div>
+                <!-- <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="5px">                    
                     <div fxFlex="50%">
                       <mat-form-field fxFlex="none">
                         <mat-label>StatusCode</mat-label>                   
                           <mat-select  name="statuscode" formControlName="statuscode">
-                          <!-- <mat-option *ngFor="let servicelevel of servicelevels" [value]="servicelevel.id">{{servicelevel.name}}</mat-option>                       -->
+                           <mat-option *ngFor="let servicelevel of servicelevels" [value]="servicelevel.id">{{servicelevel.name}}</mat-option>                       
                         </mat-select>
                       </mat-form-field>
                     </div>                                 
-                  </div>                    
+                </div>                     -->
                   <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="5px">
                     <div fxFlex="75%">
                       <mat-form-field>

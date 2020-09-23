@@ -153,6 +153,7 @@ export interface Rate {
     ZoneAreaID: number;
     ZoneID: number;
     ZoneRateID: number;
+    ETA: string;
 }
     
     

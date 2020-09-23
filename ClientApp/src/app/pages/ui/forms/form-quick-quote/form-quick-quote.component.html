@@ -281,7 +281,7 @@
                     <div fxFlex="15%">
                       <mat-form-field>
                         <mat-label>L</mat-label>
-                        <input matInput type="number" maxlength="4" min="0" formControlName="Length" required class="removeArrowsNumberInput">
+                        <input matInput type="number" maxlength="4" min="0" formControlName="Lenght" required class="removeArrowsNumberInput">
                       </mat-form-field>
                     </div>  
                     <div fxFlex="15%">
@@ -389,6 +389,9 @@
                                   <div fxFlex="90%" class="freightRate-rateInfo-text">                    
                                      Est. {{rate.TransitTime}} Transit Day(s)
                                   </div>
+                                </div>
+                                <div>
+                                  {{rate.ETA}}
                                 </div>
                                 <div>
                                   Carrier Type: {{rate.CarrierType}}

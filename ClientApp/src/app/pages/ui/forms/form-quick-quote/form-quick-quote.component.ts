@@ -1,5 +1,6 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit, ViewChild, ElementRef, Input, 
           Output, EventEmitter, HostListener, Pipe, PipeTransform } from '@angular/core';
+import { DatePipe } from '@angular/common';    
 import icVisibility from '@iconify/icons-ic/twotone-visibility';
 import icVisibilityOff from '@iconify/icons-ic/twotone-visibility-off';
 import icSmartphone from '@iconify/icons-ic/twotone-smartphone';
@@ -50,6 +51,7 @@ import { Converter } from 'showdown';
 import { ValueConverter } from '@angular/compiler/src/render3/view/template';
 import { Router, ActivatedRoute, ParamMap } from '@angular/router';
 import { MessageService } from "../../../../common/message.service";
+import { UtilitiesService } from "../../../../common/utilities.service";
 
 export interface CountryState {
   name: string;
@@ -182,10 +184,13 @@ export class FormQuickQuoteComponent implements OnInit {
     private snackbar: MatSnackBar,
     private router: Router,
     private route: ActivatedRoute,
-    private messageService: MessageService
+    private messageService: MessageService,
+    private utilitiesService: UtilitiesService,
+    public datepipe: DatePipe
     ) { }
 
-  async ngOnInit() {            
+  async ngOnInit() {       
+    
     //-- Main Form Group fields
     this.quickQuoteFormGroup = this.fb.group({
       originpostalcode: [null, Validators.required],
@@ -300,7 +305,7 @@ export class FormQuickQuoteComponent implements OnInit {
         Package: [3],
         ProductClass: [null, Validators.required],
         NMFC: [null],
-        Length: [null, Validators.required],
+        Lenght: [null, Validators.required],
         Width: [null, Validators.required],
         Height: [null, Validators.required],
         PCF: [null],
@@ -579,7 +584,24 @@ export class FormQuickQuoteComponent implements OnInit {
       console.log(objRate);
       
       this.rates = await this.ratesService.postRates(objRate);
-         
+      
+      this.rates.forEach(r => {
+        if (!String.IsNullOrWhiteSpace(r.TransitTime)){
+          let today = new Date();
+          console.log("today", today);
+          let days: number = +r.TransitTime;
+          today = this.utilitiesService.AddBusinessDays(today, days);
+          console.log("buss", today);
+          r.ETA = String.Format("{0} (ETA)", this.datepipe.transform(today,'yyyy-MM-dd'));
+          console.log("ETA", r.ETA);
+        }
+        else {
+          r.ETA = String.Empty;
+        }
+      });
+
+      
+
       // setTimeout(()=>{    //<<<---    using ()=> syntax       
       //   this.ratesCounter = 8;
       //   this.showSpinner = false;

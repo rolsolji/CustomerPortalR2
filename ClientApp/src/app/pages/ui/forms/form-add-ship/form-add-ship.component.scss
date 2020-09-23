@@ -43,6 +43,7 @@ margin: 5px 0;
 .OriginDestinationTitle{
     font-size: 14px;
     font-weight: 500;
+    text-align: left;
 }
 
 .stepTitleStyle{
@@ -113,4 +114,16 @@ input.removeArrowsNumberInput[type=number] {
 
 .mat-option{
     font-size: 12px;
-  }
+}
+
+.addToProductMaster{
+    border-right: .1875rem solid lightgray;
+    margin-right: 10px;
+}
+
+.AddSaveToLocatonsSection{
+    font-size: 12px;
+    text-align: end;
+    padding-right: 12px;
+    padding-top: 2px;
+}

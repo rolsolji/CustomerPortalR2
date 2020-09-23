@@ -16,6 +16,10 @@ import { EquipmentType } from '../Entities/EquipmentType';
 import { ShipmentMode } from '../Entities/ShipmentMode'; 
 import { Status } from '../Entities/Status';
 import { Accessorial } from '../Entities/Accessorial';
+import { ShipmentPriority } from '../Entities/ShipmentPriority';
+import { ServiceLevel } from '../Entities/ServiceLevel';
+import { PaymentTerm } from '../Entities/PaymentTerm';
+import { ShipmentError } from '../Entities/ShipmentError';
 
 @Injectable({
     providedIn: 'root'
@@ -92,9 +96,7 @@ export class HttpService{
         ,{
             headers: httpHeaders
           }
-          ).toPromise(); 
-
-        //return this.http.get(String.Format('https://customer.r2logistics.com/Services/MasClientDefaultsService.svc/json/GetMasProductPackageType?_={0}',keyId))
+          ).toPromise();         
     }
 
     getUserMessage(keyId:string){
@@ -214,4 +216,53 @@ export class HttpService{
         }
         ).toPromise();
     }
+
+    getMasShipmentPriority(){
+        let ticket = this.token;
+        let httpHeaders = new HttpHeaders({                       
+            'Ticket' : ticket                            
+        }); 
+        return this.http.get<ShipmentPriority[]>(String.Format('https://beta-customer.r2logistics.com/Services/BOLHDRService.svc/json/GetMasShipmentPriority')
+        ,{
+            headers: httpHeaders
+          }
+          ).toPromise();            
+    }
+
+    getMasServiceLevel(clientID:number, keyId:string){
+        let ticket = this.token;
+        let httpHeaders = new HttpHeaders({                       
+            'Ticket' : ticket                            
+        }); 
+        return this.http.get<ServiceLevel[]>(String.Format('https://beta-customer.r2logistics.com/Services/BOLHDRService.svc/json/GetMasServiceLevel?ClientID={0}&_={1}',clientID.toString(),keyId)
+        ,{
+            headers: httpHeaders
+          }
+          ).toPromise();            
+    }
+
+    getMasPaymentTerms(){
+        let ticket = this.token;
+        let httpHeaders = new HttpHeaders({                       
+            'Ticket' : ticket                            
+        }); 
+        return this.http.get<PaymentTerm[]>(String.Format('https://beta-customer.r2logistics.com/Services/MasClientDefaultsService.svc/json/GetMasPaymentTerms')
+        ,{
+            headers: httpHeaders
+          }
+          ).toPromise();         
+    }
+
+    getShipmentError(keyId:string){
+        let ticket = this.token;
+        let httpHeaders = new HttpHeaders({                       
+            'Ticket' : ticket                            
+        }); 
+        return this.http.get<ShipmentError[]>(String.Format('https://beta-customer.r2logistics.com/Services/BOLHDRService.svc/json/getShipmentError?_={0}',keyId)
+        ,{
+            headers: httpHeaders
+          }
+          ).toPromise(); 
+    }
+
 }

@@ -646,7 +646,13 @@
             <span class="stepTitleStyle">Rate total and Book Shipment</span>
           </ng-template>
 
-          <!-- Step Content -->
+          <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="5px">
+            <div @fadeInUp class="card" fxFlex="100%">
+              <div fxLayout="row" fxLayoutGap="8px" class="ml-5">
+                <div><h2 class="OriginDestinationTitle">Summary and Carrier Rate</h2></div>
+              </div>
+            </div>
+          </div>
 
           <div class="actions" fxLayout="row" fxLayoutAlign="end center" fxLayoutGap="8px">
             <button color="primary" mat-button matStepperPrevious type="button">Previous</button>

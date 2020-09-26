@@ -302,14 +302,17 @@ export class FormQuickQuoteComponent implements OnInit {
     return this.fb.group({
       Pallets: [null, Validators.required],
       Pieces: [null],
-        Package: [3],
-        ProductClass: [null, Validators.required],
-        NMFC: [null],
-        Lenght: [null, Validators.required],
-        Width: [null, Validators.required],
-        Height: [null, Validators.required],
-        PCF: [null],
-        Weight: [null, Validators.required]      
+      PackageTypeID: [3],
+      ProductClass: [null, Validators.required],
+      NmfcNumber: [null],
+      Length: [null, Validators.required],
+      Width: [null, Validators.required],
+      Height: [null, Validators.required],
+      PCF: [null],
+      Weight: [null, Validators.required],
+      HazMat: false,
+      Stackable: false,
+      Status: 1      
     })
   }  
 
@@ -588,12 +591,9 @@ export class FormQuickQuoteComponent implements OnInit {
       this.rates.forEach(r => {
         if (!String.IsNullOrWhiteSpace(r.TransitTime)){
           let today = new Date();
-          console.log("today", today);
           let days: number = +r.TransitTime;
           today = this.utilitiesService.AddBusinessDays(today, days);
-          console.log("buss", today);
           r.ETA = String.Format("{0} (ETA)", this.datepipe.transform(today,'yyyy-MM-dd'));
-          console.log("ETA", r.ETA);
         }
         else {
           r.ETA = String.Empty;
@@ -663,7 +663,7 @@ export class FormQuickQuoteComponent implements OnInit {
 
     console.log(index);
 
-    let selectedRate = this.rates[index];
+    let selectedRate = this.ratesFiltered[index];
 
     console.log("save quote start",selectedRate);
 
@@ -674,19 +674,19 @@ export class FormQuickQuoteComponent implements OnInit {
         Description: "NA",
         Pallets: p.Pallets,
         Pieces: p.Pieces,
-        Hazmat: true,
-        NMFC: p.NMFC,
+        Hazmat: p.HazMat,
+        NMFC: p.NmfcNumber,
         Class: p.ProductClass,
         Weight: p.Weight,
         Height: p.Height,
-        Lenght: p.Lenght,
+        Lenght: p.Length,
         Width: p.Width,
-        PackageTypeID: p.Package,
+        PackageTypeID: p.PackageTypeID,
         PCF: p.PCF,
         selectedProduct: {},
         Status: 1,
         SelectedProductClass: {},
-        Stackable: true
+        Stackable: p.Stackable
       }
 
       console.log("p", p);

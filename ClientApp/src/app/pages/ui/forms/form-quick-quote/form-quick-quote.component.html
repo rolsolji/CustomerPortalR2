@@ -239,7 +239,7 @@
                     <div fxFlex="40%">
                       <mat-form-field>
                         <mat-label>Packages</mat-label>
-                        <mat-select name="package" formControlName="Package" required>
+                        <mat-select name="package" formControlName="PackageTypeID" required>
                           <mat-option *ngFor="let package of packageTypes" [value]="package.PackageTypeID">{{package.PackageType}}</mat-option>
                         </mat-select>
                       </mat-form-field>
@@ -275,13 +275,13 @@
                     <div fxFlex="15%">
                       <mat-form-field>
                         <mat-label>NMFC</mat-label>
-                        <input matInput maxlength="50" formControlName="NMFC">
+                        <input matInput maxlength="50" formControlName="NmfcNumber">
                       </mat-form-field>
                     </div>              
                     <div fxFlex="15%">
                       <mat-form-field>
                         <mat-label>L</mat-label>
-                        <input matInput type="number" maxlength="4" min="0" formControlName="Lenght" required class="removeArrowsNumberInput">
+                        <input matInput type="number" maxlength="4" min="0" formControlName="Length" required class="removeArrowsNumberInput">
                       </mat-form-field>
                     </div>  
                     <div fxFlex="15%">
@@ -307,12 +307,19 @@
                         <mat-label>Total Weight</mat-label>
                         <input matInput type="number" maxlength="4" min="0" formControlName="Weight" (change)="onChangeProductWeight(i)" required>
                       </mat-form-field>
-                    </div>
-                    
+                    </div>  
                   </div>
     
-                  <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="5px" class="pb-5">                     
-                    <div fxLayoutAlign="end center">
+                  <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="5px" class="pb-5"> 
+                    <div fxFlex="50%" class="pt-1" fxLayout.lt-xs="column" fxLayout.gt-xs="row"> 
+                      <div fxFlex="50%">
+                        <mat-checkbox [checked]="false" formControlName="HazMat" color="warn">Hazmat</mat-checkbox>
+                      </div>
+                      <div fxFlex="50%">
+                        <mat-checkbox [checked]="false" formControlName="Stackable" color="warn">Stackable</mat-checkbox>
+                      </div>
+                    </div>    
+                    <div fxLayoutAlign="end center" fxFlex="50%">
                       <ng-container *ngIf="formProducts.length > 1">
                         <button id="{{'remoeMinus'+i}}" (click)="removeNewProdField(i)" 
                                 mat-button type="button">Remove</button>
@@ -320,8 +327,8 @@
                       <ng-container>
                         <button id="{{'addrec'+i}}" (click)="addNewProdField()" 
                                 mat-raised-button type="button" [disabled]="quickQuoteFormGroup.get('products').invalid" >Add New</button>
-                      </ng-container>
-                    </div>
+                      </ng-container>               
+                    </div>                
                   </div>
                 </div>
               </div>

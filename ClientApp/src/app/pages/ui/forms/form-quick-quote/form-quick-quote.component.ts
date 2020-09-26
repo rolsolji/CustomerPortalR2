@@ -850,7 +850,7 @@ export class FormQuickQuoteComponent implements OnInit {
   }
   onChangeProductWeight(index: number): void{
     let product = this.quickQuoteFormGroup.get('products').value[index];     
-    let PCF = this.calculatePCF(product.Pallets, product.Length, product.Width, product.Height, product.Weight);
+    let PCF = this.calculatePCF(product.Pallets, product.Lenght, product.Width, product.Height, product.Weight);
     //this.quickQuoteFormGroup.get('destinationstatename').setValue(this.postalDataDest[0].StateName.trim());
     //this.quickQuoteFormGroup.get('products')[index].setValue(product);
     (<FormArray>this.quickQuoteFormGroup.controls['products']).at(index).get("PCF").setValue(PCF); 

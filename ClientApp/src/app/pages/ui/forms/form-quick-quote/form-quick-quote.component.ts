@@ -713,8 +713,8 @@ export class FormQuickQuoteComponent implements OnInit {
     //Freight
     let accountInvoiceFreight: AccountInvoiceCost = {
       AccessorialID: 22,
-      RatedCost: selectedRate.FreightCost,
-      BilledCost: selectedRate.FreightCost,
+      RatedCost: selectedRate.GrossAmount,
+      BilledCost: selectedRate.GrossAmount,
       Description: "Freight",
       CostStatus: 1
     }
@@ -733,12 +733,12 @@ export class FormQuickQuoteComponent implements OnInit {
     //Discount
     let accountInvoiceDiscount: AccountInvoiceCost = {
       AccessorialID: 24,
-      RatedCost: selectedRate.DiscountRate,
-      BilledCost: selectedRate.DiscountRate,
+      RatedCost: -1 * selectedRate.Discount,
+      BilledCost: -1 * selectedRate.Discount,
       Description: "Discount",
       CostStatus: 1
     }
-    accountInvoiceCostList.push(accountInvoiceFuel);
+    accountInvoiceCostList.push(accountInvoiceDiscount);
 
     let sellRate: SellRate = {
       SCAC: selectedRate.CarrierID,
@@ -813,8 +813,8 @@ export class FormQuickQuoteComponent implements OnInit {
         DestStateCode:this.DestinationPostalData.StateCode,
         DestCountryCode:this.DestinationPostalData.CountryCode,
         DestZipCode:this.DestinationPostalData.PostalCode,
-        OrgLocation:String.Format("{0},{1},{2}",this.OriginPostalData.CountryName,this.OriginPostalData.StateCode,this.OriginPostalData.PostalCode),
-        DestLocation:String.Format("{0},{1},{2}",this.DestinationPostalData.CountryName,this.DestinationPostalData.StateCode,this.DestinationPostalData.PostalCode),
+        OrgLocation:String.Format("{0},{1}{2}",this.OriginPostalData.CityName,this.OriginPostalData.StateCode,this.OriginPostalData.PostalCode),
+        DestLocation:String.Format("{0},{1}{2}",this.DestinationPostalData.CityName,this.DestinationPostalData.StateCode,this.DestinationPostalData.PostalCode),
         SalesPersonList: [],
         BolDocumentsList: [],
         TrackingDetailsList: [],
@@ -850,7 +850,7 @@ export class FormQuickQuoteComponent implements OnInit {
   }
   onChangeProductWeight(index: number): void{
     let product = this.quickQuoteFormGroup.get('products').value[index];     
-    let PCF = this.calculatePCF(product.Pallets, product.Lenght, product.Width, product.Height, product.Weight);
+    let PCF = this.calculatePCF(product.Pallets, product.Length, product.Width, product.Height, product.Weight);
     //this.quickQuoteFormGroup.get('destinationstatename').setValue(this.postalDataDest[0].StateName.trim());
     //this.quickQuoteFormGroup.get('products')[index].setValue(product);
     (<FormArray>this.quickQuoteFormGroup.controls['products']).at(index).get("PCF").setValue(PCF); 

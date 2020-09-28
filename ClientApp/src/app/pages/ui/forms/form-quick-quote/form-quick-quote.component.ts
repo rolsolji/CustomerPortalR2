@@ -219,6 +219,7 @@ export class FormQuickQuoteComponent implements OnInit {
       sortAndSegregate:[null],
       blindShipment:[null],
       liftgateRequiredAtDelivery:[null],
+      showCarriers: [10, [Validators.min(10),Validators.max(25),Validators.maxLength(2)]],
       //#endregion
       products: this.fb.array([
         this.addProductFormGroup()
@@ -312,7 +313,8 @@ export class FormQuickQuoteComponent implements OnInit {
       Weight: [null, Validators.required],
       HazMat: false,
       Stackable: false,
-      Status: 1      
+      Status: 1,
+      SaveProduct: false      
     })
   }  
 
@@ -363,6 +365,46 @@ export class FormQuickQuoteComponent implements OnInit {
       top: 0, 
       left: 0, 
       behavior: 'smooth' 
+    });
+
+    this.panelCollectionServiceState = false;    
+    this.collectionServicesDescription = "Select Collection Services";
+    this.panelDeliveryServiceState = false;
+    this.deliveryServicesDescription = "Select Delivery Services";
+
+    //-- Main Form Group fields
+    this.quickQuoteFormGroup = this.fb.group({
+      originpostalcode: [null, Validators.required],
+      originstatename: [null, Validators.required],
+      originpickupdate: [null, Validators.required],
+      destinationpostalcode: [null, Validators.required],
+      destinationstatename: [null, Validators.required],
+      //#region CollectionServices          
+      residential:[null],
+      limitedAccess:[null],
+      insidePickup:[null],
+      liftgateRequiredAtPickup:[null],
+      // collectionServices: this.fb.group({
+        
+      // }),
+      //#endregion
+      //#region Delivery Services    
+      deliveryResidential:[null],
+      deliveryLimitedAccess:[null],
+      standard:[null],
+      guarantee:[null],
+      callBeforeDelivery:[null],
+      appointmentRequired:[null],
+      protectfromFreezing:[null],
+      insideDelivery:[null],
+      sortAndSegregate:[null],
+      blindShipment:[null],
+      liftgateRequiredAtDelivery:[null],
+      showCarriers: [10, [Validators.min(10),Validators.max(25),Validators.maxLength(2)]],
+      //#endregion
+      products: this.fb.array([
+        this.addProductFormGroup()
+      ])    
     });
   }
 
@@ -565,7 +607,7 @@ export class FormQuickQuoteComponent implements OnInit {
         "ShipmentDate": String.Format("/Date({0})/",this.quickQuoteFormGroup.get('originpickupdate').value.getTime()),
         "Accessorials": this.accessorials,
         "AccessorialCodes": [],
-        "TopN": 10,
+        "TopN": this.quickQuoteFormGroup.get('showCarriers').value,
         "ServiceLevelGrops": [],
         "ServiceLevels": this.serviceLevels,
         "ServiceLevelCodes": [],

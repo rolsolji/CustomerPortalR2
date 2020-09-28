@@ -465,7 +465,7 @@
                     <div fxFlex="50%">
                       <mat-form-field fxFlex="none">
                         <mat-label>Equipment</mat-label>                   
-                          <mat-select  name="equipment" formControlName="equipment">
+                          <mat-select  name="equipment" formControlName="equipment" (selectionChange)="selectChangeEquipment($event)">
                             <mat-option *ngFor="let equipment of EquipmentOptions" [value]="equipment.EquipmentID">{{equipment.Description}}</mat-option>
                         </mat-select>                        
                       </mat-form-field>
@@ -473,7 +473,7 @@
                     <div fxFlex="50%">
                       <mat-form-field fxFlex="none">
                         <mat-label>Priority</mat-label>                   
-                          <mat-select  name="priority" formControlName="priority">
+                          <mat-select  name="priority" formControlName="priority" (selectionChange)="selectChangePriority($event)">
                           <mat-option *ngFor="let priority of PriorityOptions" [value]="priority.PriorityID">{{priority.Description}}</mat-option>                      
                         </mat-select>
                       </mat-form-field>
@@ -517,7 +517,7 @@
                       <div fxFlex="50%">
                         <mat-form-field fxFlex="none">
                           <mat-label>Service Level</mat-label>                   
-                            <mat-select  name="servicelevel" formControlName="servicelevel">
+                            <mat-select  name="servicelevel" formControlName="servicelevel" (selectionChange)="selectChangeServiceLevel($event)">
                             <mat-option *ngFor="let servicelevel of ServiceLevelOptions" [value]="servicelevel.ServiceLevelID">{{servicelevel.Description}}</mat-option>                      
                           </mat-select>
                         </mat-form-field>
@@ -545,7 +545,7 @@
                     <div fxFlex="50%">
                       <mat-form-field fxFlex="none">
                         <mat-label>Payment Terms</mat-label>                   
-                          <mat-select  name="paymentterms" formControlName="paymentterms">
+                          <mat-select  name="paymentterms" formControlName="paymentterms" (selectionChange)="selectChangePaymentTerm($event)">
                           <mat-option *ngFor="let paymentterm of PaymentTerms" [value]="paymentterm.PaymentTermID">{{paymentterm.Description}}</mat-option>                      
                         </mat-select>
                       </mat-form-field>
@@ -567,7 +567,7 @@
                     <div fxFlex="50%">
                       <mat-form-field fxFlex="none">
                         <mat-label>Mode</mat-label>                   
-                          <mat-select  name="mode" formControlName="mode">
+                          <mat-select  name="mode" formControlName="mode" (selectionChange)="selectChangeShipmentMode($event)">
                           <mat-option *ngFor="let modeItem of ShipmentModeOptions" [value]="modeItem.ModeCode">{{modeItem.Mode}}</mat-option>                      
                         </mat-select>
                       </mat-form-field>                     
@@ -647,9 +647,133 @@
           </ng-template>
 
           <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="5px">
-            <div @fadeInUp class="card" fxFlex="100%">
+            <div @fadeInUp class="card" fxFlex="40%">
               <div fxLayout="row" fxLayoutGap="8px" class="ml-5">
-                <div><h2 class="OriginDestinationTitle">Summary and Carrier Rate</h2></div>
+                <div><h2 class="OriginDestinationTitle">Summary</h2></div>
+              </div>
+              <div>
+                <div fxLayout="column" class="expansion-panel-cont-style">
+                  <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="5px" >
+                    <div fxFlex="50%">
+                      <h3 class="OriginDestinationSubTitle">Origen</h3>
+                    </div>
+                    <div fxFlex="50%">
+                      <h3 class="OriginDestinationSubTitle">Destination</h3>
+                    </div>                                 
+                  </div>
+                  <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="5px">
+                    <div fxFlex="50%">
+                      <mat-label>Name: </mat-label><mat-label class="InfoLabel">{{originAndDestinationFormGroup.get('originname').value}}</mat-label>
+                    </div>
+                    <div fxFlex="50%">
+                      <mat-label>Name: </mat-label><mat-label class="InfoLabel">{{originAndDestinationFormGroup.get('destname').value}}</mat-label>
+                    </div>                                 
+                  </div>
+                  <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="5px">
+                    <div fxFlex="50%">
+                      <mat-label>Postal Code: </mat-label><mat-label class="InfoLabel">{{originAndDestinationFormGroup.get('originpostalcode').value}}</mat-label>
+                    </div>
+                    <div fxFlex="50%">
+                      <mat-label>Postal Code: </mat-label><mat-label class="InfoLabel">{{originAndDestinationFormGroup.get('destpostalcode').value}}</mat-label>
+                    </div>                                 
+                  </div>
+                  <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="5px">
+                    <div fxFlex="50%">
+                      <mat-label>State: </mat-label><mat-label class="InfoLabel">{{originAndDestinationFormGroup.get('originstatename').value}}</mat-label>
+                    </div>
+                    <div fxFlex="50%">
+                      <mat-label>State: </mat-label><mat-label class="InfoLabel">{{originAndDestinationFormGroup.get('deststatename').value}}</mat-label>
+                    </div>                                 
+                  </div>
+                  <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="5px">
+                    <div fxFlex="50%">
+                      <mat-label>Exp Pickup Date: </mat-label><mat-label class="InfoLabel">{{originPckupDate}}</mat-label>
+                    </div>
+                    <div fxFlex="50%">
+                      <mat-label>Exp Del Date: </mat-label><mat-label class="InfoLabel">{{destExpDelDate}}</mat-label>
+                    </div>                                 
+                  </div>
+                  <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="5px">
+                    <div fxFlex="100%" class="fake-link">                      
+                      <span (click)="moveToStep(0)">more</span>
+                    </div>                                                   
+                  </div>
+                  <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="5px">
+                    <div fxFlex="100%">
+                      <mat-divider></mat-divider>
+                    </div>                                                   
+                  </div>
+                  <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="5px" >
+                    <div fxFlex="50%">
+                      <h3 class="OriginDestinationSubTitle">Product(s): {{formProducts.length}}</h3>
+                    </div>
+                    <div fxFlex="50%">
+                      <h3 class="OriginDestinationSubTitle">Accessorial(s): {{accesorialsSelect.selectedOptions.selected.length}}</h3>
+                    </div>                                 
+                  </div>
+                  <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="5px">
+                    <div fxFlex="100%" class="fake-link">                      
+                      <span (click)="moveToStep(1)">more</span>
+                    </div>                                                   
+                  </div>
+                  <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="5px">
+                    <div fxFlex="100%">
+                      <mat-divider></mat-divider>
+                    </div>                                                   
+                  </div>
+                  <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="5px" >
+                    <div fxFlex="100%">
+                      <h3 class="OriginDestinationSubTitle">Shipment Information</h3>
+                    </div>                                                     
+                  </div>
+                  <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="5px">
+                    <div fxFlex="50%">
+                      <mat-label>Equipment: </mat-label><mat-label class="InfoLabel">{{equimentDescriptionSelected}}</mat-label>
+                    </div>
+                    <div fxFlex="50%">
+                      <mat-label>Priority: </mat-label><mat-label class="InfoLabel">{{priorityDescriptionSelected}}</mat-label>
+                    </div>                                 
+                  </div>
+                  <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="5px">
+                    <div fxFlex="50%">
+                      <mat-label>Customer Order Ref: </mat-label><mat-label class="InfoLabel">{{shipmentInfoFormGroup.get('customerref').value}}</mat-label>
+                    </div>
+                    <div fxFlex="50%">
+                      <mat-label>R2 Order #: </mat-label><mat-label class="InfoLabel">{{shipmentInfoFormGroup.get('r2order').value}}</mat-label>
+                    </div>                                 
+                  </div>
+                  <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="5px">
+                    <div fxFlex="50%">
+                      <mat-label>Service Level: </mat-label><mat-label class="InfoLabel">{{serviceLevelDescriptionSelected}}</mat-label>
+                    </div>
+                    <div fxFlex="50%">
+                      <mat-label>Payment Terms: </mat-label><mat-label class="InfoLabel">{{paymentTermDescriptionSelected}}</mat-label>
+                    </div>                                 
+                  </div>
+                  <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="5px">
+                    <div fxFlex="50%">
+                      <mat-label>Pro Number: </mat-label><mat-label class="InfoLabel">{{shipmentInfoFormGroup.get('pronumber').value}}</mat-label>
+                    </div>
+                    <div fxFlex="50%">
+                      <mat-label>Mode: </mat-label><mat-label class="InfoLabel">{{shipmentModeDescriptionSelected}}</mat-label>
+                    </div>                                 
+                  </div>
+                  <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="5px">
+                    <div fxFlex="100%" class="fake-link">                      
+                      <span (click)="moveToStep(2)">more</span>
+                    </div>                                                   
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div @fadeInUp class="card" fxFlex="60%">
+              <div fxLayout="row" fxLayoutGap="8px" class="ml-5">
+                <div><h2 class="OriginDestinationTitle">Carrier Rate and Total</h2></div>
+              </div>
+              <div>
+                <div fxLayout="column" class="expansion-panel-cont-style">
+                  
+                </div>
               </div>
             </div>
           </div>

@@ -127,3 +127,25 @@ input.removeArrowsNumberInput[type=number] {
     padding-right: 12px;
     padding-top: 2px;
 }
+
+.OriginDestinationSubTitle{
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.mat-divider{
+    border-top-color: darkgray;
+    margin-bottom: 5px;
+    margin-top: 5px;
+}
+
+.fake-link {
+    color: blue;
+    text-decoration: underline;
+    cursor: pointer;
+    text-align: end;
+}
+
+.InfoLabel{
+    font-style: italic;
+}

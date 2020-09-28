@@ -219,6 +219,7 @@ export class FormQuickQuoteComponent implements OnInit {
       sortAndSegregate:[null],
       blindShipment:[null],
       liftgateRequiredAtDelivery:[null],
+      showCarriers: [10, [Validators.min(10),Validators.max(25),Validators.maxLength(2)]],
       //#endregion
       products: this.fb.array([
         this.addProductFormGroup()
@@ -302,14 +303,18 @@ export class FormQuickQuoteComponent implements OnInit {
     return this.fb.group({
       Pallets: [null, Validators.required],
       Pieces: [null],
-        Package: [3],
-        ProductClass: [null, Validators.required],
-        NMFC: [null],
-        Lenght: [null, Validators.required],
-        Width: [null, Validators.required],
-        Height: [null, Validators.required],
-        PCF: [null],
-        Weight: [null, Validators.required]      
+      PackageTypeID: [3],
+      ProductClass: [null, Validators.required],
+      NmfcNumber: [null],
+      Length: [null, Validators.required],
+      Width: [null, Validators.required],
+      Height: [null, Validators.required],
+      PCF: [null],
+      Weight: [null, Validators.required],
+      HazMat: false,
+      Stackable: false,
+      Status: 1,
+      SaveProduct: false      
     })
   }  
 
@@ -360,6 +365,46 @@ export class FormQuickQuoteComponent implements OnInit {
       top: 0, 
       left: 0, 
       behavior: 'smooth' 
+    });
+
+    this.panelCollectionServiceState = false;    
+    this.collectionServicesDescription = "Select Collection Services";
+    this.panelDeliveryServiceState = false;
+    this.deliveryServicesDescription = "Select Delivery Services";
+
+    //-- Main Form Group fields
+    this.quickQuoteFormGroup = this.fb.group({
+      originpostalcode: [null, Validators.required],
+      originstatename: [null, Validators.required],
+      originpickupdate: [null, Validators.required],
+      destinationpostalcode: [null, Validators.required],
+      destinationstatename: [null, Validators.required],
+      //#region CollectionServices          
+      residential:[null],
+      limitedAccess:[null],
+      insidePickup:[null],
+      liftgateRequiredAtPickup:[null],
+      // collectionServices: this.fb.group({
+        
+      // }),
+      //#endregion
+      //#region Delivery Services    
+      deliveryResidential:[null],
+      deliveryLimitedAccess:[null],
+      standard:[null],
+      guarantee:[null],
+      callBeforeDelivery:[null],
+      appointmentRequired:[null],
+      protectfromFreezing:[null],
+      insideDelivery:[null],
+      sortAndSegregate:[null],
+      blindShipment:[null],
+      liftgateRequiredAtDelivery:[null],
+      showCarriers: [10, [Validators.min(10),Validators.max(25),Validators.maxLength(2)]],
+      //#endregion
+      products: this.fb.array([
+        this.addProductFormGroup()
+      ])    
     });
   }
 
@@ -562,7 +607,7 @@ export class FormQuickQuoteComponent implements OnInit {
         "ShipmentDate": String.Format("/Date({0})/",this.quickQuoteFormGroup.get('originpickupdate').value.getTime()),
         "Accessorials": this.accessorials,
         "AccessorialCodes": [],
-        "TopN": 10,
+        "TopN": this.quickQuoteFormGroup.get('showCarriers').value,
         "ServiceLevelGrops": [],
         "ServiceLevels": this.serviceLevels,
         "ServiceLevelCodes": [],
@@ -588,12 +633,9 @@ export class FormQuickQuoteComponent implements OnInit {
       this.rates.forEach(r => {
         if (!String.IsNullOrWhiteSpace(r.TransitTime)){
           let today = new Date();
-          console.log("today", today);
           let days: number = +r.TransitTime;
           today = this.utilitiesService.AddBusinessDays(today, days);
-          console.log("buss", today);
           r.ETA = String.Format("{0} (ETA)", this.datepipe.transform(today,'yyyy-MM-dd'));
-          console.log("ETA", r.ETA);
         }
         else {
           r.ETA = String.Empty;
@@ -663,7 +705,7 @@ export class FormQuickQuoteComponent implements OnInit {
 
     console.log(index);
 
-    let selectedRate = this.rates[index];
+    let selectedRate = this.ratesFiltered[index];
 
     console.log("save quote start",selectedRate);
 
@@ -674,19 +716,19 @@ export class FormQuickQuoteComponent implements OnInit {
         Description: "NA",
         Pallets: p.Pallets,
         Pieces: p.Pieces,
-        Hazmat: true,
-        NMFC: p.NMFC,
+        Hazmat: p.HazMat,
+        NMFC: p.NmfcNumber,
         Class: p.ProductClass,
         Weight: p.Weight,
         Height: p.Height,
-        Lenght: p.Lenght,
+        Lenght: p.Length,
         Width: p.Width,
-        PackageTypeID: p.Package,
+        PackageTypeID: p.PackageTypeID,
         PCF: p.PCF,
         selectedProduct: {},
         Status: 1,
         SelectedProductClass: {},
-        Stackable: true
+        Stackable: p.Stackable
       }
 
       console.log("p", p);
@@ -713,8 +755,8 @@ export class FormQuickQuoteComponent implements OnInit {
     //Freight
     let accountInvoiceFreight: AccountInvoiceCost = {
       AccessorialID: 22,
-      RatedCost: selectedRate.FreightCost,
-      BilledCost: selectedRate.FreightCost,
+      RatedCost: selectedRate.GrossAmount,
+      BilledCost: selectedRate.GrossAmount,
       Description: "Freight",
       CostStatus: 1
     }
@@ -733,12 +775,12 @@ export class FormQuickQuoteComponent implements OnInit {
     //Discount
     let accountInvoiceDiscount: AccountInvoiceCost = {
       AccessorialID: 24,
-      RatedCost: selectedRate.DiscountRate,
-      BilledCost: selectedRate.DiscountRate,
+      RatedCost: -1 * selectedRate.Discount,
+      BilledCost: -1 * selectedRate.Discount,
       Description: "Discount",
       CostStatus: 1
     }
-    accountInvoiceCostList.push(accountInvoiceFuel);
+    accountInvoiceCostList.push(accountInvoiceDiscount);
 
     let sellRate: SellRate = {
       SCAC: selectedRate.CarrierID,
@@ -813,8 +855,8 @@ export class FormQuickQuoteComponent implements OnInit {
         DestStateCode:this.DestinationPostalData.StateCode,
         DestCountryCode:this.DestinationPostalData.CountryCode,
         DestZipCode:this.DestinationPostalData.PostalCode,
-        OrgLocation:String.Format("{0},{1},{2}",this.OriginPostalData.CountryName,this.OriginPostalData.StateCode,this.OriginPostalData.PostalCode),
-        DestLocation:String.Format("{0},{1},{2}",this.DestinationPostalData.CountryName,this.DestinationPostalData.StateCode,this.DestinationPostalData.PostalCode),
+        OrgLocation:String.Format("{0},{1}{2}",this.OriginPostalData.CityName,this.OriginPostalData.StateCode,this.OriginPostalData.PostalCode),
+        DestLocation:String.Format("{0},{1}{2}",this.DestinationPostalData.CityName,this.DestinationPostalData.StateCode,this.DestinationPostalData.PostalCode),
         SalesPersonList: [],
         BolDocumentsList: [],
         TrackingDetailsList: [],
@@ -850,7 +892,7 @@ export class FormQuickQuoteComponent implements OnInit {
   }
   onChangeProductWeight(index: number): void{
     let product = this.quickQuoteFormGroup.get('products').value[index];     
-    let PCF = this.calculatePCF(product.Pallets, product.Lenght, product.Width, product.Height, product.Weight);
+    let PCF = this.calculatePCF(product.Pallets, product.Length, product.Width, product.Height, product.Weight);
     //this.quickQuoteFormGroup.get('destinationstatename').setValue(this.postalDataDest[0].StateName.trim());
     //this.quickQuoteFormGroup.get('products')[index].setValue(product);
     (<FormArray>this.quickQuoteFormGroup.controls['products']).at(index).get("PCF").setValue(PCF); 

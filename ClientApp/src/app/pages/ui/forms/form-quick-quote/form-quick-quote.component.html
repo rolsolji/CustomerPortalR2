@@ -239,7 +239,7 @@
                     <div fxFlex="40%">
                       <mat-form-field>
                         <mat-label>Packages</mat-label>
-                        <mat-select name="package" formControlName="Package" required>
+                        <mat-select name="package" formControlName="PackageTypeID" required>
                           <mat-option *ngFor="let package of packageTypes" [value]="package.PackageTypeID">{{package.PackageType}}</mat-option>
                         </mat-select>
                       </mat-form-field>
@@ -275,13 +275,13 @@
                     <div fxFlex="15%">
                       <mat-form-field>
                         <mat-label>NMFC</mat-label>
-                        <input matInput maxlength="50" formControlName="NMFC">
+                        <input matInput maxlength="50" formControlName="NmfcNumber">
                       </mat-form-field>
                     </div>              
                     <div fxFlex="15%">
                       <mat-form-field>
                         <mat-label>L</mat-label>
-                        <input matInput type="number" maxlength="4" min="0" formControlName="Lenght" required class="removeArrowsNumberInput">
+                        <input matInput type="number" maxlength="4" min="0" formControlName="Length" required class="removeArrowsNumberInput">
                       </mat-form-field>
                     </div>  
                     <div fxFlex="15%">
@@ -307,38 +307,52 @@
                         <mat-label>Total Weight</mat-label>
                         <input matInput type="number" maxlength="4" min="0" formControlName="Weight" (change)="onChangeProductWeight(i)" required>
                       </mat-form-field>
-                    </div>
-                    
+                    </div>  
                   </div>
     
-                  <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="5px" class="pb-5">                     
-                    <div fxLayoutAlign="end center">
-                      <ng-container *ngIf="formProducts.length > 1">
-                        <button id="{{'remoeMinus'+i}}" (click)="removeNewProdField(i)" 
-                                mat-button type="button">Remove</button>
-                      </ng-container>
-                      <ng-container>
-                        <button id="{{'addrec'+i}}" (click)="addNewProdField()" 
-                                mat-raised-button type="button" [disabled]="quickQuoteFormGroup.get('products').invalid" >Add New</button>
-                      </ng-container>
+                  <div fxLayout="row" fxLayout.lt-md="column"> 
+                    <div fxFlex="27%" class="addToProductMaster">
+                      <mat-checkbox [checked]="false" formControlName="SaveProduct" color="warn">Add to my saved products</mat-checkbox>
                     </div>
+                    <div fxFlex="15%">
+                      <mat-checkbox [checked]="false" formControlName="HazMat" color="warn">Hazmat</mat-checkbox>
+                    </div>
+                    <div fxFlex="15%">
+                      <mat-checkbox [checked]="false" formControlName="Stackable" color="warn">Stackable</mat-checkbox>
+                    </div>  
                   </div>
+                  <div fxLayoutAlign="end center">
+                    <ng-container *ngIf="formProducts.length > 1">
+                      <button id="{{'remoeMinus'+i}}" (click)="removeNewProdField(i)" 
+                              mat-button type="button">Remove</button>
+                    </ng-container>
+                    <ng-container>
+                      <button id="{{'addrec'+i}}" (click)="addNewProdField()" 
+                              mat-raised-button type="button" [disabled]="quickQuoteFormGroup.get('products').invalid" >Add New</button>
+                    </ng-container>               
+                  </div>                
                 </div>
               </div>
             </div>
-
-            
           </mat-expansion-panel>
-        </mat-accordion>
+          </mat-accordion>
 
           <div fxLayout="row" fxLayoutAlign="end center" fxLayoutGap="8px" class="py-2 pr-5">
-            <button (click)="clearQuoteAndFields()" mat-button type="button">Clear</button>
-            <button (click)="getQuote()" color="warn" mat-raised-button type="button" [disabled]="!myForm.valid" >Get Quote</button>
+            
+            <button [disabled]=showSpinner (click)="clearQuoteAndFields()" mat-button type="button">Clear</button>
+                <button [disabled]=showSpinner (click)="getQuote()" color="warn" mat-raised-button type="button" [disabled]="!myForm.valid" >Get Quote</button>
+                <mat-form-field fxFlex=15>
+                  <mat-label>Show top Carriers</mat-label>
+                  <input matInput type="number" maxlength="2" min="10" max="25" formControlName="showCarriers" required>
+                </mat-form-field>  
+                <div *ngIf="showSpinner" class="spinnerSection">
+                  <div class="center-me">
+                    <mat-progress-spinner diameter="20" color="warn" mode="indeterminate"></mat-progress-spinner>
+                  </div>
+                </div>
           </div>
         </div>
       </form>
-      
-
     </div>
 
     <div class="card" fxFlex="50%">
@@ -356,6 +370,7 @@
             <div fxLayout="row" fxLayoutGap="8px" class="py-2 freightRatesView">
                 <div><h2 class="allRatesTab-labelText">ALL QUOTES ({{ratesCounter}})</h2></div>
             </div>
+
             <div class="ratesAccordionSection">
               <mat-accordion class="rates-accordion" multi> 
                 <div *ngFor="let rate of ratesFiltered; let j = index">              

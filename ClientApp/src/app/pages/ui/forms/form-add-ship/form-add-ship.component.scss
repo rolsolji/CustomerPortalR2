@@ -149,3 +149,31 @@ input.removeArrowsNumberInput[type=number] {
 .InfoLabel{
     font-style: italic;
 }
+
+table {
+    width: 100%;
+  }
+  
+  tr.mat-footer-row {
+    font-weight: bold;
+  }
+
+  .mat-cell{
+      font-size: 12px;
+  }
+
+  .mat-footer-cell {
+    font-size: 1.25rem;
+  }
+
+  tr.mat-row, tr.mat-footer-row {
+    height: 35px;
+  }
+
+  tr.mat-header-row {
+    height: 40px;
+  }
+
+.SubTypeButton{
+    font-size: 12px;
+}

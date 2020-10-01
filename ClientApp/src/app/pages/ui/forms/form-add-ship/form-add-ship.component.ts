@@ -17,7 +17,7 @@ import { HttpService } from '../../../../common/http.service';
 import { String, StringBuilder } from 'typescript-string-operations';
 import { Accessorial } from '../../../../Entities/Accessorial';
 import { InternalNote } from '../../../../Entities/InternalNote';
-import { ShipmentCost } from '../../../../Entities/ShipmentCost';
+import { ShipmentCost, AccountInvoiceCostList } from '../../../../Entities/ShipmentCost';
 import { MessageService } from "../../../../common/message.service";
 import { Observable, of } from 'rxjs';
 import { startWith, debounceTime, distinctUntilChanged, switchMap } from 'rxjs/operators';
@@ -29,6 +29,7 @@ import { PaymentTerm } from '../../../../Entities/PaymentTerm';
 import { ShipmentMode } from '../../../../Entities/ShipmentMode';
 import { ShipmentError } from '../../../../Entities/ShipmentError';
 import { MatStepper } from '@angular/material/stepper';
+
 
 
 @Component({
@@ -65,6 +66,11 @@ export class FormAddShipComponent implements OnInit {
   PaymentTerms: PaymentTerm[];
   ShipmentModeOptions: ShipmentMode[];
   ShipmentErrorOptions: ShipmentError[];  
+  ShipmentCostObject: ShipmentCost;
+  AccountInvoiceCostList: AccountInvoiceCostList[];
+  displayedCostGridColumns: string[] = ['Code', 'Description', 'Amount'];
+  TotalShipmentCost: number;
+  showSpinner = false;
 
   originSelectedCountry: PostalData = {
     CityCode: '',
@@ -116,6 +122,8 @@ export class FormAddShipComponent implements OnInit {
 
   pcoAutoCompleteOptions: Observable<PostalData[]>;
   pcdAutoCompleteOptions: Observable<PostalData[]>;  
+
+  carrierAutoCompleteOptions: Observable<Object[]>;  
 
   constructor(private fb: FormBuilder,
               private cd: ChangeDetectorRef,
@@ -240,9 +248,12 @@ export class FormAddShipComponent implements OnInit {
     });
     //--  
     
+    //-- confirmFormGroup fields
     this.confirmFormGroup = this.fb.group({
-      terms: [null, Validators.requiredTrue]
+      carrier: [null, Validators.required],
+      showTopCarriers: [10]
     });    
+    //--
 
     try{
       this.securityToken = await this.httpService.getMainToken(); 
@@ -318,6 +329,23 @@ export class FormAddShipComponent implements OnInit {
     //Get shipment mode description by default
     this.fetchShipmentMode("LTL");
 
+
+    //-- Get Shipment Costs
+    this.ShipmentCostObject = await this.httpService.GetShipmentCostByLadingID(this.ClientID, this.keyId); 
+    this.AccountInvoiceCostList = this.ShipmentCostObject.SellRates.AccountInvoiceCostList;
+    this.TotalShipmentCost = this.ShipmentCostObject.SellRates.TotalBilledAmount;
+
+    this.carrierAutoCompleteOptions = this.confirmFormGroup.get("carrier").valueChanges
+      .pipe(
+        startWith(''),
+        debounceTime(400),
+        distinctUntilChanged(),
+        switchMap(val => {
+          return this.carrierAutoCompletefilter(val || '')             
+        })
+      );
+    
+    //console.log(this.ShipmentCostObject);
   }
 
   pcoAutoCompleteFilter(val: string): Observable<any[]> {
@@ -514,6 +542,34 @@ export class FormAddShipComponent implements OnInit {
     }    
     this.shipmentModeDescriptionSelected = Description;
     return Description;
+  }
+
+  async validateCarrier(event: KeyboardEvent){
+    //--
+    
+  }
+
+  carrierAutoCompletefilter(val: string): Observable<any[]> { 
+    // let CountryId = this.destinationSelectedCountry == null ? "1": this.destinationSelectedCountry.CountryId.toString();
+    // return this.httpService.postalCodeAutocomplete(val, CountryId, this.keyId)
+    return null;
+  }  
+
+  carrierAutoCompleteSelected(event: MatAutocompleteSelectedEvent): void {
+    // this.originAndDestinationFormGroup.get('deststatename').setValue(event.option.value.StateName.trim());
+    // this.DestinationPostalCode = String.Format("{0}-{1}",event.option.value.PostalCode,event.option.value.CityName.trim());  
+    // this.DestinationPostalData = event.option.value;        
+    // this.originAndDestinationFormGroup.get('destpostalcode').setValue(this.DestinationPostalCode);
+  }
+
+  async getQuote() {    
+    //this.getQuoteButtonClicked = true;        
+    this.showSpinner = true;   
+    setTimeout(()=>{    //<<<---    using ()=> syntax               
+        this.showSpinner = false;              
+      }, 3000);
+    //let test = await this.getShipmentRates();       
+    this.showSpinner = false;            
   }
 
 }

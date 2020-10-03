@@ -29,6 +29,7 @@ import { PaymentTerm } from '../../../../Entities/PaymentTerm';
 import { ShipmentMode } from '../../../../Entities/ShipmentMode';
 import { ShipmentError } from '../../../../Entities/ShipmentError';
 import { MatStepper } from '@angular/material/stepper';
+import { Carrier } from '../../../../Entities/Carrier';
 
 
 
@@ -544,19 +545,38 @@ export class FormAddShipComponent implements OnInit {
     return Description;
   }
 
+  Carrier: string;
+  carrierData: Carrier[];
+
   async validateCarrier(event: KeyboardEvent){
     //--
-    
+    // let CountryId = this.destinationSelectedCountry == null ? "1": this.destinationSelectedCountry.CountryId.toString();
+    this.Carrier = this.confirmFormGroup.get('carrier').value;
+    if (this.Carrier != null && this.Carrier.trim().length == 4){
+      let responseData = await this.httpService.getCarrierData(this.ClientID, this.Carrier, this.keyId);
+      this.carrierData = responseData;
+      if (this.carrierData != null && this.carrierData.length > 0) 
+      {        
+        this.confirmFormGroup.get('carrier').setValue(String.Format("{0} - {1}",this.carrierData[0].CarrierID.trim(),this.carrierData[0].CarrierName.trim()));
+        // this.DestinationPostalCode = String.Format("{0}-{1}",this.postalDataDest[0].PostalCode,this.postalDataDest[0].CityName.trim());  
+        // this.DestinationPostalData = this.postalDataDest[0];               
+        // this.originAndDestinationFormGroup.get('destpostalcode').setValue(this.DestinationPostalCode);
+      }
+      else
+      {
+        //this.DestinationStateName = String.Empty;
+        this.Carrier = String.Empty;
+        this.carrierData = null;
+      }
+    }         
   }
 
-  carrierAutoCompletefilter(val: string): Observable<any[]> { 
-    // let CountryId = this.destinationSelectedCountry == null ? "1": this.destinationSelectedCountry.CountryId.toString();
-    // return this.httpService.postalCodeAutocomplete(val, CountryId, this.keyId)
-    return null;
+  carrierAutoCompletefilter(val: string): Observable<any[]> {     
+    return this.httpService.carrierAutocomplete(this.ClientID, val, this.keyId)    
   }  
 
   carrierAutoCompleteSelected(event: MatAutocompleteSelectedEvent): void {
-    // this.originAndDestinationFormGroup.get('deststatename').setValue(event.option.value.StateName.trim());
+    this.confirmFormGroup.get('carrier').setValue(String.Format("{0} - {1}",event.option.value.CarrierID.trim(),event.option.value.CarrierName.trim()));
     // this.DestinationPostalCode = String.Format("{0}-{1}",event.option.value.PostalCode,event.option.value.CityName.trim());  
     // this.DestinationPostalData = event.option.value;        
     // this.originAndDestinationFormGroup.get('destpostalcode').setValue(this.DestinationPostalCode);

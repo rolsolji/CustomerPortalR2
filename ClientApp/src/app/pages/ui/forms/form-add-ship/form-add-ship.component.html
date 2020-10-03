@@ -537,7 +537,7 @@
             </div>
             <div @fadeInUp class="card" fxFlex="50%">
               <div fxLayout="row" fxLayoutGap="8px" class="ml-5 mt-8">
-                
+                <div><h2 class="OriginDestinationTitle">Read Only - No Action Required</h2></div>
               </div>
               <div>
                 <div fxLayout="column" class="expansion-panel-cont-style"> 
@@ -643,7 +643,7 @@
       <mat-step [stepControl]="confirmFormGroup">
         <form [formGroup]="confirmFormGroup">
           <ng-template matStepLabel>
-            <span class="stepTitleStyle">Rate total and Book Shipment</span>
+            <span class="stepTitleStyle">Rate Total and Book Shipment</span>
           </ng-template>
 
           <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="5px">
@@ -655,44 +655,60 @@
                 <div fxLayout="column" class="expansion-panel-cont-style">
                   <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="5px" >
                     <div fxFlex="50%">
-                      <h3 class="OriginDestinationSubTitle">Origin</h3>
+                      <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="5px">
+                        <div fxFlex="100%">
+                          <h3 class="OriginDestinationSubTitle">Origin</h3>
+                        </div>                                                        
+                      </div>
+                      <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="5px">
+                        <div fxFlex="100%">
+                          <mat-label>Name: </mat-label><mat-label class="InfoLabel">{{originAndDestinationFormGroup.get('originname').value}}</mat-label>
+                        </div>                                                        
+                      </div> 
+                      <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="5px">
+                        <div fxFlex="100%">
+                          <mat-label>Postal Code: </mat-label><mat-label class="InfoLabel">{{originAndDestinationFormGroup.get('originpostalcode').value}}</mat-label>
+                        </div>                                                        
+                      </div>
+                      <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="5px">
+                        <div fxFlex="100%">
+                          <mat-label>State: </mat-label><mat-label class="InfoLabel">{{originAndDestinationFormGroup.get('originstatename').value}}</mat-label>
+                        </div>                                                        
+                      </div>
+                      <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="5px">
+                        <div fxFlex="100%">
+                          <mat-label>Exp Pickup Date: </mat-label><mat-label class="InfoLabel">{{originPckupDate}}</mat-label>
+                        </div>                                                        
+                      </div>                                            
                     </div>
                     <div fxFlex="50%">
-                      <h3 class="OriginDestinationSubTitle">Destination</h3>
+                      <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="5px">
+                        <div fxFlex="100%">
+                          <h3 class="OriginDestinationSubTitle">Destination</h3>
+                        </div>                                                        
+                      </div>
+                      <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="5px">
+                        <div fxFlex="100%">
+                          <mat-label>Name: </mat-label><mat-label class="InfoLabel">{{originAndDestinationFormGroup.get('destname').value}}</mat-label>
+                        </div>                                                        
+                      </div>
+                      <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="5px">
+                        <div fxFlex="100%">
+                          <mat-label>Postal Code: </mat-label><mat-label class="InfoLabel">{{originAndDestinationFormGroup.get('destpostalcode').value}}</mat-label>
+                        </div>                                                        
+                      </div> 
+                      <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="5px">
+                        <div fxFlex="100%">
+                          <mat-label>State: </mat-label><mat-label class="InfoLabel">{{originAndDestinationFormGroup.get('deststatename').value}}</mat-label>
+                        </div>                                                        
+                      </div> 
+                      <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="5px">
+                        <div fxFlex="100%">
+                          <mat-label>Exp Del Date: </mat-label><mat-label class="InfoLabel">{{destExpDelDate}}</mat-label>
+                        </div>                                                        
+                      </div>
                     </div>                                 
-                  </div>
-                  <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="5px">
-                    <div fxFlex="50%">
-                      <mat-label>Name: </mat-label><mat-label class="InfoLabel">{{originAndDestinationFormGroup.get('originname').value}}</mat-label>
-                    </div>
-                    <div fxFlex="50%">
-                      <mat-label>Name: </mat-label><mat-label class="InfoLabel">{{originAndDestinationFormGroup.get('destname').value}}</mat-label>
-                    </div>                                 
-                  </div>
-                  <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="5px">
-                    <div fxFlex="50%">
-                      <mat-label>Postal Code: </mat-label><mat-label class="InfoLabel">{{originAndDestinationFormGroup.get('originpostalcode').value}}</mat-label>
-                    </div>
-                    <div fxFlex="50%">
-                      <mat-label>Postal Code: </mat-label><mat-label class="InfoLabel">{{originAndDestinationFormGroup.get('destpostalcode').value}}</mat-label>
-                    </div>                                 
-                  </div>
-                  <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="5px">
-                    <div fxFlex="50%">
-                      <mat-label>State: </mat-label><mat-label class="InfoLabel">{{originAndDestinationFormGroup.get('originstatename').value}}</mat-label>
-                    </div>
-                    <div fxFlex="50%">
-                      <mat-label>State: </mat-label><mat-label class="InfoLabel">{{originAndDestinationFormGroup.get('deststatename').value}}</mat-label>
-                    </div>                                 
-                  </div>
-                  <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="5px">
-                    <div fxFlex="50%">
-                      <mat-label>Exp Pickup Date: </mat-label><mat-label class="InfoLabel">{{originPckupDate}}</mat-label>
-                    </div>
-                    <div fxFlex="50%">
-                      <mat-label>Exp Del Date: </mat-label><mat-label class="InfoLabel">{{destExpDelDate}}</mat-label>
-                    </div>                                 
-                  </div>
+                  </div>                  
                   <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="5px">
                     <div fxFlex="100%" class="fake-link">                      
                       <span (click)="moveToStep(0)">edit</span>
@@ -780,9 +796,9 @@
                                 matInput required [matAutocomplete]="carrierAutoComplete"
                                 (keydown.tab)="validateCarrier($event)" >
                                 <mat-autocomplete #carrierAutoComplete="matAutocomplete" (optionSelected)="carrierAutoCompleteSelected($event)">
-                                  <!-- <mat-option *ngFor="let option of carrierAutoCompleteOptions | async" [value]="option">
-                                    {{option.PostalCode}} - {{option.CityName}}
-                                  </mat-option> -->
+                                  <mat-option *ngFor="let option of carrierAutoCompleteOptions | async" [value]="option">
+                                    {{option.CarrierID}} - {{option.CarrierName}}
+                                  </mat-option>
                                 </mat-autocomplete>
                       </mat-form-field>
                     </div>

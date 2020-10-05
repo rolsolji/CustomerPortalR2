@@ -15,9 +15,9 @@ import { Quote } from '../Entities/Quote';
 import { EquipmentType } from '../Entities/EquipmentType';
 import { ShipmentMode } from '../Entities/ShipmentMode'; 
 import { Status } from '../Entities/Status';
-import { Accessorial } from '../Entities/Accessorial';
+import { AccessorialDetail } from '../Entities/AccessorialDetail';
 import { ShipmentPriority } from '../Entities/ShipmentPriority';
-import { ServiceLevel } from '../Entities/ServiceLevel';
+import { ServiceLevelDetail } from '../Entities/ServiceLevelDetail';
 import { PaymentTerm } from '../Entities/PaymentTerm';
 import { ShipmentError } from '../Entities/ShipmentError';
 import { ShipmentCost } from '../Entities/ShipmentCost';
@@ -188,7 +188,7 @@ export class HttpService{
         let httpHeaders = new HttpHeaders({                       
             'Ticket' : ticket                            
         }); 
-        return this.http.get<Accessorial[]>(String.Format('https://beta-customer.r2logistics.com/Services/BOLHDRService.svc/json//GetClientMappedAccesorial?ClientID={0}&IsIncludeSystem=false&_={1}',clientID.toString(),keyId)
+        return this.http.get<AccessorialDetail[]>(String.Format('https://beta-customer.r2logistics.com/Services/BOLHDRService.svc/json//GetClientMappedAccesorial?ClientID={0}&IsIncludeSystem=false&_={1}',clientID.toString(),keyId)
         ,{
             headers: httpHeaders
           }
@@ -236,7 +236,7 @@ export class HttpService{
         let httpHeaders = new HttpHeaders({                       
             'Ticket' : ticket                            
         }); 
-        return this.http.get<ServiceLevel[]>(String.Format('https://beta-customer.r2logistics.com/Services/BOLHDRService.svc/json/GetMasServiceLevel?ClientID={0}&_={1}',clientID.toString(),keyId)
+        return this.http.get<ServiceLevelDetail[]>(String.Format('https://beta-customer.r2logistics.com/Services/BOLHDRService.svc/json/GetMasServiceLevel?ClientID={0}&_={1}',clientID.toString(),keyId)
         ,{
             headers: httpHeaders
           }

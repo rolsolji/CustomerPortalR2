@@ -1,4 +1,4 @@
-export interface ServiceLevel {
+export interface ServiceLevelDetail {
     ClientID: number;
     Description: string;
     IsAccending: boolean;

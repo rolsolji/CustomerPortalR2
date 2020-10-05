@@ -434,7 +434,7 @@
               </div>
               <div class="AccessorialsSection">
                 <mat-selection-list #accesorialsSelect class="accesorialsSelectionList">
-                  <mat-list-option color="warn" *ngFor="let accesorial of accesorials" checkboxPosition="before">
+                  <mat-list-option color="warn" *ngFor="let accesorial of accessorialArray" checkboxPosition="before">
                     {{accesorial.Description}}
                   </mat-list-option>
                 </mat-selection-list>
@@ -536,9 +536,9 @@
               </div>              
             </div>
             <div @fadeInUp class="card" fxFlex="50%">
-              <div fxLayout="row" fxLayoutGap="8px" class="ml-5 mt-8">
+              <div fxLayout="row" fxLayoutGap="8px" class="ml-5">
                 <div><h2 class="OriginDestinationTitle">Read Only - No Action Required</h2></div>
-              </div>
+              </div>             
               <div>
                 <div fxLayout="column" class="expansion-panel-cont-style"> 
                   <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="5px">
@@ -789,7 +789,7 @@
               <div>
                 <div fxLayout="column" class="expansion-panel-cont-style" >
                   <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="5px" >
-                    <div fxFlex="50%">
+                    <div fxFlex="58%">
                       <mat-form-field appearance="outline" class="vex-flex-form-field" color="primary">
                         <mat-label>Carrier</mat-label>
                         <input name="carrier" formControlName="carrier"
@@ -802,13 +802,13 @@
                                 </mat-autocomplete>
                       </mat-form-field>
                     </div>
-                    <div fxFlex="25%">
+                    <div fxFlex="20%">
                       <mat-form-field appearance="outline" class="vex-flex-form-field" color="primary">
                         <mat-label>Show top Carriers</mat-label>
                         <input matInput type="number" maxlength="2" min="1" max="25" formControlName="showTopCarriers" required>
                       </mat-form-field>  
                     </div> 
-                    <div fxFlex="25%" class="centeredDivButton">                      
+                    <div fxFlex="22%" class="centeredDivButton">                      
                       <button [disabled]=showSpinner (click)="getQuote()" color="warn" class="SubTypeButton" mat-raised-button type="button" [disabled]="!confirmFormGroup.valid" >Rate Shipment</button>
                     </div>                                 
                   </div>

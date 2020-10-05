@@ -1,4 +1,4 @@
-export interface Accessorial {
+export interface AccessorialDetail {
         AccesorialCode: string;
         AccessorialID: number;
         ClientID: number;

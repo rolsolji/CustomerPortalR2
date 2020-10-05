@@ -15,7 +15,6 @@ import icMoreVert from '@iconify/icons-ic/twotone-more-vert';
 import { PostalData } from '../../../../Entities/PostalData';
 import { HttpService } from '../../../../common/http.service';
 import { String, StringBuilder } from 'typescript-string-operations';
-import { Accessorial } from '../../../../Entities/Accessorial';
 import { InternalNote } from '../../../../Entities/InternalNote';
 import { ShipmentCost, AccountInvoiceCostList } from '../../../../Entities/ShipmentCost';
 import { MessageService } from "../../../../common/message.service";
@@ -24,13 +23,18 @@ import { startWith, debounceTime, distinctUntilChanged, switchMap } from 'rxjs/o
 import {MatAutocompleteSelectedEvent, MatAutocomplete} from '@angular/material/autocomplete';
 import { EquipmentType } from '../../../../Entities/EquipmentType';
 import { ShipmentPriority } from '../../../../Entities/ShipmentPriority';
-import { ServiceLevel } from '../../../../Entities/ServiceLevel';
+import { ServiceLevelDetail } from '../../../../Entities/ServiceLevelDetail';
 import { PaymentTerm } from '../../../../Entities/PaymentTerm';
 import { ShipmentMode } from '../../../../Entities/ShipmentMode';
 import { ShipmentError } from '../../../../Entities/ShipmentError';
 import { MatStepper } from '@angular/material/stepper';
 import { Carrier } from '../../../../Entities/Carrier';
-
+import { Rate,Accessorial,AccessorialBase,ServiceLevel } from '../../../../Entities/rate';
+import { AccessorialDetail } from 'src/app/Entities/AccessorialDetail';
+import { RatesService } from '../../../../rates.service';
+import { ClientDefaultData } from '../../../../Entities/ClientDefaultData';
+import { UtilitiesService } from "../../../../common/utilities.service";
+import { DatePipe } from '@angular/common';    
 
 
 @Component({
@@ -57,13 +61,13 @@ export class FormAddShipComponent implements OnInit {
   destinationCountries: Object;  
   packageTypes: Object;
 
-  accesorials: Accessorial[];    
+  accessorialArray: AccessorialDetail[];    
   internalNotes: InternalNote[];
   showInternalNotesTitle: boolean = false;
   timesArray = ["", "12:00 AM", "12:30 AM", "01:00 AM", "01:30 AM", "02:00 AM", "02:30 AM", "03:00 AM", "03:30 AM", "04:00 AM", "04:30 AM", "05:00 AM", "05:30 AM", "06:00 AM", "06:30 AM", "07:00 AM", "07:30 AM", "08:00 AM", "08:30 AM", "09:00 AM", "09:30 AM", "10:00 AM", "10:30 AM", "11:00 AM", "11:30 AM", "12:00 PM", "12:30 PM", "01:00 PM", "01:30 PM", "02:00 PM", "02:30 PM", "03:00 PM", "03:30 PM", "04:00 PM", "04:30 PM", "05:00 PM", "05:30 PM", "06:00 PM", "06:30 PM", "07:00 PM", "07:30 PM", "08:00 PM", "08:30 PM", "09:00 PM", "09:30 PM", "10:00 PM", "10:30 PM", "11:00 PM", "11:30 PM"]  
   EquipmentOptions: EquipmentType[];
   PriorityOptions: ShipmentPriority[];
-  ServiceLevelOptions: ServiceLevel[];
+  ServiceLevelOptions: ServiceLevelDetail[];
   PaymentTerms: PaymentTerm[];
   ShipmentModeOptions: ShipmentMode[];
   ShipmentErrorOptions: ShipmentError[];  
@@ -72,6 +76,17 @@ export class FormAddShipComponent implements OnInit {
   displayedCostGridColumns: string[] = ['Code', 'Description', 'Amount'];
   TotalShipmentCost: number;
   showSpinner = false;
+
+  accessorials: AccessorialBase[] = [];
+  accessorialIds: number[] = [];
+  serviceLevels: ServiceLevel[] = [];
+  rates: Rate[];
+  ratesFiltered: Rate[];
+  ratesCounter: number = 0;
+  clientTLWeightLimit: string;
+  clientDefaultData: ClientDefaultData;
+
+  carrierSelected: string;
 
   originSelectedCountry: PostalData = {
     CityCode: '',
@@ -130,7 +145,10 @@ export class FormAddShipComponent implements OnInit {
               private cd: ChangeDetectorRef,
               private snackbar: MatSnackBar,
               private httpService : HttpService,
-              private messageService: MessageService) {
+              private ratesService: RatesService,
+              private messageService: MessageService,
+              private utilitiesService: UtilitiesService,
+              private datepipe: DatePipe) {
   }
 
   addProductFormGroup(): FormGroup{
@@ -266,7 +284,7 @@ export class FormAddShipComponent implements OnInit {
     this.httpService.token = this.securityToken;
 
     let responseData = await this.httpService.getCountryList(this.keyId);   
-    this.accesorials = await this.httpService.getGetClientMappedAccessorials(this.ClientID, this.keyId);
+    this.accessorialArray = await this.httpService.getGetClientMappedAccessorials(this.ClientID, this.keyId);
     //this.clientDefaultData = await this.httpService.getClientDefaultsByClient(this.ClientID, this.keyId);
 
     this.packageTypes = await this.httpService.getProductPackageType(this.keyId);   
@@ -345,6 +363,8 @@ export class FormAddShipComponent implements OnInit {
           return this.carrierAutoCompletefilter(val || '')             
         })
       );
+
+      this.clientDefaultData = await this.httpService.getClientDefaultsByClient(this.ClientID, this.keyId);
     
     //console.log(this.ShipmentCostObject);
   }
@@ -577,6 +597,7 @@ export class FormAddShipComponent implements OnInit {
 
   carrierAutoCompleteSelected(event: MatAutocompleteSelectedEvent): void {
     this.confirmFormGroup.get('carrier').setValue(String.Format("{0} - {1}",event.option.value.CarrierID.trim(),event.option.value.CarrierName.trim()));
+    this.carrierSelected = event.option.value.CarrierID.trim();
     // this.DestinationPostalCode = String.Format("{0}-{1}",event.option.value.PostalCode,event.option.value.CityName.trim());  
     // this.DestinationPostalData = event.option.value;        
     // this.originAndDestinationFormGroup.get('destpostalcode').setValue(this.DestinationPostalCode);
@@ -585,11 +606,94 @@ export class FormAddShipComponent implements OnInit {
   async getQuote() {    
     //this.getQuoteButtonClicked = true;        
     this.showSpinner = true;   
-    setTimeout(()=>{    //<<<---    using ()=> syntax               
-        this.showSpinner = false;              
-      }, 3000);
-    //let test = await this.getShipmentRates();       
-    this.showSpinner = false;            
+    let test = await this.getShipmentRates();       
+    this.showSpinner = false;      
   }
+
+  async getShipmentRates() {
+
+    //this.spinnerMessage = "Loading...";
+
+    this.accessorialArray.forEach(a => {
+      let accessorial: AccessorialBase = { 
+        AccessorialID: a.AccessorialID, 
+        AccessorialCode: a.AccesorialCode
+      }
+
+      this.accessorials.push(accessorial);
+      this.accessorialIds.push(a.AccessorialID);      
+    });
+
+    let pickupDate = this.OriginPickupDate;
+    let arrayProducts = this.productsAndAccessorialsFormGroup.get('products').value;
+
+    let objRate = {
+      "ClientID": this.ClientID,
+      "ProfileID": 11868,
+      "Products": arrayProducts,
+      "SourcePostalCode": this.OriginPostalData.PostalCode,
+      "SourceCityID": this.OriginPostalData.CityID,
+      "SourceStateID": this.OriginPostalData.StateId,
+      "SourceCountryID": this.OriginPostalData.CountryId,
+      "SourceCountry": this.OriginPostalData.CountryCode,
+      "SourceStateCode": this.OriginPostalData.StateCode,
+      "SourceCityName": this.OriginPostalData.CityName,
+      "DestPostalCode": this.DestinationPostalData.PostalCode,
+      "DestCityID": this.DestinationPostalData.CityID,
+      "DestStateID": this.DestinationPostalData.StateId,
+      "DestCountryID": this.DestinationPostalData.CountryId,
+      "DestCountry": this.DestinationPostalData.CountryCode,
+      "DestStateCode": this.DestinationPostalData.StateCode,
+      "DestCityName": this.DestinationPostalData.CityName,
+      "ShipmentDate": String.Format("/Date({0})/",this.originAndDestinationFormGroup.get('originpickupdate').value.getTime()),
+      "Accessorials": this.accessorials,
+      "AccessorialCodes": [],
+      "TopN": this.confirmFormGroup.get('showTopCarriers').value,
+      "ServiceLevelGrops": [],
+      "ServiceLevels": [],//this.serviceLevels,
+      "ServiceLevelCodes": [],
+      //Ask
+      "SCAC": this.carrierSelected,
+      "EquipmentList": [],
+      "IsDebug": false,
+      "IsSuperAdmin": false,
+      "AccessorialIDs": this.accessorialIds,
+      "SkeepCalculatePPS": false,
+      //Ask
+      //"ProfileDescription": "**R2 BUY",
+      "Origin":  this.OriginPostalData.PostalCode + ',' +  this.OriginPostalData.CityName + ',' + this.OriginPostalData.StateName,
+      "Destination": this.DestinationPostalData.PostalCode + ',' +  this.DestinationPostalData.CityName + ',' + this.DestinationPostalData.StateName,
+      //Ask
+      //"ShipmentStopList": []
+    };
+
+    console.log(objRate);
+    
+    this.rates = await this.ratesService.postRates(objRate);
+    console.log( this.rates);           
+     
+    if ( this.rates != null &&  this.rates.length > 0){
+      this.ratesFiltered =  this.rates.filter(rate => rate.CarrierCost > 0);           
+      console.log(this.ratesFiltered);         
+      this.ratesCounter = this.ratesFiltered.length; 
+      this.snackbar.open(this.ratesCounter + ' rates retuned.', null, {
+        duration: 5000
+      });
+
+      this.rates.forEach(r => {
+        if (!String.IsNullOrWhiteSpace(r.TransitTime)){
+          let today = new Date();
+          let days: number = +r.TransitTime;
+          today = this.utilitiesService.AddBusinessDays(today, days);
+          r.ETA = String.Format("{0} (ETA)", this.datepipe.transform(today,'yyyy-MM-dd'));
+        }
+        else {
+          r.ETA = String.Empty;
+        }
+      });     
+
+      this.clientTLWeightLimit = (this.clientDefaultData.TLWeightLimit == null ? 0 : this.clientDefaultData.TLWeightLimit) + 'lb';      
+    }
+}
 
 }

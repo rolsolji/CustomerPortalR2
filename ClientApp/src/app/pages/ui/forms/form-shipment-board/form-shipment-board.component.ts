@@ -1,5 +1,7 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit, ViewChild, ElementRef, Input, 
   Output, EventEmitter, HostListener, Pipe, PipeTransform } from '@angular/core';
+import { DatePipe } from '@angular/common';
+
 import icVisibility from '@iconify/icons-ic/twotone-visibility';
 import icVisibilityOff from '@iconify/icons-ic/twotone-visibility-off';
 import icSmartphone from '@iconify/icons-ic/twotone-smartphone';
@@ -8,19 +10,21 @@ import icArrowDropDown from '@iconify/icons-ic/twotone-arrow-drop-down';
 import icMenu from '@iconify/icons-ic/twotone-menu';
 import icCamera from '@iconify/icons-ic/twotone-camera';
 import icPhone from '@iconify/icons-ic/twotone-phone';
+import icFilterList from '@iconify/icons-ic/twotone-filter-list';
+import icMoreVert from '@iconify/icons-ic/twotone-more-vert';
+import icTwotoneCalendarToday from '@iconify/icons-ic/twotone-calendar-today';
+import icBaselineImageNotSupported from '@iconify/icons-ic/baseline-image-not-supported';
+
 import { FormBuilder, FormControl, FormGroup, Validators, FormArray } from '@angular/forms';
 import { map, startWith } from 'rxjs/operators';
 import { fadeInUp400ms } from '../../../../../@vex/animations/fade-in-up.animation';
 import { stagger60ms } from '../../../../../@vex/animations/stagger.animation';
-import icMoreVert from '@iconify/icons-ic/twotone-more-vert';
 import { MatAccordion } from '@angular/material/expansion';
 import { HttpErrorResponse } from '@angular/common/http';
 import { RatesService } from '../../../../rates.service';
 import { HttpService } from '../../../../common/http.service';
 import { String, StringBuilder } from 'typescript-string-operations';
 import { strict } from 'assert';
-import icTwotoneCalendarToday from '@iconify/icons-ic/twotone-calendar-today';
-import icBaselineImageNotSupported from '@iconify/icons-ic/baseline-image-not-supported';
 import { StringifyOptions } from 'querystring';
 import { PostalData } from '../../../../Entities/PostalData';
 import { Rate } from '../../../../Entities/rate';
@@ -39,13 +43,13 @@ import { MatTableDataSource } from '@angular/material/table';
 import { Observable, of, ReplaySubject } from 'rxjs';
 import { SelectionModel } from '@angular/cdk/collections';
 import { MatSelectChange } from '@angular/material/select';
-import {MatTableModule} from '@angular/material/table';
+import { MatTableModule } from '@angular/material/table';
 import { EquipmentType } from '../../../../Entities/EquipmentType';
 import { ShipmentMode } from '../../../../Entities/ShipmentMode'; 
 import { Status } from '../../../../Entities/Status';
-import {MatAutocompleteSelectedEvent, MatAutocomplete} from '@angular/material/autocomplete';
-import {MatChipInputEvent} from '@angular/material/chips';
-import {COMMA, ENTER} from '@angular/cdk/keycodes';
+import { MatAutocompleteSelectedEvent, MatAutocomplete } from '@angular/material/autocomplete';
+import { MatChipInputEvent } from '@angular/material/chips';
+import { COMMA, ENTER } from '@angular/cdk/keycodes';
 import { ActivatedRoute, Router, ParamMap } from '@angular/router';
 import { stringToKeyValue } from '@angular/flex-layout/extended/typings/style/style-transforms';
 import { MessageService } from "../../../../common/message.service";
@@ -68,8 +72,16 @@ import { MessageService } from "../../../../common/message.service";
 //   color: ThemePalette;
 // }
 
+
+
 export class FormShipmentBoardComponent implements OnInit {
 
+
+  //displayedColumns = ['position', 'name', 'weight', 'symbol', 'colA', 'colB', 'colC'];
+  //dataSource = new MatTableDataSource<Element>(ELEMENT_DATA);
+
+  icFilterList = icFilterList;
+  
   showSpinner = false;
 
   //#region Quotes
@@ -183,7 +195,8 @@ export class FormShipmentBoardComponent implements OnInit {
     private httpService : HttpService,
     private route: ActivatedRoute, 
     private router: Router,
-    private messageService: MessageService 
+    private messageService: MessageService,
+    public datepipe: DatePipe 
   ) { 
 
     this.filteredStatus = this.statusCtrl.valueChanges.pipe(
@@ -258,7 +271,7 @@ export class FormShipmentBoardComponent implements OnInit {
     // console.log(this.quotes);
     this.quotes.forEach(element => {
       let d = element.ActualShipDate.replace("/Date(","").replace("-0400)/","");
-      element.ActualShipDateWithFormat = new Date(parseInt(d)).toDateString();//  .toString("mm/dd/yyyy");
+      element.ActualShipDateWithFormat = this.datepipe.transform(d,'MM/dd/yyyy'); // new Date(parseInt(d)).toDateString();//  .toString("mm/dd/yyyy");
     });
     // console.log(this.quotes[0].ActualShipDate );
     // console.log(this.quotes[0].ActualShipDateWithFormat);
@@ -336,5 +349,43 @@ export class FormShipmentBoardComponent implements OnInit {
     // console.log('this.selectedChips: ' + this.selectedChips);
   }
 
-  
+  toggleColumnVisibility(column, event) {
+    event.stopPropagation();
+    event.stopImmediatePropagation();
+    column.visible = !column.visible;
+  }
 }
+
+
+// export interface Element {
+//   name: string;
+//   position: number;
+//   weight: number;
+//   symbol: string;
+//   colA: string;
+//   colB: string;
+//   colC: string;
+// }
+
+// const ELEMENT_DATA: Element[] = [
+//   {position: 1, name: 'Hydrogen', weight: 1.0079, symbol: 'H', colA: 'SOUTHEASTERN FREIGHT LINES',colB:'GERMANTOWN,TN ,38138,USA', colC:'ROADRUNNER TRANSPORTATION'},
+//   {position: 2, name: 'Helium', weight: 4.0026, symbol: 'He', colA: 'SOUTHEASTERN FREIGHT LINES',colB:'GERMANTOWN,TN ,38138,USA', colC:'ROADRUNNER TRANSPORTATION'},
+//   {position: 3, name: 'Lithium', weight: 6.941, symbol: 'Li', colA: 'SOUTHEASTERN FREIGHT LINES',colB:'GERMANTOWN,TN ,38138,USA', colC:'ROADRUNNER TRANSPORTATION'},
+//   {position: 4, name: 'Beryllium', weight: 9.0122, symbol: 'Be', colA: 'SOUTHEASTERN FREIGHT LINES',colB:'GERMANTOWN,TN ,38138,USA', colC:'ROADRUNNER TRANSPORTATION'},
+//   {position: 5, name: 'Boron', weight: 10.811, symbol: 'B', colA: 'SOUTHEASTERN FREIGHT LINES',colB:'GERMANTOWN,TN ,38138,USA', colC:'ROADRUNNER TRANSPORTATION'},
+//   {position: 6, name: 'Carbon', weight: 12.0107, symbol: 'C', colA: 'SOUTHEASTERN FREIGHT LINES',colB:'GERMANTOWN,TN ,38138,USA', colC:'ROADRUNNER TRANSPORTATION'},
+//   {position: 7, name: 'Nitrogen', weight: 14.0067, symbol: 'N', colA: 'SOUTHEASTERN FREIGHT LINES',colB:'GERMANTOWN,TN ,38138,USA', colC:'ROADRUNNER TRANSPORTATION'},
+//   {position: 8, name: 'Oxygen', weight: 15.9994, symbol: 'O', colA: 'SOUTHEASTERN FREIGHT LINES',colB:'GERMANTOWN,TN ,38138,USA', colC:'ROADRUNNER TRANSPORTATION'},
+//   {position: 9, name: 'Fluorine', weight: 18.9984, symbol: 'F', colA: 'SOUTHEASTERN FREIGHT LINES',colB:'GERMANTOWN,TN ,38138,USA', colC:'ROADRUNNER TRANSPORTATION'},
+//   {position: 10, name: 'Neon', weight: 20.1797, symbol: 'Ne', colA: 'SOUTHEASTERN FREIGHT LINES',colB:'GERMANTOWN,TN ,38138,USA', colC:'ROADRUNNER TRANSPORTATION'},
+//   {position: 11, name: 'Sodium', weight: 22.9897, symbol: 'Na', colA: 'SOUTHEASTERN FREIGHT LINES',colB:'GERMANTOWN,TN ,38138,USA', colC:'ROADRUNNER TRANSPORTATION'},
+//   {position: 12, name: 'Magnesium', weight: 24.305, symbol: 'Mg', colA: 'SOUTHEASTERN FREIGHT LINES',colB:'GERMANTOWN,TN ,38138,USA', colC:'ROADRUNNER TRANSPORTATION'},
+//   {position: 13, name: 'Aluminum', weight: 26.9815, symbol: 'Al', colA: 'SOUTHEASTERN FREIGHT LINES',colB:'GERMANTOWN,TN ,38138,USA', colC:'ROADRUNNER TRANSPORTATION'},
+//   {position: 14, name: 'Silicon', weight: 28.0855, symbol: 'Si', colA: 'SOUTHEASTERN FREIGHT LINES',colB:'GERMANTOWN,TN ,38138,USA', colC:'ROADRUNNER TRANSPORTATION'},
+//   {position: 15, name: 'Phosphorus', weight: 30.9738, symbol: 'P', colA: 'SOUTHEASTERN FREIGHT LINES',colB:'GERMANTOWN,TN ,38138,USA', colC:'ROADRUNNER TRANSPORTATION'},
+//   {position: 16, name: 'Sulfur', weight: 32.065, symbol: 'S', colA: 'SOUTHEASTERN FREIGHT LINES',colB:'GERMANTOWN,TN ,38138,USA', colC:'ROADRUNNER TRANSPORTATION'},
+//   {position: 17, name: 'Chlorine', weight: 35.453, symbol: 'Cl', colA: 'SOUTHEASTERN FREIGHT LINES',colB:'GERMANTOWN,TN ,38138,USA', colC:'ROADRUNNER TRANSPORTATION'},
+//   {position: 18, name: 'Argon', weight: 39.948, symbol: 'Ar', colA: 'SOUTHEASTERN FREIGHT LINES',colB:'GERMANTOWN,TN ,38138,USA', colC:'ROADRUNNER TRANSPORTATION'},
+//   {position: 19, name: 'Potassium', weight: 39.0983, symbol: 'K', colA: 'SOUTHEASTERN FREIGHT LINES',colB:'GERMANTOWN,TN ,38138,USA', colC:'ROADRUNNER TRANSPORTATION'},
+//   {position: 20, name: 'Calcium', weight: 40.078, symbol: 'Ca', colA: 'SOUTHEASTERN FREIGHT LINES',colB:'GERMANTOWN,TN ,38138,USA', colC:'ROADRUNNER TRANSPORTATION'},
+// ];

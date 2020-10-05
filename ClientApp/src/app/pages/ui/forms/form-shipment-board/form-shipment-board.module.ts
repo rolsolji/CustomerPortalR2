@@ -26,7 +26,8 @@ import { MatExpansionModule } from '@angular/material/expansion';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatTableModule } from '@angular/material/table';
-import {MatChipsModule} from '@angular/material/chips';
+import { MatChipsModule } from '@angular/material/chips';
+import { MatMenuModule } from '@angular/material/menu';
 
 @NgModule({
   declarations: [FormShipmentBoardComponent],
@@ -56,7 +57,8 @@ import {MatChipsModule} from '@angular/material/chips';
     MatSnackBarModule,
     MatProgressSpinnerModule,
     MatTableModule,
-    MatChipsModule
+    MatChipsModule,
+    MatMenuModule,
   ]
 })
 export class FormShipmentBoardModule { }

@@ -1,6 +1,7 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit, ViewChild, ElementRef, Input, 
           Output, EventEmitter, HostListener, Pipe, PipeTransform } from '@angular/core';
 import { DatePipe } from '@angular/common';    
+
 import icVisibility from '@iconify/icons-ic/twotone-visibility';
 import icVisibilityOff from '@iconify/icons-ic/twotone-visibility-off';
 import icSmartphone from '@iconify/icons-ic/twotone-smartphone';
@@ -9,22 +10,23 @@ import icArrowDropDown from '@iconify/icons-ic/twotone-arrow-drop-down';
 import icMenu from '@iconify/icons-ic/twotone-menu';
 import icCamera from '@iconify/icons-ic/twotone-camera';
 import icPhone from '@iconify/icons-ic/twotone-phone';
+import icMoreVert from '@iconify/icons-ic/twotone-more-vert';
+import icTwotoneCalendarToday from '@iconify/icons-ic/twotone-calendar-today';
+import icBaselineImageNotSupported from '@iconify/icons-ic/baseline-image-not-supported';
+
+import outlineSave from '@iconify/icons-ic/outline-save';
+import outlinePrint from '@iconify/icons-ic/outline-print';
+import outlineEmail from '@iconify/icons-ic/outline-email';
+
 import { FormBuilder, FormControl, FormGroup, Validators, FormArray } from '@angular/forms';
 import { fadeInUp400ms } from '../../../../../@vex/animations/fade-in-up.animation';
 import { stagger60ms } from '../../../../../@vex/animations/stagger.animation';
-import icMoreVert from '@iconify/icons-ic/twotone-more-vert';
 import { MatAccordion } from '@angular/material/expansion';
 import { HttpErrorResponse } from '@angular/common/http';
 import { RatesService } from '../../../../rates.service';
 import { HttpService } from '../../../../common/http.service';
 import { String, StringBuilder } from 'typescript-string-operations';
 import { strict } from 'assert';
-import icTwotoneCalendarToday from '@iconify/icons-ic/twotone-calendar-today';
-import icBaselineImageNotSupported from '@iconify/icons-ic/baseline-image-not-supported';
-import outlineSave from '@iconify/icons-ic/outline-save';
-import outlinePrint from '@iconify/icons-ic/outline-print';
-import outlineEmail from '@iconify/icons-ic/outline-email';
-
 import { StringifyOptions } from 'querystring';
 import { PostalData } from '../../../../Entities/PostalData';
 import { Rate,Accessorial,AccessorialBase,ServiceLevel } from '../../../../Entities/rate';
@@ -44,8 +46,8 @@ import { Observable, of, ReplaySubject } from 'rxjs';
 import { tap, startWith, debounceTime, distinctUntilChanged, switchMap, map } from 'rxjs/operators';
 import { SelectionModel } from '@angular/cdk/collections';
 import { MatSelectChange } from '@angular/material/select';
-import {MatTableModule} from '@angular/material/table';
-import {MatAutocompleteSelectedEvent, MatAutocomplete} from '@angular/material/autocomplete';
+import { MatTableModule } from '@angular/material/table';
+import { MatAutocompleteSelectedEvent, MatAutocomplete } from '@angular/material/autocomplete';
 import { async } from '@angular/core/testing';
 import { Converter } from 'showdown';
 import { ValueConverter } from '@angular/compiler/src/render3/view/template';
@@ -934,4 +936,5 @@ export class FormQuickQuoteComponent implements OnInit {
 
     return PCF;
   }
+
 }

@@ -1,7 +1,7 @@
 mat-form-field {
-  font-size: 12px;
+  font-size: 10px;
   width: 100%;
-  margin-bottom: -7px;
+  margin-bottom: -10px;
 }
 
 .my-chip .mat-chip-selected {
@@ -29,4 +29,132 @@ mat-chip {
 
 .spinnerSection mat-progress-spinner{
   flex: 1;
+}
+
+.example-container {
+  display: flex;
+  flex-direction: column;
+  max-height: 500px;
+  min-width: 300px;
+}
+
+.mat-table {
+  overflow: auto;
+  max-height: 500px;
+}
+
+.mobile-label {
+  display: none;
+}
+
+@media(max-width: 600px) {
+  .mobile-label {
+    width: 80px;
+    display: inline-block;
+        font-weight: bold;
+  }
+
+  .mat-header-row {
+    display: none;
+  }
+
+  .mat-row { 
+    flex-direction: column;
+    align-items: start;
+    padding: 8px 24px;
+  }
+}
+
+
+div.table
+  {
+  display:table;
+  width:75px;
+  border: #000;
+  border-width: 1px;
+  border-style: solid;
+  }
+ div.table-row
+  {
+   display:table-row;
+   text-align: center;
+   border: #000;
+  border-width: 1px;
+  border-style: solid;
+  }
+ div.table-td
+ {
+  display:table-cell;
+  border: #000;
+  border-width: 1px;
+  border-style: solid;
+ }
+ div.table-row:nth-child(1)
+ {
+  display:block;
+ }
+
+
+ /* default status styles */
+ .defaultStatus{
+	width: 152px; 
+    height: 84px; 
+    border-collapse: collapse;
+}
+
+// .defaultStatusRowLeft{
+//   width: 50%;
+//   text-align: center; 
+//   color: #000000;
+//   background-color: #E8EbEc;
+//   border: 0px 1px 0px 0px; 
+//   border-right: gray;
+//   border-style: solid;
+// }
+
+// .defaultStatusRowRight{
+// 	width: 50%; 
+//   border-style: solid;
+//   text-align: center; 
+//   color: #000000;
+//   background-color: #E8EbEc;
+// }
+
+.defaultStatusHeaderRow{
+  padding: 10px 0;
+  text-align: center; 
+  color: #FFFFFF;
+  font-family: "Lucida Console", Courier, monospace;
+  font-weight: bold;
+}
+
+.defaultStatusValueRow{ 
+  padding: 10px 0;
+  text-align: center;
+  color: #000000;
+  background-color: #E8EbEc;
+}
+
+.quotedStatus{
+    // border-color: #D8531D;
+    background-color: #D8531D; /* For browsers that do not support gradients */
+  	// background-image: linear-gradient(to right, #D8531D , #D8531D); 
+}
+
+.bookedStatus{
+    /*border-color: #00CC7B;*/
+    background-color: #00CC7B; /* For browsers that do not support gradients */
+  	// background-image: linear-gradient(to right, #00CC7B , #00CC7B); 
+}
+
+.inTransitStatus{
+  /*border-color: #A666B7;*/
+  background-color: #A666B7; /* For browsers that do not support gradients */
+  /*background-image: linear-gradient(to right, #A666B7 , #A666B7);*/ 
+}
+
+.delivered{
+  /*border-color: #A666B7;*/
+  background-color: #F3C343; /* For browsers that do not support gradients */
+  /*background-image: linear-gradient(to right, #F3C343, #F3C343);*/
 }

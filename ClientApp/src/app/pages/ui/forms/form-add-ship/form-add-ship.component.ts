@@ -17,7 +17,7 @@ import { HttpService } from '../../../../common/http.service';
 import { String, StringBuilder } from 'typescript-string-operations';
 import { Accessorial } from '../../../../Entities/Accessorial';
 import { InternalNote } from '../../../../Entities/InternalNote';
-import { ShipmentCost } from '../../../../Entities/ShipmentCost';
+import { ShipmentCost, AccountInvoiceCostList } from '../../../../Entities/ShipmentCost';
 import { MessageService } from "../../../../common/message.service";
 import { Observable, of } from 'rxjs';
 import { startWith, debounceTime, distinctUntilChanged, switchMap } from 'rxjs/operators';
@@ -28,6 +28,9 @@ import { ServiceLevel } from '../../../../Entities/ServiceLevel';
 import { PaymentTerm } from '../../../../Entities/PaymentTerm';
 import { ShipmentMode } from '../../../../Entities/ShipmentMode';
 import { ShipmentError } from '../../../../Entities/ShipmentError';
+import { MatStepper } from '@angular/material/stepper';
+import { Carrier } from '../../../../Entities/Carrier';
+
 
 
 @Component({
@@ -63,7 +66,12 @@ export class FormAddShipComponent implements OnInit {
   ServiceLevelOptions: ServiceLevel[];
   PaymentTerms: PaymentTerm[];
   ShipmentModeOptions: ShipmentMode[];
-  ShipmentErrorOptions: ShipmentError[];
+  ShipmentErrorOptions: ShipmentError[];  
+  ShipmentCostObject: ShipmentCost;
+  AccountInvoiceCostList: AccountInvoiceCostList[];
+  displayedCostGridColumns: string[] = ['Code', 'Description', 'Amount'];
+  TotalShipmentCost: number;
+  showSpinner = false;
 
   originSelectedCountry: PostalData = {
     CityCode: '',
@@ -107,8 +115,16 @@ export class FormAddShipComponent implements OnInit {
   icVisibilityOff = icVisibilityOff;
   icMoreVert = icMoreVert;
 
+  equimentDescriptionSelected: string = '';
+  priorityDescriptionSelected: string = '';
+  serviceLevelDescriptionSelected: string = '';
+  paymentTermDescriptionSelected: string = '';
+  shipmentModeDescriptionSelected: string = '';
+
   pcoAutoCompleteOptions: Observable<PostalData[]>;
   pcdAutoCompleteOptions: Observable<PostalData[]>;  
+
+  carrierAutoCompleteOptions: Observable<Object[]>;  
 
   constructor(private fb: FormBuilder,
               private cd: ChangeDetectorRef,
@@ -136,8 +152,35 @@ export class FormAddShipComponent implements OnInit {
     })
   }  
 
-  get formProducts() { return <FormArray>this.productsAndAccessorialsFormGroup.get('products'); } 
+  get formProducts() { return <FormArray>this.productsAndAccessorialsFormGroup.get('products'); }  
+  get originPckupDate() { return this.originAndDestinationFormGroup.get('originpickupdate').value == null ? '' : new Date(this.originAndDestinationFormGroup.get('originpickupdate').value).toDateString(); }  
+  get destExpDelDate() { return this.originAndDestinationFormGroup.get('destexpdeldate').value == null ? '' : new Date(this.originAndDestinationFormGroup.get('destexpdeldate').value).toDateString(); }  
+  
+  //Equipment change event
+  selectChangeEquipment (event: any) {    
+    this.fetchEquipment(event.value);
+  }
 
+  //Priority change event
+  selectChangePriority (event: any) {    
+    this.fetchPriority(event.value);
+  }
+
+  //Service Level change event
+  selectChangeServiceLevel (event: any) {    
+    this.fetchServiceLevel(event.value);
+  }
+
+  //Payment Term change event
+   selectChangePaymentTerm (event: any) {    
+    this.fetchPaymentTerm(event.value);
+  }
+
+  //Shipment Mode change event
+  selectChangeShipmentMode (event: any) {    
+    this.fetchShipmentMode(event.value);
+  }
+  
   async ngOnInit() {
 
     //Gets quotes parameter
@@ -206,9 +249,12 @@ export class FormAddShipComponent implements OnInit {
     });
     //--  
     
+    //-- confirmFormGroup fields
     this.confirmFormGroup = this.fb.group({
-      terms: [null, Validators.requiredTrue]
-    });
+      carrier: [null, Validators.required],
+      showTopCarriers: [10]
+    });    
+    //--
 
     try{
       this.securityToken = await this.httpService.getMainToken(); 
@@ -273,8 +319,34 @@ export class FormAddShipComponent implements OnInit {
     this.ShipmentModeOptions = await this.httpService.getShipmentMode(this.keyId);
 
     //-- Get Shipment Errors
-    this.ShipmentErrorOptions = await this.httpService.getShipmentError(this.keyId);
-        
+    this.ShipmentErrorOptions = await this.httpService.getShipmentError(this.keyId);    
+
+    //Get equipment description by default
+    this.fetchEquipment(7);
+
+    //Get payment term description by default
+    this.fetchPaymentTerm(5);
+
+    //Get shipment mode description by default
+    this.fetchShipmentMode("LTL");
+
+
+    //-- Get Shipment Costs
+    this.ShipmentCostObject = await this.httpService.GetShipmentCostByLadingID(this.ClientID, this.keyId); 
+    this.AccountInvoiceCostList = this.ShipmentCostObject.SellRates.AccountInvoiceCostList;
+    this.TotalShipmentCost = this.ShipmentCostObject.SellRates.TotalBilledAmount;
+
+    this.carrierAutoCompleteOptions = this.confirmFormGroup.get("carrier").valueChanges
+      .pipe(
+        startWith(''),
+        debounceTime(400),
+        distinctUntilChanged(),
+        switchMap(val => {
+          return this.carrierAutoCompletefilter(val || '')             
+        })
+      );
+    
+    //console.log(this.ShipmentCostObject);
   }
 
   pcoAutoCompleteFilter(val: string): Observable<any[]> {
@@ -365,6 +437,8 @@ export class FormAddShipComponent implements OnInit {
   }
 
   submit() {
+    //let test = this.shipInfoEquipment;
+
     this.snackbar.open('Shipment booked.', null, {
       duration: 5000
     });
@@ -394,5 +468,128 @@ export class FormAddShipComponent implements OnInit {
       this.showInternalNotesTitle = false;
     }
   } 
+
+  // Event fired after view is initialized
+  @ViewChild('stepper') stepper: MatStepper;
+  // ngAfterViewInit() {
+  //   //this.stepper.selectedIndex = 1; 
+
+  //   // To avoid "ExpressionChangedAfterItHasBeenCheckedError" error, 
+  //   // set the index in setTimeout 
+  //   setTimeout(()=>{
+  //     this.stepper.selectedIndex = 1; 
+  //   },0);
+  // }
+  
+  moveToStep(index) {
+    this.stepper.selectedIndex = index;
+  }
+
+  fetchEquipment(equipmentId) {
+    let equimentDescription = "";
+    if (this.EquipmentOptions != null && this.EquipmentOptions.length > 0){
+      let equipment = <EquipmentType[]>this.EquipmentOptions.filter(equipment => equipment.EquipmentID == equipmentId);
+      if (equipment != null){
+        equimentDescription = equipment[0].Description;
+      }
+    }    
+    this.equimentDescriptionSelected = equimentDescription;
+    return equimentDescription;
+  }
+
+  fetchPriority(priorityId) {
+    let priorityDescription = "";
+    if (this.PriorityOptions != null && this.PriorityOptions.length > 0){
+      let item = this.PriorityOptions.filter(item => item.PriorityID == priorityId);
+      if (item != null){
+        priorityDescription = item[0].Description;
+      }
+    }    
+    this.priorityDescriptionSelected = priorityDescription;
+    return priorityDescription;
+  }
+
+  fetchServiceLevel(serviceLevelId) {
+    let serviceLevelDescription = "";
+    if (this.ServiceLevelOptions != null && this.ServiceLevelOptions.length > 0){
+      let item = this.ServiceLevelOptions.filter(item => item.ServiceLevelID == serviceLevelId);
+      if (item != null){
+        serviceLevelDescription = item[0].Description;
+      }
+    }    
+    this.serviceLevelDescriptionSelected = serviceLevelDescription;
+    return serviceLevelDescription;
+  }
+
+  fetchPaymentTerm(paymentTermId) {
+    let Description = "";
+    if (this.PaymentTerms != null && this.PaymentTerms.length > 0){
+      let item = this.PaymentTerms.filter(item => item.PaymentTermID == paymentTermId);
+      if (item != null){
+        Description = item[0].Description;
+      }
+    }    
+    this.paymentTermDescriptionSelected = Description;
+    return Description;
+  }
+
+  fetchShipmentMode(modeCode) {
+    let Description = "";
+    if (this.ShipmentModeOptions != null && this.ShipmentModeOptions.length > 0){
+      let item = this.ShipmentModeOptions.filter(item => item.ModeCode == modeCode);
+      if (item != null){
+        Description = item[0].Mode;
+      }
+    }    
+    this.shipmentModeDescriptionSelected = Description;
+    return Description;
+  }
+
+  Carrier: string;
+  carrierData: Carrier[];
+
+  async validateCarrier(event: KeyboardEvent){
+    //--
+    // let CountryId = this.destinationSelectedCountry == null ? "1": this.destinationSelectedCountry.CountryId.toString();
+    this.Carrier = this.confirmFormGroup.get('carrier').value;
+    if (this.Carrier != null && this.Carrier.trim().length == 4){
+      let responseData = await this.httpService.getCarrierData(this.ClientID, this.Carrier, this.keyId);
+      this.carrierData = responseData;
+      if (this.carrierData != null && this.carrierData.length > 0) 
+      {        
+        this.confirmFormGroup.get('carrier').setValue(String.Format("{0} - {1}",this.carrierData[0].CarrierID.trim(),this.carrierData[0].CarrierName.trim()));
+        // this.DestinationPostalCode = String.Format("{0}-{1}",this.postalDataDest[0].PostalCode,this.postalDataDest[0].CityName.trim());  
+        // this.DestinationPostalData = this.postalDataDest[0];               
+        // this.originAndDestinationFormGroup.get('destpostalcode').setValue(this.DestinationPostalCode);
+      }
+      else
+      {
+        //this.DestinationStateName = String.Empty;
+        this.Carrier = String.Empty;
+        this.carrierData = null;
+      }
+    }         
+  }
+
+  carrierAutoCompletefilter(val: string): Observable<any[]> {     
+    return this.httpService.carrierAutocomplete(this.ClientID, val, this.keyId)    
+  }  
+
+  carrierAutoCompleteSelected(event: MatAutocompleteSelectedEvent): void {
+    this.confirmFormGroup.get('carrier').setValue(String.Format("{0} - {1}",event.option.value.CarrierID.trim(),event.option.value.CarrierName.trim()));
+    // this.DestinationPostalCode = String.Format("{0}-{1}",event.option.value.PostalCode,event.option.value.CityName.trim());  
+    // this.DestinationPostalData = event.option.value;        
+    // this.originAndDestinationFormGroup.get('destpostalcode').setValue(this.DestinationPostalCode);
+  }
+
+  async getQuote() {    
+    //this.getQuoteButtonClicked = true;        
+    this.showSpinner = true;   
+    setTimeout(()=>{    //<<<---    using ()=> syntax               
+        this.showSpinner = false;              
+      }, 3000);
+    //let test = await this.getShipmentRates();       
+    this.showSpinner = false;            
+  }
 
 }

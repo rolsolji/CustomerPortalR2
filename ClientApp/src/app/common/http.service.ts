@@ -20,6 +20,8 @@ import { ShipmentPriority } from '../Entities/ShipmentPriority';
 import { ServiceLevel } from '../Entities/ServiceLevel';
 import { PaymentTerm } from '../Entities/PaymentTerm';
 import { ShipmentError } from '../Entities/ShipmentError';
+import { ShipmentCost } from '../Entities/ShipmentCost';
+import { Carrier } from '../Entities/Carrier';
 
 @Injectable({
     providedIn: 'root'
@@ -198,7 +200,7 @@ export class HttpService{
         let httpHeaders = new HttpHeaders({                       
             'Ticket' : ticket                            
         }); 
-        return this.http.get<Accessorial[]>(String.Format('https://beta-customer.r2logistics.com/Services/BOLHDRService.svc/json/GetShipmentCostByLadingID?LadingID=2386472&_=1599193487557')
+        return this.http.get<ShipmentCost>(String.Format('https://beta-customer.r2logistics.com/Services/BOLHDRService.svc/json/GetShipmentCostByLadingID?LadingID=2386472&_=1599193487557')
         ,{
             headers: httpHeaders
           }
@@ -263,6 +265,29 @@ export class HttpService{
             headers: httpHeaders
           }
           ).toPromise(); 
+    }
+
+    getCarrierData(clientID:number, carrier:string, keyId:string){
+        let ticket = this.token;
+        let httpHeaders = new HttpHeaders({                       
+            'Ticket' : ticket                            
+        }); 
+        return this.http.get<Carrier[]>(String.Format('https://beta-customer.r2logistics.com/Services/CarrierService.svc/json/GetMasCarrierByCarrierCodeOrName?clientID={0}&CarrierCodeorName={1}&_={2}',clientID.toString(),carrier,keyId)
+        ,{
+            headers: httpHeaders
+          }
+          ).toPromise();        
+    }
+    
+    carrierAutocomplete(clientID:number, carrier:string, keyId:string) {
+        let opts = [];
+        let ticket = this.token;
+        let httpHeaders = new HttpHeaders({ 'Ticket' : ticket });
+        return (carrier.length < 4) ?
+            of(opts) :
+            this.http.get<Carrier[]>(String.Format('https://beta-customer.r2logistics.com/Services/CarrierService.svc/json/GetMasCarrierByCarrierCodeOrName?clientID={0}&CarrierCodeorName={1}&_={2}',clientID.toString(),carrier,keyId)
+                ,{headers: httpHeaders}
+            ).pipe(tap(data => opts = data))
     }
 
 }

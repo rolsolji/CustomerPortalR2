@@ -311,14 +311,14 @@
                   </div>
     
                   <div fxLayout="row" fxLayout.lt-md="column"> 
-                    <div fxFlex="27%" class="addToProductMaster">
-                      <mat-checkbox [checked]="false" formControlName="SaveProduct" color="warn">Add to my saved products</mat-checkbox>
-                    </div>
-                    <div fxFlex="15%">
-                      <mat-checkbox [checked]="false" formControlName="HazMat" color="warn">Hazmat</mat-checkbox>
-                    </div>
-                    <div fxFlex="15%">
+                    <div fxFlex="40%" class="addToProductMaster">
+                      <mat-checkbox [checked]="false" formControlName="SaveProduct" color="primary">Add to my saved products</mat-checkbox>
+                    </div>                    
+                    <div fxFlex="20%">
                       <mat-checkbox [checked]="false" formControlName="Stackable" color="warn">Stackable</mat-checkbox>
+                    </div>
+                    <div fxFlex="20%">
+                      <mat-checkbox [checked]="false" formControlName="HazMat" color="warn">Hazmat</mat-checkbox>
                     </div>  
                   </div>
                   <div fxLayoutAlign="end center">

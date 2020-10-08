@@ -177,3 +177,323 @@ table {
 .SubTypeButton{
     font-size: 12px;
 }
+
+/* Rates section styles */
+.spinnerSection{
+    display: flex;
+    justify-content: center;
+  }
+
+.allRatesTab-labelText {
+    display: inline-block;
+    border-radius: 0.125rem;        
+    font-weight: 500;
+    text-transform: uppercase;
+    font-size: 1rem;
+}
+
+.ratesAccordionSection{
+    max-height: none !important;      
+  }
+
+/* Rates Accordion expansion panels */
+
+.ratesAccordionExpansionHeader {
+    height: fit-content !important;
+    font-weight: 400;
+    padding-left: 0px;
+    padding-right: 15px;
+}  
+
+.rates-accordion .mat-expansion-panel-content .mat-expansion-panel-body{
+  border-top: 1px solid #ddd;
+  line-height: 16px;
+}
+
+.CarrierCostDivStyle{  
+  font-size: 1.4rem;
+}
+
+/* Begin Inner rates data container*/
+.inner-rates-data-container {
+  max-width: 1400px;  
+  margin-top: 2%;
+  width: 100%;
+  padding-right: 3%;  
+  line-height: 16px;
+}
+
+.inner-rate-column {
+  padding: 2px;
+  box-sizing: border-box;
+  margin-bottom: 10px;    
+  flex-basis: 33.33%;
+  overflow-wrap: anywhere;
+  justify-content: center;
+  align-items: start;
+}
+
+.call-out:nth-child(2) {
+  padding: 2px;
+  box-sizing: border-box;
+  margin-bottom: 10px;
+  flex-basis: 32%;
+  overflow-wrap: anywhere;
+  justify-content: center;
+  align-items: center;    
+}
+/*End Inner rates data container*/
+
+/* Begin Inner rates options container*/
+.inner-rates-options-container {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  padding-right: 3%;
+}
+
+.inner-rate-options-column {  
+  flex-basis: 100%;
+  text-align: end;
+}
+
+.inner-rate-options-column_with_email_input {  
+  flex-basis: 60%;
+  text-align: end;
+}
+/* End Inner rates options container*/
+
+/* Begin Inner rates addresses container*/
+.inner-rates-addresses-container {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  padding-right: 3%;
+}
+
+.inner-rate-addresses-column {  
+  flex-basis: 100%;
+  text-align: start;
+  font-size: 0.5rem;
+}
+
+.rateAddressesSplitLine{
+  margin-bottom: 5px;
+  margin-top: 5px;
+  margin-left: 0;
+  margin-right: 0;
+  border: 0.5px solid silver;
+}
+
+/* End Inner rates options container*/
+
+.mat-stroked-sent-email-button {
+  border: 1px solid currentColor;
+  padding: 0 0px;
+  line-height: 25px;
+}
+
+.sendEmailInputStyle{
+  margin-top: -12px;
+  margin-left: -12%;
+  flex-basis: 60%;
+  text-align: end;
+}
+
+.ratesAccordionSection{
+  max-height: 660px;
+  overflow-y: auto;
+}
+
+.freightRatesView{
+    border-bottom: .1875rem solid #02aaf3;
+    margin-bottom: 2%;
+    margin-left: 2%;
+    margin-right: 2%;
+}
+
+.allRatesTab-labelText {
+    display: inline-block;
+    border-radius: 0.125rem;        
+    font-weight: 500;
+    text-transform: uppercase;
+    font-size: 1rem;
+}    
+
+.call-outs-container {
+  max-width: 1400px;
+  // margin: 40px auto 0 auto;
+  //border-block-end: 1px solid #ddd;
+  margin-top: 2%;
+  width: 100%;
+  padding-right: 3%;
+}
+
+.call-out:nth-child(1) {
+  padding: 2px;
+  box-sizing: border-box;
+  margin-bottom: 10px;
+  flex-basis: 15%;
+  order: 0;
+  align-items: center;
+}
+
+.call-out:nth-child(2) {
+  padding: 2px;
+  box-sizing: border-box;
+  margin-bottom: 10px;
+  flex-basis: 32%;
+  text-align: center;
+  align-items: start;
+}
+
+.call-out:nth-child(3) {
+  padding: 2px;
+  box-sizing: border-box;
+  margin-bottom: 10px;
+  flex-basis: 32%;
+  text-align: start;
+  justify-content: start;
+}
+
+.call-out:nth-child(4) {
+  padding: 2px;
+  box-sizing: border-box;
+  margin-bottom: 10px;
+  flex-basis: 21%;
+  overflow-wrap: anywhere;
+  justify-content: center;
+  align-items: center;    
+}
+
+.call-out {
+  padding: 2px;
+  box-sizing: border-box;
+  margin-bottom: 10px;    
+  flex-basis: 22%;
+  overflow-wrap: anywhere;
+  justify-content: center;
+  align-items: center;
+}
+
+.shipment-limitation-container {
+  max-width: 1400px;
+  // margin: 40px auto 0 auto;
+  //border-block-end: 1px solid #ddd;
+  margin-top: 2%;
+}
+
+.shipment-limitation-call-out {
+  padding: 2px;
+  box-sizing: border-box;
+  margin-bottom: 10px;    
+  flex-basis: 33%;
+  overflow-wrap: anywhere;
+  justify-content: center;
+  align-items: center;
+}
+
+.freightRate-carrierInfo {
+    padding-left: .9375rem;
+    font-weight: 700;
+    font-size: 0.6rem;
+}
+
+.freightRate-carrierInfo mat-icon{
+    color: #b8b8b8;
+}
+
+.freightRate-rateInfo {       
+    font-size: 0.6rem;
+    text-align: start;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.freightRate-rateInfo-icon {       
+    height: 1.25rem;
+    margin-right: .625rem;
+    color: #b8b8b8;
+    flex: 0;
+}
+
+.freightRate-rateInfo-icon mat-icon{
+    font-size: 1rem;
+}
+
+
+
+.freightRate-rateInfo-text {
+    font-size: 0.6rem;
+    flex: 1;
+}
+
+
+.freightRate-carrierShipLimitInfo {
+  //padding-left: .9375rem;
+  font-weight: 400;
+  font-size: 0.6rem;
+}
+
+.numeral {
+    font-weight: 900;
+    letter-spacing: .025rem;
+}
+
+.numeral--large {
+    font-size: 1.25rem;
+}
+
+.numeral-affix {
+    font-size: 0.5em;
+    position: relative;
+    top: -0.69em;
+}
+
+@media (min-width: 900px) {
+  .call-outs-container {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    padding-right: 3%;
+    line-height: 16px;
+  }   
+
+  .call-out:nth-child(2) {       
+      text-align: start;
+      flex-basis: 32%;
+    }
+
+  .inner-rates-data-container {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    padding-right: 3%;
+  }    
+}
+
+@media (max-width: 900px) {
+  .inner-rate-column, .call-out {     
+    justify-content: center !important;
+    align-items: center  !important;
+    text-align: center;
+  }   
+  
+  .QuickQuoteMainDiv{
+    max-height: none;
+  }
+
+  .ratesAccordionSection{
+    max-height: none !important;      
+  }
+
+}
+
+.ratesSectionTitle{
+  text-align: start;
+}
+
+.closeRatesSection{
+  text-align: end;
+}

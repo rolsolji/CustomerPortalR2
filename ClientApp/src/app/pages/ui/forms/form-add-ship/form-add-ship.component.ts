@@ -35,13 +35,21 @@ import { RatesService } from '../../../../rates.service';
 import { ClientDefaultData } from '../../../../Entities/ClientDefaultData';
 import { UtilitiesService } from "../../../../common/utilities.service";
 import { DatePipe } from '@angular/common';    
+import { MatListOption } from '@angular/material/list';
+import { MatAccordion } from '@angular/material/expansion';
+import icTwotoneCalendarToday from '@iconify/icons-ic/twotone-calendar-today';
+import icBaselineImageNotSupported from '@iconify/icons-ic/baseline-image-not-supported';
+import outlineSave from '@iconify/icons-ic/outline-save';
+import outlinePrint from '@iconify/icons-ic/outline-print';
+import outlineEmail from '@iconify/icons-ic/outline-email';
+import { StepperSelectionEvent } from '@angular/cdk/stepper';
 
 
 @Component({
   selector: 'vex-form-add-ship',
   templateUrl: './form-add-ship.component.html',
   styleUrls: ['./form-add-ship.component.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush,
+  changeDetection: ChangeDetectionStrategy.Default,
   animations: [
     stagger80ms,
     fadeInUp400ms,
@@ -76,7 +84,14 @@ export class FormAddShipComponent implements OnInit {
   displayedCostGridColumns: string[] = ['Code', 'Description', 'Amount'];
   TotalShipmentCost: number;
   showSpinner = false;
+  getQuoteButtonClicked = false;
+  spinnerMessage:string;
+  ratesOpened: number[];
+  sendEmailClicked: boolean = false;
+  carrierImageUrl = "https://beta-customer.r2logistics.com/Handlers/CarrierLogoHandler.ashx?carrierID=";
 
+  @ViewChild(MatAccordion) accordion: MatAccordion;
+  
   accessorials: AccessorialBase[] = [];
   accessorialIds: number[] = [];
   serviceLevels: ServiceLevel[] = [];
@@ -122,6 +137,7 @@ export class FormAddShipComponent implements OnInit {
   productsAndAccessorialsFormGroup: FormGroup;
   shipmentInfoFormGroup: FormGroup;
   confirmFormGroup: FormGroup;    
+  emailFormGroup: FormGroup;
 
   icDoneAll = icDoneAll;
   icDescription = icDescription;
@@ -129,6 +145,11 @@ export class FormAddShipComponent implements OnInit {
   icVisibility = icVisiblity;
   icVisibilityOff = icVisibilityOff;
   icMoreVert = icMoreVert;
+  icTwotoneCalendarToday = icTwotoneCalendarToday;
+  icBaselineImageNotSupported = icBaselineImageNotSupported;
+  outlineSave = outlineSave;
+  outlinePrint = outlinePrint;
+  outlineEmail = outlineEmail;
 
   equimentDescriptionSelected: string = '';
   priorityDescriptionSelected: string = '';
@@ -155,18 +176,18 @@ export class FormAddShipComponent implements OnInit {
     return this.fb.group({
       Pallets: [null, Validators.required],
       Pieces: [null],
-        Package: [3],
+      PackageTypeID: [3],
         ProductClass: [null, Validators.required],
-        NMFC: [null, Validators.required],
-        Description: [null, Validators.required],
+        NmfcNumber: [null, Validators.required],
+        ProductDescription: [null, Validators.required],
         Length: [null, Validators.required],
         Width: [null, Validators.required],
         Height: [null, Validators.required],
         PCF: [null],
         Weight: [null, Validators.required],
-        addToProductMaster: [null],
-        Stackable: [null],
-        Hazmat: [null]
+        addToProductMaster: [false],
+        Stackable: [false],
+        Hazmat: [false]
     })
   }  
 
@@ -274,6 +295,12 @@ export class FormAddShipComponent implements OnInit {
     });    
     //--
 
+    //-- emailFormGroup fields
+    this.emailFormGroup = this.fb.group({
+      emailToSendQuote: [null, Validators.required]
+    });
+    //--
+
     try{
       this.securityToken = await this.httpService.getMainToken(); 
     }
@@ -366,6 +393,8 @@ export class FormAddShipComponent implements OnInit {
 
       this.clientDefaultData = await this.httpService.getClientDefaultsByClient(this.ClientID, this.keyId);
     
+      this.ratesOpened = []; //initiate ratesOpened array
+
     //console.log(this.ShipmentCostObject);
   }
 
@@ -603,18 +632,11 @@ export class FormAddShipComponent implements OnInit {
     // this.originAndDestinationFormGroup.get('destpostalcode').setValue(this.DestinationPostalCode);
   }
 
-  async getQuote() {    
-    //this.getQuoteButtonClicked = true;        
-    this.showSpinner = true;   
-    let test = await this.getShipmentRates();       
-    this.showSpinner = false;      
-  }
-
-  async getShipmentRates() {
-
-    //this.spinnerMessage = "Loading...";
-
-    this.accessorialArray.forEach(a => {
+  onGroupsChange(options: MatListOption[]) {    
+    let selectedAccessorials = options.map(o => o.value)
+    this.accessorials = [];
+    this.accessorialIds = [];
+    selectedAccessorials.forEach(a => {
       let accessorial: AccessorialBase = { 
         AccessorialID: a.AccessorialID, 
         AccessorialCode: a.AccesorialCode
@@ -622,7 +644,19 @@ export class FormAddShipComponent implements OnInit {
 
       this.accessorials.push(accessorial);
       this.accessorialIds.push(a.AccessorialID);      
-    });
+    });    
+  }
+
+  async getQuote() {    
+    this.getQuoteButtonClicked = true;        
+    this.showSpinner = true;   
+    let test = await this.getShipmentRates();       
+    this.showSpinner = false;      
+  }
+
+  async getShipmentRates() {
+
+    this.spinnerMessage = "Loading...";    
 
     let pickupDate = this.OriginPickupDate;
     let arrayProducts = this.productsAndAccessorialsFormGroup.get('products').value;
@@ -655,6 +689,7 @@ export class FormAddShipComponent implements OnInit {
       //Ask
       "SCAC": this.carrierSelected,
       "EquipmentList": [],
+      "IsBuyRates": false,
       "IsDebug": false,
       "IsSuperAdmin": false,
       "AccessorialIDs": this.accessorialIds,
@@ -679,6 +714,7 @@ export class FormAddShipComponent implements OnInit {
       this.snackbar.open(this.ratesCounter + ' rates retuned.', null, {
         duration: 5000
       });
+    
 
       this.rates.forEach(r => {
         if (!String.IsNullOrWhiteSpace(r.TransitTime)){
@@ -694,6 +730,96 @@ export class FormAddShipComponent implements OnInit {
 
       this.clientTLWeightLimit = (this.clientDefaultData.TLWeightLimit == null ? 0 : this.clientDefaultData.TLWeightLimit) + 'lb';      
     }
-}
+  }
+
+  //#region RatesOpened
+  addRateOpened(rateIndex: number): void{      
+    let index: number = this.ratesOpened.indexOf(rateIndex);
+    if (index == -1) {
+      this.ratesOpened.push(rateIndex)
+    }   
+    
+    this.sendEmailClicked = false;
+  }
+
+  removeRateClosed(rateIndex: number): void{     
+    let index: number = this.ratesOpened.indexOf(rateIndex);
+    if (index !== -1) {
+        this.ratesOpened.splice(index, 1);
+    }       
+    
+    this.sendEmailClicked = false;
+  }
+
+  isRateOpened(rateIndex: number): boolean{     
+    return this.ratesOpened.some(function(r){ return r === rateIndex});     
+  }
+  ////#endregion RatesOpened
+
+  async selectQuote(index: number){
+    // await this.save(index);
+    // this.router.navigate(['/ui/forms/form-add-ship/'], { relativeTo: this.route });
+    //routerLink="/ui/forms/form-add-ship"
+  }
+
+  async saveQuote(index: number){
+    // await this.save(index);
+    // this.router.navigate(['../shipmentboard/LTLTL/'], { relativeTo: this.route });
+  }
+
+  onChangeProductWeight(index: number): void{
+    let product = this.productsAndAccessorialsFormGroup.get('products').value[index];     
+    let PCF = this.calculatePCF(product.Pallets, product.Length, product.Width, product.Height, product.Weight);   
+    (<FormArray>this.productsAndAccessorialsFormGroup.controls['products']).at(index).get("PCF").setValue(PCF);     
+  }
+
+  calculatePCF(Pallets, Lenght, Width, Height, Weight): number {
+    var length;
+    var width;
+    var height;
+    var volum;
+    var density;
+    var perpallet;
+    var PCF;
+    if (Lenght != null && Lenght != "" && Width != null && Width != "" && Height != null && Height != "" &&
+     Weight != null && Weight != "" && Lenght != 0 && Width != 0 && Height != 0 && Weight != 0) {
+        length = parseInt(Lenght);
+        width = parseInt(Width);
+        height = parseInt(Height);
+        if (length != null && length != "" && width != null && width != "" && height != null && height != null) {
+            volum = (length * width * height) / 1728;
+        }
+        if (volum != null && volum != "" && volum != 0) {
+            if (Pallets != null && Pallets != "" && Pallets != 0) {
+                perpallet = parseFloat(Weight) / parseFloat(parseFloat(Pallets).toFixed(4));
+                if (perpallet != null && perpallet != "" && perpallet != 0) {
+                    density = parseFloat(perpallet) / parseFloat(parseFloat(volum).toFixed(4));
+                }
+            }
+            else {
+                density = parseFloat(Weight) / parseFloat(parseFloat(volum).toFixed(4));
+            }
+        }
+        if (density != null && density != "") {
+            PCF =  parseFloat(parseFloat(density).toFixed(2));
+        }
+    }
+
+    return PCF;
+  }
+
+  clearRatesSection(){
+    this.ratesCounter = 0;
+    this.getQuoteButtonClicked = false;
+  }
+
+  previousFromLastStep(){
+    this.clearRatesSection()
+  }
+
+  StepperSelectionChange(event: StepperSelectionEvent){
+    //console.log(event);
+    this.clearRatesSection()
+  }
 
 }

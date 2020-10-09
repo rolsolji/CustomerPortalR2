@@ -22,6 +22,7 @@ import { PaymentTerm } from '../Entities/PaymentTerm';
 import { ShipmentError } from '../Entities/ShipmentError';
 import { ShipmentCost } from '../Entities/ShipmentCost';
 import { Carrier } from '../Entities/Carrier';
+import { ShipmentByLading } from '../Entities/ShipmentByLading';
 
 @Injectable({
     providedIn: 'root'
@@ -288,6 +289,18 @@ export class HttpService{
             this.http.get<Carrier[]>(String.Format('https://beta-customer.r2logistics.com/Services/CarrierService.svc/json/GetMasCarrierByCarrierCodeOrName?clientID={0}&CarrierCodeorName={1}&_={2}',clientID.toString(),carrier,keyId)
                 ,{headers: httpHeaders}
             ).pipe(tap(data => opts = data))
+    }
+
+    GetShipmentByLadingID(LadingID:string, keyId:string){
+        let ticket = this.token;
+        let httpHeaders = new HttpHeaders({                       
+            'Ticket' : ticket                            
+        }); 
+        return this.http.get<ShipmentByLading>(String.Format('https://beta-customer.r2logistics.com/Services/BOLHDRService.svc/json/GetShipmentByLadingID?LadingID={0}&_={1}',LadingID,keyId)
+        ,{
+            headers: httpHeaders
+          }
+          ).toPromise();            
     }
 
 }

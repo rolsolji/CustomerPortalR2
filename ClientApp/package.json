@@ -37,6 +37,7 @@
     "date-fns": "^2.12.0",
     "highlight.js": "^10.0.0",
     "luxon": "^1.23.0",
+    "moment": "^2.29.1",
     "ngx-quill": "^8.1.7",
     "ngx-showdown": "~5.1.0",
     "ngx-take-until-destroy": "~5.4.0",

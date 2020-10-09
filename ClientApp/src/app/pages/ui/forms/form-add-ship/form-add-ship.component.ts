@@ -43,6 +43,9 @@ import outlineSave from '@iconify/icons-ic/outline-save';
 import outlinePrint from '@iconify/icons-ic/outline-print';
 import outlineEmail from '@iconify/icons-ic/outline-email';
 import { StepperSelectionEvent } from '@angular/cdk/stepper';
+import { ShipmentByLading } from '../../../../Entities/ShipmentByLading';
+import * as moment from 'moment';
+
 
 
 @Component({
@@ -63,7 +66,7 @@ export class FormAddShipComponent implements OnInit {
   ClientID: number = 8473;
   securityToken: string;
 
-  quoteIdParameter: string;
+  ladingIdParameter: string;
 
   originCountries: Object;
   destinationCountries: Object;  
@@ -89,6 +92,7 @@ export class FormAddShipComponent implements OnInit {
   ratesOpened: number[];
   sendEmailClicked: boolean = false;
   carrierImageUrl = "https://beta-customer.r2logistics.com/Handlers/CarrierLogoHandler.ashx?carrierID=";
+  ShipmentByLadingObject: ShipmentByLading;
 
   @ViewChild(MatAccordion) accordion: MatAccordion;
   
@@ -223,8 +227,8 @@ export class FormAddShipComponent implements OnInit {
   async ngOnInit() {
 
     //Gets quotes parameter
-    this.messageService.SharedQuoteParameter.subscribe(message => this.quoteIdParameter = message)
-
+    this.messageService.SharedQuoteParameter.subscribe(message => this.ladingIdParameter = message)    
+    
     //-- originAndDestinationFormGroup fields
     this.originAndDestinationFormGroup = this.fb.group({
       originname: [null, Validators.required],
@@ -308,7 +312,7 @@ export class FormAddShipComponent implements OnInit {
       console.log(ex);
     }
 
-    this.httpService.token = this.securityToken;
+    this.httpService.token = this.securityToken;    
 
     let responseData = await this.httpService.getCountryList(this.keyId);   
     this.accessorialArray = await this.httpService.getGetClientMappedAccessorials(this.ClientID, this.keyId);
@@ -375,6 +379,40 @@ export class FormAddShipComponent implements OnInit {
     //Get shipment mode description by default
     this.fetchShipmentMode("LTL");
 
+    //-- Get Shipment information
+    let defaultoriginpostalcode = null;
+    let defaultoriginstatename = null;
+    let defaultpickupdate = null;
+    let defaultdestpostalcode = null;
+    let defaultdeststatename = null;
+
+    this.ladingIdParameter = "2386548";
+
+    if (this.ladingIdParameter != null && this.ladingIdParameter.length > 0){
+      //-- Get Service Level Options
+      this.ShipmentByLadingObject = await this.httpService.GetShipmentByLadingID(this.ladingIdParameter, this.keyId);
+
+      defaultoriginpostalcode = this.ShipmentByLadingObject.OriginTerminalZip.trim() + "-" + this.ShipmentByLadingObject.OriginTerminalCity.trim();
+      defaultoriginstatename = this.ShipmentByLadingObject.OrgStateName.trim()      
+      let tempPickupDate = moment.utc(this.ShipmentByLadingObject.PickupDate);
+      defaultpickupdate = tempPickupDate.format('DD/MM/YYYY');
+
+      defaultdestpostalcode = this.ShipmentByLadingObject.DestTerminalZip.trim() + "-" + this.ShipmentByLadingObject.DestTerminalCity.trim();
+      defaultdeststatename = this.ShipmentByLadingObject.DestStateName.trim()     
+
+      //-- Set default values
+      this.originAndDestinationFormGroup.controls['originpostalcode'].setValue(defaultoriginpostalcode, {onlySelf: false});
+      this.originAndDestinationFormGroup.controls['originstatename'].setValue(defaultoriginstatename, {onlySelf: false});
+      //this.originAndDestinationFormGroup.controls['originpickupdate'].setValue(tempPickupDate, {onlySelf: false});
+      this.originAndDestinationFormGroup.controls['originpickupdate'].setValue({
+        originpickupdate: defaultpickupdate
+      });
+      this.originAndDestinationFormGroup.controls['destpostalcode'].setValue(defaultdestpostalcode, {onlySelf: false});
+      this.originAndDestinationFormGroup.controls['deststatename'].setValue(defaultdeststatename, {onlySelf: false});      
+      //--
+
+    }
+    //--
 
     //-- Get Shipment Costs
     this.ShipmentCostObject = await this.httpService.GetShipmentCostByLadingID(this.ClientID, this.keyId); 

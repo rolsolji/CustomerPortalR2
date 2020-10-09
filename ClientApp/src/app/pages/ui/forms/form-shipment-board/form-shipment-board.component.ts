@@ -159,8 +159,8 @@ export class FormShipmentBoardComponent implements OnInit {
     { label: 'Destination Name', property: 'DestName', type: 'text', visible: true, cssClasses: ['text-secondary', 'font-medium'] },
     { label: 'Destination Location', property: 'DestinationLocation', type: 'text', visible: true, cssClasses: ['text-secondary', 'font-medium'] },
     { label: 'Equipment', property: 'EquipmentDescription', type: 'text', visible: true, cssClasses: ['text-secondary', 'font-medium'] },
-    { label: 'Status', property: 'Status', type: 'text', visible: true, cssClasses: ['font-medium'] },
-    { label: 'Expected Delivery Date', property: 'ExpectedDeliveryDate', type: 'text', visible: true, cssClasses: ['text-secondary', 'font-medium'] },
+    { label: 'Status', property: 'BOLStatus', type: 'text', visible: true, cssClasses: ['font-medium'] },
+    { label: 'Expected Delivery Date', property: 'ExpectedDeliveryDateWithFormat', type: 'text', visible: true, cssClasses: ['text-secondary', 'font-medium'] },
     //{ label: 'Actions', property: 'actions', type: 'button', visible: true }
   ];
 
@@ -180,6 +180,12 @@ export class FormShipmentBoardComponent implements OnInit {
   EquipmentOptions: object;
   securityToken: string;
   quoteIdParameter: string;
+  totalQuotedStatus: string;
+  totalBookedStatus: string;
+  totalInTransitStatus: string;
+  totalDeliveredStatus: string;
+
+
   get visibleColumns() {
     return this.columns.filter(column => column.visible).map(column => column.property);
   }
@@ -227,13 +233,22 @@ export class FormShipmentBoardComponent implements OnInit {
     this.httpService.token = this.securityToken;
     this.ShipmentModeOptions = await this.httpService.getShipmentMode(this.keyId);
     this.StatusOptions = await this.httpService.getBOLStatus(this.keyId);
+    // Get total per status
+
+    this.totalQuotedStatus = "11";
+    this.totalBookedStatus = "22";
+    this.totalInTransitStatus = "33";
+    this.totalDeliveredStatus = "44";
+
+    console.log(this.StatusOptions); 
+
     this.EquipmentOptions = await this.httpService.getMasEquipment(this.keyId);
     console.log(this.StatusOptionsString);
     this.StatusOptions.forEach(s => this.StatusOptionsString.push(s.Status));
-    this.search();
+    this.search('');
   }
 
-  async search(){
+  async search(statusCode:string){
     
     this.showSpinner = true;
 
@@ -258,6 +273,9 @@ export class FormShipmentBoardComponent implements OnInit {
       )
     );
 
+    if (!String.IsNullOrWhiteSpace(statusCode))
+      this.getQuotesParameters.BOlStatusIDList.push(statusCode);
+
     this.messageService.SharedQuoteParameter.subscribe(message => this.quoteIdParameter = message)
 
     if (!String.IsNullOrWhiteSpace(this.quoteIdParameter))
@@ -270,14 +288,20 @@ export class FormShipmentBoardComponent implements OnInit {
     this.quotes = await this.httpService.searchBOLHDRForJason(this.getQuotesParameters);    
     // console.log(this.quotes);
     this.quotes.forEach(element => {
-      let d = element.ActualShipDate.replace("/Date(","").replace("-0400)/","");
-      element.ActualShipDateWithFormat = this.datepipe.transform(d,'MM/dd/yyyy'); // new Date(parseInt(d)).toDateString();//  .toString("mm/dd/yyyy");
+      let actualShipDate = element.ActualShipDate.replace("/Date(","").replace("-0400)/","").replace("-0500)/","");
+      element.ActualShipDateWithFormat = this.datepipe.transform(actualShipDate,'MM/dd/yyyy'); // new Date(parseInt(d)).toDateString();//  .toString("mm/dd/yyyy");
+
+      if (!String.IsNullOrWhiteSpace(element.ExpectedDeliveryDate))
+      {
+        let expectedDeliveryDate = element.ExpectedDeliveryDate.replace("/Date(","").replace("-0400)/","").replace("-0500)/","");
+        element.ExpectedDeliveryDateWithFormat = this.datepipe.transform(expectedDeliveryDate,'MM/dd/yyyy'); // new Date(parseInt(d)).toDateString();//  .toString("mm/dd/yyyy");
+      }
     });
     // console.log(this.quotes[0].ActualShipDate );
     // console.log(this.quotes[0].ActualShipDateWithFormat);
     this.dataSource = new MatTableDataSource();
     this.dataSource.data = this.quotes;
-    console.log(this.dataSource.data);
+    console.log("DataToTable", this.dataSource.data);
 
     this.showSpinner = false;
   }

@@ -40,4 +40,15 @@ export class Quote {
     set ActualShipDateWithFormat(value){
     }
 
+    get ExpectedDeliveryDateWithFormat(){
+        let actualShipDate = '';
+
+        actualShipDate = 'A'; //this.ActualShipDate.replace(/(^.*\()|([+-].*$)/g, '')'';
+
+        return 'A';
+    }
+
+    set ExpectedDeliveryDateWithFormat(value){
+    }
+
 }

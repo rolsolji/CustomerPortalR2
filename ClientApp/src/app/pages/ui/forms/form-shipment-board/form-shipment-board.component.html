@@ -147,41 +147,49 @@
 
             <div fxLayout="row" fxLayout.lt-sm="column" fxLayoutGap="5px">
                 
-                <div class="defaultStatus">
-                    <div class="defaultStatusHeaderRow quotedStatus">
-                        Quoted
+                <button (click)="search('10')">
+                    <div class="defaultStatus">
+                        <div class="defaultStatusHeaderRow quotedStatus">
+                            Quoted
+                        </div>
+                        <div class="defaultStatusValueRow">
+                            <p>{{totalQuotedStatus}}</p>
+                        </div>
                     </div>
-                    <div class="defaultStatusValueRow">
-                        <p>222</p>
+                </button>
+                
+                <button (click)="search('2')">
+                    <div class="defaultStatus">
+                        <div class="defaultStatusHeaderRow bookedStatus">
+                            Booked
+                        </div>
+                        <div class="defaultStatusValueRow">
+                            <p>{{totalBookedStatus}}</p>
+                        </div>
                     </div>
-                </div>
+                </button>
 
-                <div class="defaultStatus">
-                    <div class="defaultStatusHeaderRow bookedStatus">
-                        Booked
+                <button (click)="search('1')">
+                    <div class="defaultStatus">
+                        <div class="defaultStatusHeaderRow inTransitStatus">
+                            In Transit
+                        </div>
+                        <div class="defaultStatusValueRow">
+                            <p>{{totalInTransitStatus}}</p>
+                        </div>
                     </div>
-                    <div class="defaultStatusValueRow">
-                        <p>333</p>
+                </button>
+                
+                <button (click)="search('6')">
+                    <div class="defaultStatus">
+                        <div class="defaultStatusHeaderRow delivered">
+                            Delivered
+                        </div>
+                        <div class="defaultStatusValueRow">
+                            <p>{{totalDeliveredStatus}}</p>
+                        </div>
                     </div>
-                </div>
-
-                <div class="defaultStatus">
-                    <div class="defaultStatusHeaderRow inTransitStatus">
-                        In Transit
-                    </div>
-                    <div class="defaultStatusValueRow">
-                        <p>444</p>
-                    </div>
-                </div>
-
-                <div class="defaultStatus">
-                    <div class="defaultStatusHeaderRow delivered">
-                        Delivered
-                    </div>
-                    <div class="defaultStatusValueRow">
-                        <p>555</p>
-                    </div>
-                </div>
+                </button>
             </div>
             
             <div fxLayout="row" fxLayoutAlign="end center" class="py-2 pr-2">           
@@ -197,7 +205,7 @@
                         fxFlex="none"
                         mat-icon-button
                         matTooltip="Filter Columns"
-                        type="button">
+                        mat-button>
                         <mat-icon [icIcon]="icFilterList"></mat-icon>
                     </button>
                 </div>
@@ -369,7 +377,7 @@
         </button>
         <div fxLayout="row" fxLayoutAlign="end center" fxLayoutGap="8px" class="py-5 pr-2">
             <div *ngIf=!showSpinner>
-                <button (click)="search()" color="warn" mat-raised-button type="button">Search</button>
+                <button (click)="search('')" color="warn" mat-raised-button type="button">Search</button>
             </div>
         </div>
       </mat-menu>

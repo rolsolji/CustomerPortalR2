@@ -29,6 +29,8 @@ import { MatTableModule } from '@angular/material/table';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatMenuModule } from '@angular/material/menu';
 
+import {MatSidenavModule} from '@angular/material/sidenav';
+
 @NgModule({
   declarations: [FormShipmentBoardComponent],
   imports: [
@@ -59,6 +61,7 @@ import { MatMenuModule } from '@angular/material/menu';
     MatTableModule,
     MatChipsModule,
     MatMenuModule,
+    MatSidenavModule
   ]
 })
 export class FormShipmentBoardModule { }

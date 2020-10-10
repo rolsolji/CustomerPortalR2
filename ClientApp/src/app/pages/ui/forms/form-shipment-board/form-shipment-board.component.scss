@@ -163,3 +163,12 @@ div.table
   background-color: #F3C343; /* For browsers that do not support gradients */
   /*background-image: linear-gradient(to right, #F3C343, #F3C343);*/
 }
+
+.example-container {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  right: 0;
+  width: fit-content;
+  max-height: fit-content;
+}

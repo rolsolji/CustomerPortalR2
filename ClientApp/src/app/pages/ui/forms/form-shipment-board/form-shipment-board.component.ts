@@ -54,6 +54,7 @@ import { ActivatedRoute, Router, ParamMap } from '@angular/router';
 import { stringToKeyValue } from '@angular/flex-layout/extended/typings/style/style-transforms';
 import { MessageService } from "../../../../common/message.service";
 //import {ThemePalette} from '@angular/material/core';
+import {MatSidenav} from '@angular/material/sidenav';
 
 @Component({
   selector: 'vex-form-shipment-board',
@@ -75,7 +76,6 @@ import { MessageService } from "../../../../common/message.service";
 
 
 export class FormShipmentBoardComponent implements OnInit {
-
 
   //displayedColumns = ['position', 'name', 'weight', 'symbol', 'colA', 'colB', 'colC'];
   //dataSource = new MatTableDataSource<Element>(ELEMENT_DATA);
@@ -141,7 +141,6 @@ export class FormShipmentBoardComponent implements OnInit {
   // searchfilter: string;
   // status: string;
 
-
   subject$: ReplaySubject<Quote[]> = new ReplaySubject<Quote[]>(1);
   data$: Observable<Quote[]> = this.subject$.asObservable();
   quotes: Quote[];
@@ -196,13 +195,14 @@ export class FormShipmentBoardComponent implements OnInit {
 
   @ViewChild('statusInput') statusInput: ElementRef<HTMLInputElement>;
   @ViewChild('auto') matAutocomplete: MatAutocomplete;
+  @ViewChild('searchModal') sidenav: MatSidenav;
 
   constructor(
     private httpService : HttpService,
     private route: ActivatedRoute, 
     private router: Router,
     private messageService: MessageService,
-    public datepipe: DatePipe 
+    public datepipe: DatePipe
   ) { 
 
     this.filteredStatus = this.statusCtrl.valueChanges.pipe(
@@ -248,8 +248,27 @@ export class FormShipmentBoardComponent implements OnInit {
     this.search('');
   }
 
+  //SearchModal Open/Close
+  close(reason: string) {
+    if (reason == "open" || reason == "search")
+    {
+      this.sidenav.open();
+      event.stopPropagation();
+      event.stopImmediatePropagation();
+    }
+    else
+    {
+      this.sidenav.close();
+      event.stopPropagation();
+      event.stopImmediatePropagation();
+    }
+  }
+
   async search(statusCode:string){
     
+    //SearchModal
+    this.close("close");
+
     this.showSpinner = true;
 
     this.cleanField()

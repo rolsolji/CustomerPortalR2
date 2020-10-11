@@ -29,6 +29,11 @@ import { MatTableModule } from '@angular/material/table';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatMenuModule } from '@angular/material/menu';
 
+import {MatSidenavModule} from '@angular/material/sidenav';
+
+import {MatPaginatorModule } from "@angular/material/paginator";
+import {MatSortModule } from "@angular/material/sort";
+
 @NgModule({
   declarations: [FormShipmentBoardComponent],
   imports: [
@@ -59,6 +64,9 @@ import { MatMenuModule } from '@angular/material/menu';
     MatTableModule,
     MatChipsModule,
     MatMenuModule,
+    MatSidenavModule,
+    MatPaginatorModule,
+    MatSortModule
   ]
 })
 export class FormShipmentBoardModule { }

@@ -129,8 +129,6 @@ export class HttpService{
             headers: httpHeaders
           }
           ).toPromise();  
-
-        //return this.http.post<Quote[]>('https://beta-customer.r2logistics.com/Services/BOLHDRService.svc/json/SearchBOLHDRForJason', parameters).toPromise();
     }
 
     getMasEquipment(keyId:string){

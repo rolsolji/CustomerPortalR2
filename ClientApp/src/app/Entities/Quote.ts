@@ -30,25 +30,18 @@ export class Quote {
     TransitDays:            string;
 
     get ActualShipDateWithFormat(){
-        let actualShipDate = '';
-
-        actualShipDate = 'A'; //this.ActualShipDate.replace(/(^.*\()|([+-].*$)/g, '')'';
-
-        return 'A';
+        return this.ActualShipDate;
     }
 
     set ActualShipDateWithFormat(value){
     }
 
     get ExpectedDeliveryDateWithFormat(){
-        let actualShipDate = '';
-
-        actualShipDate = 'A'; //this.ActualShipDate.replace(/(^.*\()|([+-].*$)/g, '')'';
-
-        return 'A';
+        return this.ActualShipDate;
     }
 
     set ExpectedDeliveryDateWithFormat(value){
     }
 
+    
 }

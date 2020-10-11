@@ -14,6 +14,8 @@ import icFilterList from '@iconify/icons-ic/twotone-filter-list';
 import icMoreVert from '@iconify/icons-ic/twotone-more-vert';
 import icTwotoneCalendarToday from '@iconify/icons-ic/twotone-calendar-today';
 import icBaselineImageNotSupported from '@iconify/icons-ic/baseline-image-not-supported';
+import baselineEdit from '@iconify/icons-ic/baseline-edit';
+import baselineDoubleArrow from '@iconify/icons-ic/baseline-double-arrow';
 
 import { FormBuilder, FormControl, FormGroup, Validators, FormArray } from '@angular/forms';
 import { map, startWith } from 'rxjs/operators';
@@ -81,7 +83,9 @@ export class FormShipmentBoardComponent implements OnInit {
   //dataSource = new MatTableDataSource<Element>(ELEMENT_DATA);
 
   icFilterList = icFilterList;
-  
+  baselineEdit = baselineEdit;
+  baselineDoubleArrow = baselineDoubleArrow;
+
   showSpinner = false;
 
   //#region Quotes
@@ -149,22 +153,20 @@ export class FormShipmentBoardComponent implements OnInit {
   columns: TableColumn<Quote>[] = [
     //{ label: 'Checkbox', property: 'checkbox', type: 'checkbox', visible: true },
     //{ label: 'Image', property: 'image', type: 'image', visible: true },
-    { label: 'Load No', property: 'ClientLadingNo', type: 'text', visible: true, cssClasses: ['font-medium'] },
-    { label: 'Client', property: 'ClientName', type: 'text', visible: true, cssClasses: ['font-medium'] },
-    { label: 'Carrier Name', property: 'CarrierName', type: 'text', visible: true, cssClasses: ['font-medium'] },
-    { label: 'Actual Ship Date', property: 'ActualShipDateWithFormat', type: 'text', visible: true, cssClasses: ['font-medium'] },
-    { label: 'Origin Name', property: 'OrgName', type: 'text', visible: true, cssClasses: ['text-secondary', 'font-medium'] },
-    { label: 'Origin Location', property: 'OriginLocation', type: 'text', visible: true, cssClasses: ['text-secondary', 'font-medium'] },
-    { label: 'Destination Name', property: 'DestName', type: 'text', visible: true, cssClasses: ['text-secondary', 'font-medium'] },
-    { label: 'Destination Location', property: 'DestinationLocation', type: 'text', visible: true, cssClasses: ['text-secondary', 'font-medium'] },
-    { label: 'Equipment', property: 'EquipmentDescription', type: 'text', visible: true, cssClasses: ['text-secondary', 'font-medium'] },
-    { label: 'Status', property: 'BOLStatus', type: 'text', visible: true, cssClasses: ['font-medium'] },
-    { label: 'Expected Delivery Date', property: 'ExpectedDeliveryDateWithFormat', type: 'text', visible: true, cssClasses: ['text-secondary', 'font-medium'] },
-    //{ label: 'Actions', property: 'actions', type: 'button', visible: true }
+    { label: 'View / Edit', property: 'View', type: 'edit', visible: true, cssClasses: ['grid-mat-cell-small']},
+    { label: 'Load No', property: 'ClientLadingNo', type: 'text', visible: true, cssClasses: ['grid-mat-cell-small'] },
+    { label: 'Client', property: 'ClientName', type: 'text', visible: true, cssClasses: ['grid-mat-cell'] },
+    { label: 'Carrier Name', property: 'CarrierName', type: 'text', visible: true, cssClasses: ['grid-mat-cell'] },
+    { label: 'Actual Ship Date', property: 'ActualShipDateWithFormat', type: 'text', visible: true, cssClasses: ['grid-mat-cell'] },
+    { label: 'Origin Name', property: 'OrgName', type: 'text', visible: true, cssClasses: ['grid-mat-cell'] },
+    { label: 'Origin Location', property: 'OriginLocation', type: 'text', visible: true, cssClasses: ['grid-mat-cell'] },
+    { label: 'Destination Name', property: 'DestName', type: 'text', visible: true, cssClasses: ['grid-mat-cell'] },
+    { label: 'Destination Location', property: 'DestinationLocation', type: 'text', visible: true, cssClasses: ['grid-mat-cell'] },
+    { label: 'Equipment', property: 'EquipmentDescription', type: 'text', visible: true, cssClasses: ['grid-mat-cell-medd'] },
+    { label: 'Status', property: 'BOLStatus', type: 'text', visible: true, cssClasses: ['grid-mat-cell-small'] },
+    { label: 'Expected Delivery Date', property: 'ExpectedDeliveryDateWithFormat', type: 'text', visible: true, cssClasses: ['grid-mat-cell'] },
+    { label: 'Action', property: 'Action', type: 'more', visible: true, cssClasses: ['grid-mat-cell-small'] },
   ];
-
-  //displayedColumns: string[] = ['ClientLadingNo', 'ClientName', 'ActualShipDate', 'city'];
-  //columnsToDisplay: string[] = this.displayedColumns.slice();
 
   keyId: string = "1593399730488";
   pageSize = 10;
@@ -233,17 +235,14 @@ export class FormShipmentBoardComponent implements OnInit {
     this.httpService.token = this.securityToken;
     this.ShipmentModeOptions = await this.httpService.getShipmentMode(this.keyId);
     this.StatusOptions = await this.httpService.getBOLStatus(this.keyId);
+    
     // Get total per status
-
     this.totalQuotedStatus = "11";
     this.totalBookedStatus = "22";
     this.totalInTransitStatus = "33";
     this.totalDeliveredStatus = "44";
 
-    console.log(this.StatusOptions); 
-
     this.EquipmentOptions = await this.httpService.getMasEquipment(this.keyId);
-    console.log(this.StatusOptionsString);
     this.StatusOptions.forEach(s => this.StatusOptionsString.push(s.Status));
     this.search('');
   }
@@ -262,6 +261,18 @@ export class FormShipmentBoardComponent implements OnInit {
       event.stopPropagation();
       event.stopImmediatePropagation();
     }
+  }
+
+  async view(event, row: Quote){
+    event.stopPropagation();
+    event.stopImmediatePropagation();
+    this.messageService.SendQuoteParameter(row.ClientLadingNo);
+    this.router.navigate(['/ui/forms/form-add-ship/'], { relativeTo: this.route });
+  }
+
+  async more(event, row: Quote){
+    event.stopPropagation();
+    event.stopImmediatePropagation();
   }
 
   async search(statusCode:string){
@@ -295,7 +306,11 @@ export class FormShipmentBoardComponent implements OnInit {
     if (!String.IsNullOrWhiteSpace(statusCode))
       this.getQuotesParameters.BOlStatusIDList.push(statusCode);
 
+    //Get parameter quote and clean variable  
     this.messageService.SharedQuoteParameter.subscribe(message => this.quoteIdParameter = message)
+    
+
+        console.log("quoteParameter", this.quoteIdParameter);
 
     if (!String.IsNullOrWhiteSpace(this.quoteIdParameter))
     {
@@ -303,26 +318,25 @@ export class FormShipmentBoardComponent implements OnInit {
       this.getQuotesParameters.Mode = String.Empty;
     }
 
-    console.log(this.getQuotesParameters);
+    console.log("Parameters", this.getQuotesParameters);
+
     this.quotes = await this.httpService.searchBOLHDRForJason(this.getQuotesParameters);    
-    // console.log(this.quotes);
+    
     this.quotes.forEach(element => {
-      let actualShipDate = element.ActualShipDate.replace("/Date(","").replace("-0400)/","").replace("-0500)/","");
-      element.ActualShipDateWithFormat = this.datepipe.transform(actualShipDate,'MM/dd/yyyy'); // new Date(parseInt(d)).toDateString();//  .toString("mm/dd/yyyy");
+      element.ActualShipDateWithFormat = this.datepipe.transform(element.ActualShipDate.replace(/(^.*\()|([+-].*$)/g, ''),'MM/dd/yyyy');
 
       if (!String.IsNullOrWhiteSpace(element.ExpectedDeliveryDate))
       {
-        let expectedDeliveryDate = element.ExpectedDeliveryDate.replace("/Date(","").replace("-0400)/","").replace("-0500)/","");
-        element.ExpectedDeliveryDateWithFormat = this.datepipe.transform(expectedDeliveryDate,'MM/dd/yyyy'); // new Date(parseInt(d)).toDateString();//  .toString("mm/dd/yyyy");
+        element.ExpectedDeliveryDateWithFormat = this.datepipe.transform(element.ExpectedDeliveryDate.replace(/(^.*\()|([+-].*$)/g, ''),'MM/dd/yyyy');
       }
     });
-    // console.log(this.quotes[0].ActualShipDate );
-    // console.log(this.quotes[0].ActualShipDateWithFormat);
+
     this.dataSource = new MatTableDataSource();
     this.dataSource.data = this.quotes;
-    console.log("DataToTable", this.dataSource.data);
-
+    
     this.showSpinner = false;
+
+    this.messageService.SendQuoteParameter(String.Empty);
   }
 
   visible = true;
@@ -378,57 +392,4 @@ export class FormShipmentBoardComponent implements OnInit {
     this.statusCtrl.setValue(null);
   }
 
-  changeSelected(parameter: string, query: string) {
-
-    console.log(String.Format("Parameter: {0}",parameter));
-    console.log(String.Format("query: {0}", query));
-
-    // const index = this.selectedChips.indexOf(query);
-    // if (index >= 0) {
-    //   this.selectedChips.splice(index, 1);
-    // } else {
-    //   this.selectedChips.push(query);
-    // }
-    // console.log('this.selectedChips: ' + this.selectedChips);
-  }
-
-  toggleColumnVisibility(column, event) {
-    event.stopPropagation();
-    event.stopImmediatePropagation();
-    column.visible = !column.visible;
-  }
 }
-
-
-// export interface Element {
-//   name: string;
-//   position: number;
-//   weight: number;
-//   symbol: string;
-//   colA: string;
-//   colB: string;
-//   colC: string;
-// }
-
-// const ELEMENT_DATA: Element[] = [
-//   {position: 1, name: 'Hydrogen', weight: 1.0079, symbol: 'H', colA: 'SOUTHEASTERN FREIGHT LINES',colB:'GERMANTOWN,TN ,38138,USA', colC:'ROADRUNNER TRANSPORTATION'},
-//   {position: 2, name: 'Helium', weight: 4.0026, symbol: 'He', colA: 'SOUTHEASTERN FREIGHT LINES',colB:'GERMANTOWN,TN ,38138,USA', colC:'ROADRUNNER TRANSPORTATION'},
-//   {position: 3, name: 'Lithium', weight: 6.941, symbol: 'Li', colA: 'SOUTHEASTERN FREIGHT LINES',colB:'GERMANTOWN,TN ,38138,USA', colC:'ROADRUNNER TRANSPORTATION'},
-//   {position: 4, name: 'Beryllium', weight: 9.0122, symbol: 'Be', colA: 'SOUTHEASTERN FREIGHT LINES',colB:'GERMANTOWN,TN ,38138,USA', colC:'ROADRUNNER TRANSPORTATION'},
-//   {position: 5, name: 'Boron', weight: 10.811, symbol: 'B', colA: 'SOUTHEASTERN FREIGHT LINES',colB:'GERMANTOWN,TN ,38138,USA', colC:'ROADRUNNER TRANSPORTATION'},
-//   {position: 6, name: 'Carbon', weight: 12.0107, symbol: 'C', colA: 'SOUTHEASTERN FREIGHT LINES',colB:'GERMANTOWN,TN ,38138,USA', colC:'ROADRUNNER TRANSPORTATION'},
-//   {position: 7, name: 'Nitrogen', weight: 14.0067, symbol: 'N', colA: 'SOUTHEASTERN FREIGHT LINES',colB:'GERMANTOWN,TN ,38138,USA', colC:'ROADRUNNER TRANSPORTATION'},
-//   {position: 8, name: 'Oxygen', weight: 15.9994, symbol: 'O', colA: 'SOUTHEASTERN FREIGHT LINES',colB:'GERMANTOWN,TN ,38138,USA', colC:'ROADRUNNER TRANSPORTATION'},
-//   {position: 9, name: 'Fluorine', weight: 18.9984, symbol: 'F', colA: 'SOUTHEASTERN FREIGHT LINES',colB:'GERMANTOWN,TN ,38138,USA', colC:'ROADRUNNER TRANSPORTATION'},
-//   {position: 10, name: 'Neon', weight: 20.1797, symbol: 'Ne', colA: 'SOUTHEASTERN FREIGHT LINES',colB:'GERMANTOWN,TN ,38138,USA', colC:'ROADRUNNER TRANSPORTATION'},
-//   {position: 11, name: 'Sodium', weight: 22.9897, symbol: 'Na', colA: 'SOUTHEASTERN FREIGHT LINES',colB:'GERMANTOWN,TN ,38138,USA', colC:'ROADRUNNER TRANSPORTATION'},
-//   {position: 12, name: 'Magnesium', weight: 24.305, symbol: 'Mg', colA: 'SOUTHEASTERN FREIGHT LINES',colB:'GERMANTOWN,TN ,38138,USA', colC:'ROADRUNNER TRANSPORTATION'},
-//   {position: 13, name: 'Aluminum', weight: 26.9815, symbol: 'Al', colA: 'SOUTHEASTERN FREIGHT LINES',colB:'GERMANTOWN,TN ,38138,USA', colC:'ROADRUNNER TRANSPORTATION'},
-//   {position: 14, name: 'Silicon', weight: 28.0855, symbol: 'Si', colA: 'SOUTHEASTERN FREIGHT LINES',colB:'GERMANTOWN,TN ,38138,USA', colC:'ROADRUNNER TRANSPORTATION'},
-//   {position: 15, name: 'Phosphorus', weight: 30.9738, symbol: 'P', colA: 'SOUTHEASTERN FREIGHT LINES',colB:'GERMANTOWN,TN ,38138,USA', colC:'ROADRUNNER TRANSPORTATION'},
-//   {position: 16, name: 'Sulfur', weight: 32.065, symbol: 'S', colA: 'SOUTHEASTERN FREIGHT LINES',colB:'GERMANTOWN,TN ,38138,USA', colC:'ROADRUNNER TRANSPORTATION'},
-//   {position: 17, name: 'Chlorine', weight: 35.453, symbol: 'Cl', colA: 'SOUTHEASTERN FREIGHT LINES',colB:'GERMANTOWN,TN ,38138,USA', colC:'ROADRUNNER TRANSPORTATION'},
-//   {position: 18, name: 'Argon', weight: 39.948, symbol: 'Ar', colA: 'SOUTHEASTERN FREIGHT LINES',colB:'GERMANTOWN,TN ,38138,USA', colC:'ROADRUNNER TRANSPORTATION'},
-//   {position: 19, name: 'Potassium', weight: 39.0983, symbol: 'K', colA: 'SOUTHEASTERN FREIGHT LINES',colB:'GERMANTOWN,TN ,38138,USA', colC:'ROADRUNNER TRANSPORTATION'},
-//   {position: 20, name: 'Calcium', weight: 40.078, symbol: 'Ca', colA: 'SOUTHEASTERN FREIGHT LINES',colB:'GERMANTOWN,TN ,38138,USA', colC:'ROADRUNNER TRANSPORTATION'},
-// ];

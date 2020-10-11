@@ -62,7 +62,7 @@
                     </button>
                 </div>
              
-                 <mat-sidenav #searchModal position="end" class="example-container" (click)="close('search')">
+                 <mat-sidenav #searchModal position="end" class="search-container" (click)="close('search')">
                     <button (click)="$event.stopPropagation()">
                         <div class="ml-2 mr-2">
                             <mat-form-field appearance="outline">
@@ -207,34 +207,54 @@
         </div>
     </div>
 
-    <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="5px" class="card ml-2 mt-5" (click)="close('close')">        
+    <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="5px" class="card ml-2 mt-5 grid-container" (click)="close('close')">        
         <div *ngIf=!showSpinner>
-        <table [dataSource]="dataSource" class="mat-elevation-z8" mat-table matSort>
-            <!-- Text Columns -->
-            <ng-container *ngFor="let column of columns; trackBy: trackByProperty">
-            <ng-container *ngIf="column.type === 'text'" [matColumnDef]="column.property">
-                <th *matHeaderCellDef class="uppercase" mat-header-cell mat-sort-header> {{ column.label }}</th>
-                <td *matCellDef="let row" [ngClass]="column.cssClasses" mat-cell>{{ row[column.property] }}</td>
-            </ng-container>
-            </ng-container>
+            
+            <table [dataSource]="dataSource" class="mat-elevation-z8" mat-table matSort>
+                
+                <!-- Action Columns -->
+                <ng-container *ngFor="let column of columns; trackBy: trackByProperty">
+                    <ng-container *ngIf="column.type === 'edit'" [matColumnDef]="column.property">
+                        <th *matHeaderCellDef class="grid-header-cell grid-mat-cell-small uppercase" mat-header-cell> {{ column.label }}</th>
+                        <td *matCellDef="let row" [ngClass]="column.cssClasses" mat-cell>
+                            <button (click)="view($event,row)" mat-icon-button type="button">
+                                <mat-icon [icIcon]="baselineEdit" color="lightgray"></mat-icon>
+                            </button>
+                        </td>
+                    </ng-container>
+                </ng-container>
 
-            <!-- Text Columns -->
-            <ng-container *ngFor="let column of columns; trackBy: trackByProperty">
-            <ng-container *ngIf="column.type === 'dateformat'" [matColumnDef]="column.property">
-                <th *matHeaderCellDef class="uppercase" mat-header-cell mat-sort-header> {{ column.label }}</th>
-                <td *matCellDef="let row" [ngClass]="column.cssClasses" mat-cell>{{ row[column.property | date:'fullDate'] }}</td>
-            </ng-container>
-            </ng-container>
+                <ng-container *ngFor="let column of columns; trackBy: trackByProperty">
+                    <ng-container *ngIf="column.type === 'more'" [matColumnDef]="column.property">
+                        <th *matHeaderCellDef class="grid-header-cell grid-mat-cell-small uppercase" mat-header-cell> {{ column.label }}</th>
+                        <td *matCellDef="let row" [ngClass]="column.cssClasses" mat-cell>
+                            <button (click)="more($event,row)" mat-icon-button type="button">
+                                <mat-icon [icIcon]="baselineDoubleArrow" color="lightgray"></mat-icon>
+                            </button>
+                        </td>
+                    </ng-container>
+                </ng-container>
 
-            <tr *matHeaderRowDef="visibleColumns" mat-header-row></tr>
-            <tr 
-                *matRowDef="let row; columns: visibleColumns;"
-                @fadeInUp
-                class="hover:bg-hover trans-ease-out cursor-pointer"
-                mat-row>
-            </tr>
-        </table>
-    </div>
+                <!-- Text Columns -->
+                <ng-container *ngFor="let column of columns; trackBy: trackByProperty">
+                <ng-container *ngIf="column.type === 'text'" [matColumnDef]="column.property">
+                    <th *matHeaderCellDef class="grid-mat-cell grid-header-cell uppercase" mat-header-cell mat-sort-header> {{ column.label }}</th>
+                    <td *matCellDef="let row" [ngClass]="column.cssClasses" mat-cell>{{ row[column.property] }}</td>
+                </ng-container>
+                </ng-container>
+
+                <tr *matHeaderRowDef="visibleColumns" mat-header-row ></tr>
+                <tr 
+                    *matRowDef="let row; columns: visibleColumns;"
+                    @fadeInUp
+                    class="hover:bg-hover trans-ease-out cursor-pointer"
+                    mat-row>
+                </tr>
+            </table>
+
+            
+
+        </div>
     </div>
 </div>
 

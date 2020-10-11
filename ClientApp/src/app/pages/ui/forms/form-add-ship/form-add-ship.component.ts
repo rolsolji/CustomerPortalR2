@@ -61,7 +61,7 @@ import * as moment from 'moment';
   ]
 })
 export class FormAddShipComponent implements OnInit {
-
+ 
   keyId: string = "1593399730488";
   ClientID: number = 8473;
   securityToken: string;
@@ -379,38 +379,13 @@ export class FormAddShipComponent implements OnInit {
     //Get shipment mode description by default
     this.fetchShipmentMode("LTL");
 
-    //-- Get Shipment information
-    let defaultoriginpostalcode = null;
-    let defaultoriginstatename = null;
-    let defaultpickupdate = null;
-    let defaultdestpostalcode = null;
-    let defaultdeststatename = null;
-
-    this.ladingIdParameter = "2386548";
+    //-- Get Shipment information    
+    this.ladingIdParameter = "2386566";
 
     if (this.ladingIdParameter != null && this.ladingIdParameter.length > 0){
       //-- Get Service Level Options
       this.ShipmentByLadingObject = await this.httpService.GetShipmentByLadingID(this.ladingIdParameter, this.keyId);
-
-      defaultoriginpostalcode = this.ShipmentByLadingObject.OriginTerminalZip.trim() + "-" + this.ShipmentByLadingObject.OriginTerminalCity.trim();
-      defaultoriginstatename = this.ShipmentByLadingObject.OrgStateName.trim()      
-      let tempPickupDate = moment.utc(this.ShipmentByLadingObject.PickupDate);
-      defaultpickupdate = tempPickupDate.format('DD/MM/YYYY');
-
-      defaultdestpostalcode = this.ShipmentByLadingObject.DestTerminalZip.trim() + "-" + this.ShipmentByLadingObject.DestTerminalCity.trim();
-      defaultdeststatename = this.ShipmentByLadingObject.DestStateName.trim()     
-
-      //-- Set default values
-      this.originAndDestinationFormGroup.controls['originpostalcode'].setValue(defaultoriginpostalcode, {onlySelf: false});
-      this.originAndDestinationFormGroup.controls['originstatename'].setValue(defaultoriginstatename, {onlySelf: false});
-      //this.originAndDestinationFormGroup.controls['originpickupdate'].setValue(tempPickupDate, {onlySelf: false});
-      this.originAndDestinationFormGroup.controls['originpickupdate'].setValue({
-        originpickupdate: defaultpickupdate
-      });
-      this.originAndDestinationFormGroup.controls['destpostalcode'].setValue(defaultdestpostalcode, {onlySelf: false});
-      this.originAndDestinationFormGroup.controls['deststatename'].setValue(defaultdeststatename, {onlySelf: false});      
-      //--
-
+      this.setDefaultValuesInSteps()     
     }
     //--
 
@@ -432,6 +407,9 @@ export class FormAddShipComponent implements OnInit {
       this.clientDefaultData = await this.httpService.getClientDefaultsByClient(this.ClientID, this.keyId);
     
       this.ratesOpened = []; //initiate ratesOpened array
+
+      //this.setDefaultDate();
+      
 
     //console.log(this.ShipmentCostObject);
   }
@@ -858,6 +836,66 @@ export class FormAddShipComponent implements OnInit {
   StepperSelectionChange(event: StepperSelectionEvent){
     //console.log(event);
     this.clearRatesSection()
+  }
+
+  setDefaultValuesInSteps() {
+    let defaultoriginpostalcode = null;
+    let defaultoriginstatename = null;
+    let defaultpickupdate = null;
+    let defaultdestpostalcode = null;
+    let defaultdeststatename = null;
+
+    if (this.ShipmentByLadingObject == null){
+      return;
+    }
+
+    defaultoriginpostalcode = this.ShipmentByLadingObject.OrgZipCode.trim() + "-" + this.ShipmentByLadingObject.OrgCityName.trim();
+    defaultoriginstatename = this.ShipmentByLadingObject.OrgStateName.trim();
+
+    let tempPickupDate = moment.utc(this.ShipmentByLadingObject.PickupDate);
+    //this.datepipe.transform(this.ShipmentByLadingObject.PickupDate.replace(/(^.\()|([+-].$)/g, ''),'MM/dd/yyyy');
+    defaultpickupdate = new Date(tempPickupDate.format('DD/MM/YYYY'));
+
+    defaultdestpostalcode = this.ShipmentByLadingObject.DestZipCode.trim() + "-" + this.ShipmentByLadingObject.DestCityName.trim();
+    defaultdeststatename = this.ShipmentByLadingObject.DestStateName.trim();     
+
+    //-- Set default values "Origin and Destination" step
+    this.originAndDestinationFormGroup.controls['originpostalcode'].setValue(defaultoriginpostalcode, {onlySelf: false});
+    this.originAndDestinationFormGroup.controls['originstatename'].setValue(defaultoriginstatename, {onlySelf: false});
+    this.originAndDestinationFormGroup.controls['originpickupdate'].setValue(defaultpickupdate, {onlySelf: false});     
+    this.originAndDestinationFormGroup.controls['destpostalcode'].setValue(defaultdestpostalcode, {onlySelf: false});
+    this.originAndDestinationFormGroup.controls['deststatename'].setValue(defaultdeststatename, {onlySelf: false});      
+    //--
+
+    //-- Set default values "Products and Accesorials" step
+    if (this.ShipmentByLadingObject.BOlProductsList != null && this.ShipmentByLadingObject.BOlProductsList.length > 0){
+      // if ((this.productsAndAccessorialsFormGroup.get('products').value).length == 1){
+      //   //(this.productsAndAccessorialsFormGroup.get('products').value).removeAt(0); //Remove the empty product record to start inserting products returned by API
+      //   this.productsAndAccessorialsFormGroup.get('products').value.splice(0, 1);
+      // }
+      let counter = 1;
+      this.ShipmentByLadingObject.BOlProductsList.forEach(p => { 
+        if (counter > 1){
+          this.addNewProdField();
+        }            
+        
+        let currentProductIndex = (<FormArray>this.productsAndAccessorialsFormGroup.controls['products']).length - 1;                       
+        (<FormArray>this.productsAndAccessorialsFormGroup.controls['products']).at(currentProductIndex).get("Pallets").setValue(p.Pallets);
+        (<FormArray>this.productsAndAccessorialsFormGroup.controls['products']).at(currentProductIndex).get("Pieces").setValue(p.Pieces);
+        (<FormArray>this.productsAndAccessorialsFormGroup.controls['products']).at(currentProductIndex).get("PackageTypeID").setValue(p.PackageTypeID);
+        (<FormArray>this.productsAndAccessorialsFormGroup.controls['products']).at(currentProductIndex).get("ProductClass").setValue(p.Class);
+        (<FormArray>this.productsAndAccessorialsFormGroup.controls['products']).at(currentProductIndex).get("NmfcNumber").setValue(p.NMFC);
+        (<FormArray>this.productsAndAccessorialsFormGroup.controls['products']).at(currentProductIndex).get("Length").setValue(p.Lenght);
+        (<FormArray>this.productsAndAccessorialsFormGroup.controls['products']).at(currentProductIndex).get("Width").setValue(p.Width);
+        (<FormArray>this.productsAndAccessorialsFormGroup.controls['products']).at(currentProductIndex).get("Height").setValue(p.Height);
+        (<FormArray>this.productsAndAccessorialsFormGroup.controls['products']).at(currentProductIndex).get("PCF").setValue(p.PCF);
+        (<FormArray>this.productsAndAccessorialsFormGroup.controls['products']).at(currentProductIndex).get("Weight").setValue(p.Weight);
+        (<FormArray>this.productsAndAccessorialsFormGroup.controls['products']).at(currentProductIndex).get("Stackable").setValue(p.Stackable);
+        (<FormArray>this.productsAndAccessorialsFormGroup.controls['products']).at(currentProductIndex).get("Hazmat").setValue(p.Hazmat);
+        
+      });    
+    }
+    //--
   }
 
 }

@@ -8,7 +8,7 @@
 
 <div @stagger class="qcForms p-gutter" vexContainer>  
   <div @fadeInUp class="card overflow-hidden">
-    <mat-horizontal-stepper #stepper="matHorizontalStepper" [linear]="false" (selectionChange)="StepperSelectionChange($event)">
+    <mat-horizontal-stepper #stepper="matHorizontalStepper" [linear]="true" (selectionChange)="StepperSelectionChange($event)">
       <ng-template matStepperIcon="edit">
         <mat-icon [icIcon]="icDoneAll"></mat-icon>
       </ng-template>
@@ -430,11 +430,11 @@
             </div>
             <div @fadeInUp class="card" fxFlex="25%">
               <div fxLayout="row" fxLayoutGap="8px" class="ml-5">
-                <div><h2 class="OriginDestinationTitle">Accessorial(s) {{accesorialsSelect.selectedOptions.selected.length}}</h2></div>
+                <div><h2 class="OriginDestinationTitle">Accessorial(s) {{accessorialsSelectedQty}}</h2></div>
               </div>
               <div class="AccessorialsSection">
                 <mat-selection-list #accesorialsSelect class="accesorialsSelectionList" (selectionChange)="onGroupsChange(accesorialsSelect.selectedOptions.selected)">
-                  <mat-list-option color="warn" *ngFor="let accesorial of accessorialArray" checkboxPosition="before" [value]="accesorial">
+                  <mat-list-option color="warn" *ngFor="let accesorial of accessorialArray" checkboxPosition="before" [value]="accesorial" [selected]="accesorial.Selected">
                     {{accesorial.Description}}
                   </mat-list-option>
                 </mat-selection-list>
@@ -1010,7 +1010,7 @@
                         </div>                                 
                       </div>
                       <div>
-                        <table mat-table [dataSource]="this.AccountInvoiceCostList" class="mat-elevation-z8">                    
+                        <table mat-table [dataSource]="this.costListFiltered" class="mat-elevation-z8">                    
                           <ng-container matColumnDef="Code">
                             <th mat-header-cell *matHeaderCellDef> Code </th>
                             <td mat-cell *matCellDef="let shipmentItem"> {{shipmentItem.AccessorialCode}} </td>

@@ -4,4 +4,5 @@ export interface AccessorialDetail {
         ClientID: number;
         Description: string;
         MappedAccessorialID: number;
+        Selected: boolean;
     }

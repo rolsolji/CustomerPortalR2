@@ -104,3 +104,7 @@ mat-chip {
     word-wrap: break-word;
     max-width: 100px;
 }
+
+.mat-cell, .mat-footer-cell {
+  font-size: 12px;
+}

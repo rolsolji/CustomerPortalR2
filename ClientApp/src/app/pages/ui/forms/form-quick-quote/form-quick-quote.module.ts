@@ -23,6 +23,7 @@ import { ContainerModule } from '../../../../../@vex/directives/container/contai
 import { MatExpansionModule } from '@angular/material/expansion';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatTooltipModule } from '@angular/material/tooltip';
 
 @NgModule({
   declarations: [FormQuickQuoteComponent],
@@ -49,7 +50,8 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
     ContainerModule,
     MatExpansionModule,
     MatSnackBarModule,
-    MatProgressSpinnerModule
+    MatProgressSpinnerModule,
+    MatTooltipModule
   ]
 })
 export class FormQuickQuoteModule {

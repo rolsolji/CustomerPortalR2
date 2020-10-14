@@ -8,7 +8,7 @@
 
 <div @stagger class="qcForms p-gutter" vexContainer>  
   <div @fadeInUp class="card overflow-hidden">
-    <mat-horizontal-stepper #stepper="matHorizontalStepper" [linear]="true" (selectionChange)="StepperSelectionChange($event)">
+    <mat-horizontal-stepper #stepper="matHorizontalStepper" [linear]="false" (selectionChange)="StepperSelectionChange($event)">
       <ng-template matStepperIcon="edit">
         <mat-icon [icIcon]="icDoneAll"></mat-icon>
       </ng-template>
@@ -356,7 +356,7 @@
                         <div fxFlex="28%">
                           <mat-form-field>
                             <mat-label>Description</mat-label>
-                            <input matInput type="text" maxlength="50" formControlName="ProductDescription">
+                            <input matInput type="text" maxlength="50" formControlName="ProductDescription" required>
                           </mat-form-field>
                         </div>     
                       </div>

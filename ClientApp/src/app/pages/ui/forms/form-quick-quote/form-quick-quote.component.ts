@@ -207,6 +207,7 @@ export class FormQuickQuoteComponent implements OnInit {
       limitedAccess:[null],
       insidePickup:[null],
       liftgateRequiredAtPickup:[null],
+      additionalInsured:[null],
       // collectionServices: this.fb.group({
         
       // }),

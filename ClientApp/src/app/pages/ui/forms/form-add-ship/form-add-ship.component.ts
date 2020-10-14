@@ -421,6 +421,7 @@ export class FormAddShipComponent implements OnInit {
     
       this.ratesOpened = []; //initiate ratesOpened array
       this.messageService.SendLadingIDParameter(String.Empty); //Clean LadingId parameter  
+      this.messageService.SendQuoteParameter(String.Empty); //Clean LadingCode parameter  
       //this.setDefaultDate();
       
 

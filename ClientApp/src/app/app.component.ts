@@ -39,6 +39,7 @@ import { SplashScreenService } from '../@vex/services/splash-screen.service';
 import { Style, StyleService } from '../@vex/services/style.service';
 import icChromeReaderMode from '@iconify/icons-ic/twotone-chrome-reader-mode';
 import { ConfigName } from '../@vex/interfaces/config-name.model';
+import baselinePostAdd from '@iconify/icons-ic/baseline-post-add';
 
 @Component({
   selector: 'vex-root',
@@ -110,8 +111,9 @@ export class AppComponent {
         type: 'link',
         label: 'Dashboard',
         route: '/dashboards/analytics',
-        icon: icLayers,
-        routerLinkActiveOptions: { exact: true }
+        icon: icLayers
+        // ,
+        // routerLinkActiveOptions: { exact: true }
       },
       {
         type: 'subheading',
@@ -121,7 +123,14 @@ export class AppComponent {
             type: 'link',
             label: 'Quick Quote',
             route: '/',
-            icon: icAssigment
+            icon: icAssigment,
+            routerLinkActiveOptions: { exact: true }
+          },
+          {
+            type: 'link',
+            label: 'Add Shipment',
+            route: '/ui/forms/form-add-ship',
+            icon: baselinePostAdd
           },
           {
             type: 'dropdown',

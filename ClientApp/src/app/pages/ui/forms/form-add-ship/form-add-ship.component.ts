@@ -304,7 +304,7 @@ export class FormAddShipComponent implements OnInit {
     // -- shipmentInfoFormGroup fields
     this.shipmentInfoFormGroup = this.fb.group({
       equipment: [7, Validators.required],
-      priority: [null],
+      priority: [0],
       customerref: [null],
       r2order: [null],
       r2pronumber: [null],
@@ -315,7 +315,7 @@ export class FormAddShipComponent implements OnInit {
       shipmentvalue: [null],
       valueperpound: [null],
       os_d: [null],
-      servicelevel: [null, Validators.required],
+      servicelevel: [1, Validators.required],
       r2refno: [null],
       statuscode: [null],
       specialinstructions: [null],
@@ -436,12 +436,12 @@ export class FormAddShipComponent implements OnInit {
         })
       );
 
-
-
-      this.ratesOpened = []; // initiate ratesOpened array
-      this.messageService.SendLadingIDParameter(String.Empty); // Clean LadingId parameter
-      // this.setDefaultDate();
-
+      
+    
+      this.ratesOpened = []; //initiate ratesOpened array
+      this.messageService.SendLadingIDParameter(String.Empty); //Clean LadingId parameter  
+      this.messageService.SendQuoteParameter(String.Empty); //Clean LadingCode parameter  
+      //this.setDefaultDate();
 
     // console.log(this.ShipmentCostObject);
   }

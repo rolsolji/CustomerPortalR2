@@ -25,17 +25,21 @@ export class AuthenticationService {
   public authenticatedUser$: BehaviorSubject<User> = new BehaviorSubject<User>(null);
   public ticket$: BehaviorSubject<string> = new BehaviorSubject<string>('');
   public clientsForUser$: BehaviorSubject<Client[]> = new BehaviorSubject<Client[]>(null);
+  public defaultClient$: BehaviorSubject<Client> = new BehaviorSubject<Client>(null);
 
   private init(): boolean {
     const ticket = this.getTicketFromStorage();
     const user = this.getUserFromStorage();
     const clients = this.getClientsForUserFromStorage();
+    const defaultClient = this.getDefaultClientFromStorage();
 
     if (ticket && user) {
       this.ticket$.next(ticket);
       this.authenticatedUser$.next(new User(user));
       this.authState$.next(true);
       this.clientsForUser$.next(clients);
+      this.defaultClient$.next(defaultClient);
+
       return true;
     }
     this.authState$.next(false);
@@ -67,7 +71,13 @@ export class AuthenticationService {
             if (user instanceof User) {
               this.authenticatedUser$.next(user);
               localStorage.setItem('authenticatedUser', JSON.stringify(user));
-              this.getClientForUser(user.UserID);
+              this.getClientsForUser(user.UserID);
+
+              const defaultClient = this.clientsForUser$.value.find(
+                (client: Client) => client.ClientID === user.ClientID);
+              localStorage.setItem('defaultClient', JSON.stringify(defaultClient));
+              this.defaultClient$.next(defaultClient);
+
             }
 
             resolve({ticket, status: true, user});
@@ -96,7 +106,7 @@ export class AuthenticationService {
     localStorage.removeItem('ticket');
   }
 
-  public getClientForUser(userID: number) {
+  public getClientsForUser(userID: number) {
     const ticket = this.ticket$.value;
     const httpHeaders = new HttpHeaders({
       Ticket : ticket
@@ -118,6 +128,14 @@ export class AuthenticationService {
 
   public getUserFromStorage(): User {
     return JSON.parse(localStorage.getItem('authenticatedUser'));
+  }
+
+  public getDefaultClientFromStorage(): Client {
+    return JSON.parse(localStorage.getItem('defaultClient'));
+  }
+
+  public getDefaultClient(): Client {
+    return this.defaultClient$.value;
   }
 
   public getClientsForUserFromStorage(): Client[] {

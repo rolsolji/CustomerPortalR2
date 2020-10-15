@@ -110,7 +110,7 @@ export class FormQuickQuoteComponent implements OnInit {
   visible = false;
 
   keyId = '1593399730488';
-  ClientID = 8473;
+  ClientID = this.authenticationService.getDefaultClient().ClientID;
   clientDefaultData: ClientDefaultData;
   clientTLWeightLimit: string;
   carrierImageUrl = 'https://beta-customer.r2logistics.com/Handlers/CarrierLogoHandler.ashx?carrierID=';

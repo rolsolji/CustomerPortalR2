@@ -20,6 +20,7 @@ import { MegaMenuComponent } from '../../components/mega-menu/mega-menu.componen
 import icSearch from '@iconify/icons-ic/twotone-search';
 import { FormControl } from '@angular/forms';
 import { HttpService } from '../../../app/common/http.service';
+import {AuthenticationService} from '../../../app/common/authentication.service';
 
 
 @Component({
@@ -28,7 +29,7 @@ import { HttpService } from '../../../app/common/http.service';
   styleUrls: ['./toolbar.component.scss']
 })
 export class ToolbarComponent implements OnInit {
-  
+
   @Input() mobileQuery: boolean;
 
   @Input()
@@ -60,15 +61,18 @@ export class ToolbarComponent implements OnInit {
 
   keyId: string = "1593399730488";
   toolBarMessage:string;
+  toolBarTitle: string;
 
   constructor(private layoutService: LayoutService,
               private configService: ConfigService,
               private navigationService: NavigationService,
               private popoverService: PopoverService,
-              private httpService : HttpService) { }
+              private httpService : HttpService,
+              public  authenticationService: AuthenticationService) { }
 
   ngOnInit() {
     this.toolBarMessage = this.httpService.getUserMessage(this.keyId);
+    this.toolBarTitle = this.authenticationService.getDefaultClient().ClientName;
   }
 
 

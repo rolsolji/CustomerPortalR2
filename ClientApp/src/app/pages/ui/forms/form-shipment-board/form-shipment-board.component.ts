@@ -113,7 +113,7 @@ export class FormShipmentBoardComponent implements OnInit {
 
   //#region Quotes
   getQuotesParameters: GetQuotesParameters = {
-    ClientID: 8473,
+    ClientID: this.authenticationService.getDefaultClient().ClientID,
     PageNumber: 1,
     PageSize: 20,
     FromShipDate: null,

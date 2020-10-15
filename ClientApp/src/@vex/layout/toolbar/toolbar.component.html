@@ -11,7 +11,7 @@
     <img class="w-8 select-none" src="assets/img/demo/logo.svg">
     <h1 [fxHide]="mobileQuery" class="title ltr:pl-4 rtl:pr-4 m-0 select-none">VEX</h1>
   </a>
-  
+
   <!--<button *ngIf="isHorizontalLayout$ | async"
           [fxHide]="mobileQuery"
           [matMenuTriggerFor]="addNewMenu"
@@ -84,15 +84,15 @@
       <div fxFlex="10%" fxHide.lt-sm>
         <img class="w-16" src="assets/img/demo/R2-Logistics_Logo.png">
       </div>
-      <div fxFlex fxLayout="column" fxLayoutAlign="space-around center"> 
-        <div><h2>R2 Logistics</h2></div>
+      <div fxFlex fxLayout="column" fxLayoutAlign="space-around center">
+        <div><h2>{{toolBarTitle}}</h2></div>
         <div fxLayout="row">
           <p class="userMessage">
             {{toolBarMessage}}
           </p>
-        </div> 
+        </div>
       </div>
-    </div>  
+    </div>
 
   <div class="-mx-1 flex items-center">
       <div class="px-1">

@@ -17,7 +17,7 @@
         <mat-icon [icIcon]="icDoneAll"></mat-icon>
       </ng-template>
 
-      <mat-step [stepControl]="originAndDestinationFormGroup">
+      <mat-step [stepControl]="originAndDestinationFormGroup" errorMessage="Missing require fields.">
         <form [formGroup]="originAndDestinationFormGroup">
           <ng-template matStepLabel>
             <span class="stepTitleStyle">Origin And Destination</span>
@@ -291,7 +291,7 @@
         </form>
       </mat-step>
 
-      <mat-step [stepControl]="productsAndAccessorialsFormGroup">
+      <mat-step [stepControl]="productsAndAccessorialsFormGroup" errorMessage="Missing require fields.">
         <form [formGroup]="productsAndAccessorialsFormGroup">
           <ng-template matStepLabel>
             <span class="stepTitleStyle">Products and Accessorials</span>
@@ -449,7 +449,7 @@
         </form>
       </mat-step>
 
-      <mat-step [stepControl]="shipmentInfoFormGroup">
+      <mat-step [stepControl]="shipmentInfoFormGroup" errorMessage="Missing require fields.">
         <form [formGroup]="shipmentInfoFormGroup">
           <ng-template matStepLabel>
             <span class="stepTitleStyle">Shipment Information</span>
@@ -1048,7 +1048,7 @@
           <div class="actions" fxLayout="row" fxLayoutAlign="end center" fxLayoutGap="8px">
             <button color="primary" mat-button matStepperPrevious type="button" (click)="previousFromLastStep()">Previous</button>
             <button (click)="submit()"  color="warn" mat-raised-button
-                    matStepperNext>
+                    matStepperNext [disabled]="!originAndDestinationFormGroup.valid || !productsAndAccessorialsFormGroup.valid || !shipmentInfoFormGroup.valid || this.costListFiltered.length == 0">
               Book Shipment
             </button>
           </div>

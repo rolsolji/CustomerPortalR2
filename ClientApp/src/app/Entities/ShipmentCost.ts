@@ -1,18 +1,18 @@
     export interface AccountInvoiceCostList {
-        AccCarrierCostSeq: number;
-        AccClientCostSeq: number;
-        AccInvoiceDetailsCostSeq: number;
+        AccCarrierCostSeq?: number;
+        AccClientCostSeq?: number;
+        AccInvoiceDetailsCostSeq?: number;
         AccessorialCode: string;
         AccessorialID?: number;
         BilledCost: number;
-        BuyCostSeq: number;
-        CostDetailID: number;
-        CostStatus: number;
+        BuyCostSeq?: number;
+        CostDetailID?: number;
+        CostStatus?: number;
         Description: string;
-        InvDetailID: number;
+        InvDetailID?: number;
         PaidCost?: number;
-        RatedCost: number;
-        SellCostSeq: number;
+        RatedCost?: number;
+        SellCostSeq?: number;
     }   
 
     export interface BuyRates {

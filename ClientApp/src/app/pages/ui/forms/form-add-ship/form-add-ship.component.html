@@ -724,10 +724,99 @@
                       <h3 class="OriginDestinationSubTitle">Product(s): {{formProducts.length}}</h3>
                     </div>                    
                   </div>
-                  <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="5px" >
-                    <div fxFlex="100%">
-                      <span>Still working on adding product(s) details...</span>
-                    </div>                    
+                  <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="5px">
+                    <div style="width: 100%;">
+                      <div *ngFor="let prod of formProducts.value; let i = index">
+                        <hr *ngIf="i > 0" >
+                        <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="5px">
+                          <div fxFlex="33.33%">
+                            <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="5px">
+                              <div fxFlex="100%">
+                                <mat-label>Pallet: </mat-label><mat-label class="InfoLabel">{{prod.Pallets}}</mat-label>
+                              </div>                                                        
+                            </div>                         
+                          </div>
+                          <div fxFlex="33.33%">
+                            <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="5px">
+                              <div fxFlex="100%">
+                                <mat-label>Pieces: </mat-label><mat-label class="InfoLabel">{{prod.Pieces}}</mat-label>
+                              </div>                                                        
+                            </div>                        
+                          </div>  
+                          <div fxFlex="33.33%">
+                            <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="5px">
+                              <div fxFlex="100%">
+                                <mat-label>Packages: </mat-label><mat-label class="InfoLabel">{{prod.PackageTypeID}}</mat-label>
+                              </div>                                                        
+                            </div>                          
+                          </div>
+                        </div>
+                        <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="5px">
+                          <div fxFlex="33.33%">
+                            <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="5px">
+                              <div fxFlex="100%">
+                                <mat-label>Class: </mat-label><mat-label class="InfoLabel">{{prod.ProductClass}}</mat-label>
+                              </div>                                                        
+                            </div>                         
+                          </div>
+                          <div fxFlex="33.33%">
+                            <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="5px">
+                              <div fxFlex="100%">
+                                <mat-label>NMFC: </mat-label><mat-label class="InfoLabel">{{prod.NmfcNumber}}</mat-label>                                
+                              </div>                                                        
+                            </div>                         
+                          </div>  
+                          <div fxFlex="33.33%">
+                            <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="5px">
+                              <div fxFlex="100%">                                
+                                <mat-label>PCF: </mat-label><mat-label class="InfoLabel">{{prod.PCF}}</mat-label>
+                              </div>                                                        
+                            </div>                         
+                          </div>                            
+                        </div>   
+                        <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="5px">
+                          <div fxFlex="33.33%">
+                            <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="5px">
+                              <div fxFlex="100%">
+                                <mat-label>Length: </mat-label><mat-label class="InfoLabel">{{prod.Length}}</mat-label>
+                              </div>                                                        
+                            </div>                        
+                          </div>  
+                          <div fxFlex="33.33%">
+                            <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="5px">
+                              <div fxFlex="100%">
+                                <mat-label>Width: </mat-label><mat-label class="InfoLabel">{{prod.Width}}</mat-label>
+                              </div>                                                        
+                            </div>                          
+                          </div>
+                          <div fxFlex="33.33%">
+                            <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="5px">
+                              <div fxFlex="100%">
+                                <mat-label>Height: </mat-label><mat-label class="InfoLabel">{{prod.Height}}</mat-label>
+                              </div>                                                        
+                            </div>                          
+                          </div>
+                        </div>
+                        <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="5px">
+                          <div fxFlex="66.66%">
+                            <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="5px">
+                              <div fxFlex="100%">
+                                <mat-label>Description: </mat-label><mat-label class="InfoLabel">{{prod.ProductDescription}}</mat-label>
+                              </div>                                                        
+                            </div>                        
+                          </div>  
+                          <div fxFlex="32.5%">
+                            <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="5px">
+                              <div fxFlex="100%">
+                                <mat-label>Total Weight: </mat-label><mat-label class="InfoLabel">{{prod.Weight}}</mat-label>
+                              </div>                                                        
+                            </div>                          
+                          </div>                          
+                        </div>                                             
+                      </div>
+                    </div>
+                    
+                    
                   </div>
                   <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="5px">
                     <div fxFlex="100%" class="fake-link">                      

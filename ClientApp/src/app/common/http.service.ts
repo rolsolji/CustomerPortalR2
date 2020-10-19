@@ -270,7 +270,8 @@ export class HttpService{
         const httpHeaders = new HttpHeaders({
             Ticket : ticket
         });
-        return this.http.get<ShipmentError[]>(String.Format(this.baseEndpoint + 'Services/BOLHDRService.svc/json/getShipmentError?_={0}',keyId)
+        return this.http.get<ShipmentError[]>(
+          String.Format(this.baseEndpoint + 'Services/BOLHDRService.svc/json/getShipmentError?_={0}',keyId)
         ,{
             headers: httpHeaders
           }

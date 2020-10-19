@@ -56,6 +56,7 @@ import { MessageService } from '../../../../common/message.service';
 import { UtilitiesService } from '../../../../common/utilities.service';
 import baselineAddCircleOutline from '@iconify/icons-ic/baseline-add-circle-outline';
 import {AuthenticationService} from '../../../../common/authentication.service';
+import {environment} from '../../../../../environments/environment';
 
 export interface CountryState {
   name: string;
@@ -113,7 +114,7 @@ export class FormQuickQuoteComponent implements OnInit {
   ClientID = this.authenticationService.getDefaultClient().ClientID;
   clientDefaultData: ClientDefaultData;
   clientTLWeightLimit: string;
-  carrierImageUrl = 'https://beta-customer.r2logistics.com/Handlers/CarrierLogoHandler.ashx?carrierID=';
+  carrierImageUrl = environment.baseEndpoint +'Handlers/CarrierLogoHandler.ashx?carrierID=';
 
   icPhone = icPhone;
   icCamera = icCamera;

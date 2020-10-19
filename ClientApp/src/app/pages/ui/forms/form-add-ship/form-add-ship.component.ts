@@ -47,6 +47,7 @@ import { ShipmentByLading } from '../../../../Entities/ShipmentByLading';
 import * as moment from 'moment';
 import {AuthenticationService} from '../../../../common/authentication.service';
 import {STEPPER_GLOBAL_OPTIONS} from '@angular/cdk/stepper';
+import {environment} from '../../../../../environments/environment';
 
 
 
@@ -60,7 +61,7 @@ import {STEPPER_GLOBAL_OPTIONS} from '@angular/cdk/stepper';
     fadeInUp400ms,
     scaleIn400ms,
     fadeInRight400ms
-  ],  
+  ],
   providers: [{
     provide: STEPPER_GLOBAL_OPTIONS, useValue: {showError: true}
   }]
@@ -120,7 +121,7 @@ export class FormAddShipComponent implements OnInit {
   spinnerMessage:string;
   ratesOpened: number[];
   sendEmailClicked = false;
-  carrierImageUrl = 'https://beta-customer.r2logistics.com/Handlers/CarrierLogoHandler.ashx?carrierID=';
+  carrierImageUrl = environment.baseEndpoint +'Handlers/CarrierLogoHandler.ashx?carrierID=';
   ShipmentByLadingObject: ShipmentByLading;
 
   @ViewChild(MatAccordion) accordion: MatAccordion;
@@ -420,10 +421,10 @@ export class FormAddShipComponent implements OnInit {
       this.clientDefaultData = await this.httpService.getClientDefaultsByClient(this.ClientID, this.keyId);
 
       if ( this.AccountInvoiceCostList != null &&  this.AccountInvoiceCostList.length > 0){
-        this.costListFiltered =  this.AccountInvoiceCostList.filter(item => item.AccessorialCode != null && item.AccessorialCode != "");                                                   
-      } 
-      
-      this.clientTLWeightLimit = (this.clientDefaultData.TLWeightLimit == null ? 0 : this.clientDefaultData.TLWeightLimit) + 'lb'; 
+        this.costListFiltered =  this.AccountInvoiceCostList.filter(item => item.AccessorialCode != null && item.AccessorialCode != "");
+      }
+
+      this.clientTLWeightLimit = (this.clientDefaultData.TLWeightLimit == null ? 0 : this.clientDefaultData.TLWeightLimit) + 'lb';
       this.TotalShipmentCost = this.ShipmentCostObject.SellRates.TotalBilledAmount;
     }
     // --
@@ -440,11 +441,11 @@ export class FormAddShipComponent implements OnInit {
         })
       );
 
-      
-    
+
+
       this.ratesOpened = []; //initiate ratesOpened array
-      this.messageService.SendLadingIDParameter(String.Empty); //Clean LadingId parameter  
-      this.messageService.SendQuoteParameter(String.Empty); //Clean LadingCode parameter  
+      this.messageService.SendLadingIDParameter(String.Empty); //Clean LadingId parameter
+      this.messageService.SendQuoteParameter(String.Empty); //Clean LadingCode parameter
       //this.setDefaultDate();
 
     // console.log(this.ShipmentCostObject);
@@ -801,47 +802,47 @@ export class FormAddShipComponent implements OnInit {
     if (selectedRate != null){
       this.costListFiltered = [];
 
-      let accessorialInvoiceFreightCost: AccountInvoiceCostList = { 
-        AccessorialCode: "FRT", 
+      let accessorialInvoiceFreightCost: AccountInvoiceCostList = {
+        AccessorialCode: "FRT",
         Description: "Freight",
         BilledCost: selectedRate.GrossAmount
       }
 
-      this.costListFiltered.push(accessorialInvoiceFreightCost);      
+      this.costListFiltered.push(accessorialInvoiceFreightCost);
 
-      let accessorialInvoiceDiscount: AccountInvoiceCostList = { 
-        AccessorialCode: "DIS", 
+      let accessorialInvoiceDiscount: AccountInvoiceCostList = {
+        AccessorialCode: "DIS",
         Description: "Discount",
         BilledCost: -selectedRate.Discount
       }
 
-      this.costListFiltered.push(accessorialInvoiceDiscount);      
+      this.costListFiltered.push(accessorialInvoiceDiscount);
 
-      let accessorialInvoiceFuelCost: AccountInvoiceCostList = { 
-        AccessorialCode: "FSC", 
+      let accessorialInvoiceFuelCost: AccountInvoiceCostList = {
+        AccessorialCode: "FSC",
         Description: "Fuel",
         BilledCost: selectedRate.FuelCost
       }
 
       this.costListFiltered.push(accessorialInvoiceFuelCost);
 
-      let accessorials = selectedRate.Accessorials.filter(item => item.AccessorialCode != null && item.AccessorialCode != "");      
+      let accessorials = selectedRate.Accessorials.filter(item => item.AccessorialCode != null && item.AccessorialCode != "");
       accessorials.forEach(a => {
-        let accessorialInvoice: AccountInvoiceCostList = { 
-          AccessorialCode: a.AccessorialCode, 
+        let accessorialInvoice: AccountInvoiceCostList = {
+          AccessorialCode: a.AccessorialCode,
           Description: a.AccessorialDescription,
           BilledCost: a.AccessorialCharge
         }
-  
-        this.costListFiltered.push(accessorialInvoice);            
-      });  
 
-       
-  
+        this.costListFiltered.push(accessorialInvoice);
+      });
+
+
+
       this.TotalShipmentCost = selectedRate.TotalCostWithOutTrueCost;
     }
 
-              
+
 
   }
 

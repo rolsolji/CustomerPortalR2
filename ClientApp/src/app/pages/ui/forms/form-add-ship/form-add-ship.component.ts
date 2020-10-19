@@ -45,11 +45,8 @@ import outlineEmail from '@iconify/icons-ic/outline-email';
 import { StepperSelectionEvent } from '@angular/cdk/stepper';
 import { ShipmentByLading } from '../../../../Entities/ShipmentByLading';
 import * as moment from 'moment';
-<<<<<<< HEAD
 import {AuthenticationService} from '../../../../common/authentication.service';
-=======
 import {STEPPER_GLOBAL_OPTIONS} from '@angular/cdk/stepper';
->>>>>>> d4ec9b774551447a8538300d6646b1907f62b8eb
 
 
 
@@ -798,11 +795,6 @@ export class FormAddShipComponent implements OnInit {
   async selectQuote(index: number){
     this.ratesCounter = 0;
     this.getQuoteButtonClicked = false;
-<<<<<<< HEAD
-    // await this.save(index);
-    // this.router.navigate(['/ui/forms/form-add-ship/'], { relativeTo: this.route });
-    // routerLink="/ui/forms/form-add-ship"
-=======
 
     let selectedRate = this.ratesFiltered[index];
     console.log(selectedRate);
@@ -850,7 +842,6 @@ export class FormAddShipComponent implements OnInit {
     }
 
               
->>>>>>> d4ec9b774551447a8538300d6646b1907f62b8eb
 
   }
 

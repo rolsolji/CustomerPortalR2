@@ -5,7 +5,7 @@ import emojioneUS from '@iconify/icons-emojione/flag-for-flag-united-states';
 import emojioneDE from '@iconify/icons-emojione/flag-for-flag-germany';
 import icMenu from '@iconify/icons-ic/twotone-menu';
 import { ConfigService } from '../../services/config.service';
-import { map } from 'rxjs/operators';
+import {debounceTime, distinctUntilChanged, map, startWith, switchMap} from 'rxjs/operators';
 import icPersonAdd from '@iconify/icons-ic/twotone-person-add';
 import icAssignmentTurnedIn from '@iconify/icons-ic/twotone-assignment-turned-in';
 import icBallot from '@iconify/icons-ic/twotone-ballot';
@@ -18,9 +18,12 @@ import icArrowDropDown from '@iconify/icons-ic/twotone-arrow-drop-down';
 import { PopoverService } from '../../components/popover/popover.service';
 import { MegaMenuComponent } from '../../components/mega-menu/mega-menu.component';
 import icSearch from '@iconify/icons-ic/twotone-search';
-import { FormControl } from '@angular/forms';
+import {FormBuilder, FormControl, FormGroup, Validators} from '@angular/forms';
 import { HttpService } from '../../../app/common/http.service';
 import {AuthenticationService} from '../../../app/common/authentication.service';
+import {Client} from '../../../app/Entities/client.model';
+import {BehaviorSubject, Observable} from 'rxjs';
+import {PostalData} from '../../../app/Entities/PostalData';
 
 
 @Component({
@@ -59,22 +62,54 @@ export class ToolbarComponent implements OnInit {
 
   searchCtrl = new FormControl();
 
-  keyId: string = "1593399730488";
+  keyId = '1593399730488';
   toolBarMessage:string;
   toolBarTitle: string;
+  filteredOptions: Observable<Client[]>;
+  clientsForm: FormGroup;
+  public clientsForUser$: BehaviorSubject<Client[]> = new BehaviorSubject<Client[]>(null);
 
-  constructor(private layoutService: LayoutService,
-              private configService: ConfigService,
-              private navigationService: NavigationService,
-              private popoverService: PopoverService,
-              private httpService : HttpService,
-              public  authenticationService: AuthenticationService) { }
 
-  ngOnInit() {
-    this.toolBarMessage = this.httpService.getUserMessage(this.keyId);
-    this.toolBarTitle = this.authenticationService.getDefaultClient().ClientName;
+  constructor(
+    private layoutService: LayoutService,
+    private configService: ConfigService,
+    private navigationService: NavigationService,
+    private popoverService: PopoverService,
+    private httpService : HttpService,
+    public  authenticationService: AuthenticationService,
+    private fb: FormBuilder,
+  ) {
+    this.clientsForUser$ = this.authenticationService.clientsForUser$;
   }
 
+  async ngOnInit() {
+    this.toolBarMessage = this.httpService.getUserMessage(this.keyId);
+    this.toolBarTitle = this.authenticationService.getDefaultClient().ClientName;
+
+    this.clientsForm = this.fb.group({
+      client: [this.authenticationService.defaultClient$.value.ClientName, null],});
+
+    this.filteredOptions = this.clientsForm.get('client').valueChanges.pipe(
+      startWith(''),
+      debounceTime(400),
+      distinctUntilChanged(),
+      switchMap(val => {
+        return this._filter(val || '')
+      })
+    )
+  }
+
+  private _filter(value: string): Observable<Client[]> {
+    const filterValue = value.toLowerCase();
+    if (filterValue.length >= 3) {
+      this.clientsForUser$.next(this.authenticationService.getClientsForUserFromStorage());
+      this.clientsForUser$.next(this.clientsForUser$.value.filter(
+        (option: Client) => option.ClientName.toLowerCase().indexOf(filterValue) === 0));
+      return this.clientsForUser$.asObservable();
+    }
+    this.clientsForUser$.next(this.authenticationService.getClientsForUserFromStorage());
+    return this.clientsForUser$.asObservable();
+  }
 
   openQuickpanel() {
     this.layoutService.openQuickpanel();
@@ -103,6 +138,16 @@ export class ToolbarComponent implements OnInit {
         },
       ]
     });
+  }
+
+  onChange(event) {
+    const clientName = event.source.value;
+    this.clientsForm.get('client').setValue(clientName);
+    const defaultClient = this.authenticationService.clientsForUser$.value.find(
+      (client: Client) => client.ClientName === clientName);
+    localStorage.setItem('defaultClient', JSON.stringify(defaultClient));
+    this.authenticationService.defaultClient$.next(defaultClient);
+    window.location.reload();
   }
 
   openSearch() {

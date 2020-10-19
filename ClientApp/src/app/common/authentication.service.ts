@@ -12,7 +12,6 @@ import {Client} from '../Entities/client.model';
 export class AuthenticationService {
 
   private baseEndpoint: string;
-
   constructor (
     private http: HttpClient,
     public router: Router
@@ -138,8 +137,12 @@ export class AuthenticationService {
     return this.defaultClient$.value;
   }
 
+  public setDefaultClient(client: Client) {
+    localStorage.setItem('defaultClient', JSON.stringify(client));
+    this.defaultClient$.next(client);
+  }
+
   public getClientsForUserFromStorage(): Client[] {
     return JSON.parse(localStorage.getItem('clientsForUser'));
   }
-
 }

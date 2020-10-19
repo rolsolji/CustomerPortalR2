@@ -143,6 +143,25 @@
 
     <div class="px-1">
       <vex-toolbar-user></vex-toolbar-user>
+      <form #ngClientsForm="ngForm" [formGroup]="clientsForm">
+        <mat-form-field>
+          <input name="client"
+                 formControlName="client"
+                 type="text"
+                 placeholder="Pick one"
+                 aria-label="Number"
+                 matInput
+                 [matAutocomplete]="clientAutoComplete">
+          <mat-autocomplete  #clientAutoComplete="matAutocomplete">
+            <mat-option *ngFor="let client of filteredOptions | async"
+                        [value]="client.ClientName"
+                        (onSelectionChange)="onChange($event)"
+            >
+              {{client.ClientName}}
+            </mat-option>
+          </mat-autocomplete>
+        </mat-form-field>
+      </form>
     </div>
 
     <!--<mat-menu #languageMenu="matMenu" overlapTrigger="false" xPosition="before" yPosition="below">

@@ -6,6 +6,7 @@ import icRadioButtonUnchecked from '@iconify/icons-ic/twotone-radio-button-unche
 import { LayoutService } from '../../services/layout.service';
 import { ConfigService } from '../../services/config.service';
 import { map } from 'rxjs/operators';
+import {AuthenticationService} from '../../../app/common/authentication.service';
 
 @Component({
   selector: 'vex-sidenav',
@@ -27,9 +28,16 @@ export class SidenavComponent implements OnInit {
 
   constructor(private navigationService: NavigationService,
               private layoutService: LayoutService,
-              private configService: ConfigService) { }
+              private configService: ConfigService,
+              private authenticationService: AuthenticationService
+  ) { }
 
   ngOnInit() {
+    this.configService.updateConfig({
+      sidenav: {
+        title: this.authenticationService.getDefaultClient().ClientName
+      }
+    });
   }
 
   onMouseEnter() {

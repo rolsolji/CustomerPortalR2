@@ -45,7 +45,11 @@ import outlineEmail from '@iconify/icons-ic/outline-email';
 import { StepperSelectionEvent } from '@angular/cdk/stepper';
 import { ShipmentByLading } from '../../../../Entities/ShipmentByLading';
 import * as moment from 'moment';
+<<<<<<< HEAD
 import {AuthenticationService} from '../../../../common/authentication.service';
+=======
+import {STEPPER_GLOBAL_OPTIONS} from '@angular/cdk/stepper';
+>>>>>>> d4ec9b774551447a8538300d6646b1907f62b8eb
 
 
 
@@ -59,7 +63,10 @@ import {AuthenticationService} from '../../../../common/authentication.service';
     fadeInUp400ms,
     scaleIn400ms,
     fadeInRight400ms
-  ]
+  ],  
+  providers: [{
+    provide: STEPPER_GLOBAL_OPTIONS, useValue: {showError: true}
+  }]
 })
 export class FormAddShipComponent implements OnInit {
 
@@ -416,10 +423,10 @@ export class FormAddShipComponent implements OnInit {
       this.clientDefaultData = await this.httpService.getClientDefaultsByClient(this.ClientID, this.keyId);
 
       if ( this.AccountInvoiceCostList != null &&  this.AccountInvoiceCostList.length > 0){
-        this.costListFiltered =  this.AccountInvoiceCostList.filter(item => item.AccessorialCode != '');
-      }
-
-      this.clientTLWeightLimit = (this.clientDefaultData.TLWeightLimit == null ? 0 : this.clientDefaultData.TLWeightLimit) + 'lb';
+        this.costListFiltered =  this.AccountInvoiceCostList.filter(item => item.AccessorialCode != null && item.AccessorialCode != "");                                                   
+      } 
+      
+      this.clientTLWeightLimit = (this.clientDefaultData.TLWeightLimit == null ? 0 : this.clientDefaultData.TLWeightLimit) + 'lb'; 
       this.TotalShipmentCost = this.ShipmentCostObject.SellRates.TotalBilledAmount;
     }
     // --
@@ -791,9 +798,59 @@ export class FormAddShipComponent implements OnInit {
   async selectQuote(index: number){
     this.ratesCounter = 0;
     this.getQuoteButtonClicked = false;
+<<<<<<< HEAD
     // await this.save(index);
     // this.router.navigate(['/ui/forms/form-add-ship/'], { relativeTo: this.route });
     // routerLink="/ui/forms/form-add-ship"
+=======
+
+    let selectedRate = this.ratesFiltered[index];
+    console.log(selectedRate);
+    if (selectedRate != null){
+      this.costListFiltered = [];
+
+      let accessorialInvoiceFreightCost: AccountInvoiceCostList = { 
+        AccessorialCode: "FRT", 
+        Description: "Freight",
+        BilledCost: selectedRate.GrossAmount
+      }
+
+      this.costListFiltered.push(accessorialInvoiceFreightCost);      
+
+      let accessorialInvoiceDiscount: AccountInvoiceCostList = { 
+        AccessorialCode: "DIS", 
+        Description: "Discount",
+        BilledCost: -selectedRate.Discount
+      }
+
+      this.costListFiltered.push(accessorialInvoiceDiscount);      
+
+      let accessorialInvoiceFuelCost: AccountInvoiceCostList = { 
+        AccessorialCode: "FSC", 
+        Description: "Fuel",
+        BilledCost: selectedRate.FuelCost
+      }
+
+      this.costListFiltered.push(accessorialInvoiceFuelCost);
+
+      let accessorials = selectedRate.Accessorials.filter(item => item.AccessorialCode != null && item.AccessorialCode != "");      
+      accessorials.forEach(a => {
+        let accessorialInvoice: AccountInvoiceCostList = { 
+          AccessorialCode: a.AccessorialCode, 
+          Description: a.AccessorialDescription,
+          BilledCost: a.AccessorialCharge
+        }
+  
+        this.costListFiltered.push(accessorialInvoice);            
+      });  
+
+       
+  
+      this.TotalShipmentCost = selectedRate.TotalCostWithOutTrueCost;
+    }
+
+              
+>>>>>>> d4ec9b774551447a8538300d6646b1907f62b8eb
 
   }
 

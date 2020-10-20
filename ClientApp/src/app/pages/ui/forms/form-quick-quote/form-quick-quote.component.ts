@@ -54,6 +54,7 @@ import { ValueConverter } from '@angular/compiler/src/render3/view/template';
 import { Router, ActivatedRoute, ParamMap } from '@angular/router';
 import { MessageService } from "../../../../common/message.service";
 import { UtilitiesService } from "../../../../common/utilities.service";
+import baselineAddCircleOutline from '@iconify/icons-ic/baseline-add-circle-outline';
 
 export interface CountryState {
   name: string;
@@ -108,6 +109,7 @@ export class FormQuickQuoteComponent implements OnInit {
   outlineSave = outlineSave;
   outlinePrint = outlinePrint;
   outlineEmail = outlineEmail;
+  baselineAddCircleOutline = baselineAddCircleOutline;
 
   stateCtrl = new FormControl();
   
@@ -205,6 +207,7 @@ export class FormQuickQuoteComponent implements OnInit {
       limitedAccess:[null],
       insidePickup:[null],
       liftgateRequiredAtPickup:[null],
+      additionalInsured:[null],
       // collectionServices: this.fb.group({
         
       // }),
@@ -880,6 +883,7 @@ export class FormQuickQuoteComponent implements OnInit {
     if (!String.IsNullOrWhiteSpace(responseData.ClientLadingNo))
     {
       this.messageService.SendQuoteParameter(responseData.ClientLadingNo);
+      this.messageService.SendLadingIDParameter(responseData.LadingID.toString());
       this.snackbar.open('Quote is saved successfully with LoadNo ' + responseData.ClientLadingNo, null, {
         duration: 5000
       });
@@ -932,6 +936,11 @@ export class FormQuickQuoteComponent implements OnInit {
 
 
     return PCF;
+  }
+
+  addShipmentButton(): void {  
+    this.messageService.SendQuoteParameter(String.Empty); //Clean LadingId parameter 
+    this.router.navigate(['/ui/forms/form-add-ship/'], { relativeTo: this.route });
   }
 
 }

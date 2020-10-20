@@ -299,6 +299,7 @@ export class FormShipmentBoardComponent implements OnInit,OnDestroy {
     event.stopPropagation();
     event.stopImmediatePropagation();
     this.messageService.SendQuoteParameter(row.ClientLadingNo);
+    this.messageService.SendLadingIDParameter(row.LadingID.toString());
     this.router.navigate(['/ui/forms/form-add-ship/'], { relativeTo: this.route });
   }
 

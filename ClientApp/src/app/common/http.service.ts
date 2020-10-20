@@ -23,7 +23,8 @@ import { ShipmentError } from '../Entities/ShipmentError';
 import { ShipmentCost } from '../Entities/ShipmentCost';
 import { Carrier } from '../Entities/Carrier';
 import { ShipmentResponse } from '../Entities/ShipmentResponse';
-import { ReferenceByClient } from '../Entities/ReferenceByClientResponse'
+import { ReferenceByClient } from '../Entities/ReferenceByClientResponse';
+import { ShipmentByLading } from '../Entities/ShipmentByLading';
 
 @Injectable({
     providedIn: 'root'
@@ -195,12 +196,12 @@ export class HttpService{
           ).toPromise();  
     }
 
-    GetShipmentCostByLadingID(clientID:number, keyId:string){
+    GetShipmentCostByLadingID(LadingID:string, keyId:string){
         let ticket = this.token;
         let httpHeaders = new HttpHeaders({                       
             'Ticket' : ticket                            
         }); 
-        return this.http.get<ShipmentCost>(String.Format('https://beta-customer.r2logistics.com/Services/BOLHDRService.svc/json/GetShipmentCostByLadingID?LadingID=2386472&_=1599193487557')
+        return this.http.get<ShipmentCost>(String.Format('https://beta-customer.r2logistics.com/Services/BOLHDRService.svc/json/GetShipmentCostByLadingID?LadingID={0}&_={1}',LadingID.toString(),keyId)
         ,{
             headers: httpHeaders
           }

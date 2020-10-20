@@ -9,6 +9,15 @@
 <div [@stagger]="true" class="p-gutter qcForms" vexContainer>
   <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="5px" class="QuickQuoteMainDiv">
     <div @fadeInUp class="card" fxFlex="50%">
+      <!-- <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="5px">
+        <button color="primary" mat-stroked-button type="button" class="AddShipmentButtonStyle" (click)="addShipmentButton()">
+          <ic-icon [icon]="baselineAddCircleOutline"
+                   class="ltr:-ml-1 rtl:-mr-1 ltr:mr-2 rtl:ml-2"
+                   inline="true"
+                   size="18px"></ic-icon>
+          <span>Add a shipment</span>
+        </button>
+      </div> -->
       <form #myForm="ngForm" [formGroup]="quickQuoteFormGroup">
         <div fxLayout="column">
           <mat-accordion class="example-headers-align" multi>
@@ -93,6 +102,14 @@
                       </div> 
                       <div fxFlex="50%">
                         <mat-checkbox [checked]="false" formControlName="liftgateRequiredAtPickup" color="warn" (change)="validateCollectionServices($event,'LFT')" value=1>Liftgate Required at Pickup</mat-checkbox>
+                      </div>
+                    </div>
+                    <div class="pt-1" fxLayout.lt-xs="column" fxLayout.gt-xs="row">
+                      <div fxFlex="50%">
+                        <mat-checkbox [checked]="false" formControlName="additionalInsured" color="warn" (change)="validateCollectionServices($event,'AIA')" value=35>Additional Insured</mat-checkbox>
+                      </div> 
+                      <div fxFlex="50%">
+                        
                       </div>
                     </div>
                   </div>

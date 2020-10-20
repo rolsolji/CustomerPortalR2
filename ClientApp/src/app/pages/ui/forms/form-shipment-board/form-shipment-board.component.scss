@@ -104,7 +104,6 @@ mat-chip {
     max-width: 100px;
 }
 
-
 tr.example-detail-row {
   height: 0;
 }
@@ -262,4 +261,8 @@ tr.example-element-row:not(.example-expanded-row):active {
     float: left;
     width: 50%;
     padding: 10px;
+  }
+
+  .mat-cell, .mat-footer-cell {
+    font-size: 12px;
   }

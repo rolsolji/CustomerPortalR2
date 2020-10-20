@@ -43,6 +43,10 @@ import outlineSave from '@iconify/icons-ic/outline-save';
 import outlinePrint from '@iconify/icons-ic/outline-print';
 import outlineEmail from '@iconify/icons-ic/outline-email';
 import { StepperSelectionEvent } from '@angular/cdk/stepper';
+import { ShipmentByLading } from '../../../../Entities/ShipmentByLading';
+import * as moment from 'moment';
+import {STEPPER_GLOBAL_OPTIONS} from '@angular/cdk/stepper';
+
 
 
 @Component({
@@ -55,15 +59,18 @@ import { StepperSelectionEvent } from '@angular/cdk/stepper';
     fadeInUp400ms,
     scaleIn400ms,
     fadeInRight400ms
-  ]
+  ],  
+  providers: [{
+    provide: STEPPER_GLOBAL_OPTIONS, useValue: {showError: true}
+  }]
 })
 export class FormAddShipComponent implements OnInit {
-
+ 
   keyId: string = "1593399730488";
   ClientID: number = 8473;
   securityToken: string;
 
-  quoteIdParameter: string;
+  //localLadingIdParameter: string;
 
   originCountries: Object;
   destinationCountries: Object;  
@@ -81,6 +88,7 @@ export class FormAddShipComponent implements OnInit {
   ShipmentErrorOptions: ShipmentError[];  
   ShipmentCostObject: ShipmentCost;
   AccountInvoiceCostList: AccountInvoiceCostList[];
+  costListFiltered: AccountInvoiceCostList[];
   displayedCostGridColumns: string[] = ['Code', 'Description', 'Amount'];
   TotalShipmentCost: number;
   showSpinner = false;
@@ -89,6 +97,7 @@ export class FormAddShipComponent implements OnInit {
   ratesOpened: number[];
   sendEmailClicked: boolean = false;
   carrierImageUrl = "https://beta-customer.r2logistics.com/Handlers/CarrierLogoHandler.ashx?carrierID=";
+  ShipmentByLadingObject: ShipmentByLading;
 
   @ViewChild(MatAccordion) accordion: MatAccordion;
   
@@ -100,6 +109,7 @@ export class FormAddShipComponent implements OnInit {
   ratesCounter: number = 0;
   clientTLWeightLimit: string;
   clientDefaultData: ClientDefaultData;
+  accessorialsSelectedQty: number = 0;
 
   carrierSelected: string;
 
@@ -222,9 +232,10 @@ export class FormAddShipComponent implements OnInit {
   
   async ngOnInit() {
 
-    //Gets quotes parameter
-    this.messageService.SharedQuoteParameter.subscribe(message => this.quoteIdParameter = message)
-
+    let localLadingIdParameter;
+    //Gets quotes parameter    
+    this.messageService.SharedLadingIDParameter.subscribe(message => localLadingIdParameter = message);      
+    
     //-- originAndDestinationFormGroup fields
     this.originAndDestinationFormGroup = this.fb.group({
       originname: [null, Validators.required],
@@ -269,7 +280,7 @@ export class FormAddShipComponent implements OnInit {
     //-- shipmentInfoFormGroup fields
     this.shipmentInfoFormGroup = this.fb.group({
       equipment: [7, Validators.required],
-      priority: [null],
+      priority: [0],
       customerref: [null],
       r2order: [null],
       r2pronumber: [null],
@@ -280,7 +291,7 @@ export class FormAddShipComponent implements OnInit {
       shipmentvalue: [null],
       valueperpound: [null],
       os_d: [null],
-      servicelevel: [null, Validators.required],
+      servicelevel: [1, Validators.required],
       r2refno: [null],
       statuscode: [null],
       specialinstructions: [null],
@@ -308,7 +319,7 @@ export class FormAddShipComponent implements OnInit {
       console.log(ex);
     }
 
-    this.httpService.token = this.securityToken;
+    this.httpService.token = this.securityToken;    
 
     let responseData = await this.httpService.getCountryList(this.keyId);   
     this.accessorialArray = await this.httpService.getGetClientMappedAccessorials(this.ClientID, this.keyId);
@@ -375,11 +386,30 @@ export class FormAddShipComponent implements OnInit {
     //Get shipment mode description by default
     this.fetchShipmentMode("LTL");
 
+    //-- Get Shipment information    
+    //this.ladingIdParameter = "2386566";
+    //this.ladingIdParameter = "2386567";
 
-    //-- Get Shipment Costs
-    this.ShipmentCostObject = await this.httpService.GetShipmentCostByLadingID(this.ClientID, this.keyId); 
-    this.AccountInvoiceCostList = this.ShipmentCostObject.SellRates.AccountInvoiceCostList;
-    this.TotalShipmentCost = this.ShipmentCostObject.SellRates.TotalBilledAmount;
+    if (localLadingIdParameter != null && localLadingIdParameter.length > 0){
+      //-- Get Service Level Options
+      this.ShipmentByLadingObject = await this.httpService.GetShipmentByLadingID(localLadingIdParameter, this.keyId);
+      this.setDefaultValuesInSteps()   
+      
+      //-- Get Shipment Costs
+      this.ShipmentCostObject = await this.httpService.GetShipmentCostByLadingID(localLadingIdParameter, this.keyId); 
+      this.AccountInvoiceCostList = this.ShipmentCostObject.SellRates.AccountInvoiceCostList;
+      this.clientDefaultData = await this.httpService.getClientDefaultsByClient(this.ClientID, this.keyId);
+
+      if ( this.AccountInvoiceCostList != null &&  this.AccountInvoiceCostList.length > 0){
+        this.costListFiltered =  this.AccountInvoiceCostList.filter(item => item.AccessorialCode != null && item.AccessorialCode != "");                                                   
+      } 
+      
+      this.clientTLWeightLimit = (this.clientDefaultData.TLWeightLimit == null ? 0 : this.clientDefaultData.TLWeightLimit) + 'lb'; 
+      this.TotalShipmentCost = this.ShipmentCostObject.SellRates.TotalBilledAmount;
+    }
+    //--
+
+    
 
     this.carrierAutoCompleteOptions = this.confirmFormGroup.get("carrier").valueChanges
       .pipe(
@@ -391,9 +421,13 @@ export class FormAddShipComponent implements OnInit {
         })
       );
 
-      this.clientDefaultData = await this.httpService.getClientDefaultsByClient(this.ClientID, this.keyId);
+      
     
       this.ratesOpened = []; //initiate ratesOpened array
+      this.messageService.SendLadingIDParameter(String.Empty); //Clean LadingId parameter  
+      this.messageService.SendQuoteParameter(String.Empty); //Clean LadingCode parameter  
+      //this.setDefaultDate();
+      
 
     //console.log(this.ShipmentCostObject);
   }
@@ -645,6 +679,8 @@ export class FormAddShipComponent implements OnInit {
       this.accessorials.push(accessorial);
       this.accessorialIds.push(a.AccessorialID);      
     });    
+
+    this.accessorialsSelectedQty = selectedAccessorials.length;
   }
 
   async getQuote() {    
@@ -757,9 +793,56 @@ export class FormAddShipComponent implements OnInit {
   ////#endregion RatesOpened
 
   async selectQuote(index: number){
-    // await this.save(index);
-    // this.router.navigate(['/ui/forms/form-add-ship/'], { relativeTo: this.route });
-    //routerLink="/ui/forms/form-add-ship"
+    this.ratesCounter = 0;
+    this.getQuoteButtonClicked = false;
+
+    let selectedRate = this.ratesFiltered[index];
+    console.log(selectedRate);
+    if (selectedRate != null){
+      this.costListFiltered = [];
+
+      let accessorialInvoiceFreightCost: AccountInvoiceCostList = { 
+        AccessorialCode: "FRT", 
+        Description: "Freight",
+        BilledCost: selectedRate.GrossAmount
+      }
+
+      this.costListFiltered.push(accessorialInvoiceFreightCost);      
+
+      let accessorialInvoiceDiscount: AccountInvoiceCostList = { 
+        AccessorialCode: "DIS", 
+        Description: "Discount",
+        BilledCost: -selectedRate.Discount
+      }
+
+      this.costListFiltered.push(accessorialInvoiceDiscount);      
+
+      let accessorialInvoiceFuelCost: AccountInvoiceCostList = { 
+        AccessorialCode: "FSC", 
+        Description: "Fuel",
+        BilledCost: selectedRate.FuelCost
+      }
+
+      this.costListFiltered.push(accessorialInvoiceFuelCost);
+
+      let accessorials = selectedRate.Accessorials.filter(item => item.AccessorialCode != null && item.AccessorialCode != "");      
+      accessorials.forEach(a => {
+        let accessorialInvoice: AccountInvoiceCostList = { 
+          AccessorialCode: a.AccessorialCode, 
+          Description: a.AccessorialDescription,
+          BilledCost: a.AccessorialCharge
+        }
+  
+        this.costListFiltered.push(accessorialInvoice);            
+      });  
+
+       
+  
+      this.TotalShipmentCost = selectedRate.TotalCostWithOutTrueCost;
+    }
+
+              
+
   }
 
   async saveQuote(index: number){
@@ -820,6 +903,143 @@ export class FormAddShipComponent implements OnInit {
   StepperSelectionChange(event: StepperSelectionEvent){
     //console.log(event);
     this.clearRatesSection()
+  }
+
+  setDefaultValuesInSteps() {
+    let defaultoriginpostalcode = null;
+    let defaultoriginstatename = null;
+    let defaultpickupdate = null;
+    let defaultdestpostalcode = null;
+    let defaultdeststatename = null;
+
+    if (this.ShipmentByLadingObject == null){
+      return;
+    }
+
+    defaultoriginpostalcode = this.ShipmentByLadingObject.OrgZipCode.trim() + "-" + this.ShipmentByLadingObject.OrgCityName.trim();
+    defaultoriginstatename = this.ShipmentByLadingObject.OrgStateName.trim();
+
+    let tempPickupDate = moment.utc(this.ShipmentByLadingObject.PickupDate);    
+    defaultpickupdate = new Date(this.datepipe.transform(tempPickupDate.toString().replace(/(^.*\()|([+-].*$)/g, ''),'MM/dd/yyyy'));
+
+    defaultdestpostalcode = this.ShipmentByLadingObject.DestZipCode.trim() + "-" + this.ShipmentByLadingObject.DestCityName.trim();
+    defaultdeststatename = this.ShipmentByLadingObject.DestStateName.trim();     
+    
+    //let tempOriginPD: PostalData;
+    //let tempDestPD: PostalData;
+
+    let tempOriginPD: PostalData = {
+      CityCode: '',
+      CityID: this.ShipmentByLadingObject.OrgCity.toString(),
+      CityName: this.ShipmentByLadingObject.OrgCityName.trim(),
+      CountryCode: this.ShipmentByLadingObject.OrgCountryCode,
+      CountryId: this.ShipmentByLadingObject.OrgCountry.toString(),
+      CountryName: '',
+      IsActive: '',
+      PostalCode: this.ShipmentByLadingObject.OrgZipCode.trim(),
+      PostalID: '',
+      StateCode: this.ShipmentByLadingObject.OrgStateCode.trim(),
+      StateId: this.ShipmentByLadingObject.OrgState.toString(),
+      StateName: this.ShipmentByLadingObject.OrgStateName.trim(),
+    };
+
+    let tempDestPD: PostalData = {
+      CityCode: '',
+      CityID: this.ShipmentByLadingObject.DestCity.toString(),
+      CityName: this.ShipmentByLadingObject.DestCityName.trim(),
+      CountryCode: this.ShipmentByLadingObject.DestCountryCode,
+      CountryId: this.ShipmentByLadingObject.DestCountry.toString(),
+      CountryName: '',
+      IsActive: '',
+      PostalCode: this.ShipmentByLadingObject.DestZipCode.trim(),
+      PostalID: '',
+      StateCode: this.ShipmentByLadingObject.DestStateCode.trim(),
+      StateId: this.ShipmentByLadingObject.DestState.toString(),
+      StateName: this.ShipmentByLadingObject.DestStateName.trim(),
+    };
+
+    // tempOriginPD.PostalCode = this.ShipmentByLadingObject.OrgZipCode.trim();
+    // tempOriginPD.CityID = this.ShipmentByLadingObject.OrgCity.toString();
+    // tempOriginPD.StateId = this.ShipmentByLadingObject.OrgState.toString();
+    // tempOriginPD.CountryId = this.ShipmentByLadingObject.OrgCountry.toString();
+    // tempOriginPD.CountryCode = this.ShipmentByLadingObject.OrgCountryCode;
+    // tempOriginPD.StateCode = this.ShipmentByLadingObject.OrgStateCode.trim();
+    // tempOriginPD.CityName = this.ShipmentByLadingObject.OrgCityName.trim();
+
+    this.OriginPostalData = tempOriginPD;
+    
+    // tempDestPD.PostalCode = this.ShipmentByLadingObject.DestZipCode.trim();
+    // tempDestPD.CityID = this.ShipmentByLadingObject.DestCity.toString();
+    // tempDestPD.StateId = this.ShipmentByLadingObject.DestState.toString();
+    // tempDestPD.CountryId = this.ShipmentByLadingObject.DestCountry.toString();
+    // tempDestPD.CountryCode = this.ShipmentByLadingObject.DestCountryCode;
+    // tempDestPD.StateCode = this.ShipmentByLadingObject.DestStateCode.trim();
+    // tempDestPD.CityName = this.ShipmentByLadingObject.DestCityName.trim();
+
+    this.DestinationPostalData = tempDestPD;
+
+    //-- Set default values "Origin and Destination" step
+    this.originAndDestinationFormGroup.controls['originpostalcode'].setValue(defaultoriginpostalcode, {onlySelf: false});
+    this.originAndDestinationFormGroup.controls['originstatename'].setValue(defaultoriginstatename, {onlySelf: false});
+    this.originAndDestinationFormGroup.controls['originpickupdate'].setValue(defaultpickupdate, {onlySelf: false});     
+    this.originAndDestinationFormGroup.controls['destpostalcode'].setValue(defaultdestpostalcode, {onlySelf: false});
+    this.originAndDestinationFormGroup.controls['deststatename'].setValue(defaultdeststatename, {onlySelf: false});      
+    //--
+
+    //-- Set default values "Products and Accesorials" step
+    if (this.ShipmentByLadingObject.BOlProductsList != null && this.ShipmentByLadingObject.BOlProductsList.length > 0){      
+      let counter = 1;
+      this.ShipmentByLadingObject.BOlProductsList.forEach(p => { 
+        if (counter > 1){
+          this.addNewProdField();
+        }            
+        
+        let currentProductIndex = (<FormArray>this.productsAndAccessorialsFormGroup.controls['products']).length - 1;                       
+        (<FormArray>this.productsAndAccessorialsFormGroup.controls['products']).at(currentProductIndex).get("Pallets").setValue(p.Pallets);
+        (<FormArray>this.productsAndAccessorialsFormGroup.controls['products']).at(currentProductIndex).get("Pieces").setValue(p.Pieces);
+        (<FormArray>this.productsAndAccessorialsFormGroup.controls['products']).at(currentProductIndex).get("PackageTypeID").setValue(p.PackageTypeID);
+        (<FormArray>this.productsAndAccessorialsFormGroup.controls['products']).at(currentProductIndex).get("ProductClass").setValue(p.Class);
+        (<FormArray>this.productsAndAccessorialsFormGroup.controls['products']).at(currentProductIndex).get("NmfcNumber").setValue(p.NMFC);
+        (<FormArray>this.productsAndAccessorialsFormGroup.controls['products']).at(currentProductIndex).get("Length").setValue(p.Lenght);
+        (<FormArray>this.productsAndAccessorialsFormGroup.controls['products']).at(currentProductIndex).get("Width").setValue(p.Width);
+        (<FormArray>this.productsAndAccessorialsFormGroup.controls['products']).at(currentProductIndex).get("Height").setValue(p.Height);
+        (<FormArray>this.productsAndAccessorialsFormGroup.controls['products']).at(currentProductIndex).get("PCF").setValue(p.PCF);
+        (<FormArray>this.productsAndAccessorialsFormGroup.controls['products']).at(currentProductIndex).get("Weight").setValue(p.Weight);
+        (<FormArray>this.productsAndAccessorialsFormGroup.controls['products']).at(currentProductIndex).get("Stackable").setValue(p.Stackable);
+        (<FormArray>this.productsAndAccessorialsFormGroup.controls['products']).at(currentProductIndex).get("Hazmat").setValue(p.Hazmat);
+        
+        counter += 1;
+      });    
+    }
+
+    if (this.ShipmentByLadingObject.BOLAccesorialList != null && this.ShipmentByLadingObject.BOLAccesorialList.length > 0){          
+      this.ShipmentByLadingObject.BOLAccesorialList.forEach(BOLAccesorial => {        
+        this.accessorialArray.forEach(AvailableAccesorial => {
+          if (BOLAccesorial.AccesorialID == AvailableAccesorial.AccessorialID){
+            let accessorial: AccessorialBase = { 
+              AccessorialID: AvailableAccesorial.AccessorialID, 
+              AccessorialCode: AvailableAccesorial.AccesorialCode
+            }
+      
+            this.accessorials.push(accessorial);
+            this.accessorialIds.push(AvailableAccesorial.AccessorialID); 
+
+            AvailableAccesorial.Selected = true;                        
+          }
+        });                
+      });    
+    }
+  
+    this.accessorialsSelectedQty = this.ShipmentByLadingObject.BOLAccesorialList.length; //Quantiry of accessorials selected
+
+    //--
+
+    //-- Set default values "Last/Confirm step" step
+    this.confirmFormGroup.controls['carrier'].setValue(this.ShipmentByLadingObject.CarrierName, {onlySelf: false});
+    this.carrierSelected = this.ShipmentByLadingObject.CarrierCode;
+    //--
+    
+    
   }
 
 }

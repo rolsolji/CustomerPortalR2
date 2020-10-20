@@ -392,7 +392,7 @@ export class FormAddShipComponent implements OnInit {
 
     if (localLadingIdParameter != null && localLadingIdParameter.length > 0){
       //-- Get Service Level Options
-      this.ShipmentByLadingObject = await this.httpService.GetShipmentByLadingID(localLadingIdParameter, this.keyId);
+      this.ShipmentByLadingObject = await this.httpService.getShipmentByLadingID(localLadingIdParameter, this.keyId);
       this.setDefaultValuesInSteps()   
       
       //-- Get Shipment Costs

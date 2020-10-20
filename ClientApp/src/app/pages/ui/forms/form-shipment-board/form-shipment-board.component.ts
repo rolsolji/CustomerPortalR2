@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit, ViewChild, ElementRef, Input, 
-  Output, EventEmitter, HostListener, Pipe, PipeTransform } from '@angular/core';
+  Output, EventEmitter, HostListener, Pipe, PipeTransform, AfterViewInit, OnDestroy } from '@angular/core';
 import { DatePipe } from '@angular/common';
 
 import icVisibility from '@iconify/icons-ic/twotone-visibility';
@@ -16,6 +16,11 @@ import icTwotoneCalendarToday from '@iconify/icons-ic/twotone-calendar-today';
 import icBaselineImageNotSupported from '@iconify/icons-ic/baseline-image-not-supported';
 import baselineEdit from '@iconify/icons-ic/baseline-edit';
 import baselineDoubleArrow from '@iconify/icons-ic/baseline-double-arrow';
+import outlinePhone from '@iconify/icons-ic/outline-phone';
+import outlineMap from '@iconify/icons-ic/outline-map';
+import outlineTextSnippet from '@iconify/icons-ic/outline-text-snippet';
+import outlinePrint from '@iconify/icons-ic/outline-print';
+import outlineEmail from '@iconify/icons-ic/outline-email';
 
 import { FormBuilder, FormControl, FormGroup, Validators, FormArray } from '@angular/forms';
 import { map, startWith } from 'rxjs/operators';
@@ -57,6 +62,10 @@ import { stringToKeyValue } from '@angular/flex-layout/extended/typings/style/st
 import { MessageService } from "../../../../common/message.service";
 //import {ThemePalette} from '@angular/material/core';
 import {MatSidenav} from '@angular/material/sidenav';
+import {MatSort} from '@angular/material/sort';
+import { MatPaginator } from '@angular/material/paginator';
+import {animate, state, style, transition, trigger} from '@angular/animations';
+import { ShipmentResponse } from '../../../../Entities/ShipmentResponse'; 
 
 @Component({
   selector: 'vex-form-shipment-board',
@@ -65,7 +74,12 @@ import {MatSidenav} from '@angular/material/sidenav';
   changeDetection: ChangeDetectionStrategy.Default,
   animations: [
     stagger60ms,
-    fadeInUp400ms
+    fadeInUp400ms,
+    trigger('detailExpand', [
+      state('collapsed', style({height: '0px', minHeight: '0'})),
+      state('expanded', style({height: '*'})),
+      transition('expanded <=> collapsed', animate('225ms cubic-bezier(0.4, 0.0, 0.2, 1)')),
+    ])
   ]
 })
 
@@ -76,17 +90,19 @@ import {MatSidenav} from '@angular/material/sidenav';
 // }
 
 
-
-export class FormShipmentBoardComponent implements OnInit {
-
-  //displayedColumns = ['position', 'name', 'weight', 'symbol', 'colA', 'colB', 'colC'];
-  //dataSource = new MatTableDataSource<Element>(ELEMENT_DATA);
+export class FormShipmentBoardComponent implements OnInit,OnDestroy {
 
   icFilterList = icFilterList;
   baselineEdit = baselineEdit;
   baselineDoubleArrow = baselineDoubleArrow;
+  outlinePhone = outlinePhone;
+  outlineMap = outlineMap;
+  outlineTextSnippet = outlineTextSnippet;
+  outlinePrint = outlinePrint;
+  outlineEmail = outlineEmail;
 
   showSpinner = false;
+  showSpinnerGrid = false;
 
   //#region Quotes
   getQuotesParameters: GetQuotesParameters = {
@@ -168,7 +184,7 @@ export class FormShipmentBoardComponent implements OnInit {
     { label: 'Action', property: 'Action', type: 'more', visible: true, cssClasses: ['grid-mat-cell-small'] },
   ];
 
-  keyId: string = "1593399730488";
+  keyId: string = "1602966166220";
   pageSize = 10;
   pageSizeOptions: number[] = [5, 10, 20, 50];
   dataSource: MatTableDataSource<Quote> | null;
@@ -186,10 +202,8 @@ export class FormShipmentBoardComponent implements OnInit {
   totalInTransitStatus: string;
   totalDeliveredStatus: string;
 
+  shipmentInformation: ShipmentResponse;
 
-  get visibleColumns() {
-    return this.columns.filter(column => column.visible).map(column => column.property);
-  }
   //#endregion
 
   // @ViewChild('statusInput') statusInput: ElementRef<HTMLInputElement>;
@@ -198,6 +212,8 @@ export class FormShipmentBoardComponent implements OnInit {
   @ViewChild('statusInput') statusInput: ElementRef<HTMLInputElement>;
   @ViewChild('auto') matAutocomplete: MatAutocomplete;
   @ViewChild('searchModal') sidenav: MatSidenav;
+  @ViewChild(MatPaginator, { static: false }) paginator: MatPaginator;
+  @ViewChild(MatSort, { static: false }) sort: MatSort;
 
   constructor(
     private httpService : HttpService,
@@ -210,12 +226,28 @@ export class FormShipmentBoardComponent implements OnInit {
     this.filteredStatus = this.statusCtrl.valueChanges.pipe(
       startWith(null),
       map((status: string | null) => status ? this._filter(status) : this.StatusOptionsString.slice()));
-
   }
 
+  get visibleColumns() {
+    return this.columns.filter(column => column.visible).map(column => column.property);
+  }
+
+  get visibleColumnsNew() {
+    return ['View', 'ClientLadingNo', 'ClientName'];
+  }
+
+  expandedElement: Quote | null;
+
   async ngOnInit() {
+
     this.showSpinner = true;
+
     this.InitialLoadPage();
+  }
+
+  ngOnChanges(){ 
+    this.dataSource.sort = this.sort; 
+    this.dataSource.paginator = this.paginator; 
   }
 
   trackByProperty<T>(index: number, column: TableColumn<T>) {
@@ -282,8 +314,6 @@ export class FormShipmentBoardComponent implements OnInit {
 
     this.showSpinner = true;
 
-    this.cleanField()
-
     if (this.fromShipDate != null)
       this.getQuotesParameters.FromShipDate = String.Format("/Date({0})/",this.fromShipDate.getTime());
 
@@ -296,10 +326,13 @@ export class FormShipmentBoardComponent implements OnInit {
     if (this.toDeliveryDate != null)
       this.getQuotesParameters.ToDeliveryDate = String.Format("/Date({0})/",this.toDeliveryDate.getTime());
 
+    console.log("statusSelected", this.statusSelected);  
+
+
     this.getQuotesParameters.BOlStatusIDList = [];
     this.statusSelected.forEach(s => 
       this.getQuotesParameters.BOlStatusIDList.push(
-        this.StatusOptions.find(so => so.Status == s).BOLStatusID
+        s.BOLStatusID
       )
     );
 
@@ -308,9 +341,6 @@ export class FormShipmentBoardComponent implements OnInit {
 
     //Get parameter quote and clean variable  
     this.messageService.SharedQuoteParameter.subscribe(message => this.quoteIdParameter = message)
-    
-
-        console.log("quoteParameter", this.quoteIdParameter);
 
     if (!String.IsNullOrWhiteSpace(this.quoteIdParameter))
     {
@@ -333,7 +363,9 @@ export class FormShipmentBoardComponent implements OnInit {
 
     this.dataSource = new MatTableDataSource();
     this.dataSource.data = this.quotes;
-    
+    this.dataSource.sort = this.sort;
+    console.log('result', this.quotes);
+
     this.showSpinner = false;
 
     this.messageService.SendQuoteParameter(String.Empty);
@@ -346,50 +378,26 @@ export class FormShipmentBoardComponent implements OnInit {
   
   statusCtrl = new FormControl();
   filteredStatus: Observable<string[]>;
-  statusSelected: string[] = [];
-
-  add(event: MatChipInputEvent): void {
-    const input = event.input;
-    const value = event.value;
-
-    if ((value || '').trim()) {
-      this.statusSelected.push(value.trim());
-    }
-
-    // Reset the input value
-    if (input) {
-      input.value = '';
-    }
-
-    this.statusCtrl.setValue(null);
-  }
-
-  remove(status: string): void {
-    const index = this.statusSelected.indexOf(status);
-
-    if (index >= 0) {
-      this.statusSelected.splice(index, 1);
-    }
-  }
-
-  selected(event: MatAutocompleteSelectedEvent): void {
-    if (this.statusSelected.find(s => s == event.option.viewValue))
-      return;
-
-    this.statusSelected.push(event.option.viewValue);
-    this.statusInput.nativeElement.value = '';
-    this.statusCtrl.setValue(null);
-  }
+  statusSelected: Status[] = [];
 
   private _filter(value: string): string[] {
     const filterValue = value.toLowerCase();
     return this.StatusOptionsString.filter(status => status.toLowerCase().indexOf(filterValue) === 0);
   }
 
-  //(blur)="cleanField()"
-  cleanField(){
-    this.statusInput.nativeElement.value = '';
-    this.statusCtrl.setValue(null);
+  ngOnDestroy() {
   }
 
+  async GetQuoteInfo(rowSelected:Quote){
+
+    this.showSpinnerGrid = true;
+
+    this.shipmentInformation = null;
+    //console.log("more details", rowSelected);
+
+    this.shipmentInformation = await this.httpService.getShipmentByLadingID(rowSelected.LadingID.toString(), this.keyId);
+
+    //console.log("shipmentDetails", this.shipmentInformation);
+    this.showSpinnerGrid = false;
+  }
 }

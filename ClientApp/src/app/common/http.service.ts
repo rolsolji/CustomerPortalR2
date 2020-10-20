@@ -22,6 +22,8 @@ import { PaymentTerm } from '../Entities/PaymentTerm';
 import { ShipmentError } from '../Entities/ShipmentError';
 import { ShipmentCost } from '../Entities/ShipmentCost';
 import { Carrier } from '../Entities/Carrier';
+import { ShipmentResponse } from '../Entities/ShipmentResponse';
+import { ReferenceByClient } from '../Entities/ReferenceByClientResponse'
 
 @Injectable({
     providedIn: 'root'
@@ -288,4 +290,40 @@ export class HttpService{
             ).pipe(tap(data => opts = data))
     }
 
+    //Get quote detais
+    getShipmentByLadingID(landingId:string,keyId:string){
+        let ticket = this.token;
+        let httpHeaders = new HttpHeaders({                       
+            'Ticket' : ticket                            
+        }); 
+        return this.http.get<ShipmentResponse>(String.Format('https://beta-customer.r2logistics.com/Services/BOLHDRService.svc/json/GetShipmentByLadingID?LadingID={0}&_={1}', landingId, keyId)
+        ,{
+            headers: httpHeaders
+          }
+        ).toPromise();  
+    }
+
+    getTrackingDetailsByLadingID(landingId:string,keyId:string){
+        let ticket = this.token;
+        let httpHeaders = new HttpHeaders({                       
+            'Ticket' : ticket                            
+        }); 
+        return this.http.get<any>(String.Format('https://beta-customer.r2logistics.com/Services/BOLHDRService.svc/json/GetTrackingDetailsByLadingID?LadingID={0}&_={1}', landingId, keyId)
+        ,{
+            headers: httpHeaders
+          }
+        ).toPromise();  
+    }
+
+    getReferenceByClient(landingId:string,keyId:string){
+        let ticket = this.token;
+        let httpHeaders = new HttpHeaders({                       
+            'Ticket' : ticket                            
+        }); 
+        return this.http.get<ReferenceByClient[]>(String.Format('https://beta-customer.r2logistics.com/Services/BOLHDRService.svc/json/GetReferenceByClient?LadingID={0}&_={1}', landingId, keyId)
+        ,{
+            headers: httpHeaders
+          }
+        ).toPromise();  
+    }
 }

@@ -46,6 +46,8 @@ import { StepperSelectionEvent } from '@angular/cdk/stepper';
 import { ShipmentByLading } from '../../../../Entities/ShipmentByLading';
 import * as moment from 'moment';
 import {STEPPER_GLOBAL_OPTIONS} from '@angular/cdk/stepper';
+import { ProductPackageType } from '../../../../Entities/ProductPackageType';
+import { ReferenceByClient } from '../../../../Entities/ReferenceByClient';
 
 
 
@@ -74,7 +76,7 @@ export class FormAddShipComponent implements OnInit {
 
   originCountries: Object;
   destinationCountries: Object;  
-  packageTypes: Object;
+  packageTypes: ProductPackageType[];
 
   accessorialArray: AccessorialDetail[];    
   internalNotes: InternalNote[];
@@ -98,6 +100,7 @@ export class FormAddShipComponent implements OnInit {
   sendEmailClicked: boolean = false;
   carrierImageUrl = "https://beta-customer.r2logistics.com/Handlers/CarrierLogoHandler.ashx?carrierID=";
   ShipmentByLadingObject: ShipmentByLading;
+  ReferenceByClientOptions: ReferenceByClient[];  
 
   @ViewChild(MatAccordion) accordion: MatAccordion;
   
@@ -167,6 +170,10 @@ export class FormAddShipComponent implements OnInit {
   paymentTermDescriptionSelected: string = '';
   shipmentModeDescriptionSelected: string = '';
 
+  ReferenceByClientField1: string = '';
+  ReferenceByClientField2: string = '';
+  ReferenceByClientField3: string = '';
+
   pcoAutoCompleteOptions: Observable<PostalData[]>;
   pcdAutoCompleteOptions: Observable<PostalData[]>;  
 
@@ -197,7 +204,8 @@ export class FormAddShipComponent implements OnInit {
         Weight: [null, Validators.required],
         addToProductMaster: [false],
         Stackable: [false],
-        Hazmat: [false]
+        Hazmat: [false],
+        PackageTypeDescription: [null]
     })
   }  
 
@@ -385,6 +393,12 @@ export class FormAddShipComponent implements OnInit {
 
     //Get shipment mode description by default
     this.fetchShipmentMode("LTL");
+
+    //Get priority description by default
+    this.fetchPriority(0);
+
+    //Get service level description by default
+    this.fetchServiceLevel(1);
 
     //-- Get Shipment information    
     //this.ladingIdParameter = "2386566";
@@ -900,8 +914,43 @@ export class FormAddShipComponent implements OnInit {
     this.clearRatesSection()
   }
 
-  StepperSelectionChange(event: StepperSelectionEvent){
-    //console.log(event);
+  async StepperSelectionChange(event: StepperSelectionEvent){
+    console.log(event);
+
+    if (event.selectedIndex == 2) //shipment info step selected
+    {
+        //-- Get Shipment Errors
+        this.ReferenceByClientOptions = await this.httpService.GetReferenceByClient(this.ClientID, this.keyId); 
+        if (this.ReferenceByClientOptions != null && this.ReferenceByClientOptions.length > 0){
+          this.ReferenceByClientField1 = this.ReferenceByClientOptions[0].Description.trim();
+
+          if (this.ReferenceByClientOptions.length > 1){
+            this.ReferenceByClientField2 = this.ReferenceByClientOptions[1].Description.trim();
+          }
+          
+          if (this.ReferenceByClientOptions.length > 2){
+            this.ReferenceByClientField3 = this.ReferenceByClientOptions[2].Description.trim();
+          }
+        }
+        else{ // If we can't get fields from API then set R2 fields as default
+          this.ReferenceByClientField1 = "Customer Ref #";
+          this.ReferenceByClientField2 = "R2 Order #";
+          this.ReferenceByClientField3 = "R2 Pro number";
+        }
+        
+
+    }
+
+    if (event.selectedIndex == 3) //last step selected
+    {
+      this.formProducts.value.forEach(prod => {
+        let PackageItem = this.packageTypes.filter(item => item.PackageTypeID == prod.PackageTypeID);
+        prod.PackageTypeDescription = (PackageItem.length > 0 ? PackageItem[0].PackageType : "");      
+      });      
+    }
+    
+    
+
     this.clearRatesSection()
   }
 

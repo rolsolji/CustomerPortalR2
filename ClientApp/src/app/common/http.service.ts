@@ -23,6 +23,7 @@ import { ShipmentError } from '../Entities/ShipmentError';
 import { ShipmentCost } from '../Entities/ShipmentCost';
 import { Carrier } from '../Entities/Carrier';
 import { ShipmentByLading } from '../Entities/ShipmentByLading';
+import { ReferenceByClient } from '../Entities/ReferenceByClient';
 
 @Injectable({
     providedIn: 'root'
@@ -95,7 +96,7 @@ export class HttpService{
         let httpHeaders = new HttpHeaders({                       
             'Ticket' : ticket                            
         }); 
-        return this.http.get(String.Format('https://beta-customer.r2logistics.com/Services/MasClientDefaultsService.svc/json/GetMasProductPackageType?_={0}',keyId)
+        return this.http.get<ProductPackageType[]>(String.Format('https://beta-customer.r2logistics.com/Services/MasClientDefaultsService.svc/json/GetMasProductPackageType?_={0}',keyId)
         ,{
             headers: httpHeaders
           }
@@ -300,5 +301,17 @@ export class HttpService{
           }
           ).toPromise();            
     }
+
+    GetReferenceByClient(clientID:number, keyId:string){
+        let ticket = this.token;
+        let httpHeaders = new HttpHeaders({                       
+            'Ticket' : ticket                            
+        }); 
+        return this.http.get<ReferenceByClient[]>(String.Format('https://beta-customer.r2logistics.com/Services/BOLHDRService.svc/json//GetReferenceByClient?ClientID={0}&_={1}',clientID.toString(),keyId)
+        ,{
+            headers: httpHeaders
+          }
+          ).toPromise();            
+    }    
 
 }

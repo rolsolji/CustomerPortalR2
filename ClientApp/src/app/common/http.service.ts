@@ -22,6 +22,8 @@ import { PaymentTerm } from '../Entities/PaymentTerm';
 import { ShipmentError } from '../Entities/ShipmentError';
 import { ShipmentCost } from '../Entities/ShipmentCost';
 import { Carrier } from '../Entities/Carrier';
+import { ShipmentResponse } from '../Entities/ShipmentResponse';
+import { ReferenceByClient } from '../Entities/ReferenceByClientResponse';
 import { ShipmentByLading } from '../Entities/ShipmentByLading';
 import { ReferenceByClient } from '../Entities/ReferenceByClient';
 
@@ -290,16 +292,29 @@ export class HttpService{
             ).pipe(tap(data => opts = data))
     }
 
-    GetShipmentByLadingID(LadingID:string, keyId:string){
+    //Get quote detais
+    getShipmentByLadingID(landingId:string,keyId:string){
         let ticket = this.token;
         let httpHeaders = new HttpHeaders({                       
             'Ticket' : ticket                            
         }); 
-        return this.http.get<ShipmentByLading>(String.Format('https://beta-customer.r2logistics.com/Services/BOLHDRService.svc/json/GetShipmentByLadingID?LadingID={0}&_={1}',LadingID,keyId)
+        return this.http.get<ShipmentByLading>(String.Format('https://beta-customer.r2logistics.com/Services/BOLHDRService.svc/json/GetShipmentByLadingID?LadingID={0}&_={1}', landingId, keyId)
         ,{
             headers: httpHeaders
           }
-          ).toPromise();            
+        ).toPromise();  
+    }
+
+    getTrackingDetailsByLadingID(landingId:string,keyId:string){
+        let ticket = this.token;
+        let httpHeaders = new HttpHeaders({                       
+            'Ticket' : ticket                            
+        }); 
+        return this.http.get<any>(String.Format('https://beta-customer.r2logistics.com/Services/BOLHDRService.svc/json/GetTrackingDetailsByLadingID?LadingID={0}&_={1}', landingId, keyId)
+        ,{
+            headers: httpHeaders
+          }
+        ).toPromise();  
     }
 
     GetReferenceByClient(clientID:number, keyId:string){

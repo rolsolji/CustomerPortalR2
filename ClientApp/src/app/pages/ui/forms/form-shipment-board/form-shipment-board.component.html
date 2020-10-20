@@ -167,30 +167,11 @@
                                 </mat-form-field>
                             </div>
                             <div class="ml-2 mr-2">
-                                <mat-form-field class="example-chip-list" appearance="outline">
+                                <mat-form-field appearance="outline">
                                     <mat-label>Select Status</mat-label>
-                                    <mat-chip-list #chipList aria-label="Status selection">
-                                      <mat-chip
-                                        *ngFor="let status of statusSelected"
-                                        [selectable]="selectable"
-                                        [removable]="removable"
-                                        (removed)="remove(status)"> 
-                                        {{status}}
-                                        <mat-icon matChipRemove *ngIf="removable">cancel</mat-icon>
-                                      </mat-chip>
-                                      <input
-                                        #statusInput
-                                        [formControl]="statusCtrl"
-                                        [matAutocomplete]="auto"
-                                        [matChipInputFor]="chipList"
-                                        [matChipInputSeparatorKeyCodes]="separatorKeysCodes"
-                                        (matChipInputTokenEnd)="add($event)">
-                                    </mat-chip-list>
-                                    <mat-autocomplete #auto="matAutocomplete" (optionSelected)="selected($event)">
-                                      <mat-option *ngFor="let status of filteredStatus | async" [value]="status">
-                                        {{status}}
-                                      </mat-option>
-                                    </mat-autocomplete>
+                                    <mat-select multiple [(value)]="statusSelected">
+                                        <mat-option *ngFor="let status of StatusOptions" [value]="status">{{status.Status}}</mat-option>
+                                    </mat-select>
                                 </mat-form-field>
                             </div>
 
@@ -208,9 +189,8 @@
     </div>
 
     <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="5px" class="card ml-2 mt-5 grid-container" (click)="close('close')">        
-        <div *ngIf=!showSpinner>
-            
-            <table [dataSource]="dataSource" class="mat-elevation-z8" mat-table matSort>
+        <div >
+            <table [dataSource]="dataSource" class="mat-elevation-z8" mat-table multiTemplateDataRows matSort>
                 
                 <!-- Action Columns -->
                 <ng-container *ngFor="let column of columns; trackBy: trackByProperty">
@@ -243,18 +223,161 @@
                 </ng-container>
                 </ng-container>
 
+                <ng-container matColumnDef="expandedDetail">
+                    <td mat-cell *matCellDef="let row" [attr.colspan]="visibleColumns.length">
+                        <div class="example-element-detail" [@detailExpand]="row == expandedElement ? 'expanded' : 'collapsed'">
+                            
+                            <div class="spinnerSection" *ngIf="showSpinnerGrid">
+                                <div class="center-me">
+                                  <mat-progress-spinner diameter="50" color="warn" mode="indeterminate"></mat-progress-spinner>
+                                  <p>Loading...</p>
+                                </div>
+                            </div>
+                            
+                            <div *ngIf="!showSpinnerGrid" fxLayout="row" fxFlex=100%>
+                                <div fxFlex="20%">
+                                    <div class="div-container div-container-title">
+                                        Origin Terminal
+                                    </div>
+                                    <hr class="horizontal-title-line">
+                                    <div class="div-container div-container-content">
+                                        <p *ngIf="shipmentInformation != null"><mat-icon [icIcon]="outlinePhone" color="black"></mat-icon> 
+                                            {{ shipmentInformation.OriginTerminalPhone }}</p>   
+                                    </div>
+                                    <div class="div-container div-container-content">
+                                        <p *ngIf="shipmentInformation != null"><mat-icon [icIcon]="outlineMap" color="black"></mat-icon>
+                                            {{ shipmentInformation.OriginTerminalAdd1 }} 
+                                            {{ shipmentInformation.OriginTerminalAdd2 }}
+                                            {{ shipmentInformation.OriginTerminalCity }}, 
+                                            {{ shipmentInformation.OriginTerminalState }}, 
+                                            {{ shipmentInformation.OriginTerminalZip }}
+                                        </p>
+                                    </div>
+                                    <hr class="horizontal-separator-line">
+                                    <div class="div-container div-container-title">
+                                        Destination Terminal
+                                    </div>
+                                    <hr class="horizontal-title-line">
+                                    <div class="div-container div-container-content">
+                                        <p *ngIf="shipmentInformation != null"><mat-icon [icIcon]="outlinePhone" color="black"></mat-icon>
+                                            {{ shipmentInformation.DestTerminalPhone }}</p>   
+                                    </div>
+                                    <div class="div-container div-container-content">
+                                        <p *ngIf="shipmentInformation != null"><mat-icon [icIcon]="outlineMap" color="black"></mat-icon>
+                                            {{ shipmentInformation.DestTerminalAdd1 }} 
+                                            {{ shipmentInformation.DestTerminalAdd2 }}
+                                            {{ shipmentInformation.DestTerminalCity }}, 
+                                            {{ shipmentInformation.DestTerminalState }}, 
+                                            {{ shipmentInformation.DestTerminalZip }}
+                                        </p>
+                                    </div>
+                                </div>
+                                <div class="vertical-line"></div>
+                                <div fxFlex="20%">
+                                    <div class="div-container div-container-title">
+                                        Tracking Details
+                                    </div>
+                                    <hr class="horizontal-title-line">    
+                                    <div class="div-container div-container-content">
+                                        <p *ngIf="shipmentInformation != null">Tracking Number: {{shipmentInformation.TrackingNumber}}</p>
+                                    </div>
+                                </div>
+                                <div class="vertical-line"></div>
+                                <div fxFlex="20%">
+                                    <div class="div-container div-container-title">
+                                        Shipping Details
+                                    </div>
+                                    <hr class="horizontal-title-line">
+                                    <div class="div-container div-container-content">
+                                        <p *ngIf="shipmentInformation != null">Pro Number:</p>
+                                        <p *ngIf="shipmentInformation != null">Pickup Number:</p> 
+                                        <p *ngIf="shipmentInformation != null">R2 Ref.No:</p>
+                                        <p *ngIf="shipmentInformation != null">Exp Ship Date: {{row.ActualShipDateWithFormat}}</p> 
+                                        <p *ngIf="shipmentInformation != null">Actual Ship Date: {{row.ActualShipDateWithFormat}}</p>
+                                        <p *ngIf="shipmentInformation != null">Actual Del Date:</p>
+                                        <p *ngIf="shipmentInformation != null">Expected Del Date:</p>
+                                    </div>
+                                </div>
+                                <div class="vertical-line"></div>
+                                <div fxFlex="20%">
+                                    <div class="div-container div-container-title">
+                                        References
+                                    </div>
+                                    <hr class="horizontal-title-line">
+                                    <div class="div-container div-container-content">
+                                        <p *ngIf="shipmentInformation != null">PO Number:</p>
+                                        <p *ngIf="shipmentInformation != null">SO Number:</p> 
+                                        <p *ngIf="shipmentInformation != null">GL Code:</p>
+                                    </div>
+                                    <hr class="horizontal-separator-line">
+                                    <div class="div-container div-container-title">
+                                        View Related Documents
+                                    </div>
+                                    <hr class="horizontal-title-line">
+                                    <div>
+                                        <div class="div-container-three-column">
+                                            <mat-icon [icIcon]="outlineTextSnippet" color="black">BOL</mat-icon>
+                                            <p>BOL</p>
+                                        </div>
+                                        <div class="div-container-three-column">
+                                            <mat-icon [icIcon]="outlineTextSnippet" color="black">POD</mat-icon>
+                                            <p>POD</p>
+                                        </div>
+                                        <div class="div-container-three-column">
+                                            <mat-icon [icIcon]="outlineTextSnippet" color="black">OTHER</mat-icon>
+                                            <p>OTHER</p>
+                                        </div>  
+                                    </div>
+                                    <div>
+                                        <div class="div-container-two-column">
+                                            <mat-icon [icIcon]="outlineTextSnippet" color="black">NOTES</mat-icon>
+                                            <p>NOTES</p>
+                                        </div>
+                                        <div class="div-container-two-column">
+                                            <mat-icon [icIcon]="outlineTextSnippet" color="black">AUDIT LOG</mat-icon>
+                                            <p>AUDIT LOG</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="vertical-line"></div>
+                                <div fxFlex="20%">
+                                    <div class="div-container div-container-title">
+                                        View/Print Documents
+                                    </div>
+                                    <hr class="horizontal-title-line">
+                                    <div class="div-container">
+                                        <p><mat-icon [icIcon]="outlinePrint" color="black"></mat-icon>BOL</p>
+                                        <p><mat-icon [icIcon]="outlinePrint" color="black"></mat-icon>Shipment Labels</p>
+                                    </div>
+                                    <hr class="horizontal-separator-line">
+                                    <div class="div-container div-container-title">
+                                        Email Documents
+                                    </div>
+                                    <hr class="horizontal-title-line">
+                                    <div class="div-container">
+                                        <p><mat-icon [icIcon]="outlineEmail" color="black"></mat-icon>BOL</p>
+                                        <p><mat-icon [icIcon]="outlineEmail" color="black"></mat-icon>Shipment Labels</p>
+                                        <p><mat-icon [icIcon]="outlineEmail" color="black"></mat-icon>Rate Quote</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </td>
+                </ng-container>
+
                 <tr *matHeaderRowDef="visibleColumns" mat-header-row ></tr>
-                <tr 
+                <tr mat-row
                     *matRowDef="let row; columns: visibleColumns;"
-                    @fadeInUp
-                    class="hover:bg-hover trans-ease-out cursor-pointer"
-                    mat-row>
+                    class="example-element-row"
+                    [class.example-expanded-row]="expandedElement === row"
+                    (click)="expandedElement = expandedElement === row ? null : row; GetQuoteInfo(row);">
                 </tr>
+                <tr mat-row *matRowDef="let row; columns: ['expandedDetail']" class="example-detail-row"></tr> 
             </table>
-
-            
-
         </div>
     </div>
+
+
+
 </div>
 

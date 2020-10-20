@@ -65,9 +65,12 @@ export class ToolbarComponent implements OnInit {
   keyId = '1593399730488';
   toolBarMessage:string;
   toolBarTitle: string;
+  defaultClient: Client;
   filteredOptions: Observable<Client[]>;
   clientsForm: FormGroup;
   public clientsForUser$: BehaviorSubject<Client[]> = new BehaviorSubject<Client[]>(null);
+  public securityToken: string;
+  public clientImage: string;
 
 
   constructor(
@@ -85,6 +88,9 @@ export class ToolbarComponent implements OnInit {
   async ngOnInit() {
     this.toolBarMessage = this.httpService.getUserMessage(this.keyId);
     this.toolBarTitle = this.authenticationService.getDefaultClient().ClientName;
+    this.defaultClient = this.authenticationService.getDefaultClient();
+    this.securityToken = this.authenticationService.ticket$.value;
+    this.clientImage = `https://beta-customer.r2logistics.com/Handlers/ClientLogoHandler.ashx?ClientID=${this.defaultClient.ClientID}&id=e(${Math.random().toString().slice(2,11)})/&Ticket=${this.securityToken}`;
 
     this.clientsForm = this.fb.group({
       client: [this.authenticationService.defaultClient$.value.ClientName, null],});
@@ -143,10 +149,10 @@ export class ToolbarComponent implements OnInit {
   onChange(event) {
     const clientName = event.source.value;
     this.clientsForm.get('client').setValue(clientName);
-    const defaultClient = this.authenticationService.clientsForUser$.value.find(
+    const _defaultClient = this.authenticationService.clientsForUser$.value.find(
       (client: Client) => client.ClientName === clientName);
-    localStorage.setItem('defaultClient', JSON.stringify(defaultClient));
-    this.authenticationService.defaultClient$.next(defaultClient);
+    localStorage.setItem('defaultClient', JSON.stringify(_defaultClient));
+    this.authenticationService.defaultClient$.next(_defaultClient);
     window.location.reload();
   }
 

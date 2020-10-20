@@ -82,15 +82,16 @@
 
     <div fxFlex fxLayout="row" fxLayoutGap="5px">
       <div fxFlex="10%" fxHide.lt-sm>
-        <img class="w-16" src="assets/img/demo/R2-Logistics_Logo.png">
+        <img class="w-16"
+             [src]="clientImage">
       </div>
       <div fxFlex fxLayout="column" fxLayoutAlign="space-around center">
         <div><h2>{{toolBarTitle}}</h2></div>
-        <div fxLayout="row">
-          <p class="userMessage">
-            {{toolBarMessage}}
-          </p>
-        </div>
+<!--        <div fxLayout="row">-->
+<!--&lt;!&ndash;          <p [fxHide]="mobileQuery" class="userMessage">&ndash;&gt;-->
+<!--&lt;!&ndash;            {{toolBarMessage}}&ndash;&gt;-->
+<!--&lt;!&ndash;          </p>&ndash;&gt;-->
+<!--        </div>-->
       </div>
     </div>
 

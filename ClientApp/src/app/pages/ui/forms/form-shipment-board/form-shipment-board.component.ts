@@ -65,7 +65,7 @@ import {MatSidenav} from '@angular/material/sidenav';
 import {MatSort} from '@angular/material/sort';
 import { MatPaginator } from '@angular/material/paginator';
 import {animate, state, style, transition, trigger} from '@angular/animations';
-import { ShipmentResponse } from '../../../../Entities/ShipmentResponse'; 
+import { ShipmentByLading } from '../../../../Entities/ShipmentByLading'; 
 
 @Component({
   selector: 'vex-form-shipment-board',
@@ -202,7 +202,7 @@ export class FormShipmentBoardComponent implements OnInit,OnDestroy {
   totalInTransitStatus: string;
   totalDeliveredStatus: string;
 
-  shipmentInformation: ShipmentResponse;
+  shipmentInformation: ShipmentByLading;
 
   //#endregion
 

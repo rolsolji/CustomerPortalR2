@@ -297,7 +297,7 @@ export class HttpService{
         let httpHeaders = new HttpHeaders({                       
             'Ticket' : ticket                            
         }); 
-        return this.http.get<ShipmentResponse>(String.Format('https://beta-customer.r2logistics.com/Services/BOLHDRService.svc/json/GetShipmentByLadingID?LadingID={0}&_={1}', landingId, keyId)
+        return this.http.get<ShipmentByLading>(String.Format('https://beta-customer.r2logistics.com/Services/BOLHDRService.svc/json/GetShipmentByLadingID?LadingID={0}&_={1}', landingId, keyId)
         ,{
             headers: httpHeaders
           }

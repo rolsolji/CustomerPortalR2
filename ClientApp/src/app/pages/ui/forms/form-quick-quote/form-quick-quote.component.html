@@ -360,7 +360,7 @@
                 <button [disabled]=showSpinner (click)="getQuote()" color="warn" mat-raised-button type="button" [disabled]="!myForm.valid" >Get Quote</button>
                 <mat-form-field fxFlex=15>
                   <mat-label>Show top Carriers</mat-label>
-                  <input matInput type="number" maxlength="2" min="10" max="25" formControlName="showCarriers" required>
+                  <input matInput type="number" maxlength="2" min="1" max="25" formControlName="showCarriers" required>
                 </mat-form-field>  
                 <div *ngIf="showSpinner" class="spinnerSection">
                   <div class="center-me">

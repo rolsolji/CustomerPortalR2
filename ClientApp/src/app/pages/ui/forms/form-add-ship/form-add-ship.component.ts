@@ -45,9 +45,11 @@ import outlineEmail from '@iconify/icons-ic/outline-email';
 import { StepperSelectionEvent } from '@angular/cdk/stepper';
 import { ShipmentByLading } from '../../../../Entities/ShipmentByLading';
 import * as moment from 'moment';
+import {AuthenticationService} from '../../../../common/authentication.service';
 import {STEPPER_GLOBAL_OPTIONS} from '@angular/cdk/stepper';
 import { ProductPackageType } from '../../../../Entities/ProductPackageType';
 import { ReferenceByClient } from '../../../../Entities/ReferenceByClient';
+import {environment} from '../../../../../environments/environment';
 
 
 
@@ -68,9 +70,32 @@ import { ReferenceByClient } from '../../../../Entities/ReferenceByClient';
 })
 export class FormAddShipComponent implements OnInit {
 
+  securityToken: string;
+
+  constructor(
+    private fb: FormBuilder,
+    private cd: ChangeDetectorRef,
+    private snackbar: MatSnackBar,
+    private httpService : HttpService,
+    private ratesService: RatesService,
+    private messageService: MessageService,
+    private utilitiesService: UtilitiesService,
+    private datepipe: DatePipe,
+    private authenticationService: AuthenticationService
+  ) {
+    this.securityToken = this.authenticationService.ticket$.value;
+  }
+
+  get formProducts() { return this.productsAndAccessorialsFormGroup.get('products') as FormArray; }
+  get originPckupDate() {
+    return this.originAndDestinationFormGroup.get('originpickupdate').value == null ? '' : new Date(this.originAndDestinationFormGroup.get('originpickupdate').value).toDateString();
+  }
+  get destExpDelDate() {
+    return this.originAndDestinationFormGroup.get('destexpdeldate').value == null ? '' : new Date(this.originAndDestinationFormGroup.get('destexpdeldate').value).toDateString();
+  }
+
   keyId = '1593399730488';
   ClientID = 8473;
-  securityToken: string;
 
   // localLadingIdParameter: string;
 
@@ -98,7 +123,7 @@ export class FormAddShipComponent implements OnInit {
   spinnerMessage:string;
   ratesOpened: number[];
   sendEmailClicked = false;
-  carrierImageUrl = 'https://beta-customer.r2logistics.com/Handlers/CarrierLogoHandler.ashx?carrierID=';
+  carrierImageUrl = environment.baseEndpoint +'Handlers/CarrierLogoHandler.ashx?carrierID=';
   ShipmentByLadingObject: ShipmentByLading;
   ReferenceByClientOptions: ReferenceByClient[];
 
@@ -179,15 +204,23 @@ export class FormAddShipComponent implements OnInit {
 
   carrierAutoCompleteOptions: Observable<Object[]>;
 
-  constructor(private fb: FormBuilder,
-              private cd: ChangeDetectorRef,
-              private snackbar: MatSnackBar,
-              private httpService : HttpService,
-              private ratesService: RatesService,
-              private messageService: MessageService,
-              private utilitiesService: UtilitiesService,
-              private datepipe: DatePipe) {
-  }
+  postalData: PostalData[];
+  postalDataDest: PostalData[];
+  OriginPostalCode: string;
+  OriginStateName: String;
+  OriginPostalData: PostalData;
+  OriginPickupDate: string;
+
+  //#region Destination Fields
+  DestinationPostalCode: string;
+  DestinationStateName: String;
+  DestinationPostalData: PostalData;
+
+  // Event fired after view is initialized
+  @ViewChild('stepper') stepper: MatStepper;
+
+  Carrier: string;
+  carrierData: Carrier[];
 
   addProductFormGroup(): FormGroup{
     return this.fb.group({
@@ -320,15 +353,6 @@ export class FormAddShipComponent implements OnInit {
     });
     // --
 
-    try{
-      this.securityToken = await this.httpService.getMainToken();
-    }
-    catch(ex){
-      console.log(ex);
-    }
-
-    this.httpService.token = this.securityToken;
-
     const responseData = await this.httpService.getCountryList(this.keyId);
     this.accessorialArray = await this.httpService.getGetClientMappedAccessorials(this.ClientID, this.keyId);
     // this.clientDefaultData = await this.httpService.getClientDefaultsByClient(this.ClientID, this.keyId);
@@ -406,7 +430,7 @@ export class FormAddShipComponent implements OnInit {
 
     if (localLadingIdParameter != null && localLadingIdParameter.length > 0){
       // -- Get Service Level Options
-      this.ShipmentByLadingObject = await this.httpService.getShipmentByLadingID(localLadingIdParameter, this.keyId);
+      this.ShipmentByLadingObject = await this.httpService.GetShipmentByLadingID(localLadingIdParameter, this.keyId);
       this.setDefaultValuesInSteps()
 
       // -- Get Shipment Costs
@@ -470,13 +494,6 @@ export class FormAddShipComponent implements OnInit {
     this.originAndDestinationFormGroup.get('destpostalcode').setValue(this.DestinationPostalCode);
   }
 
-  postalData: PostalData[];
-  postalDataDest: PostalData[];
-  OriginPostalCode: string;
-  OriginStateName: String;
-  OriginPostalData: PostalData;
-  OriginPickupDate: string;
-
   async validateOriginPostalCode(event: KeyboardEvent){
     const CountryId = this.originSelectedCountry == null ? '1': this.originSelectedCountry.CountryId.toString();
     this.OriginPostalCode = this.originAndDestinationFormGroup.get('originpostalcode').value;
@@ -496,11 +513,6 @@ export class FormAddShipComponent implements OnInit {
       }
     }
   }
-
-  //#region Destination Fields
-  DestinationPostalCode: string;
-  DestinationStateName: String;
-  DestinationPostalData: PostalData;
 
   async validateDestinationPostalCode(event: KeyboardEvent){
     const CountryId = this.destinationSelectedCountry == null ? '1': this.destinationSelectedCountry.CountryId.toString();
@@ -565,9 +577,6 @@ export class FormAddShipComponent implements OnInit {
       this.showInternalNotesTitle = false;
     }
   }
-
-  // Event fired after view is initialized
-  @ViewChild('stepper') stepper: MatStepper;
   // ngAfterViewInit() {
   //   //this.stepper.selectedIndex = 1;
 
@@ -642,9 +651,6 @@ export class FormAddShipComponent implements OnInit {
     return Description;
   }
 
-  Carrier: string;
-  carrierData: Carrier[];
-
   async validateCarrier(event: KeyboardEvent){
     // --
     // let CountryId = this.destinationSelectedCountry == null ? "1": this.destinationSelectedCountry.CountryId.toString();
@@ -712,42 +718,42 @@ export class FormAddShipComponent implements OnInit {
     const arrayProducts = this.productsAndAccessorialsFormGroup.get('products').value;
 
     const objRate = {
-      'ClientID': this.ClientID,
-      'ProfileID': 11868,
-      'Products': arrayProducts,
-      'SourcePostalCode': this.OriginPostalData.PostalCode,
-      'SourceCityID': this.OriginPostalData.CityID,
-      'SourceStateID': this.OriginPostalData.StateId,
-      'SourceCountryID': this.OriginPostalData.CountryId,
-      'SourceCountry': this.OriginPostalData.CountryCode,
-      'SourceStateCode': this.OriginPostalData.StateCode,
-      'SourceCityName': this.OriginPostalData.CityName,
-      'DestPostalCode': this.DestinationPostalData.PostalCode,
-      'DestCityID': this.DestinationPostalData.CityID,
-      'DestStateID': this.DestinationPostalData.StateId,
-      'DestCountryID': this.DestinationPostalData.CountryId,
-      'DestCountry': this.DestinationPostalData.CountryCode,
-      'DestStateCode': this.DestinationPostalData.StateCode,
-      'DestCityName': this.DestinationPostalData.CityName,
-      'ShipmentDate': String.Format('/Date({0})/',this.originAndDestinationFormGroup.get('originpickupdate').value.getTime()),
-      'Accessorials': this.accessorials,
-      'AccessorialCodes': [],
-      'TopN': this.confirmFormGroup.get('showTopCarriers').value,
-      'ServiceLevelGrops': [],
-      'ServiceLevels': [],// this.serviceLevels,
-      'ServiceLevelCodes': [],
+      ClientID: this.ClientID,
+      ProfileID: 11868,
+      Products: arrayProducts,
+      SourcePostalCode: this.OriginPostalData.PostalCode,
+      SourceCityID: this.OriginPostalData.CityID,
+      SourceStateID: this.OriginPostalData.StateId,
+      SourceCountryID: this.OriginPostalData.CountryId,
+      SourceCountry: this.OriginPostalData.CountryCode,
+      SourceStateCode: this.OriginPostalData.StateCode,
+      SourceCityName: this.OriginPostalData.CityName,
+      DestPostalCode: this.DestinationPostalData.PostalCode,
+      DestCityID: this.DestinationPostalData.CityID,
+      DestStateID: this.DestinationPostalData.StateId,
+      DestCountryID: this.DestinationPostalData.CountryId,
+      DestCountry: this.DestinationPostalData.CountryCode,
+      DestStateCode: this.DestinationPostalData.StateCode,
+      DestCityName: this.DestinationPostalData.CityName,
+      ShipmentDate: String.Format('/Date({0})/',this.originAndDestinationFormGroup.get('originpickupdate').value.getTime()),
+      Accessorials: this.accessorials,
+      AccessorialCodes: [],
+      TopN: this.confirmFormGroup.get('showTopCarriers').value,
+      ServiceLevelGrops: [],
+      ServiceLevels: [],// this.serviceLevels,
+      ServiceLevelCodes: [],
       // Ask
-      'SCAC': this.carrierSelected,
-      'EquipmentList': [],
-      'IsBuyRates': false,
-      'IsDebug': false,
-      'IsSuperAdmin': false,
-      'AccessorialIDs': this.accessorialIds,
-      'SkeepCalculatePPS': false,
+      SCAC: this.carrierSelected,
+      EquipmentList: [],
+      IsBuyRates: false,
+      IsDebug: false,
+      IsSuperAdmin: false,
+      AccessorialIDs: this.accessorialIds,
+      SkeepCalculatePPS: false,
       // Ask
       // "ProfileDescription": "**R2 BUY",
-      'Origin':  this.OriginPostalData.PostalCode + ',' +  this.OriginPostalData.CityName + ',' + this.OriginPostalData.StateName,
-      'Destination': this.DestinationPostalData.PostalCode + ',' +  this.DestinationPostalData.CityName + ',' + this.DestinationPostalData.StateName,
+      Origin:  this.OriginPostalData.PostalCode + ',' +  this.OriginPostalData.CityName + ',' + this.OriginPostalData.StateName,
+      Destination: this.DestinationPostalData.PostalCode + ',' +  this.DestinationPostalData.CityName + ',' + this.DestinationPostalData.StateName,
       // Ask
       // "ShipmentStopList": []
     };
@@ -1043,19 +1049,19 @@ export class FormAddShipComponent implements OnInit {
           this.addNewProdField();
         }
 
-        const currentProductIndex = (<FormArray>this.productsAndAccessorialsFormGroup.controls.products).length - 1;
-        (<FormArray>this.productsAndAccessorialsFormGroup.controls.products).at(currentProductIndex).get('Pallets').setValue(p.Pallets);
-        (<FormArray>this.productsAndAccessorialsFormGroup.controls.products).at(currentProductIndex).get('Pieces').setValue(p.Pieces);
-        (<FormArray>this.productsAndAccessorialsFormGroup.controls.products).at(currentProductIndex).get('PackageTypeID').setValue(p.PackageTypeID);
-        (<FormArray>this.productsAndAccessorialsFormGroup.controls.products).at(currentProductIndex).get('ProductClass').setValue(p.Class);
-        (<FormArray>this.productsAndAccessorialsFormGroup.controls.products).at(currentProductIndex).get('NmfcNumber').setValue(p.NMFC);
-        (<FormArray>this.productsAndAccessorialsFormGroup.controls.products).at(currentProductIndex).get('Length').setValue(p.Lenght);
-        (<FormArray>this.productsAndAccessorialsFormGroup.controls.products).at(currentProductIndex).get('Width').setValue(p.Width);
-        (<FormArray>this.productsAndAccessorialsFormGroup.controls.products).at(currentProductIndex).get('Height').setValue(p.Height);
-        (<FormArray>this.productsAndAccessorialsFormGroup.controls.products).at(currentProductIndex).get('PCF').setValue(p.PCF);
-        (<FormArray>this.productsAndAccessorialsFormGroup.controls.products).at(currentProductIndex).get('Weight').setValue(p.Weight);
-        (<FormArray>this.productsAndAccessorialsFormGroup.controls.products).at(currentProductIndex).get('Stackable').setValue(p.Stackable);
-        (<FormArray>this.productsAndAccessorialsFormGroup.controls.products).at(currentProductIndex).get('Hazmat').setValue(p.Hazmat);
+        const currentProductIndex = (this.productsAndAccessorialsFormGroup.controls.products as FormArray).length - 1;
+        (this.productsAndAccessorialsFormGroup.controls.products as FormArray).at(currentProductIndex).get('Pallets').setValue(p.Pallets);
+        (this.productsAndAccessorialsFormGroup.controls.products as FormArray).at(currentProductIndex).get('Pieces').setValue(p.Pieces);
+        (this.productsAndAccessorialsFormGroup.controls.products as FormArray).at(currentProductIndex).get('PackageTypeID').setValue(p.PackageTypeID);
+        (this.productsAndAccessorialsFormGroup.controls.products as FormArray).at(currentProductIndex).get('ProductClass').setValue(p.Class);
+        (this.productsAndAccessorialsFormGroup.controls.products as FormArray).at(currentProductIndex).get('NmfcNumber').setValue(p.NMFC);
+        (this.productsAndAccessorialsFormGroup.controls.products as FormArray).at(currentProductIndex).get('Length').setValue(p.Lenght);
+        (this.productsAndAccessorialsFormGroup.controls.products as FormArray).at(currentProductIndex).get('Width').setValue(p.Width);
+        (this.productsAndAccessorialsFormGroup.controls.products as FormArray).at(currentProductIndex).get('Height').setValue(p.Height);
+        (this.productsAndAccessorialsFormGroup.controls.products as FormArray).at(currentProductIndex).get('PCF').setValue(p.PCF);
+        (this.productsAndAccessorialsFormGroup.controls.products as FormArray).at(currentProductIndex).get('Weight').setValue(p.Weight);
+        (this.productsAndAccessorialsFormGroup.controls.products as FormArray).at(currentProductIndex).get('Stackable').setValue(p.Stackable);
+        (this.productsAndAccessorialsFormGroup.controls.products as FormArray).at(currentProductIndex).get('Hazmat').setValue(p.Hazmat);
 
         counter += 1;
       });

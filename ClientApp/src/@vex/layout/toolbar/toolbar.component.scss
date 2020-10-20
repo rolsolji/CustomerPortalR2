@@ -24,3 +24,12 @@ a {
   font-size: 12px;
   text-align: center;
 }
+
+.client-form {
+  mat-form-field {
+    width: 100%;
+  }
+  input {
+    font-size: 12px;
+  }
+}

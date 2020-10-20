@@ -1,28 +1,31 @@
 import { NgModule } from '@angular/core';
-import { RouterModule, Routes } from '@angular/router';
+import { RouterModule, Routes, CanActivate } from '@angular/router';
 import { VexRoutes } from '../@vex/interfaces/vex-route.interface';
 import { CustomLayoutComponent } from './custom-layout/custom-layout.component';
+import {AuthGuardService as AuthGuard} from './common/auth-guard.service';
 
-const childrenRoutes: VexRoutes = [   
+const childrenRoutes: VexRoutes = [
   {
     path: 'dashboards/analytics',
     loadChildren: () => import('./pages/dashboards/dashboard-analytics/dashboard-analytics.module').then(m => m.DashboardAnalyticsModule),
-    //redirectTo: '/'
+    canActivate: [AuthGuard]
+    // redirectTo: '/'
   },
   {
-      // path: '',            
+      // path: '',
       // loadChildren: () => import('./pages/dashboards/dashboard-analytics/dashboard-analytics.module').then(m => m.DashboardAnalyticsModule),
-      path: '',            
+      path: '',
       loadChildren: () => import('./pages/ui/forms/form-quick-quote/form-quick-quote.module').then(m => m.FormQuickQuoteModule),
+      canActivate: [AuthGuard]
   },  
   {    
     path: 'ui/forms/form-add-ship',            
     loadChildren: () => import('./pages/ui/forms/form-add-ship/form-add-ship.module').then(m => m.FormAddShipModule),
   },  
   // {
-  //   // path: '',            
+  //   // path: '',
   //   // loadChildren: () => import('./pages/dashboards/dashboard-analytics/dashboard-analytics.module').then(m => m.DashboardAnalyticsModule),
-  //   path: 'shipmentboard',            
+  //   path: 'shipmentboard',
   //   loadChildren: () => import('./pages/ui/forms/form-shipment-board/form-shipment-board.module').then(m => m.FormShipmentBoardModule),
   // },
   {
@@ -30,15 +33,16 @@ const childrenRoutes: VexRoutes = [
     children:[
       {
         path: 'LTLTL',
-        //loadChildren: () => import('./pages/ui/forms/form-shipment-board/form-shipment-board.module').then(m => m.FormShipmentBoardModule)
+        // loadChildren: () => import('./pages/ui/forms/form-shipment-board/form-shipment-board.module').then(m => m.FormShipmentBoardModule)
         loadChildren: () => import('./pages/ui/forms/form-shipment-board/form-shipment-board.module').then(m => m.FormShipmentBoardModule)
       },
       {
         path: 'TL',
-        //loadChildren: () => import('./pages/ui/forms/form-shipment-board/form-shipment-board.module').then(m => m.FormShipmentBoardModule)
+        // loadChildren: () => import('./pages/ui/forms/form-shipment-board/form-shipment-board.module').then(m => m.FormShipmentBoardModule)
         loadChildren: () => import('./pages/ui/forms/form-shipment-board-tl/form-shipment-board-tl.module').then(m => m.FormShipmentBoardTlModule)
       }
-    ]
+    ],
+    canActivate: [AuthGuard]
   },
   {
     path: 'apps',
@@ -118,24 +122,28 @@ const childrenRoutes: VexRoutes = [
       {
         path: 'components',
         loadChildren: () => import('./pages/ui/components/components.module').then(m => m.ComponentsModule),
+        canActivate: [AuthGuard]
       },
       {
         path: 'forms/form-elements',
         loadChildren: () => import('./pages/ui/forms/form-elements/form-elements.module').then(m => m.FormElementsModule),
         data: {
           containerEnabled: true
-        }
+        },
+        canActivate: [AuthGuard]
       },
       {
         path: 'forms/form-quick-quote',
         loadChildren: () => import('./pages/ui/forms/form-quick-quote/form-quick-quote.module').then(m => m.FormQuickQuoteModule),
         data: {
           containerEnabled: true
-        }
+        },
+        canActivate: [AuthGuard]
       },
       {
         path: 'forms/form-shipment-board',
         loadChildren: () => import('./pages/ui/forms/form-shipment-board/form-shipment-board.module').then(m => m.FormShipmentBoardModule),
+        canActivate: [AuthGuard]
         // data: {
         //   containerEnabled: true
         // }
@@ -145,14 +153,16 @@ const childrenRoutes: VexRoutes = [
         loadChildren: () => import('./pages/ui/forms/form-wizard/form-wizard.module').then(m => m.FormWizardModule),
         data: {
           containerEnabled: true
-        }
+        },
+        canActivate: [AuthGuard]
       },
       {
         path: 'forms/form-add-ship',
         loadChildren: () => import('./pages/ui/forms/form-add-ship/form-add-ship.module').then(m => m.FormAddShipModule),
         data: {
           containerEnabled: true
-        }
+        },
+        canActivate: [AuthGuard]
       },
       {
         path: 'icons',

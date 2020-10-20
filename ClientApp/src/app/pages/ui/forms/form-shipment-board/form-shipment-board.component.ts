@@ -52,20 +52,21 @@ import { SelectionModel } from '@angular/cdk/collections';
 import { MatSelectChange } from '@angular/material/select';
 import { MatTableModule } from '@angular/material/table';
 import { EquipmentType } from '../../../../Entities/EquipmentType';
-import { ShipmentMode } from '../../../../Entities/ShipmentMode'; 
+import { ShipmentMode } from '../../../../Entities/ShipmentMode';
 import { Status } from '../../../../Entities/Status';
 import { MatAutocompleteSelectedEvent, MatAutocomplete } from '@angular/material/autocomplete';
 import { MatChipInputEvent } from '@angular/material/chips';
 import { COMMA, ENTER } from '@angular/cdk/keycodes';
 import { ActivatedRoute, Router, ParamMap } from '@angular/router';
 import { stringToKeyValue } from '@angular/flex-layout/extended/typings/style/style-transforms';
-import { MessageService } from "../../../../common/message.service";
-//import {ThemePalette} from '@angular/material/core';
+import { MessageService } from '../../../../common/message.service';
+// import {ThemePalette} from '@angular/material/core';
 import {MatSidenav} from '@angular/material/sidenav';
 import {MatSort} from '@angular/material/sort';
 import { MatPaginator } from '@angular/material/paginator';
 import {animate, state, style, transition, trigger} from '@angular/animations';
 import { ShipmentByLading } from '../../../../Entities/ShipmentByLading'; 
+import {AuthenticationService} from '../../../../common/authentication.service';
 
 @Component({
   selector: 'vex-form-shipment-board',
@@ -92,6 +93,33 @@ import { ShipmentByLading } from '../../../../Entities/ShipmentByLading';
 
 export class FormShipmentBoardComponent implements OnInit,OnDestroy {
 
+
+
+
+  get visibleColumns() {
+    return this.columns.filter(column => column.visible).map(column => column.property);
+  }
+
+  securityToken: string;
+
+  constructor(
+    private httpService : HttpService,
+    private route: ActivatedRoute,
+    private router: Router,
+    private messageService: MessageService,
+    public datepipe: DatePipe,
+    private authenticationService: AuthenticationService
+  ) {
+    this.securityToken = this.authenticationService.ticket$.value;
+    this.filteredStatus = this.statusCtrl.valueChanges.pipe(
+      startWith(null),
+      map((status: string | null) => status ? this._filter(status) : this.StatusOptionsString.slice()));
+
+  }
+
+  // displayedColumns = ['position', 'name', 'weight', 'symbol', 'colA', 'colB', 'colC'];
+  // dataSource = new MatTableDataSource<Element>(ELEMENT_DATA);
+
   icFilterList = icFilterList;
   baselineEdit = baselineEdit;
   baselineDoubleArrow = baselineDoubleArrow;
@@ -106,7 +134,7 @@ export class FormShipmentBoardComponent implements OnInit,OnDestroy {
 
   //#region Quotes
   getQuotesParameters: GetQuotesParameters = {
-    ClientID: 8473,
+    ClientID: this.authenticationService.getDefaultClient().ClientID,
     PageNumber: 1,
     PageSize: 20,
     FromShipDate: null,
@@ -114,7 +142,7 @@ export class FormShipmentBoardComponent implements OnInit,OnDestroy {
     SCAC: null,
     Status: null,
     ClientName: null,
-    OrderBy: "LadingID",
+    OrderBy: 'LadingID',
     IsAccending: false,
     UserRowID: 39249,
     LadingIDList: [],
@@ -137,7 +165,7 @@ export class FormShipmentBoardComponent implements OnInit,OnDestroy {
     ToDeliveryDate: null,
     IsIncludeSubClient: true,
     EquipmentID: 0,
-    Mode: "LTL",
+    Mode: 'LTL',
     FreeSearch: null,
     Ref4Value: null,
     ShipmentType: null
@@ -167,8 +195,8 @@ export class FormShipmentBoardComponent implements OnInit,OnDestroy {
 
   @Input()
   columns: TableColumn<Quote>[] = [
-    //{ label: 'Checkbox', property: 'checkbox', type: 'checkbox', visible: true },
-    //{ label: 'Image', property: 'image', type: 'image', visible: true },
+    // { label: 'Checkbox', property: 'checkbox', type: 'checkbox', visible: true },
+    // { label: 'Image', property: 'image', type: 'image', visible: true },
     { label: 'View / Edit', property: 'View', type: 'edit', visible: true, cssClasses: ['grid-mat-cell-small']},
     { label: 'Load No', property: 'ClientLadingNo', type: 'text', visible: true, cssClasses: ['grid-mat-cell-small'] },
     { label: 'Client', property: 'ClientName', type: 'text', visible: true, cssClasses: ['grid-mat-cell'] },
@@ -184,7 +212,7 @@ export class FormShipmentBoardComponent implements OnInit,OnDestroy {
     { label: 'Action', property: 'Action', type: 'more', visible: true, cssClasses: ['grid-mat-cell-small'] },
   ];
 
-  keyId: string = "1602966166220";
+  keyId = '1593399730488';
   pageSize = 10;
   pageSizeOptions: number[] = [5, 10, 20, 50];
   dataSource: MatTableDataSource<Quote> | null;
@@ -192,10 +220,9 @@ export class FormShipmentBoardComponent implements OnInit,OnDestroy {
   ShipmentModeOptions: object;
   StatusOptions: Status[];
   StatusOptionsString: string[] = [];
-  //StatusOptionsChip: ChipColor[] = [];
+  // StatusOptionsChip: ChipColor[] = [];
   StatusSelectec: string[];
   EquipmentOptions: object;
-  securityToken: string;
   quoteIdParameter: string;
   totalQuotedStatus: string;
   totalBookedStatus: string;
@@ -215,23 +242,14 @@ export class FormShipmentBoardComponent implements OnInit,OnDestroy {
   @ViewChild(MatPaginator, { static: false }) paginator: MatPaginator;
   @ViewChild(MatSort, { static: false }) sort: MatSort;
 
-  constructor(
-    private httpService : HttpService,
-    private route: ActivatedRoute, 
-    private router: Router,
-    private messageService: MessageService,
-    public datepipe: DatePipe
-  ) { 
+  visible = true;
+  selectable = true;
+  removable = true;
+  separatorKeysCodes: number[] = [ENTER, COMMA];
 
-    this.filteredStatus = this.statusCtrl.valueChanges.pipe(
-      startWith(null),
-      map((status: string | null) => status ? this._filter(status) : this.StatusOptionsString.slice()));
-  }
-
-  get visibleColumns() {
-    return this.columns.filter(column => column.visible).map(column => column.property);
-  }
-
+  statusCtrl = new FormControl();
+  filteredStatus: Observable<string[]>;
+  statusSelected: string[] = [];
   get visibleColumnsNew() {
     return ['View', 'ClientLadingNo', 'ClientName'];
   }
@@ -255,33 +273,24 @@ export class FormShipmentBoardComponent implements OnInit,OnDestroy {
   }
 
   async InitialLoadPage(){
-    //-- Get security token
-    try{
-      this.securityToken = await this.httpService.getMainToken(); 
-    }
-    catch(ex){
-      console.log(ex);
-    }
-    //--
 
-    this.httpService.token = this.securityToken;
     this.ShipmentModeOptions = await this.httpService.getShipmentMode(this.keyId);
     this.StatusOptions = await this.httpService.getBOLStatus(this.keyId);
-    
+
     // Get total per status
-    this.totalQuotedStatus = "11";
-    this.totalBookedStatus = "22";
-    this.totalInTransitStatus = "33";
-    this.totalDeliveredStatus = "44";
+    this.totalQuotedStatus = '11';
+    this.totalBookedStatus = '22';
+    this.totalInTransitStatus = '33';
+    this.totalDeliveredStatus = '44';
 
     this.EquipmentOptions = await this.httpService.getMasEquipment(this.keyId);
     this.StatusOptions.forEach(s => this.StatusOptionsString.push(s.Status));
     this.search('');
   }
 
-  //SearchModal Open/Close
+  // SearchModal Open/Close
   close(reason: string) {
-    if (reason == "open" || reason == "search")
+    if (reason == 'open' || reason == 'search')
     {
       this.sidenav.open();
       event.stopPropagation();
@@ -309,29 +318,29 @@ export class FormShipmentBoardComponent implements OnInit,OnDestroy {
   }
 
   async search(statusCode:string){
-    
-    //SearchModal
-    this.close("close");
+
+    // SearchModal
+    this.close('close');
 
     this.showSpinner = true;
 
     if (this.fromShipDate != null)
-      this.getQuotesParameters.FromShipDate = String.Format("/Date({0})/",this.fromShipDate.getTime());
+      this.getQuotesParameters.FromShipDate = String.Format('/Date({0})/',this.fromShipDate.getTime());
 
     if (this.toShipDate != null)
-      this.getQuotesParameters.ToShipDate = String.Format("/Date({0})/",this.toShipDate.getTime());
+      this.getQuotesParameters.ToShipDate = String.Format('/Date({0})/',this.toShipDate.getTime());
 
     if (this.fromDeliveryDate != null)
-      this.getQuotesParameters.FromDeliveryDate = String.Format("/Date({0})/",this.fromDeliveryDate.getTime());
+      this.getQuotesParameters.FromDeliveryDate = String.Format('/Date({0})/',this.fromDeliveryDate.getTime());
 
     if (this.toDeliveryDate != null)
-      this.getQuotesParameters.ToDeliveryDate = String.Format("/Date({0})/",this.toDeliveryDate.getTime());
+      this.getQuotesParameters.ToDeliveryDate = String.Format('/Date({0})/',this.toDeliveryDate.getTime());
 
     console.log("statusSelected", this.statusSelected);  
 
 
     this.getQuotesParameters.BOlStatusIDList = [];
-    this.statusSelected.forEach(s => 
+    this.statusSelected.forEach(s =>
       this.getQuotesParameters.BOlStatusIDList.push(
         s.BOLStatusID
       )
@@ -340,7 +349,7 @@ export class FormShipmentBoardComponent implements OnInit,OnDestroy {
     if (!String.IsNullOrWhiteSpace(statusCode))
       this.getQuotesParameters.BOlStatusIDList.push(statusCode);
 
-    //Get parameter quote and clean variable  
+    // Get parameter quote and clean variable
     this.messageService.SharedQuoteParameter.subscribe(message => this.quoteIdParameter = message)
 
     if (!String.IsNullOrWhiteSpace(this.quoteIdParameter))
@@ -349,10 +358,10 @@ export class FormShipmentBoardComponent implements OnInit,OnDestroy {
       this.getQuotesParameters.Mode = String.Empty;
     }
 
-    console.log("Parameters", this.getQuotesParameters);
+    console.log('Parameters', this.getQuotesParameters);
 
-    this.quotes = await this.httpService.searchBOLHDRForJason(this.getQuotesParameters);    
-    
+    this.quotes = await this.httpService.searchBOLHDRForJason(this.getQuotesParameters);
+
     this.quotes.forEach(element => {
       element.ActualShipDateWithFormat = this.datepipe.transform(element.ActualShipDate.replace(/(^.*\()|([+-].*$)/g, ''),'MM/dd/yyyy');
 
@@ -370,21 +379,20 @@ export class FormShipmentBoardComponent implements OnInit,OnDestroy {
     this.showSpinner = false;
 
     this.messageService.SendQuoteParameter(String.Empty);
-  }
+    }
 
-  visible = true;
-  selectable = true;
-  removable = true;
-  separatorKeysCodes: number[] = [ENTER, COMMA];
-  
-  statusCtrl = new FormControl();
-  filteredStatus: Observable<string[]>;
-  statusSelected: Status[] = [];
+    private _filter(value: string): string[] {
+        const filterValue = value.toLowerCase();
+        return this.StatusOptionsString.filter(status => status.toLowerCase().indexOf(filterValue) === 0);
+    }
 
-  private _filter(value: string): string[] {
-    const filterValue = value.toLowerCase();
-    return this.StatusOptionsString.filter(status => status.toLowerCase().indexOf(filterValue) === 0);
-  }
+  add(event: MatChipInputEvent): void {
+    const input = event.input;
+    const value = event.value;
+
+    if ((value || '').trim()) {
+      this.statusSelected.push(value.trim());
+    }
 
   ngOnDestroy() {
   }

@@ -1,3 +1,4 @@
 export const environment = {
-  production: true
+  production: true,
+  baseEndpoint: 'https://beta-customer.r2logistics.com/'
 };

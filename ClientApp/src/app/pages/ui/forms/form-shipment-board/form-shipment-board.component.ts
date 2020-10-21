@@ -249,7 +249,7 @@ export class FormShipmentBoardComponent implements OnInit,OnDestroy {
 
   statusCtrl = new FormControl();
   filteredStatus: Observable<string[]>;
-  statusSelected: string[] = [];
+  statusSelected: Status[] = [];
   get visibleColumnsNew() {
     return ['View', 'ClientLadingNo', 'ClientName'];
   }
@@ -379,20 +379,12 @@ export class FormShipmentBoardComponent implements OnInit,OnDestroy {
     this.showSpinner = false;
 
     this.messageService.SendQuoteParameter(String.Empty);
-    }
+  }
 
-    private _filter(value: string): string[] {
+  private _filter(value: string): string[] {
         const filterValue = value.toLowerCase();
         return this.StatusOptionsString.filter(status => status.toLowerCase().indexOf(filterValue) === 0);
-    }
-
-  add(event: MatChipInputEvent): void {
-    const input = event.input;
-    const value = event.value;
-
-    if ((value || '').trim()) {
-      this.statusSelected.push(value.trim());
-    }
+  } 
 
   ngOnDestroy() {
   }
@@ -404,7 +396,7 @@ export class FormShipmentBoardComponent implements OnInit,OnDestroy {
     this.shipmentInformation = null;
     //console.log("more details", rowSelected);
 
-    this.shipmentInformation = await this.httpService.getShipmentByLadingID(rowSelected.LadingID.toString(), this.keyId);
+    this.shipmentInformation = await this.httpService.GetShipmentByLadingID(rowSelected.LadingID.toString(), this.keyId);
 
     //console.log("shipmentDetails", this.shipmentInformation);
     this.showSpinnerGrid = false;

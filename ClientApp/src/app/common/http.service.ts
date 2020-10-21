@@ -23,7 +23,6 @@ import { ShipmentError } from '../Entities/ShipmentError';
 import { ShipmentCost } from '../Entities/ShipmentCost';
 import { Carrier } from '../Entities/Carrier';
 import { ShipmentResponse } from '../Entities/ShipmentResponse';
-import { ReferenceByClient } from '../Entities/ReferenceByClientResponse';
 import { ShipmentByLading } from '../Entities/ShipmentByLading';
 import {User} from '../Entities/user.model';
 import {environment} from '../../environments/environment';
@@ -109,7 +108,7 @@ export class HttpService{
         const httpHeaders = new HttpHeaders({
             Ticket : ticket
         });
-        return this.http.get(String.Format(this.baseEndpoint + 'Services/MasClientDefaultsService.svc/json/GetMasProductPackageType?_={0}',keyId)
+        return this.http.get<ProductPackageType[]>(String.Format(this.baseEndpoint + 'Services/MasClientDefaultsService.svc/json/GetMasProductPackageType?_={0}',keyId)
         ,{
             headers: httpHeaders
           }

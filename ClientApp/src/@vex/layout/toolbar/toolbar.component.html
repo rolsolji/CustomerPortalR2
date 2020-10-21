@@ -21,13 +21,12 @@
     <vex-navigation-item *ngFor="let item of navigationItems" [item]="item"></vex-navigation-item>
   </div>
 
-  <div fxFlex fxLayout="row" fxLayoutGap="5px">
-    <div fxFlex="10%" fxHide.lt-sm>
-      <img class="w-16"
-           [src]="clientImage">
+  <div fxFlex.xs="100%" fxFlex fxLayout="row" fxLayoutGap="5px">
+    <div fxLayoutAlign="space-around center" fxFlex="20%" fxHide.lt-sm>
+      <img [alt]="toolBarTitle" [src]="clientImage">
     </div>
     <div fxFlex fxLayout="column" fxLayoutAlign="space-around center">
-      <div><h2>{{toolBarTitle}}</h2></div>
+      <div><h2 ngClass.xs="toolBarTitle">{{toolBarTitle}}</h2></div>
       <div fxLayout="row">
         <p [fxHide]="mobileQuery" class="userMessage">
           {{toolBarMessage}}
@@ -36,10 +35,10 @@
     </div>
   </div>
 
-  <div fxFlex="30%" fxLayout="row" fxLayoutGap="5px" class="-mx-1 flex items-center">
+  <div fxFlex.xs="100%" fxFlex="30%" fxLayout="row" fxLayoutGap="5px" class="-mx-1 flex items-center">
     <div fxFlex="60%" fxLayout="column" fxLayoutAlign="space-around center" class="px-1 flex">
-      <form style="width: 100%" #ngClientsForm="ngForm" class="client-form" [formGroup]="clientsForm">
-        <mat-form-field  appearance="outline" class="vex-flex-form-field" color="primary">
+      <form style="width: 100%" class="client-form" [formGroup]="clientsForm">
+        <mat-form-field appearance="outline" class="vex-flex-form-field" color="primary">
           <mat-label>Client</mat-label>
           <input name="client"
                  formControlName="client"

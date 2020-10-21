@@ -101,7 +101,7 @@ export class FormAddShipComponent implements OnInit {
 
   originCountries: Object;
   destinationCountries: Object;
-  packageTypes: ProductPackageType[];
+  packageTypes: Object;
 
   accessorialArray: AccessorialDetail[];
   internalNotes: InternalNote[];
@@ -241,10 +241,6 @@ export class FormAddShipComponent implements OnInit {
         PackageTypeDescription: [null]
     })
   }
-
-  get formProducts() { return this.productsAndAccessorialsFormGroup.get('products') as FormArray; }
-  get originPckupDate() { return this.originAndDestinationFormGroup.get('originpickupdate').value == null ? '' : new Date(this.originAndDestinationFormGroup.get('originpickupdate').value).toDateString(); }
-  get destExpDelDate() { return this.originAndDestinationFormGroup.get('destexpdeldate').value == null ? '' : new Date(this.originAndDestinationFormGroup.get('destexpdeldate').value).toDateString(); }
 
   // Equipment change event
   selectChangeEquipment (event: any) {

@@ -1,5 +1,7 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit, ViewChild, ElementRef, Input, 
-  Output, EventEmitter, HostListener, Pipe, PipeTransform, AfterViewInit, OnDestroy } from '@angular/core';
+import {
+  ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit, ViewChild, ElementRef, Input,
+  Output, EventEmitter, HostListener, Pipe, PipeTransform, AfterViewInit, OnDestroy, OnChanges
+} from '@angular/core';
 import { DatePipe } from '@angular/common';
 
 import icVisibility from '@iconify/icons-ic/twotone-visibility';
@@ -65,7 +67,7 @@ import {MatSidenav} from '@angular/material/sidenav';
 import {MatSort} from '@angular/material/sort';
 import { MatPaginator } from '@angular/material/paginator';
 import {animate, state, style, transition, trigger} from '@angular/animations';
-import { ShipmentByLading } from '../../../../Entities/ShipmentByLading'; 
+import { ShipmentByLading } from '../../../../Entities/ShipmentByLading';
 import {AuthenticationService} from '../../../../common/authentication.service';
 
 @Component({
@@ -91,7 +93,7 @@ import {AuthenticationService} from '../../../../common/authentication.service';
 // }
 
 
-export class FormShipmentBoardComponent implements OnInit,OnDestroy {
+export class FormShipmentBoardComponent implements OnInit,OnDestroy, OnChanges {
 
 
 
@@ -249,7 +251,7 @@ export class FormShipmentBoardComponent implements OnInit,OnDestroy {
 
   statusCtrl = new FormControl();
   filteredStatus: Observable<string[]>;
-  statusSelected: string[] = [];
+  statusSelected: any[] = [];
   get visibleColumnsNew() {
     return ['View', 'ClientLadingNo', 'ClientName'];
   }
@@ -263,9 +265,9 @@ export class FormShipmentBoardComponent implements OnInit,OnDestroy {
     this.InitialLoadPage();
   }
 
-  ngOnChanges(){ 
-    this.dataSource.sort = this.sort; 
-    this.dataSource.paginator = this.paginator; 
+  ngOnChanges(){
+    this.dataSource.sort = this.sort;
+    this.dataSource.paginator = this.paginator;
   }
 
   trackByProperty<T>(index: number, column: TableColumn<T>) {
@@ -336,7 +338,7 @@ export class FormShipmentBoardComponent implements OnInit,OnDestroy {
     if (this.toDeliveryDate != null)
       this.getQuotesParameters.ToDeliveryDate = String.Format('/Date({0})/',this.toDeliveryDate.getTime());
 
-    console.log("statusSelected", this.statusSelected);  
+    console.log('statusSelected', this.statusSelected);
 
 
     this.getQuotesParameters.BOlStatusIDList = [];
@@ -393,6 +395,7 @@ export class FormShipmentBoardComponent implements OnInit,OnDestroy {
     if ((value || '').trim()) {
       this.statusSelected.push(value.trim());
     }
+  }
 
   ngOnDestroy() {
   }
@@ -402,11 +405,11 @@ export class FormShipmentBoardComponent implements OnInit,OnDestroy {
     this.showSpinnerGrid = true;
 
     this.shipmentInformation = null;
-    //console.log("more details", rowSelected);
+    // console.log("more details", rowSelected);
 
-    this.shipmentInformation = await this.httpService.getShipmentByLadingID(rowSelected.LadingID.toString(), this.keyId);
+    this.shipmentInformation = await this.httpService.GetShipmentByLadingID(rowSelected.LadingID.toString(), this.keyId);
 
-    //console.log("shipmentDetails", this.shipmentInformation);
+    // console.log("shipmentDetails", this.shipmentInformation);
     this.showSpinnerGrid = false;
   }
 }

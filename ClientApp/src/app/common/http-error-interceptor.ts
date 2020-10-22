@@ -16,7 +16,6 @@ export class HttpErrorInterceptor implements HttpInterceptor {
       .pipe(
         catchError((error: HttpErrorResponse) => {
           let errorMsg = '';
-          console.log(error);
           if (error.error instanceof ErrorEvent) {
             // This is client side error'
             errorMsg = `Error: ${error.error.message}`;
@@ -28,9 +27,19 @@ export class HttpErrorInterceptor implements HttpInterceptor {
             if (error && error.error
               && error.error.ErrorMessage
               && error.error.ErrorMessage === 'Your Access is Expired.') {
-              console.log(error.error.ErrorMessage);
+              errorMsg = `Error Code: ${error.status},  Message: ${error.error.ErrorMessage}`;
               this.authenticationService.logout();
               this.snackbar.open('Your Access is Expired. Log in again.', '', {
+                duration: 5000
+              });
+            }
+
+            if (error && error.error
+              && error.error.ErrorMessage &&
+              (typeof error.error.ErrorMessage === 'string' || error.error.ErrorMessage instanceof String)) {
+              errorMsg = `Error Code: ${error.status},  Message: ${error.error.ErrorMessage}`;
+              this.authenticationService.loading$.next(false);
+              this.snackbar.open(error.error.ErrorMessage, '', {
                 duration: 5000
               });
             }

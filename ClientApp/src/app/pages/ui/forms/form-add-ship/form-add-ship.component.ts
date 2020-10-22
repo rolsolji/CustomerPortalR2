@@ -102,7 +102,7 @@ export class FormAddShipComponent implements OnInit {
 
   originCountries: Object;
   destinationCountries: Object;
-  packageTypes: ProductPackageType[];
+  packageTypes: any;
 
   accessorialArray: AccessorialDetail[];
   internalNotes: InternalNote[];

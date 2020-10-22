@@ -1,5 +1,7 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit, ViewChild, ElementRef, Input, 
-  Output, EventEmitter, HostListener, Pipe, PipeTransform, AfterViewInit, OnDestroy } from '@angular/core';
+import {
+  ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit, ViewChild, ElementRef, Input,
+  Output, EventEmitter, HostListener, Pipe, PipeTransform, AfterViewInit, OnDestroy, OnChanges
+} from '@angular/core';
 import { DatePipe } from '@angular/common';
 
 import icVisibility from '@iconify/icons-ic/twotone-visibility';
@@ -64,7 +66,7 @@ import {MatSidenav} from '@angular/material/sidenav';
 import {MatSort} from '@angular/material/sort';
 import { MatPaginator } from '@angular/material/paginator';
 import {animate, state, style, transition, trigger} from '@angular/animations';
-import { ShipmentByLading } from '../../../../Entities/ShipmentByLading'; 
+import { ShipmentByLading } from '../../../../Entities/ShipmentByLading';
 import {AuthenticationService} from '../../../../common/authentication.service';
 
 @Component({
@@ -311,7 +313,7 @@ export class FormShipmentBoardComponent implements OnInit {
     if (this.toDeliveryDate != null)
       this.getQuotesParameters.ToDeliveryDate = String.Format('/Date({0})/',this.toDeliveryDate.getTime());
 
-    console.log("statusSelected", this.statusSelected);  
+    console.log('statusSelected', this.statusSelected);
 
 
     this.getQuotesParameters.BOlStatusIDList = [];

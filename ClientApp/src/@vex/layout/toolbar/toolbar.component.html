@@ -3,56 +3,41 @@
     <mat-icon [icIcon]="icMenu"></mat-icon>
   </button>
 
-  <a *ngIf="isVerticalLayout$ | async"
-     [routerLink]="['/']"
-     class="ltr:mr-4 rtl:ml-4 block"
-     fxLayout="row"
-     fxLayoutAlign="start center">
-    <img class="w-8 select-none" src="assets/img/demo/logo.svg">
-    <h1 [fxHide]="mobileQuery" class="title ltr:pl-4 rtl:pr-4 m-0 select-none">VEX</h1>
-  </a>
-
   <!--<button *ngIf="isHorizontalLayout$ | async"
-          [fxHide]="mobileQuery"
-          [matMenuTriggerFor]="addNewMenu"
-          color="primary"
-          mat-raised-button
-          type="button">ADD NEW
-  </button>
-
-  <mat-menu #addNewMenu="matMenu" [overlapTrigger]="false" xPosition="after" yPosition="below">
-    <button mat-menu-item>
-      <mat-icon [icIcon]="icPersonAdd"></mat-icon>
-      <span>Add Contact</span>
+            [fxHide]="mobileQuery"
+            [matMenuTriggerFor]="addNewMenu"
+            color="primary"
+            mat-raised-button
+            type="button">ADD NEW
     </button>
-
-    <button mat-menu-item>
-      <mat-icon [icIcon]="icDoneAll"></mat-icon>
-      <span>Add Task</span>
-    </button>
-
-    <button mat-menu-item>
-      <mat-icon [icIcon]="icAssignmentTurnedIn"></mat-icon>
-      <span>Add Project</span>
-    </button>
-
-    <button [matMenuTriggerFor]="documentMenu" mat-menu-item>
-      <mat-icon [icIcon]="icBallot"></mat-icon>
-      <span>Add Document</span>
-    </button>
-  </mat-menu>-->
+    <mat-menu #addNewMenu="matMenu" [overlapTrigger]="false" xPosition="after" yPosition="below">
+      <button mat-menu-item>
+        <mat-icon [icIcon]="icPersonAdd"></mat-icon>
+        <span>Add Contact</span>
+      </button>
+      <button mat-menu-item>
+        <mat-icon [icIcon]="icDoneAll"></mat-icon>
+        <span>Add Task</span>
+      </button>
+      <button mat-menu-item>
+        <mat-icon [icIcon]="icAssignmentTurnedIn"></mat-icon>
+        <span>Add Project</span>
+      </button>
+      <button [matMenuTriggerFor]="documentMenu" mat-menu-item>
+        <mat-icon [icIcon]="icBallot"></mat-icon>
+        <span>Add Document</span>
+      </button>
+    </mat-menu>-->
 
   <!--<mat-menu #documentMenu="matMenu">
     <button mat-menu-item>
       <mat-icon [icIcon]="icDescription"></mat-icon>
       <span>Add Quote</span>
     </button>
-
     <button mat-menu-item>
       <mat-icon [icIcon]="icAssignment"></mat-icon>
       <span>Add Invoice</span>
     </button>
-
     <button mat-menu-item>
       <mat-icon [icIcon]="icReceipt"></mat-icon>
       <span>Add Receipt</span>
@@ -70,6 +55,14 @@
     </button>
   </div>-->
 
+  <a *ngIf="isVerticalLayout$ | async"
+     [routerLink]="['/']"
+     class="ltr:mr-4 rtl:ml-4 block"
+     fxLayout="row"
+     fxLayoutAlign="start center">
+    <img class="w-8 select-none" src="assets/img/demo/logo.svg">
+    <h1 [fxHide]="mobileQuery" class="title ltr:pl-4 rtl:pr-4 m-0 select-none">VEX</h1>
+  </a>
 
   <div *ngIf="(isVerticalLayout$ | async) && isNavbarInToolbar$ | async"
        [fxHide]="mobileQuery"
@@ -80,71 +73,61 @@
     <vex-navigation-item *ngFor="let item of navigationItems" [item]="item"></vex-navigation-item>
   </div>
 
-    <div fxFlex fxLayout="row" fxLayoutGap="5px">
-      <div fxFlex="10%" fxHide.lt-sm>
-        <img class="w-16"
-             [src]="clientImage">
-      </div>
-      <div fxFlex fxLayout="column" fxLayoutAlign="space-around center">
-        <div><h2>{{toolBarTitle}}</h2></div>
-<!--        <div fxLayout="row">-->
-<!--&lt;!&ndash;          <p [fxHide]="mobileQuery" class="userMessage">&ndash;&gt;-->
-<!--&lt;!&ndash;            {{toolBarMessage}}&ndash;&gt;-->
-<!--&lt;!&ndash;          </p>&ndash;&gt;-->
-<!--        </div>-->
-      </div>
+  <div fxFlex.xs="100%" fxFlex fxLayout="row" fxLayoutGap="5px">
+    <div fxLayoutAlign="space-around center" fxFlex="20%" fxHide.lt-sm>
+      <img [alt]="toolBarTitle" [src]="clientImage">
     </div>
+    <!-- <button (click)="openSearch()" mat-icon-button type="button">
+           <mat-icon [icIcon]="icSearch"></mat-icon>
+         </button> -->
 
-  <div class="-mx-1 flex items-center">
-      <div class="px-1">
-          <!-- <button (click)="openSearch()" mat-icon-button type="button">
+    <!-- <div class="bg-app-bar px-6 h-16 border-b sticky left-0 bg-app-bar-toolbar-search" fxLayout="row" fxLayoutAlign="start center">
+        <h2 class="body-1 font-medium leading-snug ltr:mr-3 rtl:ml-3" fxFlex="none" fxHide.xs>
+            <span>Client</span>
+        </h2>
+        <div class="bg-card rounded-full border px-4"
+             fxFlex="400px"
+             fxFlex.lt-md="auto"
+             fxHide.xs
+             fxLayout="row"
+             fxLayoutAlign="start center">
+            <ic-icon [icIcon]="icSearch" size="20px"></ic-icon>
+            <input class="px-4 py-3 border-0 outline-none w-full bg-transparent"
+                   placeholder="Search..."
+                   type="search">
+        </div>
+        <span fxFlex></span>
+        <button class="ml-4" fxFlex="none" fxHide.gt-xs mat-icon-button type="button">
             <mat-icon [icIcon]="icSearch"></mat-icon>
-          </button> -->
-
-          <!-- <div class="bg-app-bar px-6 h-16 border-b sticky left-0 bg-app-bar-toolbar-search" fxLayout="row" fxLayoutAlign="start center">
-              <h2 class="body-1 font-medium leading-snug ltr:mr-3 rtl:ml-3" fxFlex="none" fxHide.xs>
-                  <span>Client</span>
-              </h2>
-
-              <div class="bg-card rounded-full border px-4"
-                   fxFlex="400px"
-                   fxFlex.lt-md="auto"
-                   fxHide.xs
-                   fxLayout="row"
-                   fxLayoutAlign="start center">
-                  <ic-icon [icIcon]="icSearch" size="20px"></ic-icon>
-                  <input class="px-4 py-3 border-0 outline-none w-full bg-transparent"
-                         placeholder="Search..."
-                         type="search">
-              </div>
-              <span fxFlex></span>
-
-              <button class="ml-4" fxFlex="none" fxHide.gt-xs mat-icon-button type="button">
-                  <mat-icon [icIcon]="icSearch"></mat-icon>
-              </button>
-
-          </div> -->
+        </button>
+    </div> -->
+    <div fxFlex fxLayout="column" fxLayoutAlign="space-around center">
+      <div><h2 ngClass.xs="toolBarTitle">{{toolBarTitle}}</h2></div>
+      <div fxLayout="row">
+        <p [fxHide]="mobileQuery" class="userMessage">
+          {{toolBarMessage}}
+        </p>
       </div>
-
-    <!--<div class="px-1">
+      <!--<div class="px-1">
       <vex-toolbar-notifications></vex-toolbar-notifications>
+      </div> -->
     </div>
+  </div>
 
-    <div class="px-1">
-      <button (click)="openQuickpanel()" mat-icon-button type="button">
-        <mat-icon [icIcon]="icBookmarks"></mat-icon>
-      </button>
-    </div>
+ <!-- <div class="px-1">
+    <button (click)="openQuickpanel()" mat-icon-button type="button">
+      <mat-icon [icIcon]="icBookmarks"></mat-icon>
+    </button>
+  </div>
+  <div class="px-1">
+    <button [matMenuTriggerFor]="languageMenu" mat-icon-button type="button">
+      <mat-icon [icIcon]="emojioneUS"></mat-icon>
+    </button>
+  </div>-->
 
-    <div class="px-1">
-      <button [matMenuTriggerFor]="languageMenu" mat-icon-button type="button">
-        <mat-icon [icIcon]="emojioneUS"></mat-icon>
-      </button>
-    </div>-->
-
-    <div class="px-1">
-      <vex-toolbar-user></vex-toolbar-user>
-      <form #ngClientsForm="ngForm" class="client-form" [formGroup]="clientsForm">
+  <div fxFlex.xs="100%" fxFlex="30%" fxLayout="row" fxLayoutGap="5px" class="-mx-1 flex items-center">
+    <div fxFlex="60%" fxLayout="column" fxLayoutAlign="space-around center" class="px-1 flex">
+      <form style="width: 100%" class="client-form" [formGroup]="clientsForm">
         <mat-form-field appearance="outline" class="vex-flex-form-field" color="primary">
           <mat-label>Client</mat-label>
           <input name="client"
@@ -165,18 +148,17 @@
         </mat-form-field>
       </form>
     </div>
-
+    <vex-toolbar-user></vex-toolbar-user>
     <!--<mat-menu #languageMenu="matMenu" overlapTrigger="false" xPosition="before" yPosition="below">
-      <button mat-menu-item>
-        <mat-icon [icIcon]="emojioneUS"></mat-icon>
-        <span>English</span>
-      </button>
-
-      <button mat-menu-item>
-        <mat-icon [icIcon]="emojioneDE"></mat-icon>
-        <span>German</span>
-      </button>
-    </mat-menu>-->
+     <button mat-menu-item>
+       <mat-icon [icIcon]="emojioneUS"></mat-icon>
+       <span>English</span>
+     </button>
+     <button mat-menu-item>
+       <mat-icon [icIcon]="emojioneDE"></mat-icon>
+       <span>German</span>
+     </button>
+   </mat-menu>-->
   </div>
 </div>
 

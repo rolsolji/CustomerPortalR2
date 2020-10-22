@@ -5,6 +5,7 @@ import {BehaviorSubject} from 'rxjs';
 import {environment} from '../../environments/environment';
 import {Router} from '@angular/router';
 import {Client} from '../Entities/client.model';
+import {MatSnackBar} from '@angular/material/snack-bar';
 
 @Injectable({
   providedIn: 'root'
@@ -14,7 +15,8 @@ export class AuthenticationService {
   private baseEndpoint: string;
   constructor (
     private http: HttpClient,
-    public router: Router
+    public router: Router,
+    private snackbar: MatSnackBar
   ) {
     this.baseEndpoint = environment.baseEndpoint;
     this.init();
@@ -49,7 +51,7 @@ export class AuthenticationService {
     return this.authState$.value;
   }
 
-  public doLogin(username: string, password: string) {
+  public async doLogin(username: string, password: string) {
     return new Promise((resolve, reject) => {
 
       this.http
@@ -57,7 +59,7 @@ export class AuthenticationService {
           `${environment.baseEndpoint}Services/LoginService.svc/Json/DoLogin?Username=${username}&Password=${password}&userType=C`,
           {observe: 'response'}
         )
-        .subscribe(resp => {
+        .subscribe(async resp => {
 
             const {body, headers} = resp;
             const ticket = headers.get('ticket');
@@ -70,7 +72,8 @@ export class AuthenticationService {
             if (user instanceof User) {
               this.authenticatedUser$.next(user);
               localStorage.setItem('authenticatedUser', JSON.stringify(user));
-              this.getClientsForUser(user.UserID);
+
+              await this.getClientsForUser(user.UserID);
 
               const defaultClient = this.clientsForUser$.value.find(
                 (client: Client) => client.ClientID === user.ClientID);
@@ -103,22 +106,27 @@ export class AuthenticationService {
     this.authState$.next(false);
     localStorage.removeItem('authenticatedUser');
     localStorage.removeItem('ticket');
+    localStorage.removeItem('defaultClient');
+    localStorage.removeItem('clientsForUser');
   }
 
-  public getClientsForUser(userID: number) {
+  public async getClientsForUser(userID: number) {
     const ticket = this.ticket$.value;
+
     const httpHeaders = new HttpHeaders({
       Ticket : ticket
     });
 
-    return this.http.get(`${this.baseEndpoint}Services/MASClientService.svc/json/GetClientForUser?userID=${userID}&ClientName=`
+    const clients = await this.http.get<Client[]>(`${this.baseEndpoint}Services/MASClientService.svc/json/GetClientForUser?userID=${userID}&ClientName=`
       ,{
         headers: httpHeaders
       }
-    ).subscribe((clients: Client[]) => {
-      localStorage.setItem('clientsForUser', JSON.stringify(clients));
-      this.clientsForUser$.next(clients);
-    });
+    ).toPromise();
+
+    localStorage.setItem('clientsForUser', JSON.stringify(clients));
+    this.clientsForUser$.next(clients);
+
+    return clients;
   }
 
   public getTicketFromStorage(): string {

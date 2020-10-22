@@ -309,35 +309,35 @@ export class HttpService{
             Ticket : ticket
         });
         return this.http.get<ShipmentByLading>(String.Format(this.baseEndpoint + 'Services/BOLHDRService.svc/json/GetShipmentByLadingID?LadingID={0}&_={1}',LadingID,keyId)
-    
+
         ,{
             headers: httpHeaders
           }
-        ).toPromise();  
+        ).toPromise();
     }
 
     getTrackingDetailsByLadingID(landingId:string,keyId:string){
         let ticket = this.token;
-        let httpHeaders = new HttpHeaders({                       
-            'Ticket' : ticket                            
-        }); 
+        let httpHeaders = new HttpHeaders({
+            'Ticket' : ticket
+        });
         return this.http.get<any>(String.Format(this.baseEndpoint + 'Services/BOLHDRService.svc/json/GetTrackingDetailsByLadingID?LadingID={0}&_={1}', landingId, keyId)
         ,{
             headers: httpHeaders
           }
-        ).toPromise();  
+        ).toPromise();
     }
 
     GetReferenceByClient(clientID:number, keyId:string){
         let ticket = this.token;
-        let httpHeaders = new HttpHeaders({                       
-            'Ticket' : ticket                            
-        }); 
+        let httpHeaders = new HttpHeaders({
+            'Ticket' : ticket
+        });
         return this.http.get<ReferenceByClient[]>(String.Format(this.baseEndpoint + 'Services/BOLHDRService.svc/json//GetReferenceByClient?ClientID={0}&_={1}',clientID.toString(),keyId)
         ,{
             headers: httpHeaders
           }
-          ).toPromise();            
-    }    
+          ).toPromise();
+    }
 
 }

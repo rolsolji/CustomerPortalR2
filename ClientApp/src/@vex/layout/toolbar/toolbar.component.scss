@@ -28,8 +28,13 @@ a {
 .client-form {
   mat-form-field {
     width: 100%;
+    margin-bottom: -1.25em
   }
   input {
     font-size: 12px;
   }
+}
+
+.toolBarTitle {
+  font-size: 12px;
 }

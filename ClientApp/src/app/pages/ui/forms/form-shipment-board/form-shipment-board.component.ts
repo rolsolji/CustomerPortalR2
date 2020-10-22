@@ -381,16 +381,16 @@ export class FormShipmentBoardComponent implements OnInit,OnDestroy, OnChanges {
     this.showSpinner = false;
 
     this.messageService.SendQuoteParameter(String.Empty);
-    }
+  }
 
-    private _filter(value: string): string[] {
+  private _filter(value: string): string[] {
         const filterValue = value.toLowerCase();
         return this.StatusOptionsString.filter(status => status.toLowerCase().indexOf(filterValue) === 0);
     }
 
   add(event: MatChipInputEvent): void {
     const input = event.input;
-    const value = event.value;
+    const value = event.value.toString();
 
     if ((value || '').trim()) {
       this.statusSelected.push(value.trim());

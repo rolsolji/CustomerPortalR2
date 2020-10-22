@@ -50,6 +50,8 @@ import {STEPPER_GLOBAL_OPTIONS} from '@angular/cdk/stepper';
 import { ProductPackageType } from '../../../../Entities/ProductPackageType';
 import { ReferenceByClient } from '../../../../Entities/ReferenceByClient';
 import {environment} from '../../../../../environments/environment';
+import {MatDialog, MatDialogConfig} from '@angular/material/dialog';
+
 
 
 
@@ -81,7 +83,8 @@ export class FormAddShipComponent implements OnInit {
     private messageService: MessageService,
     private utilitiesService: UtilitiesService,
     private datepipe: DatePipe,
-    private authenticationService: AuthenticationService
+    private authenticationService: AuthenticationService,
+    private dialog: MatDialog
   ) {
     this.securityToken = this.authenticationService.ticket$.value;
   }
@@ -101,7 +104,7 @@ export class FormAddShipComponent implements OnInit {
 
   originCountries: Object;
   destinationCountries: Object;
-  packageTypes: Object;
+  packageTypes: any;
 
   accessorialArray: AccessorialDetail[];
   internalNotes: InternalNote[];
@@ -1091,6 +1094,19 @@ export class FormAddShipComponent implements OnInit {
     // --
 
 
+  }
+
+  openDialog(){
+    const dialogConfig = new MatDialogConfig();
+    dialogConfig.disableClose = true;
+    dialogConfig.autoFocus = true;
+
+    dialogConfig.data = {
+      id: 1,
+      title: 'Dialog Title'
+    };
+
+    //this.dialog.open(ConfirmAlertDialogComponent, dialogConfig);
   }
 
 }

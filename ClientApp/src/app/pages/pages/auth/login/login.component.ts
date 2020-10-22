@@ -22,15 +22,17 @@ export class LoginComponent implements OnInit {
 
   inputType = 'password';
   visible = false;
+  loading = false;
 
   icVisibility = icVisibility;
   icVisibilityOff = icVisibilityOff;
 
-  constructor(private router: Router,
-              private fb: FormBuilder,
-              private cd: ChangeDetectorRef,
-              private snackbar: MatSnackBar,
-              private authService: AuthenticationService
+  constructor(
+    private router: Router,
+    private fb: FormBuilder,
+    private cd: ChangeDetectorRef,
+    private snackbar: MatSnackBar,
+    private authService: AuthenticationService
   ) {}
 
   ngOnInit() {
@@ -41,20 +43,24 @@ export class LoginComponent implements OnInit {
   }
 
   async send() {
+    this.loading = true;
     if (this.form.value && this.form.value.username && this.form.value.password) {
       const username = this.form.value.username;
       const password = this.form.value.password;
       const response: any = await this.authService.doLogin(username.toString(), password.toString());
       if (response.status) {
         this.router.navigate(['/']);
+        this.loading = false;
         return true;
       }
       if (!response.status && response.message) {
+        this.loading = false;
         this.snackbar.open(response.message.toString(), '', {
           duration: 5000
         });
       }
     }
+    this.loading = false;
     this.snackbar.open('No valid credentials needed.', '', {
       duration: 5000
     });

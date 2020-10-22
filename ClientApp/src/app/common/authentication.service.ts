@@ -27,8 +27,10 @@ export class AuthenticationService {
   public ticket$: BehaviorSubject<string> = new BehaviorSubject<string>('');
   public clientsForUser$: BehaviorSubject<Client[]> = new BehaviorSubject<Client[]>(null);
   public defaultClient$: BehaviorSubject<Client> = new BehaviorSubject<Client>(null);
+  public loading$: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
 
   private init(): boolean {
+    this.loading$.next(false);
     const ticket = this.getTicketFromStorage();
     const user = this.getUserFromStorage();
     const clients = this.getClientsForUserFromStorage();
@@ -60,7 +62,6 @@ export class AuthenticationService {
           {observe: 'response'}
         )
         .subscribe(async resp => {
-
             const {body, headers} = resp;
             const ticket = headers.get('ticket');
             const user = resp && body ? new User(body) : {};
@@ -86,7 +87,6 @@ export class AuthenticationService {
 
           },
           error => {
-
             this.authState$.next(false);
             resolve({status: false, message: error.error.ErrorMessage})
 

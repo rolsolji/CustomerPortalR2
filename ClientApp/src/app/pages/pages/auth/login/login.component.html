@@ -1,4 +1,4 @@
-<mat-progress-bar mode="indeterminate" *ngIf="loading"></mat-progress-bar>
+<mat-progress-bar mode="indeterminate" *ngIf="authService.loading$ | async"></mat-progress-bar>
 <div class="w-full h-full bg-pattern" fxLayout="column" fxLayoutAlign="center center">
   <div @fadeInUp class="card overflow-hidden w-full max-w-xs">
     <div class="p-6 pb-0" fxLayout="column" fxLayoutAlign="center center">
@@ -31,19 +31,19 @@
         </mat-form-field>
       </div>
 
-      <div fxLayout="row" fxLayoutAlign="space-between center">
-        <mat-checkbox class="caption" color="primary">Remember Me</mat-checkbox>
-        <a [routerLink]="['/forgot-password']" class="caption">Forgot Password?</a>
-      </div>
+<!--      <div fxLayout="row" fxLayoutAlign="space-between center">-->
+<!--        <mat-checkbox class="caption" color="primary">Remember Me</mat-checkbox>-->
+<!--        <a [routerLink]="['/forgot-password']" class="caption">Forgot Password?</a>-->
+<!--      </div>-->
 
       <button (click)="send()" color="primary" mat-raised-button type="button">
         SIGN IN
       </button>
 
-      <p class="text-secondary text-center">
-        Don't have an account?<br/>
-        <a [routerLink]="['/register']">Click here to create one</a>
-      </p>
+<!--      <p class="text-secondary text-center">-->
+<!--        Don't have an account?<br/>-->
+<!--        <a [routerLink]="['/register']">Click here to create one</a>-->
+<!--      </p>-->
     </div>
   </div>
 </div>

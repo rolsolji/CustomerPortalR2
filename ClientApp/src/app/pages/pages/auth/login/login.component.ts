@@ -6,6 +6,8 @@ import icVisibility from '@iconify/icons-ic/twotone-visibility';
 import icVisibilityOff from '@iconify/icons-ic/twotone-visibility-off';
 import { fadeInUp400ms } from '../../../../../@vex/animations/fade-in-up.animation';
 import {AuthenticationService} from '../../../../common/authentication.service';
+import {BehaviorSubject} from 'rxjs';
+import {Client} from '../../../../Entities/client.model';
 
 @Component({
   selector: 'vex-login',
@@ -22,7 +24,6 @@ export class LoginComponent implements OnInit {
 
   inputType = 'password';
   visible = false;
-  loading = false;
 
   icVisibility = icVisibility;
   icVisibilityOff = icVisibilityOff;
@@ -32,7 +33,7 @@ export class LoginComponent implements OnInit {
     private fb: FormBuilder,
     private cd: ChangeDetectorRef,
     private snackbar: MatSnackBar,
-    private authService: AuthenticationService
+    public authService: AuthenticationService
   ) {}
 
   ngOnInit() {
@@ -43,24 +44,18 @@ export class LoginComponent implements OnInit {
   }
 
   async send() {
-    this.loading = true;
+    this.authService.loading$.next(true);
     if (this.form.value && this.form.value.username && this.form.value.password) {
       const username = this.form.value.username;
       const password = this.form.value.password;
       const response: any = await this.authService.doLogin(username.toString(), password.toString());
       if (response.status) {
         this.router.navigate(['/']);
-        this.loading = false;
+        this.authService.loading$.next(false);
         return true;
       }
-      if (!response.status && response.message) {
-        this.loading = false;
-        this.snackbar.open(response.message.toString(), '', {
-          duration: 5000
-        });
-      }
     }
-    this.loading = false;
+    this.authService.loading$.next(false);
     this.snackbar.open('No valid credentials needed.', '', {
       duration: 5000
     });

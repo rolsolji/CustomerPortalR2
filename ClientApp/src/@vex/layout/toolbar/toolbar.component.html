@@ -11,7 +11,7 @@
     <img class="w-8 select-none" src="assets/img/demo/logo.svg">
     <h1 [fxHide]="mobileQuery" class="title ltr:pl-4 rtl:pr-4 m-0 select-none">VEX</h1>
   </a>
-  
+
   <!--<button *ngIf="isHorizontalLayout$ | async"
           [fxHide]="mobileQuery"
           [matMenuTriggerFor]="addNewMenu"
@@ -82,17 +82,18 @@
 
     <div fxFlex fxLayout="row" fxLayoutGap="5px">
       <div fxFlex="10%" fxHide.lt-sm>
-        <img class="w-16" src="assets/img/demo/R2-Logistics_Logo.png">
+        <img class="w-16"
+             [src]="clientImage">
       </div>
-      <div fxFlex fxLayout="column" fxLayoutAlign="space-around center"> 
-        <div><h2>R2 Logistics</h2></div>
-        <div fxLayout="row">
-          <p class="userMessage">
-            {{toolBarMessage}}
-          </p>
-        </div> 
+      <div fxFlex fxLayout="column" fxLayoutAlign="space-around center">
+        <div><h2>{{toolBarTitle}}</h2></div>
+<!--        <div fxLayout="row">-->
+<!--&lt;!&ndash;          <p [fxHide]="mobileQuery" class="userMessage">&ndash;&gt;-->
+<!--&lt;!&ndash;            {{toolBarMessage}}&ndash;&gt;-->
+<!--&lt;!&ndash;          </p>&ndash;&gt;-->
+<!--        </div>-->
       </div>
-    </div>  
+    </div>
 
   <div class="-mx-1 flex items-center">
       <div class="px-1">
@@ -143,6 +144,26 @@
 
     <div class="px-1">
       <vex-toolbar-user></vex-toolbar-user>
+      <form #ngClientsForm="ngForm" class="client-form" [formGroup]="clientsForm">
+        <mat-form-field appearance="outline" class="vex-flex-form-field" color="primary">
+          <mat-label>Client</mat-label>
+          <input name="client"
+                 formControlName="client"
+                 type="text"
+                 placeholder="Pick one"
+                 aria-label="Number"
+                 matInput
+                 [matAutocomplete]="clientAutoComplete">
+          <mat-autocomplete  #clientAutoComplete="matAutocomplete">
+            <mat-option *ngFor="let client of filteredOptions | async"
+                        [value]="client.ClientName"
+                        (onSelectionChange)="onChange($event)"
+                        style="font-size: 12px">
+              {{client.ClientName}}
+            </mat-option>
+          </mat-autocomplete>
+        </mat-form-field>
+      </form>
     </div>
 
     <!--<mat-menu #languageMenu="matMenu" overlapTrigger="false" xPosition="before" yPosition="below">

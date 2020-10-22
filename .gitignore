@@ -232,3 +232,4 @@ _Pvt_Extensions
 /ClientApp/node_modules
 /ClientApp/.vscode
 /ClientApp/dist/vex
+/ClientApp/.idea

@@ -17,7 +17,7 @@
         <mat-icon [icIcon]="icDoneAll"></mat-icon>
       </ng-template>
 
-      <mat-step [stepControl]="originAndDestinationFormGroup" errorMessage="Missing require fields.">
+      <mat-step [stepControl]="originAndDestinationFormGroup" errorMessage="Missing required fields.">
         <form [formGroup]="originAndDestinationFormGroup">
           <ng-template matStepLabel>
             <span class="stepTitleStyle">Origin And Destination</span>
@@ -291,7 +291,7 @@
         </form>
       </mat-step>
 
-      <mat-step [stepControl]="productsAndAccessorialsFormGroup" errorMessage="Missing require fields.">
+      <mat-step [stepControl]="productsAndAccessorialsFormGroup" errorMessage="Missing required fields.">
         <form [formGroup]="productsAndAccessorialsFormGroup">
           <ng-template matStepLabel>
             <span class="stepTitleStyle">Products and Accessorials</span>
@@ -300,7 +300,7 @@
           <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="5px">
             <div @fadeInUp class="card" fxFlex="75%">
               <div fxLayout="row" fxLayoutGap="8px" class="ml-5">
-                <div><h2 class="OriginDestinationTitle">Product(s) {{formProducts.length}}</h2></div>
+                <div><h2 class="OriginDestinationTitle">Product(s) <label class="QuantityLabel">{{formProducts.length}}</label></h2></div>
               </div>
               <div  [ngClass]="{'ProductsSection': formProducts.length >= 3}">
                <div formArrayName='products' *ngFor="let prod of formProducts.controls; let i = index" > 
@@ -430,7 +430,7 @@
             </div>
             <div @fadeInUp class="card" fxFlex="25%">
               <div fxLayout="row" fxLayoutGap="8px" class="ml-5">
-                <div><h2 class="OriginDestinationTitle">Accessorial(s) {{accessorialsSelectedQty}}</h2></div>
+                <div><h2 class="OriginDestinationTitle">Accessorial(s) <label class="QuantityLabel">{{accessorialsSelectedQty}}</label></h2></div>
               </div>
               <div class="AccessorialsSection">
                 <mat-selection-list #accesorialsSelect class="accesorialsSelectionList" (selectionChange)="onGroupsChange(accesorialsSelect.selectedOptions.selected)">
@@ -449,7 +449,7 @@
         </form>
       </mat-step>
 
-      <mat-step [stepControl]="shipmentInfoFormGroup" errorMessage="Missing require fields.">
+      <mat-step [stepControl]="shipmentInfoFormGroup" errorMessage="Missing required fields.">
         <form [formGroup]="shipmentInfoFormGroup">
           <ng-template matStepLabel>
             <span class="stepTitleStyle">Shipment Information</span>
@@ -469,7 +469,9 @@
                             <mat-option *ngFor="let equipment of EquipmentOptions" [value]="equipment.EquipmentID">{{equipment.Description}}</mat-option>
                         </mat-select>                        
                       </mat-form-field>
-                    </div>
+                    </div>                                                  
+                  </div>
+                  <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="5px">                    
                     <div fxFlex="50%">
                       <mat-form-field fxFlex="none">
                         <mat-label>Priority</mat-label>                   
@@ -477,52 +479,44 @@
                           <mat-option *ngFor="let priority of PriorityOptions" [value]="priority.PriorityID">{{priority.Description}}</mat-option>                      
                         </mat-select>
                       </mat-form-field>
-                    </div>                                 
-                  </div>
+                    </div>   
+                    <div fxFlex="50%">
+                      <mat-form-field fxFlex="none">
+                        <mat-label>Service Level</mat-label>                   
+                          <mat-select  name="servicelevel" formControlName="servicelevel" (selectionChange)="selectChangeServiceLevel($event)">
+                          <mat-option *ngFor="let servicelevel of ServiceLevelOptions" [value]="servicelevel.ServiceLevelID">{{servicelevel.Description}}</mat-option>                      
+                        </mat-select>
+                      </mat-form-field>
+                    </div>                              
+                  </div>             
                   <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="5px">
                     <div fxFlex="50%">
                       <mat-form-field>
-                        <mat-label>Customer Ref #</mat-label>
+                        <mat-label>{{ReferenceByClientField1}}</mat-label>
                         <input name="customerref" formControlName="customerref" matInput >
                       </mat-form-field>
                     </div>
                     <div fxFlex="50%">
                       <mat-form-field>
-                        <mat-label>R2 Order #</mat-label>
+                        <mat-label>{{ReferenceByClientField2}}</mat-label>
                         <input name="r2order" formControlName="r2order" matInput >
                       </mat-form-field>
                     </div>                                 
                   </div>
-                  <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="5px">
-                    <div fxFlex="50%">
-                      <mat-form-field>
-                        <mat-label>R2 Pro number</mat-label>
-                        <input name="r2pronumber" formControlName="r2pronumber" matInput >
-                      </mat-form-field>
-                    </div>  
+                  <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="5px">                  
                     <div fxFlex="50%">
                       <mat-form-field>
                         <mat-label>Shipment Value</mat-label>
                         <input name="shipmentvalue" maxlength="7" formControlName="shipmentvalue" matInput >
                       </mat-form-field>
+                    </div> 
+                    <div fxFlex="50%">
+                      <mat-form-field>
+                        <mat-label>Value Per Pound</mat-label>
+                        <input name="valueperpound" type="number" maxlength="8" min="0" formControlName="valueperpound" matInput >
+                      </mat-form-field>
                     </div>                                        
-                  </div>                 
-                  <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="5px">                      
-                      <div fxFlex="50%">
-                        <mat-form-field>
-                          <mat-label>Value Per Pound</mat-label>
-                          <input name="valueperpound" type="number" maxlength="8" min="0" formControlName="valueperpound" matInput >
-                        </mat-form-field>
-                      </div>
-                      <div fxFlex="50%">
-                        <mat-form-field fxFlex="none">
-                          <mat-label>Service Level</mat-label>                   
-                            <mat-select  name="servicelevel" formControlName="servicelevel" (selectionChange)="selectChangeServiceLevel($event)">
-                            <mat-option *ngFor="let servicelevel of ServiceLevelOptions" [value]="servicelevel.ServiceLevelID">{{servicelevel.Description}}</mat-option>                      
-                          </mat-select>
-                        </mat-form-field>
-                      </div> 
-                  </div> 
+                  </div>                                   
                   <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="5px">
                     <div fxFlex="100%">
                       <mat-form-field>
@@ -573,32 +567,20 @@
                       </mat-form-field>                     
                     </div>
                   </div>
-                  <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="5px">
-                    <!-- <div fxFlex="50%">
-                      <mat-form-field fxFlex="none">
-                        <mat-label>OS & D</mat-label>                   
-                          <mat-select  name="os_d" formControlName="os_d">
-                          <mat-option *ngFor="let os_dItem of ShipmentErrorOptions" [value]="os_dItem.ShipmentErrorId">{{os_dItem.ErrorDescription}}</mat-option>                      
-                        </mat-select>
-                      </mat-form-field>
-                    </div>   -->
+                  <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="5px">                    
                     <div fxFlex="50%">
                       <mat-form-field>
                         <mat-label>R2 Ref No</mat-label>
                         <input name="r2refno" formControlName="r2refno" matInput >
                       </mat-form-field>
-                    </div>                                                      
-                </div>
-                <!-- <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="5px">                    
+                    </div>             
                     <div fxFlex="50%">
-                      <mat-form-field fxFlex="none">
-                        <mat-label>StatusCode</mat-label>                   
-                          <mat-select  name="statuscode" formControlName="statuscode">
-                           <mat-option *ngFor="let servicelevel of servicelevels" [value]="servicelevel.id">{{servicelevel.name}}</mat-option>                       
-                        </mat-select>
+                      <mat-form-field>
+                        <mat-label>{{ReferenceByClientField3}}</mat-label>
+                        <input name="r2pronumber" formControlName="r2pronumber" matInput >
                       </mat-form-field>
-                    </div>                                 
-                </div>                     -->
+                    </div>                                           
+                </div>                       
                   <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="5px">
                     <div fxFlex="75%">
                       <mat-form-field>
@@ -746,7 +728,7 @@
                           <div fxFlex="33.33%">
                             <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="5px">
                               <div fxFlex="100%">
-                                <mat-label>Packages: </mat-label><mat-label class="InfoLabel">{{prod.PackageTypeID}}</mat-label>
+                                <mat-label>Packages: </mat-label><mat-label class="InfoLabel">{{prod.PackageTypeDescription}}</mat-label>
                               </div>                                                        
                             </div>                          
                           </div>
@@ -843,10 +825,10 @@
                   </div>
                   <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="5px">
                     <div fxFlex="50%">
-                      <mat-label>Customer Order Ref: </mat-label><mat-label class="InfoLabel">{{shipmentInfoFormGroup.get('customerref').value}}</mat-label>
+                      <mat-label>{{ReferenceByClientField1}}</mat-label><mat-label class="InfoLabel">{{shipmentInfoFormGroup.get('customerref').value}}</mat-label>
                     </div>
                     <div fxFlex="50%">
-                      <mat-label>R2 Order #: </mat-label><mat-label class="InfoLabel">{{shipmentInfoFormGroup.get('r2order').value}}</mat-label>
+                      <mat-label>{{ReferenceByClientField2}}</mat-label><mat-label class="InfoLabel">{{shipmentInfoFormGroup.get('r2order').value}}</mat-label>
                     </div>                                 
                   </div>
                   <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="5px">

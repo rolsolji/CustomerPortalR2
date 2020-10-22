@@ -15,6 +15,9 @@ import { RouterModule } from '@angular/router';
 import { NavigationItemModule } from '../../components/navigation-item/navigation-item.module';
 import { MegaMenuModule } from '../../components/mega-menu/mega-menu.module';
 import { ContainerModule } from '../../directives/container/container.module';
+import {MatAutocompleteModule} from '@angular/material/autocomplete';
+import {ReactiveFormsModule, FormsModule} from '@angular/forms';
+import {MatInputModule} from '@angular/material/input';
 
 
 @NgModule({
@@ -34,7 +37,11 @@ import { ContainerModule } from '../../directives/container/container.module';
     RouterModule,
     NavigationItemModule,
     MegaMenuModule,
-    ContainerModule
+    ContainerModule,
+    MatAutocompleteModule,
+    ReactiveFormsModule,
+    MatInputModule,
+    FormsModule
   ],
   exports: [ToolbarComponent]
 })

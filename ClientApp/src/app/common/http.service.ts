@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http'; 
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 
-import { Observable, of } from 'rxjs';
+import {BehaviorSubject, Observable, of} from 'rxjs';
 import { catchError, map, tap } from 'rxjs/operators';
 
 import { String, StringBuilder } from 'typescript-string-operations';
@@ -13,7 +13,7 @@ import { SaveQuoteParameters } from '../Entities/SaveQuoteParameters';
 import { SaveQuoteResponse } from '../Entities/SaveQuoteResponse'
 import { Quote } from '../Entities/Quote';
 import { EquipmentType } from '../Entities/EquipmentType';
-import { ShipmentMode } from '../Entities/ShipmentMode'; 
+import { ShipmentMode } from '../Entities/ShipmentMode';
 import { Status } from '../Entities/Status';
 import { AccessorialDetail } from '../Entities/AccessorialDetail';
 import { ShipmentPriority } from '../Entities/ShipmentPriority';
@@ -23,8 +23,11 @@ import { ShipmentError } from '../Entities/ShipmentError';
 import { ShipmentCost } from '../Entities/ShipmentCost';
 import { Carrier } from '../Entities/Carrier';
 import { ShipmentResponse } from '../Entities/ShipmentResponse';
-import { ReferenceByClient } from '../Entities/ReferenceByClientResponse';
 import { ShipmentByLading } from '../Entities/ShipmentByLading';
+import {User} from '../Entities/user.model';
+import {environment} from '../../environments/environment';
+import {AuthenticationService} from './authentication.service';
+import { ReferenceByClient } from '../Entities/ReferenceByClient';
 
 @Injectable({
     providedIn: 'root'
@@ -32,188 +35,196 @@ import { ShipmentByLading } from '../Entities/ShipmentByLading';
 
 export class HttpService{
 
-    public token: string = '';
-    constructor(private http: HttpClient){}
+    public token = '';
+    private baseEndpoint: string;
+    constructor(
+      private http: HttpClient,
+      private authenticationService: AuthenticationService
+    ){
+      this.token = this.authenticationService.ticket$.value;
+      this.baseEndpoint = environment.baseEndpoint;
+    }
 
-    getCountryList(keyId:string){        
-        let ticket = this.token;
-        let httpHeaders = new HttpHeaders({                       
-            'Ticket' : ticket                            
-        }); 
-        return this.http.get(String.Format('https://beta-customer.r2logistics.com/Services/MASCityStatePostalService.svc/json/GetCountryList?_={0}',keyId)
+    getCountryList(keyId:string){
+        const ticket = this.token;
+        const httpHeaders = new HttpHeaders({
+            Ticket : ticket
+        });
+        return this.http.get(
+          String.Format(this.baseEndpoint + 'Services/MASCityStatePostalService.svc/json/GetCountryList?_={0}',keyId)
         ,{
             headers: httpHeaders
           }
           ).toPromise();
     }
 
+
     async getMainToken(): Promise<string> {
 
         return new Promise((resolve, reject) => {
-     
+
             let headers;
             let Ticket;
             this.http
-            .get<Object>('https://beta-customer.r2logistics.com/Services/LoginService.svc/Json/DoLogin?Username=superadmin&Password=3500oaklawn&userType=C', {observe: 'response'})        
-            .subscribe(resp => {                      
-                console.log(resp.headers.get('ticket'));
+            .get<Object>(this.baseEndpoint + 'Services/LoginService.svc/Json/DoLogin?Username=superadmin&Password=3500oaklawn&userType=C', {observe: 'response'})
+            .subscribe(resp => {
                 Ticket = resp.headers.get('ticket');
-                const keys = resp.headers.keys();            
+                const keys = resp.headers.keys();
                 // headers = keys.map(key =>
                 //   `${key}: ${resp.headers.get(key)}`);
-                
-                //console.log(headers);            
-                console.log(resp.body);
+
                 resolve(Ticket);
-            });        
-     
-     
+            });
+
+
        })
-    }    
+    }
+
+
 
     getStateDataByCountryId(countryId:string, keyId:string){
-        let httpHeaders = new HttpHeaders({
-            'Ticket' : this.token                           
-        }); 
-        return this.http.get(String.Format('https://beta-customer.r2logistics.com/Services/MASCityStatePostalService.svc/json//GetStateDataByCountryId?MASCountryId={0}&_={1}',countryId,keyId),{
+        const httpHeaders = new HttpHeaders({
+            Ticket : this.token
+        });
+        return this.http.get(String.Format(this.baseEndpoint + 'Services/MASCityStatePostalService.svc/json//GetStateDataByCountryId?MASCountryId={0}&_={1}',countryId,keyId),{
             headers: httpHeaders
           });
     }
 
     getPostalDataByPostalCode(postalCode:string, countryId:string, keyId:string){
-        let ticket = this.token;
-        let httpHeaders = new HttpHeaders({                       
-            'Ticket' : ticket                            
-        }); 
-        return this.http.get<PostalData[]>(String.Format('https://beta-customer.r2logistics.com/Services/MASCityStatePostalService.svc/json/GetPostalDataByPostalCode?MASPostalCode={0}&countryID={1}&_={2}',postalCode,countryId,keyId)
+        const ticket = this.token;
+        const httpHeaders = new HttpHeaders({
+            Ticket : ticket
+        });
+        return this.http.get<PostalData[]>(String.Format(this.baseEndpoint + 'Services/MASCityStatePostalService.svc/json/GetPostalDataByPostalCode?MASPostalCode={0}&countryID={1}&_={2}',postalCode,countryId,keyId)
         ,{
             headers: httpHeaders
           }
-          ).toPromise();        
+          ).toPromise();
     }
-    
+
     getProductPackageType(keyId:string){
-        let ticket = this.token;
-        let httpHeaders = new HttpHeaders({                       
-            'Ticket' : ticket                            
-        }); 
-        return this.http.get(String.Format('https://beta-customer.r2logistics.com/Services/MasClientDefaultsService.svc/json/GetMasProductPackageType?_={0}',keyId)
+        const ticket = this.token;
+        const httpHeaders = new HttpHeaders({
+            Ticket : ticket
+        });
+        return this.http.get<ProductPackageType[]>(String.Format(this.baseEndpoint + 'Services/MasClientDefaultsService.svc/json/GetMasProductPackageType?_={0}',keyId)
         ,{
             headers: httpHeaders
           }
-          ).toPromise();         
+          ).toPromise();
     }
 
     getUserMessage(keyId:string){
-        //return this.http.get(String.Format('https://beta-customer.r2logistics.com/Services/MASCityStatePostalService.svc/json/GetCountryList?_={0}',keyId)).toPromise();
-        return "It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout.";
+        // return this.http.get(String.Format(this.baseEndpoint + 'Services/MASCityStatePostalService.svc/json/GetCountryList?_={0}',keyId)).toPromise();
+        return 'It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout.';
     }
 
-    getClientDefaultsByClient(clientID:number, keyId:string){        
-        let ticket = this.token;
-        let httpHeaders = new HttpHeaders({                       
-            'Ticket' : ticket                            
-        }); 
-        return this.http.get<ClientDefaultData>(String.Format('https://beta-customer.r2logistics.com/Services/MasClientDefaultsService.svc/json/GetClientDefaultsByClient?ClientID={0}&_={1}',clientID.toString(),keyId)
+    getClientDefaultsByClient(clientID:number, keyId:string){
+        const ticket = this.token;
+        const httpHeaders = new HttpHeaders({
+            Ticket : ticket
+        });
+        return this.http.get<ClientDefaultData>(String.Format(this.baseEndpoint + 'Services/MasClientDefaultsService.svc/json/GetClientDefaultsByClient?ClientID={0}&_={1}',clientID.toString(),keyId)
         ,{
             headers: httpHeaders
           }
-          ).toPromise();        
+          ).toPromise();
     }
 
     searchBOLHDRForJason(parameters:GetQuotesParameters){
-        let ticket = this.token;
-        let httpHeaders = new HttpHeaders({                       
-            'Ticket' : ticket                            
-        }); 
-        return this.http.post<Quote[]>('https://beta-customer.r2logistics.com/Services/BOLHDRService.svc/json/SearchBOLHDRForJason', parameters
+        const ticket = this.token;
+        const httpHeaders = new HttpHeaders({
+            Ticket : ticket
+        });
+        return this.http.post<Quote[]>(this.baseEndpoint + 'Services/BOLHDRService.svc/json/SearchBOLHDRForJason', parameters
         ,{
             headers: httpHeaders
           }
-          ).toPromise();  
+          ).toPromise();
     }
 
     getMasEquipment(keyId:string){
-        let ticket = this.token;
-        let httpHeaders = new HttpHeaders({                       
-            'Ticket' : ticket                            
-        }); 
-        return this.http.get<EquipmentType[]>(String.Format('https://beta-customer.r2logistics.com/Services/BOLHDRService.svc/json/GetMasEquipment?_={0}',keyId)
+        const ticket = this.token;
+        const httpHeaders = new HttpHeaders({
+            Ticket : ticket
+        });
+        return this.http.get<EquipmentType[]>(String.Format(this.baseEndpoint + 'Services/BOLHDRService.svc/json/GetMasEquipment?_={0}',keyId)
         ,{
             headers: httpHeaders
           }
-          ).toPromise(); 
+          ).toPromise();
 
-        //return this.http.get<EquipmentType[]>(String.Format('https://customer.r2logistics.com/Services/BOLHDRService.svc/json/GetMasEquipment?_={0}',keyId)).toPromise();
+        // return this.http.get<EquipmentType[]>(String.Format('https://customer.r2logistics.com/Services/BOLHDRService.svc/json/GetMasEquipment?_={0}',keyId)).toPromise();
     }
 
     getShipmentMode(keyId:string){
-        let ticket = this.token;
-        let httpHeaders = new HttpHeaders({                       
-            'Ticket' : ticket                            
-        }); 
-        return this.http.get<ShipmentMode[]>(String.Format('https://beta-customer.r2logistics.com/Services/BOLHDRService.svc/json/GetShipmentMode?_={0}',keyId)
+        const ticket = this.token;
+        const httpHeaders = new HttpHeaders({
+            Ticket : ticket
+        });
+        return this.http.get<ShipmentMode[]>(String.Format(this.baseEndpoint + 'Services/BOLHDRService.svc/json/GetShipmentMode?_={0}',keyId)
         ,{
             headers: httpHeaders
           }
-          ).toPromise();    
+          ).toPromise();
 
-        //return this.http.get<ShipmentMode[]>(String.Format('https://beta-customer.r2logistics.com/Services/BOLHDRService.svc/json/GetShipmentMode?_={0}',keyId)).toPromise();
+        // return this.http.get<ShipmentMode[]>(String.Format(this.baseEndpoint + 'Services/BOLHDRService.svc/json/GetShipmentMode?_={0}',keyId)).toPromise();
     }
 
     getBOLStatus(keyId:string){
-        let ticket = this.token;
-        let httpHeaders = new HttpHeaders({                       
-            'Ticket' : ticket                            
-        }); 
-        return this.http.get<Status[]>(String.Format('https://beta-customer.r2logistics.com/Services/BOLHDRService.svc/json/GetBOLStatus?_={0}',keyId)
+        const ticket = this.token;
+        const httpHeaders = new HttpHeaders({
+            Ticket : ticket
+        });
+        return this.http.get<Status[]>(String.Format(this.baseEndpoint + 'Services/BOLHDRService.svc/json/GetBOLStatus?_={0}',keyId)
         ,{
             headers: httpHeaders
           }
-          ).toPromise(); 
+          ).toPromise();
     }
 
     postalCodeAutocomplete(postalCode:string, countryId:string, keyId:string) {
         let opts = [];
-        let ticket = this.token;
-        let httpHeaders = new HttpHeaders({ 'Ticket' : ticket });
+        const ticket = this.token;
+        const httpHeaders = new HttpHeaders({ Ticket : ticket });
         return (postalCode.length < 5) ?
             of(opts) :
-            this.http.get<PostalData[]>(String.Format('https://beta-customer.r2logistics.com/Services/MASCityStatePostalService.svc/json/GetPostalDataByPostalCode?MASPostalCode={0}&countryID={1}&_={2}',postalCode,countryId,keyId)
+            this.http.get<PostalData[]>(String.Format(this.baseEndpoint + 'Services/MASCityStatePostalService.svc/json/GetPostalDataByPostalCode?MASPostalCode={0}&countryID={1}&_={2}',postalCode,countryId,keyId)
                 ,{headers: httpHeaders}
             ).pipe(tap(data => opts = data))
     }
 
     getGetClientMappedAccessorials(clientID:number, keyId:string){
-        let ticket = this.token;
-        let httpHeaders = new HttpHeaders({                       
-            'Ticket' : ticket                            
-        }); 
-        return this.http.get<AccessorialDetail[]>(String.Format('https://beta-customer.r2logistics.com/Services/BOLHDRService.svc/json//GetClientMappedAccesorial?ClientID={0}&IsIncludeSystem=false&_={1}',clientID.toString(),keyId)
+        const ticket = this.token;
+        const httpHeaders = new HttpHeaders({
+            Ticket : ticket
+        });
+        return this.http.get<AccessorialDetail[]>(String.Format(this.baseEndpoint + 'Services/BOLHDRService.svc/json//GetClientMappedAccesorial?ClientID={0}&IsIncludeSystem=false&_={1}',clientID.toString(),keyId)
         ,{
             headers: httpHeaders
           }
-          ).toPromise();  
+          ).toPromise();
     }
 
     GetShipmentCostByLadingID(LadingID:string, keyId:string){
-        let ticket = this.token;
-        let httpHeaders = new HttpHeaders({                       
-            'Ticket' : ticket                            
-        }); 
-        return this.http.get<ShipmentCost>(String.Format('https://beta-customer.r2logistics.com/Services/BOLHDRService.svc/json/GetShipmentCostByLadingID?LadingID={0}&_={1}',LadingID.toString(),keyId)
+        const ticket = this.token;
+        const httpHeaders = new HttpHeaders({
+            Ticket : ticket
+        });
+        return this.http.get<ShipmentCost>(String.Format(this.baseEndpoint + 'Services/BOLHDRService.svc/json/GetShipmentCostByLadingID?LadingID={0}&_={1}',LadingID.toString(),keyId)
         ,{
             headers: httpHeaders
           }
-          ).toPromise();  
+          ).toPromise();
     }
 
     saveQuote(parameters:SaveQuoteParameters){
-        let ticket = this.token;
-        let httpHeaders = new HttpHeaders({                       
-            'Ticket' : ticket                            
-        }); 
-        return this.http.post<SaveQuoteResponse>('https://beta-customer.r2logistics.com/Services/BOLHDRService.svc/json/SaveQuote',parameters
+        const ticket = this.token;
+        const httpHeaders = new HttpHeaders({
+            Ticket : ticket
+        });
+        return this.http.post<SaveQuoteResponse>(this.baseEndpoint + 'Services/BOLHDRService.svc/json/SaveQuote',parameters
         ,{
             headers: httpHeaders
         }
@@ -221,83 +232,84 @@ export class HttpService{
     }
 
     getMasShipmentPriority(){
-        let ticket = this.token;
-        let httpHeaders = new HttpHeaders({                       
-            'Ticket' : ticket                            
-        }); 
-        return this.http.get<ShipmentPriority[]>(String.Format('https://beta-customer.r2logistics.com/Services/BOLHDRService.svc/json/GetMasShipmentPriority')
+        const ticket = this.token;
+        const httpHeaders = new HttpHeaders({
+            Ticket : ticket
+        });
+        return this.http.get<ShipmentPriority[]>(String.Format(this.baseEndpoint + 'Services/BOLHDRService.svc/json/GetMasShipmentPriority')
         ,{
             headers: httpHeaders
           }
-          ).toPromise();            
+          ).toPromise();
     }
 
     getMasServiceLevel(clientID:number, keyId:string){
-        let ticket = this.token;
-        let httpHeaders = new HttpHeaders({                       
-            'Ticket' : ticket                            
-        }); 
-        return this.http.get<ServiceLevelDetail[]>(String.Format('https://beta-customer.r2logistics.com/Services/BOLHDRService.svc/json/GetMasServiceLevel?ClientID={0}&_={1}',clientID.toString(),keyId)
+        const ticket = this.token;
+        const httpHeaders = new HttpHeaders({
+            Ticket : ticket
+        });
+        return this.http.get<ServiceLevelDetail[]>(String.Format(this.baseEndpoint + 'Services/BOLHDRService.svc/json/GetMasServiceLevel?ClientID={0}&_={1}',clientID.toString(),keyId)
         ,{
             headers: httpHeaders
           }
-          ).toPromise();            
+          ).toPromise();
     }
 
     getMasPaymentTerms(){
-        let ticket = this.token;
-        let httpHeaders = new HttpHeaders({                       
-            'Ticket' : ticket                            
-        }); 
-        return this.http.get<PaymentTerm[]>(String.Format('https://beta-customer.r2logistics.com/Services/MasClientDefaultsService.svc/json/GetMasPaymentTerms')
+        const ticket = this.token;
+        const httpHeaders = new HttpHeaders({
+            Ticket : ticket
+        });
+        return this.http.get<PaymentTerm[]>(String.Format(this.baseEndpoint + 'Services/MasClientDefaultsService.svc/json/GetMasPaymentTerms')
         ,{
             headers: httpHeaders
           }
-          ).toPromise();         
+          ).toPromise();
     }
 
     getShipmentError(keyId:string){
-        let ticket = this.token;
-        let httpHeaders = new HttpHeaders({                       
-            'Ticket' : ticket                            
-        }); 
-        return this.http.get<ShipmentError[]>(String.Format('https://beta-customer.r2logistics.com/Services/BOLHDRService.svc/json/getShipmentError?_={0}',keyId)
+        const ticket = this.token;
+        const httpHeaders = new HttpHeaders({
+            Ticket : ticket
+        });
+        return this.http.get<ShipmentError[]>(
+          String.Format(this.baseEndpoint + 'Services/BOLHDRService.svc/json/getShipmentError?_={0}',keyId)
         ,{
             headers: httpHeaders
           }
-          ).toPromise(); 
+          ).toPromise();
     }
 
     getCarrierData(clientID:number, carrier:string, keyId:string){
-        let ticket = this.token;
-        let httpHeaders = new HttpHeaders({                       
-            'Ticket' : ticket                            
-        }); 
-        return this.http.get<Carrier[]>(String.Format('https://beta-customer.r2logistics.com/Services/CarrierService.svc/json/GetMasCarrierByCarrierCodeOrName?clientID={0}&CarrierCodeorName={1}&_={2}',clientID.toString(),carrier,keyId)
+        const ticket = this.token;
+        const httpHeaders = new HttpHeaders({
+            Ticket : ticket
+        });
+        return this.http.get<Carrier[]>(String.Format(this.baseEndpoint + 'Services/CarrierService.svc/json/GetMasCarrierByCarrierCodeOrName?clientID={0}&CarrierCodeorName={1}&_={2}',clientID.toString(),carrier,keyId)
         ,{
             headers: httpHeaders
           }
-          ).toPromise();        
+          ).toPromise();
     }
-    
+
     carrierAutocomplete(clientID:number, carrier:string, keyId:string) {
         let opts = [];
-        let ticket = this.token;
-        let httpHeaders = new HttpHeaders({ 'Ticket' : ticket });
+        const ticket = this.token;
+        const httpHeaders = new HttpHeaders({ Ticket : ticket });
         return (carrier.length < 4) ?
             of(opts) :
-            this.http.get<Carrier[]>(String.Format('https://beta-customer.r2logistics.com/Services/CarrierService.svc/json/GetMasCarrierByCarrierCodeOrName?clientID={0}&CarrierCodeorName={1}&_={2}',clientID.toString(),carrier,keyId)
+            this.http.get<Carrier[]>(String.Format(this.baseEndpoint + 'Services/CarrierService.svc/json/GetMasCarrierByCarrierCodeOrName?clientID={0}&CarrierCodeorName={1}&_={2}',clientID.toString(),carrier,keyId)
                 ,{headers: httpHeaders}
             ).pipe(tap(data => opts = data))
     }
 
-    //Get quote detais
-    getShipmentByLadingID(landingId:string,keyId:string){
-        let ticket = this.token;
-        let httpHeaders = new HttpHeaders({                       
-            'Ticket' : ticket                            
-        }); 
-        return this.http.get<ShipmentByLading>(String.Format('https://beta-customer.r2logistics.com/Services/BOLHDRService.svc/json/GetShipmentByLadingID?LadingID={0}&_={1}', landingId, keyId)
+    GetShipmentByLadingID(LadingID:string, keyId:string){
+        const ticket = this.token;
+        const httpHeaders = new HttpHeaders({
+            Ticket : ticket
+        });
+        return this.http.get<ShipmentByLading>(String.Format(this.baseEndpoint + 'Services/BOLHDRService.svc/json/GetShipmentByLadingID?LadingID={0}&_={1}',LadingID,keyId)
+    
         ,{
             headers: httpHeaders
           }
@@ -309,22 +321,23 @@ export class HttpService{
         let httpHeaders = new HttpHeaders({                       
             'Ticket' : ticket                            
         }); 
-        return this.http.get<any>(String.Format('https://beta-customer.r2logistics.com/Services/BOLHDRService.svc/json/GetTrackingDetailsByLadingID?LadingID={0}&_={1}', landingId, keyId)
+        return this.http.get<any>(String.Format(this.baseEndpoint + 'Services/BOLHDRService.svc/json/GetTrackingDetailsByLadingID?LadingID={0}&_={1}', landingId, keyId)
         ,{
             headers: httpHeaders
           }
         ).toPromise();  
     }
 
-    getReferenceByClient(landingId:string,keyId:string){
+    GetReferenceByClient(clientID:number, keyId:string){
         let ticket = this.token;
         let httpHeaders = new HttpHeaders({                       
             'Ticket' : ticket                            
         }); 
-        return this.http.get<ReferenceByClient[]>(String.Format('https://beta-customer.r2logistics.com/Services/BOLHDRService.svc/json/GetReferenceByClient?LadingID={0}&_={1}', landingId, keyId)
+        return this.http.get<ReferenceByClient[]>(String.Format(this.baseEndpoint + 'Services/BOLHDRService.svc/json//GetReferenceByClient?ClientID={0}&_={1}',clientID.toString(),keyId)
         ,{
             headers: httpHeaders
           }
-        ).toPromise();  
-    }
+          ).toPromise();            
+    }    
+
 }

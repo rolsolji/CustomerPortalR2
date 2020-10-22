@@ -36,10 +36,10 @@ export class HttpErrorInterceptor implements HttpInterceptor {
             }
 
             if (error && error.error
-              && error.error.ErrorMessage
-              && error.error.ErrorMessage === 'Invalid username or password') {
+              && error.error.ErrorMessage &&
+              (typeof error.error.ErrorMessage === 'string' || error.error.ErrorMessage instanceof String)) {
               this.authenticationService.loading$.next(false);
-              this.snackbar.open('Invalid username or password.', '', {
+              this.snackbar.open(error.error.ErrorMessage, '', {
                 duration: 5000
               });
             }

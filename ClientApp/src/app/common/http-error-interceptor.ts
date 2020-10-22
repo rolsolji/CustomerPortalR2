@@ -28,7 +28,6 @@ export class HttpErrorInterceptor implements HttpInterceptor {
             if (error && error.error
               && error.error.ErrorMessage
               && error.error.ErrorMessage === 'Your Access is Expired.') {
-              console.log(error.error.ErrorMessage);
               this.authenticationService.logout();
               this.snackbar.open('Your Access is Expired. Log in again.', '', {
                 duration: 5000

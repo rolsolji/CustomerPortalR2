@@ -60,7 +60,6 @@ import { COMMA, ENTER } from '@angular/cdk/keycodes';
 import { ActivatedRoute, Router, ParamMap } from '@angular/router';
 import { stringToKeyValue } from '@angular/flex-layout/extended/typings/style/style-transforms';
 import { MessageService } from '../../../../common/message.service';
-// import {ThemePalette} from '@angular/material/core';
 import {MatSidenav} from '@angular/material/sidenav';
 import {MatSort} from '@angular/material/sort';
 import { MatPaginator } from '@angular/material/paginator';
@@ -84,14 +83,7 @@ import {AuthenticationService} from '../../../../common/authentication.service';
   ]
 })
 
-
-// export interface ChipColor {
-//   name: string;
-//   color: ThemePalette;
-// }
-
-
-export class FormShipmentBoardComponent implements OnInit,OnDestroy {
+export class FormShipmentBoardComponent implements OnInit {
 
 
 
@@ -171,23 +163,10 @@ export class FormShipmentBoardComponent implements OnInit,OnDestroy {
     ShipmentType: null
   }
 
-  // shipperName: string;
-  // consigneeName: string;
   fromShipDate: Date;
   toShipDate: Date;
   fromDeliveryDate: Date;
   toDeliveryDate: Date;
-  // shipdateto: string;
-  // deliverydatefrom: string;
-  // deliverydateto: string;
-  // ponumber: string;
-  // bolnumber: string;
-  // pronumber: string;
-  // smallparcel: string;
-  // selectmode: string;
-  // shipmenttype: string;
-  // searchfilter: string;
-  // status: string;
 
   subject$: ReplaySubject<Quote[]> = new ReplaySubject<Quote[]>(1);
   data$: Observable<Quote[]> = this.subject$.asObservable();
@@ -195,8 +174,6 @@ export class FormShipmentBoardComponent implements OnInit,OnDestroy {
 
   @Input()
   columns: TableColumn<Quote>[] = [
-    // { label: 'Checkbox', property: 'checkbox', type: 'checkbox', visible: true },
-    // { label: 'Image', property: 'image', type: 'image', visible: true },
     { label: 'View / Edit', property: 'View', type: 'edit', visible: true, cssClasses: ['grid-mat-cell-small']},
     { label: 'Load No', property: 'ClientLadingNo', type: 'text', visible: true, cssClasses: ['grid-mat-cell-small'] },
     { label: 'Client', property: 'ClientName', type: 'text', visible: true, cssClasses: ['grid-mat-cell'] },
@@ -212,7 +189,7 @@ export class FormShipmentBoardComponent implements OnInit,OnDestroy {
     { label: 'Action', property: 'Action', type: 'more', visible: true, cssClasses: ['grid-mat-cell-small'] },
   ];
 
-  keyId = '1593399730488';
+  keyId = '1602966166220';
   pageSize = 10;
   pageSizeOptions: number[] = [5, 10, 20, 50];
   dataSource: MatTableDataSource<Quote> | null;
@@ -220,7 +197,6 @@ export class FormShipmentBoardComponent implements OnInit,OnDestroy {
   ShipmentModeOptions: object;
   StatusOptions: Status[];
   StatusOptionsString: string[] = [];
-  // StatusOptionsChip: ChipColor[] = [];
   StatusSelectec: string[];
   EquipmentOptions: object;
   quoteIdParameter: string;
@@ -230,7 +206,14 @@ export class FormShipmentBoardComponent implements OnInit,OnDestroy {
   totalDeliveredStatus: string;
 
   shipmentInformation: ShipmentByLading;
-
+  visible = true;
+  selectable = true;
+  removable = true;
+  separatorKeysCodes: number[] = [ENTER, COMMA];
+  statusCtrl = new FormControl();
+  filteredStatus: Observable<string[]>;
+  statusSelected: Status[] = [];
+  expandedQuote: string = String.Empty;
   //#endregion
 
   // @ViewChild('statusInput') statusInput: ElementRef<HTMLInputElement>;
@@ -242,14 +225,6 @@ export class FormShipmentBoardComponent implements OnInit,OnDestroy {
   @ViewChild(MatPaginator, { static: false }) paginator: MatPaginator;
   @ViewChild(MatSort, { static: false }) sort: MatSort;
 
-  visible = true;
-  selectable = true;
-  removable = true;
-  separatorKeysCodes: number[] = [ENTER, COMMA];
-
-  statusCtrl = new FormControl();
-  filteredStatus: Observable<string[]>;
-  statusSelected: Status[] = [];
   get visibleColumnsNew() {
     return ['View', 'ClientLadingNo', 'ClientName'];
   }
@@ -263,9 +238,9 @@ export class FormShipmentBoardComponent implements OnInit,OnDestroy {
     this.InitialLoadPage();
   }
 
-  ngOnChanges(){ 
-    this.dataSource.sort = this.sort; 
-    this.dataSource.paginator = this.paginator; 
+  ngOnChanges(){
+    this.dataSource.sort = this.sort;
+    this.dataSource.paginator = this.paginator;
   }
 
   trackByProperty<T>(index: number, column: TableColumn<T>) {
@@ -362,6 +337,8 @@ export class FormShipmentBoardComponent implements OnInit,OnDestroy {
 
     this.quotes = await this.httpService.searchBOLHDRForJason(this.getQuotesParameters);
 
+    this.quotes = await this.httpService.searchBOLHDRForJason(this.getQuotesParameters);
+
     this.quotes.forEach(element => {
       element.ActualShipDateWithFormat = this.datepipe.transform(element.ActualShipDate.replace(/(^.*\()|([+-].*$)/g, ''),'MM/dd/yyyy');
 
@@ -384,21 +361,16 @@ export class FormShipmentBoardComponent implements OnInit,OnDestroy {
   private _filter(value: string): string[] {
         const filterValue = value.toLowerCase();
         return this.StatusOptionsString.filter(status => status.toLowerCase().indexOf(filterValue) === 0);
-  } 
-
-  ngOnDestroy() {
   }
 
   async GetQuoteInfo(rowSelected:Quote){
-
+    if (rowSelected == null){
+      this.expandedQuote = String.Empty;
+      return;
+    }
     this.showSpinnerGrid = true;
-
-    this.shipmentInformation = null;
-    //console.log("more details", rowSelected);
-
+    this.expandedQuote = this.expandedQuote === rowSelected.ClientLadingNo ? String.Empty : rowSelected.ClientLadingNo;
     this.shipmentInformation = await this.httpService.GetShipmentByLadingID(rowSelected.LadingID.toString(), this.keyId);
-
-    //console.log("shipmentDetails", this.shipmentInformation);
     this.showSpinnerGrid = false;
   }
 }

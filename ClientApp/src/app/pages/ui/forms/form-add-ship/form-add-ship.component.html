@@ -1118,8 +1118,8 @@
 
           <div class="actions" fxLayout="row" fxLayoutAlign="end center" fxLayoutGap="8px">
             <button color="primary" mat-button matStepperPrevious type="button" (click)="previousFromLastStep()">Previous</button>
-            <button (click)="submit()"  color="warn" mat-raised-button
-                    matStepperNext [disabled]="!originAndDestinationFormGroup.valid || !productsAndAccessorialsFormGroup.valid || !shipmentInfoFormGroup.valid || this.costListFiltered.length == 0">
+            <button (click)="BookShipmentSubmit()"  color="warn" mat-raised-button
+                    matStepperNext>
               Book Shipment
             </button>
           </div>

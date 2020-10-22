@@ -51,9 +51,7 @@ import { ProductPackageType } from '../../../../Entities/ProductPackageType';
 import { ReferenceByClient } from '../../../../Entities/ReferenceByClient';
 import {environment} from '../../../../../environments/environment';
 import {MatDialog, MatDialogConfig} from '@angular/material/dialog';
-
-
-
+import { ConfirmAlertDialogComponent } from '../confirm-alert-dialog/confirm-alert-dialog.component';
 
 @Component({
   selector: 'vex-form-add-ship',
@@ -544,12 +542,24 @@ export class FormAddShipComponent implements OnInit {
     (this.productsAndAccessorialsFormGroup.get('products') as FormArray).removeAt(index);
   }
 
-  submit() {
+  BookShipmentSubmit() {
     // let test = this.shipInfoEquipment;
-
-    this.snackbar.open('Shipment booked.', null, {
-      duration: 5000
+    let counter = 0;
+    this.stepper._steps.forEach(step => {
+      if (step.hasError){
+        counter += 1;
+      }
     });
+
+    if (counter > 0){
+      this.openDialog(false);
+    }else{
+      this.snackbar.open('Shipment booked.', null, {
+        duration: 5000
+      });
+    }
+
+    
   }
 
   addNewInternalNote(): void {
@@ -1096,17 +1106,23 @@ export class FormAddShipComponent implements OnInit {
 
   }
 
-  openDialog(){
+  openDialog(isConfirmDialog){
     const dialogConfig = new MatDialogConfig();
     dialogConfig.disableClose = true;
     dialogConfig.autoFocus = true;
 
     dialogConfig.data = {
-      id: 1,
-      title: 'Dialog Title'
+      title: 'Message',
+      message: 'Please complete all required fields.',
+      confirmDialog: isConfirmDialog
     };
 
-    //this.dialog.open(ConfirmAlertDialogComponent, dialogConfig);
+    const dialogRef = this.dialog.open(ConfirmAlertDialogComponent, dialogConfig);
+
+    // dialogRef.afterClosed().subscribe(
+    //   data => console.log('Dialog output: ', data)
+    // );
+
   }
 
 }

@@ -59,13 +59,12 @@ import { MatChipInputEvent } from '@angular/material/chips';
 import { COMMA, ENTER } from '@angular/cdk/keycodes';
 import { ActivatedRoute, Router, ParamMap } from '@angular/router';
 import { stringToKeyValue } from '@angular/flex-layout/extended/typings/style/style-transforms';
-import { MessageService } from "../../../../common/message.service";
-//import {ThemePalette} from '@angular/material/core';
+import { MessageService } from '../../../../common/message.service';
 import {MatSidenav} from '@angular/material/sidenav';
 import {MatSort} from '@angular/material/sort';
 import { MatPaginator } from '@angular/material/paginator';
 import {animate, state, style, transition, trigger} from '@angular/animations';
-import { ShipmentByLading } from '../../../../Entities/ShipmentByLading'; 
+import { ShipmentByLading } from '../../../../Entities/ShipmentByLading';
 
 @Component({
   selector: 'vex-form-shipment-board',
@@ -83,14 +82,7 @@ import { ShipmentByLading } from '../../../../Entities/ShipmentByLading';
   ]
 })
 
-
-// export interface ChipColor {
-//   name: string;
-//   color: ThemePalette;
-// }
-
-
-export class FormShipmentBoardComponent implements OnInit,OnDestroy {
+export class FormShipmentBoardComponent implements OnInit {
 
   icFilterList = icFilterList;
   baselineEdit = baselineEdit;
@@ -114,7 +106,7 @@ export class FormShipmentBoardComponent implements OnInit,OnDestroy {
     SCAC: null,
     Status: null,
     ClientName: null,
-    OrderBy: "LadingID",
+    OrderBy: 'LadingID',
     IsAccending: false,
     UserRowID: 39249,
     LadingIDList: [],
@@ -137,29 +129,16 @@ export class FormShipmentBoardComponent implements OnInit,OnDestroy {
     ToDeliveryDate: null,
     IsIncludeSubClient: true,
     EquipmentID: 0,
-    Mode: "LTL",
+    Mode: 'LTL',
     FreeSearch: null,
     Ref4Value: null,
     ShipmentType: null
   }
 
-  // shipperName: string;
-  // consigneeName: string;
   fromShipDate: Date;
   toShipDate: Date;
   fromDeliveryDate: Date;
   toDeliveryDate: Date;
-  // shipdateto: string;
-  // deliverydatefrom: string;
-  // deliverydateto: string;
-  // ponumber: string;
-  // bolnumber: string;
-  // pronumber: string;
-  // smallparcel: string;
-  // selectmode: string;
-  // shipmenttype: string;
-  // searchfilter: string;
-  // status: string;
 
   subject$: ReplaySubject<Quote[]> = new ReplaySubject<Quote[]>(1);
   data$: Observable<Quote[]> = this.subject$.asObservable();
@@ -167,8 +146,6 @@ export class FormShipmentBoardComponent implements OnInit,OnDestroy {
 
   @Input()
   columns: TableColumn<Quote>[] = [
-    //{ label: 'Checkbox', property: 'checkbox', type: 'checkbox', visible: true },
-    //{ label: 'Image', property: 'image', type: 'image', visible: true },
     { label: 'View / Edit', property: 'View', type: 'edit', visible: true, cssClasses: ['grid-mat-cell-small']},
     { label: 'Load No', property: 'ClientLadingNo', type: 'text', visible: true, cssClasses: ['grid-mat-cell-small'] },
     { label: 'Client', property: 'ClientName', type: 'text', visible: true, cssClasses: ['grid-mat-cell'] },
@@ -184,7 +161,7 @@ export class FormShipmentBoardComponent implements OnInit,OnDestroy {
     { label: 'Action', property: 'Action', type: 'more', visible: true, cssClasses: ['grid-mat-cell-small'] },
   ];
 
-  keyId: string = "1602966166220";
+  keyId = '1602966166220';
   pageSize = 10;
   pageSizeOptions: number[] = [5, 10, 20, 50];
   dataSource: MatTableDataSource<Quote> | null;
@@ -192,7 +169,6 @@ export class FormShipmentBoardComponent implements OnInit,OnDestroy {
   ShipmentModeOptions: object;
   StatusOptions: Status[];
   StatusOptionsString: string[] = [];
-  //StatusOptionsChip: ChipColor[] = [];
   StatusSelectec: string[];
   EquipmentOptions: object;
   securityToken: string;
@@ -203,7 +179,14 @@ export class FormShipmentBoardComponent implements OnInit,OnDestroy {
   totalDeliveredStatus: string;
 
   shipmentInformation: ShipmentByLading;
-
+  visible = true;
+  selectable = true;
+  removable = true;
+  separatorKeysCodes: number[] = [ENTER, COMMA];
+  statusCtrl = new FormControl();
+  filteredStatus: Observable<string[]>;
+  statusSelected: Status[] = [];
+  expandedQuote: string = String.Empty;
   //#endregion
 
   // @ViewChild('statusInput') statusInput: ElementRef<HTMLInputElement>;
@@ -351,8 +334,8 @@ export class FormShipmentBoardComponent implements OnInit,OnDestroy {
 
     console.log("Parameters", this.getQuotesParameters);
 
-    this.quotes = await this.httpService.searchBOLHDRForJason(this.getQuotesParameters);    
-    
+    this.quotes = await this.httpService.searchBOLHDRForJason(this.getQuotesParameters);
+
     this.quotes.forEach(element => {
       element.ActualShipDateWithFormat = this.datepipe.transform(element.ActualShipDate.replace(/(^.*\()|([+-].*$)/g, ''),'MM/dd/yyyy');
 
@@ -372,33 +355,21 @@ export class FormShipmentBoardComponent implements OnInit,OnDestroy {
     this.messageService.SendQuoteParameter(String.Empty);
   }
 
-  visible = true;
-  selectable = true;
-  removable = true;
-  separatorKeysCodes: number[] = [ENTER, COMMA];
-  
-  statusCtrl = new FormControl();
-  filteredStatus: Observable<string[]>;
-  statusSelected: Status[] = [];
-
   private _filter(value: string): string[] {
     const filterValue = value.toLowerCase();
     return this.StatusOptionsString.filter(status => status.toLowerCase().indexOf(filterValue) === 0);
   }
 
-  ngOnDestroy() {
-  }
-
   async GetQuoteInfo(rowSelected:Quote){
 
+    if (rowSelected == null){
+      this.expandedQuote = String.Empty;
+      return;
+    }
+
     this.showSpinnerGrid = true;
-
-    this.shipmentInformation = null;
-    //console.log("more details", rowSelected);
-
+    this.expandedQuote = this.expandedQuote === rowSelected.ClientLadingNo ? String.Empty : rowSelected.ClientLadingNo;
     this.shipmentInformation = await this.httpService.getShipmentByLadingID(rowSelected.LadingID.toString(), this.keyId);
-
-    //console.log("shipmentDetails", this.shipmentInformation);
     this.showSpinnerGrid = false;
   }
 }

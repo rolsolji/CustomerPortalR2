@@ -24,12 +24,12 @@ export class AuthenticationService {
 
   public authState$ = new BehaviorSubject(false);
   public authenticatedUser$: BehaviorSubject<User> = new BehaviorSubject<User>(null);
-  public ticket$: BehaviorSubject<string> = new BehaviorSubject<string>('');
+  public ticket$: BehaviorSubject<string> = new BehaviorSubject<string>(null);
   public clientsForUser$: BehaviorSubject<Client[]> = new BehaviorSubject<Client[]>(null);
   public defaultClient$: BehaviorSubject<Client> = new BehaviorSubject<Client>(null);
   public loading$: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
 
-  private init(): boolean {
+  public init(): boolean {
     this.loading$.next(false);
     const ticket = this.getTicketFromStorage();
     const user = this.getUserFromStorage();
@@ -102,7 +102,7 @@ export class AuthenticationService {
 
   private clearSession() {
     this.authenticatedUser$.next(null);
-    this.ticket$.next('');
+    this.ticket$.next(null);
     this.authState$.next(false);
     localStorage.removeItem('authenticatedUser');
     localStorage.removeItem('ticket');
@@ -112,6 +112,8 @@ export class AuthenticationService {
 
   public async getClientsForUser(userID: number) {
     const ticket = this.ticket$.value;
+
+    console.log(ticket);
 
     const httpHeaders = new HttpHeaders({
       Ticket : ticket

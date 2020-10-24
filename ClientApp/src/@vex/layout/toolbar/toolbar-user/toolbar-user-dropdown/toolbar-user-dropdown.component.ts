@@ -20,6 +20,10 @@ import icNotificationsOff from '@iconify/icons-ic/twotone-notifications-off';
 import { Icon } from '@visurel/iconify-angular';
 import { PopoverRef } from '../../../../components/popover/popover-ref';
 import {AuthenticationService} from '../../../../../app/common/authentication.service';
+import {CustomerCreateUpdateComponent} from '../../../../../app/pages/apps/aio-table/customer-create-update/customer-create-update.component';
+import {Customer} from '../../../../../app/pages/apps/aio-table/interfaces/customer.model';
+import {User} from '../../../../../app/Entities/user.model';
+import {MatDialog} from '@angular/material/dialog';
 
 export interface OnlineStatus {
   id: 'online' | 'away' | 'dnd' | 'offline';
@@ -35,7 +39,7 @@ export interface OnlineStatus {
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ToolbarUserDropdownComponent implements OnInit {
-
+  icAccountCircle = icAccountCircle;
   items: MenuItem[] = [
     {
       id: '1',
@@ -97,7 +101,8 @@ export class ToolbarUserDropdownComponent implements OnInit {
   constructor(
     private cd: ChangeDetectorRef,
     private popoverRef: PopoverRef<ToolbarUserDropdownComponent>,
-    public authService: AuthenticationService
+    public authService: AuthenticationService,
+    private dialog: MatDialog
   ) { }
 
   ngOnInit() {
@@ -109,7 +114,27 @@ export class ToolbarUserDropdownComponent implements OnInit {
   }
 
   close() {
-    this.authService.logout();
     this.popoverRef.close();
+  }
+  logout() {
+    this.close();
+    this.authService.logout();
+  }
+
+  updateUser() {
+    this.dialog.open(CustomerCreateUpdateComponent, {
+      data: this.authService.getUserFromStorage()
+    }).afterClosed().subscribe((updatedUser: User) => {
+      /**
+       * Customer is the updated customer (if the user pressed Save - otherwise it's null)
+       */
+      if (updatedUser) {
+        /**
+         * Here we are updating our local array.
+         * You would probably make an HTTP request here.
+         */
+        console.log(updatedUser);
+      }
+    })
   }
 }

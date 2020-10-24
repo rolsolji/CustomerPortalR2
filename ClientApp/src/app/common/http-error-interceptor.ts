@@ -23,7 +23,7 @@ export class HttpErrorInterceptor implements HttpInterceptor {
           else {
             // This is server side error
             errorMsg = `Error Code: ${error.status},  Message: ${error.message}`;
-
+            debugger;
             if (error && error.error
               && error.error.ErrorMessage
               && error.error.ErrorMessage === 'Your Access is Expired.') {

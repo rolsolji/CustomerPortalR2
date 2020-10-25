@@ -4,7 +4,7 @@
       <div class="dropdown-heading-icon" fxLayout="row" fxLayoutAlign="center center">
         <mat-icon [icIcon]="icPerson"></mat-icon>
       </div>
-      <div class="dropdown-heading">Super Admin</div>
+      <div class="dropdown-heading">{{authService.getUserFromStorage().UserName}}</div>
     </div>
 
     <!--<button [matMenuTriggerFor]="settingsMenu"
@@ -16,24 +16,41 @@
     </button>-->
   </div>
 
+<!--  <div class="dropdown-content">-->
+<!--    <a (click)="close()"-->
+<!--       *ngFor="let item of items; trackBy: trackById"-->
+<!--       [routerLink]="item.route"-->
+<!--       class="notification"-->
+<!--       fxLayout="row"-->
+<!--       fxLayoutAlign="start center"-->
+<!--       matRipple>-->
+<!--      <mat-icon [icIcon]="item.icon"-->
+<!--                [ngClass]="item.colorClass"-->
+<!--                class="notification-icon"-->
+<!--                fxFlex="none"></mat-icon>-->
+<!--      <div fxFlex="auto">-->
+<!--        <div class="notification-label">{{ item.label }}</div>-->
+<!--        <div class="notification-description">{{ item.description }}</div>-->
+<!--      </div>-->
+<!--      <mat-icon [icIcon]="icChevronRight" class="notification-chevron" fxFlex="none"></mat-icon>-->
+<!--    </a>-->
+<!--  </div>-->
+
   <div class="dropdown-content">
-    <a (click)="close()"
-       *ngFor="let item of items; trackBy: trackById"
-       [routerLink]="item.route"
+    <div (click)="updateUser()"
        class="notification"
        fxLayout="row"
        fxLayoutAlign="start center"
        matRipple>
-      <mat-icon [icIcon]="item.icon"
-                [ngClass]="item.colorClass"
-                class="notification-icon"
+      <mat-icon [icIcon]="icAccountCircle"
+                class="notification-icon text-teal"
                 fxFlex="none"></mat-icon>
       <div fxFlex="auto">
-        <div class="notification-label">{{ item.label }}</div>
-        <div class="notification-description">{{ item.description }}</div>
+        <div class="notification-label">My Profile</div>
+        <div class="notification-description">Personal Information</div>
       </div>
       <mat-icon [icIcon]="icChevronRight" class="notification-chevron" fxFlex="none"></mat-icon>
-    </a>
+    </div>
   </div>
 
   <div class="dropdown-footer" fxLayout="row" fxLayoutAlign="space-between center">
@@ -46,7 +63,7 @@
         </span>
       </ng-container>
     </button>-->
-    <a (click)="close()" [routerLink]="['/login']" color="primary" mat-button>LOGOUT</a>
+    <a (click)="logout()" [routerLink]="['/login']" color="primary" mat-button>LOGOUT</a>
   </div>
 </div>
 

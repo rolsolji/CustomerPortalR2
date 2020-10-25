@@ -41,6 +41,7 @@ export class HttpService{
       private http: HttpClient,
       private authenticationService: AuthenticationService
     ){
+      this.authenticationService.init();
       this.token = this.authenticationService.ticket$.value;
       this.baseEndpoint = environment.baseEndpoint;
     }
@@ -317,9 +318,9 @@ export class HttpService{
     }
 
     getTrackingDetailsByLadingID(landingId:string,keyId:string){
-        let ticket = this.token;
-        let httpHeaders = new HttpHeaders({
-            'Ticket' : ticket
+        const ticket = this.token;
+        const httpHeaders = new HttpHeaders({
+            Ticket : ticket
         });
         return this.http.get<any>(String.Format(this.baseEndpoint + 'Services/BOLHDRService.svc/json/GetTrackingDetailsByLadingID?LadingID={0}&_={1}', landingId, keyId)
         ,{
@@ -329,9 +330,9 @@ export class HttpService{
     }
 
     GetReferenceByClient(clientID:number, keyId:string){
-        let ticket = this.token;
-        let httpHeaders = new HttpHeaders({
-            'Ticket' : ticket
+        const ticket = this.token;
+        const httpHeaders = new HttpHeaders({
+            Ticket : ticket
         });
         return this.http.get<ReferenceByClient[]>(String.Format(this.baseEndpoint + 'Services/BOLHDRService.svc/json//GetReferenceByClient?ClientID={0}&_={1}',clientID.toString(),keyId)
         ,{

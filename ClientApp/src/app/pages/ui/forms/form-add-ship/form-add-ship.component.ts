@@ -96,7 +96,7 @@ export class FormAddShipComponent implements OnInit {
   }
 
   keyId = '1593399730488';
-  ClientID = 8473;
+  ClientID = this.authenticationService.getDefaultClient().ClientID;
 
   // localLadingIdParameter: string;
 

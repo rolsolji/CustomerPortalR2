@@ -337,9 +337,7 @@ export class FormShipmentBoardComponent implements OnInit {
 
     console.log('Parameters', this.getQuotesParameters);
 
-    this.quotes = await this.httpService.searchBOLHDRForJason(this.getQuotesParameters);
-
-    this.quotes = await this.httpService.searchBOLHDRForJason(this.getQuotesParameters);
+    this.quotes = await this.httpService.searchBOLHDRForJason(this.getQuotesParameters);  
 
     this.quotes.forEach(element => {
       element.ActualShipDateWithFormat = this.datepipe.transform(element.ActualShipDate.replace(/(^.*\()|([+-].*$)/g, ''),'MM/dd/yyyy');

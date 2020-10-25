@@ -19,7 +19,7 @@ import { InternalNote } from '../../../../Entities/InternalNote';
 import { ShipmentCost, AccountInvoiceCostList } from '../../../../Entities/ShipmentCost';
 import { MessageService } from '../../../../common/message.service';
 import { Observable, of } from 'rxjs';
-import { startWith, debounceTime, distinctUntilChanged, switchMap } from 'rxjs/operators';
+import { startWith, debounceTime, distinctUntilChanged, switchMap, pairwise } from 'rxjs/operators';
 import {MatAutocompleteSelectedEvent, MatAutocomplete} from '@angular/material/autocomplete';
 import { EquipmentType } from '../../../../Entities/EquipmentType';
 import { ShipmentPriority } from '../../../../Entities/ShipmentPriority';
@@ -200,6 +200,10 @@ export class FormAddShipComponent implements OnInit {
   ReferenceByClientField2 = '';
   ReferenceByClientField3 = '';
 
+  ForceToReRate = false;
+  accessorialsUsedToRate: AccessorialBase[] = [];
+  productsUsedToRate: any[] = [];
+
   pcoAutoCompleteOptions: Observable<PostalData[]>;
   pcdAutoCompleteOptions: Observable<PostalData[]>;
 
@@ -208,13 +212,13 @@ export class FormAddShipComponent implements OnInit {
   postalData: PostalData[];
   postalDataDest: PostalData[];
   OriginPostalCode: string;
-  OriginStateName: String;
+  OriginStateName: string;
   OriginPostalData: PostalData;
   OriginPickupDate: string;
 
   //#region Destination Fields
   DestinationPostalCode: string;
-  DestinationStateName: String;
+  DestinationStateName: string;
   DestinationPostalData: PostalData;
 
   // Event fired after view is initialized
@@ -352,7 +356,7 @@ export class FormAddShipComponent implements OnInit {
 
     const responseData = await this.httpService.getCountryList(this.keyId);
     this.accessorialArray = await this.httpService.getGetClientMappedAccessorials(this.ClientID, this.keyId);
-    // this.clientDefaultData = await this.httpService.getClientDefaultsByClient(this.ClientID, this.keyId);
+    this.clientDefaultData = await this.httpService.getClientDefaultsByClient(this.ClientID, this.keyId);
 
     this.packageTypes = await this.httpService.getProductPackageType(this.keyId);
 
@@ -433,10 +437,10 @@ export class FormAddShipComponent implements OnInit {
       // -- Get Shipment Costs
       this.ShipmentCostObject = await this.httpService.GetShipmentCostByLadingID(localLadingIdParameter, this.keyId);
       this.AccountInvoiceCostList = this.ShipmentCostObject.SellRates.AccountInvoiceCostList;
-      this.clientDefaultData = await this.httpService.getClientDefaultsByClient(this.ClientID, this.keyId);
+      // this.clientDefaultData = await this.httpService.getClientDefaultsByClient(this.ClientID, this.keyId);
 
       if ( this.AccountInvoiceCostList != null &&  this.AccountInvoiceCostList.length > 0){
-        this.costListFiltered =  this.AccountInvoiceCostList.filter(item => item.AccessorialCode != null && item.AccessorialCode != '');
+        this.costListFiltered =  this.AccountInvoiceCostList.filter(item => item.AccessorialCode != null && item.AccessorialCode !== '');
       }
 
       this.clientTLWeightLimit = (this.clientDefaultData.TLWeightLimit == null ? 0 : this.clientDefaultData.TLWeightLimit) + 'lb';
@@ -461,10 +465,47 @@ export class FormAddShipComponent implements OnInit {
       this.ratesOpened = []; // initiate ratesOpened array
       this.messageService.SendLadingIDParameter(String.Empty); // Clean LadingId parameter
       this.messageService.SendQuoteParameter(String.Empty); // Clean LadingCode parameter
-      // this.setDefaultDate();
 
+      this.originAndDestinationFormGroup.get('originpostalcode')
+      .valueChanges
+      .pipe(pairwise())
+      .subscribe(([prev, next]: [any, any]) => {
+        console.log('originpostalcode PREV1', prev);
+        console.log('originpostalcode NEXT1', next);
+        if (prev !== next && this.costListFiltered != null && this.costListFiltered.length > 0){
+          // if previous value is dif from the current value and also costs has already been calculated, force re-rate
+          this.ForceToReRate = true;
+        }
+      });
 
-    // console.log(this.ShipmentCostObject);
+      this.originAndDestinationFormGroup.get('destpostalcode')
+      .valueChanges
+      .pipe(pairwise())
+      .subscribe(([prev, next]: [any, any]) => {
+        console.log('destpostalcode PREV1', prev);
+        console.log('destpostalcode NEXT1', next);
+        if (prev !== next && this.costListFiltered != null && this.costListFiltered.length > 0){
+          // if previous value is dif from the current value and also costs has already been calculated, force re-rate
+          this.ForceToReRate = true;
+        }
+      });
+
+      this.originAndDestinationFormGroup.get('originpickupdate')
+      .valueChanges
+      .pipe(pairwise())
+      .subscribe(([prev, next]: [any, any]) => {
+        console.log('originpickupdate PREV1', prev);
+        console.log('originpickupdate NEXT1', next);
+        if (prev !== next && this.costListFiltered != null && this.costListFiltered.length > 0){
+          // if previous value is dif from the current value and also costs has already been calculated, force re-rate
+          this.ForceToReRate = true;
+        }
+      });
+
+      this.productsAndAccessorialsFormGroup.get('products').valueChanges.pipe(pairwise()).subscribe(([prev, next]: [any, any]) => {
+        console.log('products PREV1', JSON.stringify(prev));
+        console.log('products NEXT1', JSON.stringify(next));
+      });
   }
 
   pcoAutoCompleteFilter(val: string): Observable<any[]> {
@@ -551,12 +592,24 @@ export class FormAddShipComponent implements OnInit {
       }
     });
 
+    let message;
     if (counter > 0){
-      this.openDialog(false);
+      message = 'Please complete all required fields.';
+      this.openDialog(false, message);
+    }else if(this.costListFiltered.length === 0){
+      message = 'Please select a rate the shipment first.';
+      this.openDialog(false, message);
     }else{
-      this.snackbar.open('Shipment booked.', null, {
-        duration: 5000
-      });
+      const fieldsHaveChanged = this.validateIfFieldsHaveChanged();
+      if (fieldsHaveChanged){
+        message = 'You have modified some value(s), that requires re-rate this shipment. If you will not re-rate, then this shipment will go to "Quote Modified" status. Do you want to proceed?';
+        this.openDialog(true, message);
+      }
+      else {
+        this.snackbar.open('Shipment booked.', null, {
+          duration: 5000
+        });
+      }      
     }
 
     
@@ -795,6 +848,11 @@ export class FormAddShipComponent implements OnInit {
 
       this.clientTLWeightLimit = (this.clientDefaultData.TLWeightLimit == null ? 0 : this.clientDefaultData.TLWeightLimit) + 'lb';
     }
+
+    this.ForceToReRate = false;
+    this.productsUsedToRate = arrayProducts;
+    this.accessorialsUsedToRate = this.accessorials;
+
   }
 
   //#region RatesOpened
@@ -1020,26 +1078,9 @@ export class FormAddShipComponent implements OnInit {
       StateCode: this.ShipmentByLadingObject.DestStateCode.trim(),
       StateId: this.ShipmentByLadingObject.DestState.toString(),
       StateName: this.ShipmentByLadingObject.DestStateName.trim(),
-    };
-
-    // tempOriginPD.PostalCode = this.ShipmentByLadingObject.OrgZipCode.trim();
-    // tempOriginPD.CityID = this.ShipmentByLadingObject.OrgCity.toString();
-    // tempOriginPD.StateId = this.ShipmentByLadingObject.OrgState.toString();
-    // tempOriginPD.CountryId = this.ShipmentByLadingObject.OrgCountry.toString();
-    // tempOriginPD.CountryCode = this.ShipmentByLadingObject.OrgCountryCode;
-    // tempOriginPD.StateCode = this.ShipmentByLadingObject.OrgStateCode.trim();
-    // tempOriginPD.CityName = this.ShipmentByLadingObject.OrgCityName.trim();
+    };    
 
     this.OriginPostalData = tempOriginPD;
-
-    // tempDestPD.PostalCode = this.ShipmentByLadingObject.DestZipCode.trim();
-    // tempDestPD.CityID = this.ShipmentByLadingObject.DestCity.toString();
-    // tempDestPD.StateId = this.ShipmentByLadingObject.DestState.toString();
-    // tempDestPD.CountryId = this.ShipmentByLadingObject.DestCountry.toString();
-    // tempDestPD.CountryCode = this.ShipmentByLadingObject.DestCountryCode;
-    // tempDestPD.StateCode = this.ShipmentByLadingObject.DestStateCode.trim();
-    // tempDestPD.CityName = this.ShipmentByLadingObject.DestCityName.trim();
-
     this.DestinationPostalData = tempDestPD;
 
     // -- Set default values "Origin and Destination" step
@@ -1106,14 +1147,14 @@ export class FormAddShipComponent implements OnInit {
 
   }
 
-  openDialog(isConfirmDialog){
+  openDialog(isConfirmDialog, pMessage){
     const dialogConfig = new MatDialogConfig();
     dialogConfig.disableClose = true;
     dialogConfig.autoFocus = true;
 
     dialogConfig.data = {
       title: 'Message',
-      message: 'Please complete all required fields.',
+      message: pMessage,
       confirmDialog: isConfirmDialog
     };
 
@@ -1123,6 +1164,166 @@ export class FormAddShipComponent implements OnInit {
     //   data => console.log('Dialog output: ', data)
     // );
 
+  }
+
+  validateIfFieldsHaveChanged(){
+    const bFieldsHaveChanged = false;
+    if (this.ShipmentByLadingObject == null){
+      if (this.ForceToReRate){
+        return true;
+      }else{
+        if (this.productsUsedToRate != null && this.productsUsedToRate.length > 0){
+          this.productsUsedToRate.forEach(p => {
+            const currentProductIndex = (this.productsAndAccessorialsFormGroup.controls.products as FormArray).length - 1;
+            if (p.Pallets !== (this.productsAndAccessorialsFormGroup.controls.products as FormArray).at(currentProductIndex).get('Pallets').value){
+              return true;
+            }
+  
+            if (p.Pieces !== (this.productsAndAccessorialsFormGroup.controls.products as FormArray).at(currentProductIndex).get('Pieces').value){
+              return true;
+            }
+  
+            if (p.PackageTypeID !== (this.productsAndAccessorialsFormGroup.controls.products as FormArray).at(currentProductIndex).get('PackageTypeID').value){
+              return true;
+            }
+  
+            if (p.Class !== (this.productsAndAccessorialsFormGroup.controls.products as FormArray).at(currentProductIndex).get('ProductClass').value){
+              return true;
+            }
+  
+            if (p.NMFC !== (this.productsAndAccessorialsFormGroup.controls.products as FormArray).at(currentProductIndex).get('NmfcNumber').value){
+              return true;
+            }
+  
+            if (p.Lenght !== (this.productsAndAccessorialsFormGroup.controls.products as FormArray).at(currentProductIndex).get('Length').value){
+              return true;
+            }
+  
+            if (p.Width !== (this.productsAndAccessorialsFormGroup.controls.products as FormArray).at(currentProductIndex).get('Width').value){
+              return true;
+            }
+  
+            if (p.Height !== (this.productsAndAccessorialsFormGroup.controls.products as FormArray).at(currentProductIndex).get('Height').value){
+              return true;
+            }
+  
+            if (p.PCF !== (this.productsAndAccessorialsFormGroup.controls.products as FormArray).at(currentProductIndex).get('PCF').value){
+              return true;
+            }
+  
+            if (p.Weight !== (this.productsAndAccessorialsFormGroup.controls.products as FormArray).at(currentProductIndex).get('Weight').value){
+              return true;
+            }
+          });
+
+        }
+
+        if (this.accessorialsUsedToRate != null && this.accessorialsUsedToRate.length > 0){
+          if (this.accessorialsUsedToRate.length !== this.accessorialArray.length)
+          {
+            // accessorials selected are different from the ones previously selected, so return true to re-rate
+            return true;
+          }else{
+            this.accessorialsUsedToRate.forEach(Acc => {
+              this.accessorialArray.forEach(AvailableAccesorial => {
+                if (Acc.AccessorialID !== AvailableAccesorial.AccessorialID){
+                  // accessorial selected is different from the one previously selected, so return true to re-rate
+                  return true;
+                }
+              });
+            });
+          }
+        }
+      }
+    }
+    else // costs have been already obtained, so compare current values with previous ones
+    {
+      // Validate if origin postal code has changed
+      const defaultoriginpostalcode = this.ShipmentByLadingObject.OrgZipCode.trim() + '-' + this.ShipmentByLadingObject.OrgCityName.trim();
+      if (defaultoriginpostalcode !== this.originAndDestinationFormGroup.get('originpostalcode').value){
+        return true;
+      }
+
+      // Validate if destination postal code has changed
+      const defaultdestpostalcode = this.ShipmentByLadingObject.DestZipCode.trim() + '-' + this.ShipmentByLadingObject.DestCityName.trim();
+      if (defaultdestpostalcode !== this.originAndDestinationFormGroup.get('destpostalcode').value){
+        return true;
+      }
+
+      // Validate if origin pickup date has changed
+      const tempPickupDate = moment.utc(this.ShipmentByLadingObject.PickupDate);
+      const defaultpickupdate = new Date(this.datepipe.transform(tempPickupDate.toString().replace(/(^.*\()|([+-].*$)/g, ''),'MM/dd/yyyy'));      
+      if (defaultpickupdate !== this.originAndDestinationFormGroup.get('originpickupdate').value){
+        return true;
+      }
+
+      // Validate if data in products has changed
+      if (this.ShipmentByLadingObject.BOlProductsList != null && this.ShipmentByLadingObject.BOlProductsList.length > 0){
+        this.ShipmentByLadingObject.BOlProductsList.forEach(p => {
+          const currentProductIndex = (this.productsAndAccessorialsFormGroup.controls.products as FormArray).length - 1;
+          if (p.Pallets !== (this.productsAndAccessorialsFormGroup.controls.products as FormArray).at(currentProductIndex).get('Pallets').value){
+            return true;
+          }
+
+          if (p.Pieces !== (this.productsAndAccessorialsFormGroup.controls.products as FormArray).at(currentProductIndex).get('Pieces').value){
+            return true;
+          }
+
+          if (p.PackageTypeID !== (this.productsAndAccessorialsFormGroup.controls.products as FormArray).at(currentProductIndex).get('PackageTypeID').value){
+            return true;
+          }
+
+          if (p.Class !== (this.productsAndAccessorialsFormGroup.controls.products as FormArray).at(currentProductIndex).get('ProductClass').value){
+            return true;
+          }
+
+          if (p.NMFC !== (this.productsAndAccessorialsFormGroup.controls.products as FormArray).at(currentProductIndex).get('NmfcNumber').value){
+            return true;
+          }
+
+          if (p.Lenght !== (this.productsAndAccessorialsFormGroup.controls.products as FormArray).at(currentProductIndex).get('Length').value){
+            return true;
+          }
+
+          if (p.Width !== (this.productsAndAccessorialsFormGroup.controls.products as FormArray).at(currentProductIndex).get('Width').value){
+            return true;
+          }
+
+          if (p.Height !== (this.productsAndAccessorialsFormGroup.controls.products as FormArray).at(currentProductIndex).get('Height').value){
+            return true;
+          }
+
+          if (p.PCF !== (this.productsAndAccessorialsFormGroup.controls.products as FormArray).at(currentProductIndex).get('PCF').value){
+            return true;
+          }
+
+          if (p.Weight !== (this.productsAndAccessorialsFormGroup.controls.products as FormArray).at(currentProductIndex).get('Weight').value){
+            return true;
+          }
+        });
+
+      }
+
+      if (this.ShipmentByLadingObject.BOLAccesorialList != null && this.ShipmentByLadingObject.BOLAccesorialList.length > 0){
+        if (this.ShipmentByLadingObject.BOLAccesorialList.length !== this.accessorialArray.length)
+        {
+          // accessorials selected are different from the ones previously selected, so return true to re-rate
+          return true;
+        }else{
+          this.ShipmentByLadingObject.BOLAccesorialList.forEach(BOLAccesorial => {
+            this.accessorialArray.forEach(AvailableAccesorial => {
+              if (BOLAccesorial.AccesorialID !== AvailableAccesorial.AccessorialID){
+                // accessorial selected is different from the one previously selected, so return true to re-rate
+                return true;
+              }
+            });
+          });
+        }
+      }
+
+    }
+
+    return bFieldsHaveChanged;
   }
 
 }

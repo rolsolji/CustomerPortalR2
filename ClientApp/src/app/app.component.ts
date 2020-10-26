@@ -133,22 +133,23 @@ export class AppComponent {
             icon: baselinePostAdd
           },
           {
-            type: 'dropdown',
+            type: 'link',
             label: 'Shipment Board',
+            route: '/shipmentboard/LTLTL',
             icon: icBaselineListAlt,
-            children: [
-              {
-                type: 'link',
-                label: 'LTL/TL Shipment Board',
-                route: '/shipmentboard/LTLTL' 
-              }
-              // ,
-              // {
-              //   type: 'link',
-              //   label: 'TL Spot Quote Board',
-              //   route: '/shipmentboard/TL'
-              // }
-            ]
+            // children: [
+            //   {
+            //     type: 'link',
+            //     label: 'LTL/TL Shipment Board',
+            //     route: '/shipmentboard/LTLTL' 
+            //   }
+            //   // ,
+            //   // {
+            //   //   type: 'link',
+            //   //   label: 'TL Spot Quote Board',
+            //   //   route: '/shipmentboard/TL'
+            //   // }
+            // ]
           },
           {
             type: 'link',

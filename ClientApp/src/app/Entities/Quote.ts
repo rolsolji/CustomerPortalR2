@@ -28,20 +28,6 @@ export class Quote {
     Status:                number;
     TotalRowCount:         number;
     TransitDays:            string;
-
-    get ActualShipDateWithFormat(){
-        return this.ActualShipDate;
-    }
-
-    set ActualShipDateWithFormat(value){
-    }
-
-    get ExpectedDeliveryDateWithFormat(){
-        return this.ActualShipDate;
-    }
-
-    set ExpectedDeliveryDateWithFormat(value){
-    }
-
-    
+    ActualShipDateWithFormat: string;
+    ExpectedDeliveryDateWithFormat: string;
 }

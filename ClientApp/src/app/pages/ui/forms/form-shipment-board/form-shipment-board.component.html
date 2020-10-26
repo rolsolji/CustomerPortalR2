@@ -177,6 +177,7 @@
 
                             <div fxLayout="row" fxLayoutAlign="end center" fxLayoutGap="8px" class="py-5 pr-2">
                                 <div *ngIf=!showSpinner>
+                                    <button [disabled]=showSpinner (click)="search('clearfilters')" mat-button type="button">Clear</button>
                                     <button (click)="search('')" color="warn" mat-raised-button type="button">Search</button>
                                 </div>
                             </div>   
@@ -366,9 +367,16 @@
                 <tr mat-row
                     *matRowDef="let row; columns: ['expandedDetail'];"
                     [@detailExpand]="row.ClientLadingNo === expandedQuote ? 'expanded' : 'collapsed'">
+                </tr>
             </table>
 
-            <mat-paginator [length]="totalRows" [pageSize]="20" [pageIndex]="currentPage" (page)="getServerData($event)"></mat-paginator>
+            <div fxLayout="row" fxLayoutAlign="end center" fxLayoutGap="8px" class="py-5 pr-2">
+                <div *ngIf=!showSpinner>
+                    <button (click)="search('loadmore')" color="warn" mat-raised-button type="button">Load more</button>
+                </div>
+            </div>   
+
+            <!-- <mat-paginator [length]="totalRows" [pageSize]="20" [pageIndex]="currentPage" (page)="getServerData($event)"></mat-paginator> -->
         </div>
     </div>
 </div>

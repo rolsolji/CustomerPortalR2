@@ -88,9 +88,6 @@ import { ReferenceByClient } from '../../../../Entities/ReferenceByClient';
 
 export class FormShipmentBoardComponent implements OnInit {
 
-
-
-
   get visibleColumns() {
     return this.columns.filter(column => column.visible).map(column => column.property);
   }
@@ -110,6 +107,7 @@ export class FormShipmentBoardComponent implements OnInit {
       startWith(null),
       map((status: string | null) => status ? this._filter(status) : this.StatusOptionsString.slice()));
 
+      this.initGetQuoteParameter();
   }
 
   icFilterList = icFilterList;
@@ -124,44 +122,7 @@ export class FormShipmentBoardComponent implements OnInit {
   showSpinner = false;
   showSpinnerGrid = false;
 
-  //#region Quotes
-  getQuotesParameters: GetQuotesParameters = {
-    ClientID: this.authenticationService.getDefaultClient().ClientID,
-    PageNumber: 1,
-    PageSize: 20,
-    FromShipDate: null,
-    ToShipDate: null,
-    SCAC: null,
-    Status: null,
-    ClientName: null,
-    OrderBy: 'LadingID',
-    IsAccending: false,
-    UserRowID: 39249,
-    LadingIDList: [],
-    LoadNo: null,
-    IsExpired: false,
-    IsQuote: true,
-    BOlStatusIDList: [],
-    OrgName: null,
-    DestName: null,
-    OrgZipCode: null,
-    DestZipCode: null,
-    PickupNumber: null,
-    ProNumber: null,
-    Ref1Value: null,
-    Ref2Value: null,
-    Ref3Value: null,
-    QuoteNo: null,
-    PONumber: null,
-    FromDeliveryDate: null,
-    ToDeliveryDate: null,
-    IsIncludeSubClient: true,
-    EquipmentID: 0,
-    Mode: 'LTL',
-    FreeSearch: null,
-    Ref4Value: null,
-    ShipmentType: null
-  }
+  getQuotesParameters: GetQuotesParameters;
 
   fromShipDate: Date;
   toShipDate: Date;
@@ -170,7 +131,8 @@ export class FormShipmentBoardComponent implements OnInit {
 
   subject$: ReplaySubject<Quote[]> = new ReplaySubject<Quote[]>(1);
   data$: Observable<Quote[]> = this.subject$.asObservable();
-  quotes: Quote[];
+  quotes: Quote[] = [];
+  quotesResponse: Quote[];
 
   @Input()
   columns: TableColumn<Quote>[] = [
@@ -267,7 +229,59 @@ export class FormShipmentBoardComponent implements OnInit {
 
     this.EquipmentOptions = await this.httpService.getMasEquipment(this.keyId);
     this.StatusOptions.forEach(s => this.StatusOptionsString.push(s.Status));
+
+    this.dataSource = new MatTableDataSource();
+    this.dataSource.sort = this.sort;
+    this.dataSource.paginator = this.paginator;
+
+    this.initGetQuoteParameter();
     this.search('');
+  }
+
+  initGetQuoteParameter(){
+    this.getQuotesParameters = {
+      ClientID: this.authenticationService.getDefaultClient().ClientID,
+      PageNumber: 1,
+      PageSize: 20,
+      FromShipDate: null,
+      ToShipDate: null,
+      SCAC: null,
+      Status: null,
+      ClientName: null,
+      OrderBy: 'LadingID',
+      IsAccending: false,
+      UserRowID: 0,
+      LadingIDList: [],
+      LoadNo: null,
+      IsExpired: false,
+      IsQuote: true,
+      BOlStatusIDList: [],
+      OrgName: null,
+      DestName: null,
+      OrgZipCode: null,
+      DestZipCode: null,
+      PickupNumber: null,
+      ProNumber: null,
+      Ref1Value: null,
+      Ref2Value: null,
+      Ref3Value: null,
+      QuoteNo: null,
+      PONumber: null,
+      FromDeliveryDate: null,
+      ToDeliveryDate: null,
+      IsIncludeSubClient: true,
+      EquipmentID: 0,
+      Mode: 'LTL',
+      FreeSearch: null,
+      Ref4Value: null,
+      ShipmentType: null
+    }
+
+    this.fromShipDate = null;
+    this.toShipDate = null;
+    this.fromDeliveryDate = null;
+    this.toDeliveryDate = null;
+    this.statusSelected = [];
   }
 
   // SearchModal Open/Close
@@ -299,11 +313,17 @@ export class FormShipmentBoardComponent implements OnInit {
     event.stopImmediatePropagation();
   }
 
-  async search(statusCode:string){
+  async search(parameter:string){
 
     // SearchModal
     this.close('close');
 
+    //Clean filters
+    if (parameter === 'clearfilters'){
+      this.initGetQuoteParameter();
+      this.getQuotesParameters.PageNumber = 1;
+      this.quotes = [];
+    }
     this.showSpinner = true;
 
     if (this.fromShipDate != null)
@@ -318,9 +338,6 @@ export class FormShipmentBoardComponent implements OnInit {
     if (this.toDeliveryDate != null)
       this.getQuotesParameters.ToDeliveryDate = String.Format('/Date({0})/',this.toDeliveryDate.getTime());
 
-    console.log('statusSelected', this.statusSelected);
-
-
     this.getQuotesParameters.BOlStatusIDList = [];
     this.statusSelected.forEach(s =>
       this.getQuotesParameters.BOlStatusIDList.push(
@@ -328,8 +345,8 @@ export class FormShipmentBoardComponent implements OnInit {
       )
     );
 
-    if (!String.IsNullOrWhiteSpace(statusCode))
-      this.getQuotesParameters.BOlStatusIDList.push(statusCode);
+    if (!String.IsNullOrWhiteSpace(parameter) && parameter !== 'loadmore' && parameter !== 'clearfilters' )
+      this.getQuotesParameters.BOlStatusIDList.push(parameter);
 
     // Get parameter quote and clean variable
     this.messageService.SharedQuoteParameter.subscribe(message => this.quoteIdParameter = message)
@@ -340,17 +357,26 @@ export class FormShipmentBoardComponent implements OnInit {
       this.getQuotesParameters.Mode = String.Empty;
     }
 
-    console.log('Parameters', this.getQuotesParameters);
+    if (!String.IsNullOrWhiteSpace(parameter) && parameter === 'loadmore' )
+    {
+      this.getQuotesParameters.PageNumber = this.getQuotesParameters.PageNumber + 1;
+    }
+    else{
+      this.getQuotesParameters.PageNumber = 1;
+      this.quotes = [];
+    }
 
-    this.quotes = await this.httpService.searchBOLHDRForJason(this.getQuotesParameters);
+    this.quotesResponse = await this.httpService.searchBOLHDRForJason(this.getQuotesParameters);
 
-    this.quotes.forEach(element => {
-      element.ActualShipDateWithFormat = this.datepipe.transform(element.ActualShipDate.replace(/(^.*\()|([+-].*$)/g, ''),'MM/dd/yyyy');
+    this.quotesResponse.forEach(element => {
+      if (!String.IsNullOrWhiteSpace(element.ActualShipDate)){
+        element.ActualShipDateWithFormat = this.datepipe.transform(element.ActualShipDate.replace(/(^.*\()|([+-].*$)/g, ''),'MM/dd/yyyy');
+      }
 
-      if (!String.IsNullOrWhiteSpace(element.ExpectedDeliveryDate))
-      {
+      if (!String.IsNullOrWhiteSpace(element.ExpectedDeliveryDate)){
         element.ExpectedDeliveryDateWithFormat = this.datepipe.transform(element.ExpectedDeliveryDate.replace(/(^.*\()|([+-].*$)/g, ''),'MM/dd/yyyy');
       }
+      this.quotes.push(element);
     });
 
     this.dataSource = new MatTableDataSource();
@@ -419,49 +445,6 @@ export class FormShipmentBoardComponent implements OnInit {
       this.ReferenceByClientField2 = 'R2 Order #: ';
       this.ReferenceByClientField3 = 'R2 Pro number: ';
     }
-
-
     this.showSpinnerGrid = false;
-  }
-
-  async getServerData(event){
-    this.showSpinner = true;
-    console.log(event);
-
-    this.getQuotesParameters.PageNumber = event.pageIndex + 1;
-    
-    console.log('Parameters', this.getQuotesParameters);
-
-    this.quotes = await this.httpService.searchBOLHDRForJason(this.getQuotesParameters);
-
-    this.quotes.forEach(element => {
-      element.ActualShipDateWithFormat = this.datepipe.transform(element.ActualShipDate.replace(/(^.*\()|([+-].*$)/g, ''),'MM/dd/yyyy');
-
-      if (!String.IsNullOrWhiteSpace(element.ExpectedDeliveryDate))
-      {
-        element.ExpectedDeliveryDateWithFormat = this.datepipe.transform(element.ExpectedDeliveryDate.replace(/(^.*\()|([+-].*$)/g, ''),'MM/dd/yyyy');
-      }
-    });
-
-    //this.dataSource = new MatTableDataSource();
-
-    this.quotes.forEach(q => {
-      this.dataSource.data.push(q);
-    });
-
-    console.log('newdatasource',this.dataSource.data.length );
-
-    //this.dataSource.sort = this.sort;
-    //this.dataSource.paginator = this.paginator;
-
-    if (this.quotes != null && this.quotes.length > 0){
-      this.totalRows = this.quotes[0].TotalRowCount;
-    }
-
-    console.log('totalRows', this.totalRows);
-
-    this.currentPage = event.pageIndex + 1;
-
-    this.showSpinner = false;
   }
 }

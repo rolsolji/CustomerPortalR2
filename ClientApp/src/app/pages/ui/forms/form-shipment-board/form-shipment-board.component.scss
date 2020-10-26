@@ -109,7 +109,8 @@ tr.example-detail-row {
 }
 
 tr.example-element-row:not(.example-expanded-row):hover {
-  background: whitesmoke;
+  background: rgb(214, 214, 214);
+  cursor: pointer;
 }
 
 tr.example-element-row:not(.example-expanded-row):active {

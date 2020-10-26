@@ -204,17 +204,6 @@
                     </ng-container>
                 </ng-container>
 
-                <ng-container *ngFor="let column of columns; trackBy: trackByProperty">
-                    <ng-container *ngIf="column.type === 'more'" [matColumnDef]="column.property">
-                        <th *matHeaderCellDef class="grid-header-cell grid-mat-cell-small uppercase" mat-header-cell> {{ column.label }}</th>
-                        <td *matCellDef="let row" [ngClass]="column.cssClasses" mat-cell>
-                            <button (click)="more($event,row)" mat-icon-button type="button">
-                                <mat-icon [icIcon]="baselineDoubleArrow" color="lightgray"></mat-icon>
-                            </button>
-                        </td>
-                    </ng-container>
-                </ng-container>
-
                 <!-- Text Columns -->
                 <ng-container *ngFor="let column of columns; trackBy: trackByProperty">
                 <ng-container *ngIf="column.type === 'text'" [matColumnDef]="column.property">
@@ -289,13 +278,13 @@
                                     </div>
                                     <hr class="horizontal-title-line">
                                     <div class="div-container div-container-content">
-                                        <p *ngIf="shipmentInformation != null">Pro Number:</p>
-                                        <p *ngIf="shipmentInformation != null">Pickup Number:</p> 
-                                        <p *ngIf="shipmentInformation != null">R2 Ref.No:</p>
-                                        <p *ngIf="shipmentInformation != null">Exp Ship Date: {{row.ActualShipDateWithFormat}}</p> 
-                                        <p *ngIf="shipmentInformation != null">Actual Ship Date: {{row.ActualShipDateWithFormat}}</p>
-                                        <p *ngIf="shipmentInformation != null">Actual Del Date:</p>
-                                        <p *ngIf="shipmentInformation != null">Expected Del Date:</p>
+                                        <p *ngIf="shipmentInformation != null">Pro Number: {{row.ProNumber}}</p>
+                                        <p *ngIf="shipmentInformation != null">Pickup Number: {{shipmentInformation.PickupNumber}}</p> 
+                                        <p *ngIf="shipmentInformation != null">R2 Ref.No: {{shipmentInformation.BrokerReferenceNo}}</p>
+                                        <p *ngIf="shipmentInformation != null">Exp Ship Date: {{shipmentInformation.RequestedPickupDateFromWithFormat}}</p> 
+                                        <p *ngIf="shipmentInformation != null">Actual Ship Date: {{shipmentInformation.PickupDateWithFormat}}</p>
+                                        <p *ngIf="shipmentInformation != null">Actual Del Date: {{shipmentInformation.DeliveryDateWithFormat}}</p>
+                                        <p *ngIf="shipmentInformation != null">Expected Del Date: {{shipmentInformation.RequestedDeliveryDateWithFormat}}</p>
                                     </div>
                                 </div>
                                 <div class="vertical-line"></div>
@@ -303,11 +292,13 @@
                                     <div class="div-container div-container-title">
                                         References
                                     </div>
+
                                     <hr class="horizontal-title-line">
                                     <div class="div-container div-container-content">
-                                        <p *ngIf="shipmentInformation != null">PO Number:</p>
-                                        <p *ngIf="shipmentInformation != null">SO Number:</p> 
-                                        <p *ngIf="shipmentInformation != null">GL Code:</p>
+                                        <p *ngIf="shipmentInformation != null">{{ReferenceByClientField1}}{{shipmentInformation.Ref1Value}}</p>
+                                        <p *ngIf="shipmentInformation != null">{{ReferenceByClientField2}}{{shipmentInformation.Ref2Value}}</p> 
+                                        <p *ngIf="shipmentInformation != null">{{ReferenceByClientField3}}{{shipmentInformation.Ref3Value}}</p>
+                                        <p *ngIf="shipmentInformation != null">{{ReferenceByClientField4}}{{shipmentInformation.Ref4Value}}</p>
                                     </div>
                                     <hr class="horizontal-separator-line">
                                     <div class="div-container div-container-title">
@@ -376,6 +367,8 @@
                     *matRowDef="let row; columns: ['expandedDetail'];"
                     [@detailExpand]="row.ClientLadingNo === expandedQuote ? 'expanded' : 'collapsed'">
             </table>
+
+            <mat-paginator [length]="totalRows" [pageSize]="20" [pageIndex]="currentPage" (page)="getServerData($event)"></mat-paginator>
         </div>
     </div>
 </div>

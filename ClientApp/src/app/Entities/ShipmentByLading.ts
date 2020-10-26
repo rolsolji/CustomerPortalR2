@@ -433,4 +433,8 @@ export interface ShipmentByLading {
     UserName?: any;
     ValuePerPound?: any;
     WaterfallList?: any;
+    RequestedPickupDateFromWithFormat: string;
+    PickupDateWithFormat: string;
+    DeliveryDateWithFormat: string;
+    RequestedDeliveryDateWithFormat: string;
 }

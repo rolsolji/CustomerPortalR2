@@ -68,6 +68,7 @@ import { MatPaginator } from '@angular/material/paginator';
 import {animate, state, style, transition, trigger} from '@angular/animations';
 import { ShipmentByLading } from '../../../../Entities/ShipmentByLading';
 import {AuthenticationService} from '../../../../common/authentication.service';
+import { ReferenceByClient } from '../../../../Entities/ReferenceByClient';
 
 @Component({
   selector: 'vex-form-shipment-board',
@@ -110,9 +111,6 @@ export class FormShipmentBoardComponent implements OnInit {
       map((status: string | null) => status ? this._filter(status) : this.StatusOptionsString.slice()));
 
   }
-
-  // displayedColumns = ['position', 'name', 'weight', 'symbol', 'colA', 'colB', 'colC'];
-  // dataSource = new MatTableDataSource<Element>(ELEMENT_DATA);
 
   icFilterList = icFilterList;
   baselineEdit = baselineEdit;
@@ -187,12 +185,14 @@ export class FormShipmentBoardComponent implements OnInit {
     { label: 'Destination Location', property: 'DestinationLocation', type: 'text', visible: true, cssClasses: ['grid-mat-cell'] },
     { label: 'Equipment', property: 'EquipmentDescription', type: 'text', visible: true, cssClasses: ['grid-mat-cell-medd'] },
     { label: 'Status', property: 'BOLStatus', type: 'text', visible: true, cssClasses: ['grid-mat-cell-small'] },
-    { label: 'Expected Delivery Date', property: 'ExpectedDeliveryDateWithFormat', type: 'text', visible: true, cssClasses: ['grid-mat-cell'] },
-    { label: 'Action', property: 'Action', type: 'more', visible: true, cssClasses: ['grid-mat-cell-small'] },
+    { label: 'Expected Delivery Date', property: 'ExpectedDeliveryDateWithFormat', type: 'text', visible: true, cssClasses: ['grid-mat-cell'] }
   ];
 
-  keyId = '1602966166220';
-  pageSize = 10;
+  keyId = '1603591137983';
+  ClientID = 11992;
+  pageSize = 20;
+  currentPage = 1;
+  totalRows: number;
   pageSizeOptions: number[] = [5, 10, 20, 50];
   dataSource: MatTableDataSource<Quote> | null;
   selection = new SelectionModel<Quote>(true, []);
@@ -208,6 +208,13 @@ export class FormShipmentBoardComponent implements OnInit {
   totalDeliveredStatus: string;
 
   shipmentInformation: ShipmentByLading;
+  ReferenceByClientOptions: ReferenceByClient[];
+
+  ReferenceByClientField1 = '';
+  ReferenceByClientField2 = '';
+  ReferenceByClientField3 = '';
+  ReferenceByClientField4 = '';
+
   visible = true;
   selectable = true;
   removable = true;
@@ -217,9 +224,6 @@ export class FormShipmentBoardComponent implements OnInit {
   statusSelected: Status[] = [];
   expandedQuote: string = String.Empty;
   //#endregion
-
-  // @ViewChild('statusInput') statusInput: ElementRef<HTMLInputElement>;
-  // @ViewChild('auto') matAutocomplete: MatAutocomplete;
 
   @ViewChild('statusInput') statusInput: ElementRef<HTMLInputElement>;
   @ViewChild('auto') matAutocomplete: MatAutocomplete;
@@ -243,6 +247,7 @@ export class FormShipmentBoardComponent implements OnInit {
   ngOnChanges(){
     this.dataSource.sort = this.sort;
     this.dataSource.paginator = this.paginator;
+    console.log('pag', this.paginator);
   }
 
   trackByProperty<T>(index: number, column: TableColumn<T>) {
@@ -267,7 +272,7 @@ export class FormShipmentBoardComponent implements OnInit {
 
   // SearchModal Open/Close
   close(reason: string) {
-    if (reason == 'open' || reason == 'search')
+    if (reason === 'open' || reason === 'search')
     {
       this.sidenav.open();
       event.stopPropagation();
@@ -339,8 +344,6 @@ export class FormShipmentBoardComponent implements OnInit {
 
     this.quotes = await this.httpService.searchBOLHDRForJason(this.getQuotesParameters);
 
-    this.quotes = await this.httpService.searchBOLHDRForJason(this.getQuotesParameters);
-
     this.quotes.forEach(element => {
       element.ActualShipDateWithFormat = this.datepipe.transform(element.ActualShipDate.replace(/(^.*\()|([+-].*$)/g, ''),'MM/dd/yyyy');
 
@@ -353,7 +356,11 @@ export class FormShipmentBoardComponent implements OnInit {
     this.dataSource = new MatTableDataSource();
     this.dataSource.data = this.quotes;
     this.dataSource.sort = this.sort;
-    console.log('result', this.quotes);
+    this.dataSource.paginator = this.paginator;
+
+    if (this.quotes != null && this.quotes.length > 0){
+      this.totalRows = this.quotes[0].TotalRowCount;
+    }
 
     this.showSpinner = false;
 
@@ -373,6 +380,88 @@ export class FormShipmentBoardComponent implements OnInit {
     this.showSpinnerGrid = true;
     this.expandedQuote = this.expandedQuote === rowSelected.ClientLadingNo ? String.Empty : rowSelected.ClientLadingNo;
     this.shipmentInformation = await this.httpService.GetShipmentByLadingID(rowSelected.LadingID.toString(), this.keyId);
+    if (this.shipmentInformation != null){
+      if (this.shipmentInformation.RequestedPickupDateFrom != null && !String.IsNullOrWhiteSpace(this.shipmentInformation.RequestedPickupDateFrom.toString())){
+        this.shipmentInformation.RequestedPickupDateFromWithFormat = this.datepipe.transform(this.shipmentInformation.RequestedPickupDateFrom.toString().replace(/(^.*\()|([+-].*$)/g, ''),'MM/dd/yyyy');
+      }
+
+      if (this.shipmentInformation.PickupDate != null && !String.IsNullOrWhiteSpace(this.shipmentInformation.PickupDate.toString())){
+        this.shipmentInformation.PickupDateWithFormat = this.datepipe.transform(this.shipmentInformation.PickupDate.toString().replace(/(^.*\()|([+-].*$)/g, ''),'MM/dd/yyyy');
+      }
+
+      if (this.shipmentInformation.DeliveryDate != null && !String.IsNullOrWhiteSpace(this.shipmentInformation.DeliveryDate.toString())){
+        this.shipmentInformation.DeliveryDateWithFormat = this.datepipe.transform(this.shipmentInformation.DeliveryDate.toString().replace(/(^.*\()|([+-].*$)/g, ''),'MM/dd/yyyy');
+      }
+
+      if (this.shipmentInformation.RequestedDeliveryDate != null && !String.IsNullOrWhiteSpace(this.shipmentInformation.RequestedDeliveryDate.toString())){
+        this.shipmentInformation.RequestedDeliveryDateWithFormat = this.datepipe.transform(this.shipmentInformation.RequestedDeliveryDate.toString().replace(/(^.*\()|([+-].*$)/g, ''),'MM/dd/yyyy');
+      }
+    }
+
+    this.ReferenceByClientOptions = await this.httpService.GetReferenceByClient(this.shipmentInformation.ClientId, this.keyId);
+    if (this.ReferenceByClientOptions != null && this.ReferenceByClientOptions.length > 0){
+      this.ReferenceByClientField1 = String.Format('{0}: ',this.ReferenceByClientOptions[0].Description.trim()) ;
+
+      if (this.ReferenceByClientOptions.length > 1){
+        this.ReferenceByClientField2 =  String.Format('{0}: ',this.ReferenceByClientOptions[1].Description.trim());
+      }
+
+      if (this.ReferenceByClientOptions.length > 2){
+        this.ReferenceByClientField3 = String.Format('{0}: ',this.ReferenceByClientOptions[2].Description.trim());
+      }
+
+      if (this.ReferenceByClientOptions.length > 3){
+        this.ReferenceByClientField4 = String.Format('{0}: ',this.ReferenceByClientOptions[3].Description.trim());
+      }
+    }
+    else{ // If we can't get fields from API then set R2 fields as default
+      this.ReferenceByClientField1 = 'Customer Ref #: ';
+      this.ReferenceByClientField2 = 'R2 Order #: ';
+      this.ReferenceByClientField3 = 'R2 Pro number: ';
+    }
+
+
     this.showSpinnerGrid = false;
+  }
+
+  async getServerData(event){
+    this.showSpinner = true;
+    console.log(event);
+
+    this.getQuotesParameters.PageNumber = event.pageIndex + 1;
+    
+    console.log('Parameters', this.getQuotesParameters);
+
+    this.quotes = await this.httpService.searchBOLHDRForJason(this.getQuotesParameters);
+
+    this.quotes.forEach(element => {
+      element.ActualShipDateWithFormat = this.datepipe.transform(element.ActualShipDate.replace(/(^.*\()|([+-].*$)/g, ''),'MM/dd/yyyy');
+
+      if (!String.IsNullOrWhiteSpace(element.ExpectedDeliveryDate))
+      {
+        element.ExpectedDeliveryDateWithFormat = this.datepipe.transform(element.ExpectedDeliveryDate.replace(/(^.*\()|([+-].*$)/g, ''),'MM/dd/yyyy');
+      }
+    });
+
+    //this.dataSource = new MatTableDataSource();
+
+    this.quotes.forEach(q => {
+      this.dataSource.data.push(q);
+    });
+
+    console.log('newdatasource',this.dataSource.data.length );
+
+    //this.dataSource.sort = this.sort;
+    //this.dataSource.paginator = this.paginator;
+
+    if (this.quotes != null && this.quotes.length > 0){
+      this.totalRows = this.quotes[0].TotalRowCount;
+    }
+
+    console.log('totalRows', this.totalRows);
+
+    this.currentPage = event.pageIndex + 1;
+
+    this.showSpinner = false;
   }
 }

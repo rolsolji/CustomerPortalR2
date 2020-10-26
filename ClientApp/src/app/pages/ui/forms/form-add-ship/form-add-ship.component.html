@@ -1060,7 +1060,7 @@
                           <mat-form-field appearance="outline" class="vex-flex-form-field" color="primary">
                             <mat-label>Carrier</mat-label>
                             <input name="carrier" formControlName="carrier"
-                                    matInput required [matAutocomplete]="carrierAutoComplete"
+                                    matInput [matAutocomplete]="carrierAutoComplete"
                                     (keydown.tab)="validateCarrier($event)" >
                                     <mat-autocomplete #carrierAutoComplete="matAutocomplete" (optionSelected)="carrierAutoCompleteSelected($event)">
                                       <mat-option *ngFor="let option of carrierAutoCompleteOptions | async" [value]="option">
@@ -1077,7 +1077,7 @@
                         </div> 
                         <div fxFlex="22%" class="centeredDivButton">                      
                           <!-- <button (click)="getQuote()" color="warn" class="SubTypeButton" mat-raised-button type="button" [disabled]="true" >Rate Shipment</button> -->
-                          <button [disabled]=showSpinner (click)="getQuote()" color="warn" class="SubTypeButton" mat-raised-button type="button" [disabled]="!confirmFormGroup.valid" >Rate Shipment</button>
+                          <button [disabled]=showSpinner (click)="getQuote()" color="warn" class="SubTypeButton" mat-raised-button type="button" >Rate Shipment</button>
                         </div>                                 
                       </div>
                       <div>

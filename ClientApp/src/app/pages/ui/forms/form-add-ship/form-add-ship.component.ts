@@ -343,7 +343,7 @@ export class FormAddShipComponent implements OnInit {
 
     // -- confirmFormGroup fields
     this.confirmFormGroup = this.fb.group({
-      carrier: [null, Validators.required],
+      carrier: [null],
       showTopCarriers: [10]
     });
     // --
@@ -500,12 +500,7 @@ export class FormAddShipComponent implements OnInit {
           // if previous value is dif from the current value and also costs has already been calculated, force re-rate
           this.ForceToReRate = true;
         }
-      });
-
-      this.productsAndAccessorialsFormGroup.get('products').valueChanges.pipe(pairwise()).subscribe(([prev, next]: [any, any]) => {
-        console.log('products PREV1', JSON.stringify(prev));
-        console.log('products NEXT1', JSON.stringify(next));
-      });
+      });     
   }
 
   pcoAutoCompleteFilter(val: string): Observable<any[]> {
@@ -769,6 +764,7 @@ export class FormAddShipComponent implements OnInit {
     this.getQuoteButtonClicked = true;
     this.showSpinner = true;
     const test = await this.getShipmentRates();
+    this.confirmFormGroup.get('carrier').setValue('');
     this.showSpinner = false;
   }
 
@@ -926,6 +922,7 @@ export class FormAddShipComponent implements OnInit {
 
 
       this.TotalShipmentCost = selectedRate.TotalCostWithOutTrueCost;
+      this.confirmFormGroup.get('carrier').setValue(selectedRate.CarrierName);
     }
 
 
@@ -1168,139 +1165,178 @@ export class FormAddShipComponent implements OnInit {
 
   validateIfFieldsHaveChanged(){
     const bFieldsHaveChanged = false;
+    if (this.ForceToReRate){
+      return true;
+    }
+    
     if (this.ShipmentByLadingObject == null){
-      if (this.ForceToReRate){
-        return true;
-      }else{
+      
         if (this.productsUsedToRate != null && this.productsUsedToRate.length > 0){
+          let productHasChanged = false;
           this.productsUsedToRate.forEach(p => {
             const currentProductIndex = (this.productsAndAccessorialsFormGroup.controls.products as FormArray).length - 1;
             if (p.Pallets !== (this.productsAndAccessorialsFormGroup.controls.products as FormArray).at(currentProductIndex).get('Pallets').value){
+              productHasChanged = true;
               return true;
             }
   
             if (p.Pieces !== (this.productsAndAccessorialsFormGroup.controls.products as FormArray).at(currentProductIndex).get('Pieces').value){
+              productHasChanged = true;
               return true;
             }
   
             if (p.PackageTypeID !== (this.productsAndAccessorialsFormGroup.controls.products as FormArray).at(currentProductIndex).get('PackageTypeID').value){
+              productHasChanged = true;
               return true;
             }
   
-            if (p.Class !== (this.productsAndAccessorialsFormGroup.controls.products as FormArray).at(currentProductIndex).get('ProductClass').value){
+            if (p.ProductClass !== (this.productsAndAccessorialsFormGroup.controls.products as FormArray).at(currentProductIndex).get('ProductClass').value){
+              productHasChanged = true;
               return true;
             }
   
-            if (p.NMFC !== (this.productsAndAccessorialsFormGroup.controls.products as FormArray).at(currentProductIndex).get('NmfcNumber').value){
+            if (p.NmfcNumber !== (this.productsAndAccessorialsFormGroup.controls.products as FormArray).at(currentProductIndex).get('NmfcNumber').value){
+              productHasChanged = true;
               return true;
             }
   
-            if (p.Lenght !== (this.productsAndAccessorialsFormGroup.controls.products as FormArray).at(currentProductIndex).get('Length').value){
+            if (p.Length !== (this.productsAndAccessorialsFormGroup.controls.products as FormArray).at(currentProductIndex).get('Length').value){
+              productHasChanged = true;
               return true;
             }
   
             if (p.Width !== (this.productsAndAccessorialsFormGroup.controls.products as FormArray).at(currentProductIndex).get('Width').value){
+              productHasChanged = true;
               return true;
             }
   
             if (p.Height !== (this.productsAndAccessorialsFormGroup.controls.products as FormArray).at(currentProductIndex).get('Height').value){
+              productHasChanged = true;
               return true;
             }
   
             if (p.PCF !== (this.productsAndAccessorialsFormGroup.controls.products as FormArray).at(currentProductIndex).get('PCF').value){
+              productHasChanged = true;
               return true;
             }
   
             if (p.Weight !== (this.productsAndAccessorialsFormGroup.controls.products as FormArray).at(currentProductIndex).get('Weight').value){
+              productHasChanged = true;
               return true;
             }
           });
 
+          if (productHasChanged){
+            return true;
+          }
+
         }
 
         if (this.accessorialsUsedToRate != null && this.accessorialsUsedToRate.length > 0){
-          if (this.accessorialsUsedToRate.length !== this.accessorialArray.length)
+          if (this.accessorialsUsedToRate.length !== this.accessorials.length)
           {
             // accessorials selected are different from the ones previously selected, so return true to re-rate
             return true;
           }else{
+            let accessorialsFound : AccessorialBase[] = [];
+            let accessorialHasChanged = false;
             this.accessorialsUsedToRate.forEach(Acc => {
-              this.accessorialArray.forEach(AvailableAccesorial => {
-                if (Acc.AccessorialID !== AvailableAccesorial.AccessorialID){
-                  // accessorial selected is different from the one previously selected, so return true to re-rate
-                  return true;
+              if (this.accessorials != null && this.accessorials.length > 0){
+                accessorialsFound = this.accessorials.filter(item => item.AccessorialID === Acc.AccessorialID);
+                if (accessorialsFound == null || accessorialsFound.length === 0){
+                  accessorialHasChanged = true;
+                  return true; // Previous accessorial selected not found in current list of accessorials, so return true (re-rate)
                 }
-              });
+              }
             });
+
+            if (accessorialHasChanged){
+              return true;
+            }
+
           }
         }
-      }
     }
     else // costs have been already obtained, so compare current values with previous ones
     {
-      // Validate if origin postal code has changed
-      const defaultoriginpostalcode = this.ShipmentByLadingObject.OrgZipCode.trim() + '-' + this.ShipmentByLadingObject.OrgCityName.trim();
-      if (defaultoriginpostalcode !== this.originAndDestinationFormGroup.get('originpostalcode').value){
-        return true;
-      }
+      // // Validate if origin postal code has changed
+      // const defaultoriginpostalcode = this.ShipmentByLadingObject.OrgZipCode.trim() + '-' + this.ShipmentByLadingObject.OrgCityName.trim();
+      // if (defaultoriginpostalcode !== this.originAndDestinationFormGroup.get('originpostalcode').value){
+      //   return true;
+      // }
 
-      // Validate if destination postal code has changed
-      const defaultdestpostalcode = this.ShipmentByLadingObject.DestZipCode.trim() + '-' + this.ShipmentByLadingObject.DestCityName.trim();
-      if (defaultdestpostalcode !== this.originAndDestinationFormGroup.get('destpostalcode').value){
-        return true;
-      }
+      // // Validate if destination postal code has changed
+      // const defaultdestpostalcode = this.ShipmentByLadingObject.DestZipCode.trim() + '-' + this.ShipmentByLadingObject.DestCityName.trim();
+      // if (defaultdestpostalcode !== this.originAndDestinationFormGroup.get('destpostalcode').value){
+      //   return true;
+      // }
 
-      // Validate if origin pickup date has changed
-      const tempPickupDate = moment.utc(this.ShipmentByLadingObject.PickupDate);
-      const defaultpickupdate = new Date(this.datepipe.transform(tempPickupDate.toString().replace(/(^.*\()|([+-].*$)/g, ''),'MM/dd/yyyy'));      
-      if (defaultpickupdate !== this.originAndDestinationFormGroup.get('originpickupdate').value){
-        return true;
-      }
+      // // Validate if origin pickup date has changed
+      // const tempPickupDate = moment.utc(this.ShipmentByLadingObject.PickupDate);
+      // const defaultpickupdate = new Date(this.datepipe.transform(tempPickupDate.toString().replace(/(^.*\()|([+-].*$)/g, ''),'MM/dd/yyyy'));      
+      // if (defaultpickupdate !== this.originAndDestinationFormGroup.get('originpickupdate').value){
+      //   return true;
+      // }
 
       // Validate if data in products has changed
       if (this.ShipmentByLadingObject.BOlProductsList != null && this.ShipmentByLadingObject.BOlProductsList.length > 0){
+        let productHasChanged = false;
         this.ShipmentByLadingObject.BOlProductsList.forEach(p => {
           const currentProductIndex = (this.productsAndAccessorialsFormGroup.controls.products as FormArray).length - 1;
           if (p.Pallets !== (this.productsAndAccessorialsFormGroup.controls.products as FormArray).at(currentProductIndex).get('Pallets').value){
+            productHasChanged = true;
             return true;
           }
 
           if (p.Pieces !== (this.productsAndAccessorialsFormGroup.controls.products as FormArray).at(currentProductIndex).get('Pieces').value){
+            productHasChanged = true;
             return true;
           }
 
           if (p.PackageTypeID !== (this.productsAndAccessorialsFormGroup.controls.products as FormArray).at(currentProductIndex).get('PackageTypeID').value){
+            productHasChanged = true;
             return true;
           }
 
           if (p.Class !== (this.productsAndAccessorialsFormGroup.controls.products as FormArray).at(currentProductIndex).get('ProductClass').value){
+            productHasChanged = true;
             return true;
           }
 
           if (p.NMFC !== (this.productsAndAccessorialsFormGroup.controls.products as FormArray).at(currentProductIndex).get('NmfcNumber').value){
+            productHasChanged = true;
             return true;
           }
 
           if (p.Lenght !== (this.productsAndAccessorialsFormGroup.controls.products as FormArray).at(currentProductIndex).get('Length').value){
+            productHasChanged = true;
             return true;
           }
 
           if (p.Width !== (this.productsAndAccessorialsFormGroup.controls.products as FormArray).at(currentProductIndex).get('Width').value){
+            productHasChanged = true;
             return true;
           }
 
           if (p.Height !== (this.productsAndAccessorialsFormGroup.controls.products as FormArray).at(currentProductIndex).get('Height').value){
+            productHasChanged = true;
             return true;
           }
 
           if (p.PCF !== (this.productsAndAccessorialsFormGroup.controls.products as FormArray).at(currentProductIndex).get('PCF').value){
+            productHasChanged = true;
             return true;
           }
 
           if (p.Weight !== (this.productsAndAccessorialsFormGroup.controls.products as FormArray).at(currentProductIndex).get('Weight').value){
+            productHasChanged = true;
             return true;
           }
         });
+
+        if (productHasChanged){
+          return true;
+        }
 
       }
 
@@ -1310,14 +1346,19 @@ export class FormAddShipComponent implements OnInit {
           // accessorials selected are different from the ones previously selected, so return true to re-rate
           return true;
         }else{
+          let accessorialArrayFound: AccessorialDetail[];
+          let accessorialHasChanged = false;
           this.ShipmentByLadingObject.BOLAccesorialList.forEach(BOLAccesorial => {
-            this.accessorialArray.forEach(AvailableAccesorial => {
-              if (BOLAccesorial.AccesorialID !== AvailableAccesorial.AccessorialID){
-                // accessorial selected is different from the one previously selected, so return true to re-rate
-                return true;
-              }
-            });
+            accessorialArrayFound = this.accessorialArray.filter(item => item.AccessorialID === BOLAccesorial.AccesorialID);
+            if (accessorialArrayFound == null || accessorialArrayFound.length === 0){
+              accessorialHasChanged = true;
+              return true; // Previous accessorial selected not found in current list of accessorials, so return true (re-rate)
+            }
           });
+
+          if (accessorialHasChanged){
+            return true;
+          }
         }
       }
 

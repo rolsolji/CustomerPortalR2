@@ -142,6 +142,10 @@ export class FormAddShipComponent implements OnInit {
 
   carrierSelected: string;
 
+  gDefaultoriginpostalcode = '';
+  gDefaultdestpostalcode = '';
+  gDefaultpickupdate = '';
+
   originSelectedCountry: PostalData = {
     CityCode: '',
     CityID: '',
@@ -761,6 +765,21 @@ export class FormAddShipComponent implements OnInit {
   }
 
   async getQuote() {
+
+    let counter = 0;
+    this.stepper._steps.forEach(step => {
+      if (step.hasError){
+        counter += 1;
+      }
+    });
+
+    let message;
+    if (counter > 0){
+      message = 'Please complete all required fields.';
+      this.openDialog(false, message);
+      return;
+    }
+
     this.getQuoteButtonClicked = true;
     this.showSpinner = true;
     const test = await this.getShipmentRates();
@@ -848,6 +867,11 @@ export class FormAddShipComponent implements OnInit {
     this.ForceToReRate = false;
     this.productsUsedToRate = arrayProducts;
     this.accessorialsUsedToRate = this.accessorials;
+
+    // Set default values again for origin and destination postcodes, also for pickup date
+    this.gDefaultoriginpostalcode = this.originAndDestinationFormGroup.get('originpostalcode').value;
+    this.gDefaultdestpostalcode = this.originAndDestinationFormGroup.get('destpostalcode').value;
+    this.gDefaultpickupdate = this.originAndDestinationFormGroup.get('originpickupdate').value.toString();
 
   }
 
@@ -1044,8 +1068,9 @@ export class FormAddShipComponent implements OnInit {
     defaultdestpostalcode = this.ShipmentByLadingObject.DestZipCode.trim() + '-' + this.ShipmentByLadingObject.DestCityName.trim();
     defaultdeststatename = this.ShipmentByLadingObject.DestStateName.trim();
 
-    // let tempOriginPD: PostalData;
-    // let tempDestPD: PostalData;
+    this.gDefaultoriginpostalcode = defaultoriginpostalcode;
+    this.gDefaultdestpostalcode = defaultdestpostalcode;
+    this.gDefaultpickupdate = defaultpickupdate;
 
     const tempOriginPD: PostalData = {
       CityCode: '',
@@ -1259,24 +1284,24 @@ export class FormAddShipComponent implements OnInit {
     }
     else // costs have been already obtained, so compare current values with previous ones
     {
-      // // Validate if origin postal code has changed
-      // const defaultoriginpostalcode = this.ShipmentByLadingObject.OrgZipCode.trim() + '-' + this.ShipmentByLadingObject.OrgCityName.trim();
-      // if (defaultoriginpostalcode !== this.originAndDestinationFormGroup.get('originpostalcode').value){
-      //   return true;
-      // }
+      // Validate if origin postal code has changed
+      //const defaultoriginpostalcode = this.ShipmentByLadingObject.OrgZipCode.trim() + '-' + this.ShipmentByLadingObject.OrgCityName.trim();
+      if (this.gDefaultoriginpostalcode !== this.originAndDestinationFormGroup.get('originpostalcode').value){
+        return true;
+      }
 
-      // // Validate if destination postal code has changed
-      // const defaultdestpostalcode = this.ShipmentByLadingObject.DestZipCode.trim() + '-' + this.ShipmentByLadingObject.DestCityName.trim();
-      // if (defaultdestpostalcode !== this.originAndDestinationFormGroup.get('destpostalcode').value){
-      //   return true;
-      // }
+      // Validate if destination postal code has changed
+      //const defaultdestpostalcode = this.ShipmentByLadingObject.DestZipCode.trim() + '-' + this.ShipmentByLadingObject.DestCityName.trim();
+      if (this.gDefaultdestpostalcode !== this.originAndDestinationFormGroup.get('destpostalcode').value){
+        return true;
+      }
 
-      // // Validate if origin pickup date has changed
+      // Validate if origin pickup date has changed
       // const tempPickupDate = moment.utc(this.ShipmentByLadingObject.PickupDate);
       // const defaultpickupdate = new Date(this.datepipe.transform(tempPickupDate.toString().replace(/(^.*\()|([+-].*$)/g, ''),'MM/dd/yyyy'));      
-      // if (defaultpickupdate !== this.originAndDestinationFormGroup.get('originpickupdate').value){
-      //   return true;
-      // }
+      if (this.gDefaultpickupdate.toString() !== this.originAndDestinationFormGroup.get('originpickupdate').value.toString()){
+        return true;
+      }
 
       // Validate if data in products has changed
       if (this.ShipmentByLadingObject.BOlProductsList != null && this.ShipmentByLadingObject.BOlProductsList.length > 0){

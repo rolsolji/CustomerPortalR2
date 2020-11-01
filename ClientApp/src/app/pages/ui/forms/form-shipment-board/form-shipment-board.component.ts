@@ -37,6 +37,7 @@ import { strict } from 'assert';
 import { StringifyOptions } from 'querystring';
 import { PostalData } from '../../../../Entities/PostalData';
 import { Rate } from '../../../../Entities/rate';
+import { User } from '../../../../Entities/user.model';
 import { ProductPackageType } from '../../../../Entities/ProductPackageType'
 import { ProductFeatures } from '../../../../Entities/ProductFeatures'
 import { ClientDefaultData } from '../../../../Entities/ClientDefaultData';
@@ -69,6 +70,9 @@ import {animate, state, style, transition, trigger} from '@angular/animations';
 import { ShipmentByLading } from '../../../../Entities/ShipmentByLading';
 import {AuthenticationService} from '../../../../common/authentication.service';
 import { ReferenceByClient } from '../../../../Entities/ReferenceByClient';
+import {environment} from '../../../../../environments/environment';
+import { SendEmailParameters, InvoiceParameter } from '../../../../Entities/SendEmailParameters';
+import { SendEmailResponse } from '../../../../Entities/SendEmailResponse';
 
 @Component({
   selector: 'vex-form-shipment-board',
@@ -93,16 +97,20 @@ export class FormShipmentBoardComponent implements OnInit {
   }
 
   securityToken: string;
+  user: User
 
   constructor(
+    private fb: FormBuilder,
     private httpService : HttpService,
     private route: ActivatedRoute,
     private router: Router,
     private messageService: MessageService,
     public datepipe: DatePipe,
-    private authenticationService: AuthenticationService
+    private authenticationService: AuthenticationService,
+    private snackbar: MatSnackBar,
   ) {
     this.securityToken = this.authenticationService.ticket$.value;
+    this.user = this.authenticationService.getUserFromStorage();
     this.filteredStatus = this.statusCtrl.valueChanges.pipe(
       startWith(null),
       map((status: string | null) => status ? this._filter(status) : this.StatusOptionsString.slice()));
@@ -185,6 +193,42 @@ export class FormShipmentBoardComponent implements OnInit {
   filteredStatus: Observable<string[]>;
   statusSelected: Status[] = [];
   expandedQuote: string = String.Empty;
+
+  emailFormGroup = new FormGroup({
+    emailSendDocs: new FormControl('',[
+      Validators.required,
+      Validators.pattern('^[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,4}$')])
+  });
+
+  sendEmailClicked = false;
+  emailBOL = false;
+  emailShipmentLabels = false;
+  emailRateQuote = false;
+  emailSendDocs: string = String.Empty;
+
+  bolPrintURL: string;
+  shipmentlabelsPrintURL: string;
+  ratequotePrintURL: string;
+  noCopies: string;
+  labelPrintURL: string;
+  labelPrintURLEnable: boolean = false;
+
+  bolDocumentURL: string;
+  bolDocumentURLIsEnabled: boolean = false;
+
+  podDocumentURL: string;
+  podDocumentURLIsEnabled: boolean = false;
+
+  othDocumentURL: string;
+  othDocumentURLIsEnabled: boolean = false;
+
+  notesList:[];
+  notesIsEnabled: boolean = false;
+
+  auditLog:[];
+  auditLogIsEnabled: boolean = false;
+
+  
   //#endregion
 
   @ViewChild('statusInput') statusInput: ElementRef<HTMLInputElement>;
@@ -204,6 +248,12 @@ export class FormShipmentBoardComponent implements OnInit {
     this.showSpinner = true;
 
     this.InitialLoadPage();
+
+    // -- emailFormGroup fields
+    this.emailFormGroup = this.fb.group({
+      emailToSendQuote: [null, Validators.required]
+    });
+    // --
   }
 
   ngOnChanges(){
@@ -398,12 +448,15 @@ export class FormShipmentBoardComponent implements OnInit {
         return this.StatusOptionsString.filter(status => status.toLowerCase().indexOf(filterValue) === 0);
   }
 
+  quoteSelected: Quote;
+
   async GetQuoteInfo(rowSelected:Quote){
     if (rowSelected == null){
       this.expandedQuote = String.Empty;
       return;
     }
     this.showSpinnerGrid = true;
+    this.quoteSelected = rowSelected;
     this.expandedQuote = this.expandedQuote === rowSelected.ClientLadingNo ? String.Empty : rowSelected.ClientLadingNo;
     this.shipmentInformation = await this.httpService.GetShipmentByLadingID(rowSelected.LadingID.toString(), this.keyId);
     if (this.shipmentInformation != null){
@@ -445,6 +498,156 @@ export class FormShipmentBoardComponent implements OnInit {
       this.ReferenceByClientField2 = 'R2 Order #: ';
       this.ReferenceByClientField3 = 'R2 Pro number: ';
     }
+
+    if (this.shipmentInformation.BolDocumentsList !== null && this.shipmentInformation.BolDocumentsList.length > 0)
+    {
+      const BOLDocument = this.shipmentInformation.BolDocumentsList.find(d => d.DocType === 'BOL');
+      if (BOLDocument !== null && BOLDocument.length > 0){
+        this.bolDocumentURL = String.Format(environment.baseEndpoint + 'Handlers/DownLoadPODHandler.ashx?userToken={0}&clientID={1}&imageName={2}&docType={3}&TMWUrl={4}&Ticket={5}',
+                                              this.user.TokenString,this.shipmentInformation.ShortName,BOLDocument[0].FilePath,BOLDocument[0].DocType,BOLDocument[0].TMWUrl,this.securityToken) ;
+        this.bolDocumentURLIsEnabled = true;
+      }
+      
+      const PODDocument = this.shipmentInformation.BolDocumentsList.find(d => d.DocType === 'POD');
+      if (PODDocument !== null && PODDocument.length > 0){
+        this.podDocumentURL = String.Format(environment.baseEndpoint + 'Handlers/DownLoadPODHandler.ashx?userToken={0}&clientID={1}&imageName={2}&docType={3}&TMWUrl={4}&Ticket={5}',
+                                              this.user.TokenString,this.shipmentInformation.ShortName,PODDocument[0].FilePath,PODDocument[0].DocType,PODDocument[0].TMWUrl,this.securityToken) ;
+        this.podDocumentURLIsEnabled = true;
+      }
+
+      const OTHDocument = this.shipmentInformation.BolDocumentsList.find(d => d.DocType === 'OTH');
+      if (OTHDocument !== null && OTHDocument.length > 0){
+        this.othDocumentURL = String.Format(environment.baseEndpoint + 'Handlers/DownLoadPODHandler.ashx?userToken={0}&clientID={1}&imageName={2}&docType={3}&TMWUrl={4}&Ticket={5}',
+                                              this.user.TokenString,this.shipmentInformation.ShortName,OTHDocument[0].FilePath,OTHDocument[0].DocType,OTHDocument[0].TMWUrl,this.securityToken) ;
+        this.othDocumentURLIsEnabled = true;
+      }
+    }
+
+    if (this.shipmentInformation.BOLDispatchNotesList !== null && this.shipmentInformation.BOLDispatchNotesList.length > 0){
+      const notes = this.shipmentInformation.BOLDispatchNotesList.find(n => n.NoteTypeId === 1);
+      if (notes !== null && notes.length > 0){
+
+      }
+
+      const auditLog = this.shipmentInformation.BOLDispatchNotesList.find(n => n.NoteTypeId === 3);
+      if (auditLog !== null && auditLog.length > 0){
+
+      }
+    }
+
+    this.bolPrintURL = String.Format(environment.baseEndpoint + 'Handlers/PrintBOLHandler.ashx?LadingID={0}&ClientID={1}&Ticket={2}',
+                                        this.shipmentInformation.LadingID,this.shipmentInformation.ClientId,this.securityToken);
+
+    this.shipmentlabelsPrintURL = String.Format(environment.baseEndpoint + 'Handlers/PrintLabelHandler.ashx?LadingID={0}&Ticket={1}',
+                                        this.shipmentInformation.LadingID,this.securityToken);
+
+    this.ratequotePrintURL = String.Format(environment.baseEndpoint + 'Handlers/PrintQuoteHandler.ashx?LadingID={0}&Ticket={1}',
+                                        this.shipmentInformation.LadingID,this.securityToken);
+
+    this.labelPrintURLEnable = false;
+    this.noCopies = null;
+
     this.showSpinnerGrid = false;
+  }
+
+  async NoCopiesChange(){
+    if (this.noCopies === '4' || this.noCopies === '6'){
+      this.labelPrintURL = String.Format(environment.baseEndpoint + 'Handlers/PrintMultiCopyLabelHandler.ashx?LadingID={0}&NoOfCopy={1}&Ticket={2}',
+        this.shipmentInformation.LadingID,this.noCopies,this.securityToken);
+      this.labelPrintURLEnable = true;
+    }
+    else {
+      this.labelPrintURLEnable = false;
+    }
+  }
+
+  async ValidateEmail(){
+    const emailregx = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
+    this.sendEmailClicked = emailregx.test(this.emailSendDocs) &&
+      (this.emailBOL || this.emailShipmentLabels || this.emailRateQuote);
+  }
+
+  async SendDocsByEmail(sendEmail:boolean){
+    
+    if (!sendEmail){
+      this.emailSendDocs = String.Empty;
+      return;
+    }
+
+    const emailregx = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
+
+    if(emailregx.test(this.emailSendDocs) &&
+      (this.emailBOL || this.emailShipmentLabels || this.emailRateQuote)){
+
+      if (this.emailBOL){
+        let emailBOLParameters: SendEmailParameters;
+
+        let invoiceParameter: InvoiceParameter = {
+          InvoiceDetailIDs: []
+        };
+
+        emailBOLParameters = {
+          ClientID: this.shipmentInformation.ClientId,
+          CarrierID : String.Empty,
+          ApplicationID: 67,
+          EventID: 44,
+          EmailAddresses: this.emailSendDocs,
+          LadingID: this.shipmentInformation.LadingID,
+          UserRowID: 40306,
+          InvoiceParameter: invoiceParameter,
+          LadingIDs: [],
+        }
+
+        let emailBOLResponse = this.httpService.SendBolConfirmation(emailBOLParameters);
+      }
+
+      if (this.emailShipmentLabels){
+        let emailBOLParameters: SendEmailParameters;
+
+        let invoiceParameter: InvoiceParameter = {
+          InvoiceDetailIDs: []
+        };
+
+        emailBOLParameters = {
+          ClientID: this.shipmentInformation.ClientId,
+          CarrierID : String.Empty,
+          ApplicationID: 0,
+          EventID: 0,
+          EmailAddresses: this.emailSendDocs,
+          LadingID: this.shipmentInformation.LadingID,
+          UserRowID: 0,
+          InvoiceParameter: invoiceParameter,
+          LadingIDs: [],
+        }
+
+        let emailShipmentLabelResponse = this.httpService.SendMailLabelManually(emailBOLParameters);
+      }
+
+      if (this.emailRateQuote){
+        let emailBOLParameters: SendEmailParameters;
+
+        let invoiceParameter: InvoiceParameter = {
+          InvoiceDetailIDs: []
+        };
+
+        emailBOLParameters = {
+          ClientID: this.shipmentInformation.ClientId,
+          CarrierID : String.Empty,
+          ApplicationID: 56,
+          EventID: 39,
+          EmailAddresses: this.emailSendDocs,
+          LadingID: this.shipmentInformation.LadingID,
+          UserRowID: 13970,
+          InvoiceParameter: invoiceParameter,
+          LadingIDs: [],
+        }
+
+        let emailRateQuoteResponse = this.httpService.SendEmailManually(emailBOLParameters);
+      }
+
+      this.snackbar.open('Send mail sucessfully', null, {
+        duration: 5000
+      });
+    }
   }
 }

@@ -308,26 +308,36 @@
                                     <hr class="horizontal-title-line">
                                     <div>
                                         <div class="div-container-three-column">
-                                            <mat-icon [icIcon]="outlineTextSnippet" color="black">BOL</mat-icon>
-                                            <p>BOL</p>
+                                            <button mat-icon-button matTooltip="Print BOL document" [class.disabled]="!bolDocumentURLIsEnabled">
+                                                <mat-icon [icIcon]="outlineTextSnippet" color="black"></mat-icon>
+                                            </button>
+                                            <p class="document-label"><a mat-flat-button [class.disabled]="!bolDocumentURLIsEnabled" href="{{bolDocumentURL}}" target="_blank">BOL</a></p>
                                         </div>
                                         <div class="div-container-three-column">
-                                            <mat-icon [icIcon]="outlineTextSnippet" color="black">POD</mat-icon>
-                                            <p>POD</p>
+                                            <button mat-icon-button matTooltip="Print POD document" [class.disabled]="!podDocumentURLIsEnabled">
+                                                <mat-icon [icIcon]="outlineTextSnippet" color="black">POD</mat-icon>
+                                            </button>
+                                            <p class="document-label"><a mat-flat-button [class.disabled]="!podDocumentURLIsEnabled" href="{{podDocumentURL}}" target="_blank">POD</a></p>
                                         </div>
                                         <div class="div-container-three-column">
-                                            <mat-icon [icIcon]="outlineTextSnippet" color="black">OTHER</mat-icon>
-                                            <p>OTHER</p>
+                                            <button mat-icon-button matTooltip="Print OTHER document" [class.disabled]="!othDocumentURLIsEnabled">
+                                                <mat-icon [icIcon]="outlineTextSnippet" color="black">OTHER</mat-icon>
+                                            </button>
+                                            <p class="document-label"><a mat-flat-button [class.disabled]="!othDocumentURLIsEnabled" href="{{othDocumentURL}}" target="_blank">OTHER</a></p>
                                         </div>  
                                     </div>
                                     <div>
                                         <div class="div-container-two-column">
-                                            <mat-icon [icIcon]="outlineTextSnippet" color="black">NOTES</mat-icon>
-                                            <p>NOTES</p>
+                                            <button mat-icon-button matTooltip="Print OTHER document" [class.disabled]="!notesIsEnabled">
+                                                <mat-icon [icIcon]="outlineTextSnippet" color="black">NOTES</mat-icon>
+                                            </button>
+                                            <p class="document-label"><a mat-flat-button [class.disabled]="!notesIsEnabled" href="{{notesList}}" target="_blank">NOTES</a></p>
                                         </div>
                                         <div class="div-container-two-column">
-                                            <mat-icon [icIcon]="outlineTextSnippet" color="black">AUDIT LOG</mat-icon>
-                                            <p>AUDIT LOG</p>
+                                            <button mat-icon-button matTooltip="Print OTHER document" [class.disabled]="!auditLogIsEnabled">
+                                                <mat-icon [icIcon]="outlineTextSnippet" color="black">AUDIT LOG</mat-icon>
+                                            </button>
+                                            <p class="document-label"><a mat-flat-button [class.disabled]="!auditLogIsEnabled" href="{{auditLog}}" target="_blank">AUDIT LOG</a></p>
                                         </div>
                                     </div>
                                 </div>
@@ -338,8 +348,45 @@
                                     </div>
                                     <hr class="horizontal-title-line">
                                     <div class="div-container">
-                                        <p><mat-icon [icIcon]="outlinePrint" color="black"></mat-icon>BOL</p>
-                                        <p><mat-icon [icIcon]="outlinePrint" color="black"></mat-icon>Shipment Labels</p>
+                                        <p>
+                                            <a mat-icon-button href="{{bolPrintURL}}" target="_blank">
+                                                <p>
+                                                    <mat-icon class="printIcon" [icIcon]="outlinePrint" color="black"></mat-icon>
+                                                    <a mat-flat-button href="{{bolPrintURL}}" target="_blank">BOL</a>
+                                                </p>
+                                            </a>
+                                        </p>
+                                        <p>
+                                            <a mat-icon-button href="{{shipmentlabelsPrintURL}}" target="_blank">
+                                                <p>
+                                                    <mat-icon class="printIcon" [icIcon]="outlinePrint" color="black"></mat-icon>
+                                                    <a mat-flat-button href="{{shipmentlabelsPrintURL}}" target="_blank">Shipment Labels</a>
+                                                </p>
+                                            </a>
+                                        </p>
+                                        <p>
+                                            <a mat-icon-button href="{{ratequotePrintURL}}" target="_blank">
+                                                <p>
+                                                    <mat-icon class="printIcon" [icIcon]="outlinePrint" color="black"></mat-icon>
+                                                    <a mat-flat-button href="{{ratequotePrintURL}}" target="_blank">Rate Quote</a>
+                                                </p>
+                                            </a>
+                                        </p>
+                                        <p>
+                                            <mat-form-field appearance="standard">
+                                                <mat-label>No of Copy</mat-label>
+                                                <mat-select [(value)]="noCopies" (selectionChange)="NoCopiesChange()">
+                                                  <mat-option value="4">4</mat-option>
+                                                  <mat-option value="6">6</mat-option>
+                                                </mat-select>
+                                              </mat-form-field>
+                                            <a mat-icon-button href="{{labelPrintURL}}" target="_blank" [class.disabled]="!labelPrintURLEnable">
+                                                <p>
+                                                    <mat-icon class="printIcon" [icIcon]="outlinePrint" color="black"></mat-icon>
+                                                    <a mat-flat-button href="{{labelPrintURL}}" target="_blank" [class.disabled]="!labelPrintURLEnable">Print Label</a>
+                                                </p>
+                                            </a>
+                                        </p>
                                     </div>
                                     <hr class="horizontal-separator-line">
                                     <div class="div-container div-container-title">
@@ -347,9 +394,26 @@
                                     </div>
                                     <hr class="horizontal-title-line">
                                     <div class="div-container">
-                                        <p><mat-icon [icIcon]="outlineEmail" color="black"></mat-icon>BOL</p>
-                                        <p><mat-icon [icIcon]="outlineEmail" color="black"></mat-icon>Shipment Labels</p>
-                                        <p><mat-icon [icIcon]="outlineEmail" color="black"></mat-icon>Rate Quote</p>
+                                        <p><mat-checkbox class="checkbox-margin" [checked]="emailBOL" [(ngModel)]="emailBOL" (change)="ValidateEmail()"></mat-checkbox>
+                                            <mat-icon class="emailIcon" [icIcon]="outlineEmail" color="black"></mat-icon>BOL</p>
+                                        <p><mat-checkbox class="checkbox-margin" [checked]="emailShipmentLabels" [(ngModel)]="emailShipmentLabels" (change)="ValidateEmail()"></mat-checkbox>
+                                            <mat-icon class="emailIcon" [icIcon]="outlineEmail" color="black"></mat-icon>Shipment Labels</p>
+                                        <p><mat-checkbox class="checkbox-margin" [checked]="emailRateQuote" [(ngModel)]="emailRateQuote" (change)="ValidateEmail()"></mat-checkbox>
+                                            <mat-icon class="emailIcon" [icIcon]="outlineEmail" color="black"></mat-icon>Rate Quote</p>
+                                    </div>
+                                    <div class="inner-rate-options-column sendEmailInputStyle">
+                                        <div >
+                                            <mat-form-field appearance="standard" color="primary" style="width: 75%;" >
+                                                <mat-label>Email</mat-label>
+                                                <input matInput type="email" required [(ngModel)]="emailSendDocs" (ngModelChange)="ValidateEmail()"
+                                                (keydown.tab)="ValidateEmail()"> >
+                                            </mat-form-field>   
+                                        
+                                            <div>
+                                                <button color="primary" class="mr-1 mat-stroked-sent-email-button" mat-stroked-button type="button"  [disabled]="!sendEmailClicked" (click)="SendDocsByEmail(true)">Send</button>
+                                                <button color="primary"  class="mat-stroked-sent-email-button" mat-stroked-button type="button" (click)="SendDocsByEmail(false)">Cancel</button>                                   
+                                            </div>
+                                        </div>                                                
                                     </div>
                                 </div>
                             </div>

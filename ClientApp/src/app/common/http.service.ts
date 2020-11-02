@@ -28,6 +28,8 @@ import {User} from '../Entities/user.model';
 import {environment} from '../../environments/environment';
 import {AuthenticationService} from './authentication.service';
 import { ReferenceByClient } from '../Entities/ReferenceByClient';
+import { SendEmailParameters } from '../Entities/SendEmailParameters';
+import { SendEmailResponse } from '../Entities/SendEmailResponse';
 
 @Injectable({
     providedIn: 'root'
@@ -341,4 +343,39 @@ export class HttpService{
           ).toPromise();
     }
 
+    SendBolConfirmation(parameters: SendEmailParameters){
+        const ticket = this.token;
+        const httpHeaders = new HttpHeaders({
+            Ticket : ticket
+        });
+        return this.http.post<SendEmailResponse>(this.baseEndpoint + 'Services/SendEmailService.svc/json/SendBolConfirmation',parameters
+        ,{
+            headers: httpHeaders
+          }
+          ).toPromise();
+    }
+
+    SendMailLabelManually(parameters: SendEmailParameters){
+        const ticket = this.token;
+        const httpHeaders = new HttpHeaders({
+            Ticket : ticket
+        });
+        return this.http.post<SendEmailResponse>(this.baseEndpoint + 'Services/SendEmailService.svc/json/SendMailLabelManually',parameters
+        ,{
+            headers: httpHeaders
+          }
+          ).toPromise();
+    }
+
+    SendEmailManually(parameters: SendEmailParameters){
+        const ticket = this.token;
+        const httpHeaders = new HttpHeaders({
+            Ticket : ticket
+        });
+        return this.http.post<SendEmailResponse>(this.baseEndpoint + 'Services/SendEmailService.svc/json/SendEmailManually',parameters
+        ,{
+            headers: httpHeaders
+          }
+          ).toPromise();
+    }
 }

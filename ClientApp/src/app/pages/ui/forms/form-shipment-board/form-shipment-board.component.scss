@@ -267,3 +267,38 @@ tr.example-element-row:not(.example-expanded-row):active {
   .mat-cell, .mat-footer-cell {
     font-size: 12px;
   }
+
+  .disabled {
+    pointer-events: none;
+    cursor: not-allowed;
+  }
+
+  .sendEmailInputStyle{
+    margin-top: -12px;
+    margin-left: -12%;
+    margin-bottom: 5px;
+    flex-basis: 60%;
+    text-align: end;
+  }
+
+  .inner-rate-options-column {  
+    flex-basis: 100%;
+    text-align: end;
+  }
+
+  .checkbox-margin {
+    margin: 0 12px;
+  }
+
+  .emailIcon  {
+    margin-bottom: -7px;
+    margin-right: 5px;
+  }
+
+  .printIcon  {
+    margin-bottom: -7px;
+  }
+
+  .document-label{
+    margin: -10px;
+  }

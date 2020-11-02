@@ -1121,6 +1121,9 @@
 
           <div class="actions" fxLayout="row" fxLayoutAlign="end center" fxLayoutGap="8px">
             <button color="primary" mat-button matStepperPrevious type="button" (click)="previousFromLastStep()">Previous</button>
+            <button (click)="SaveAsQuote()"  color="warn" mat-raised-button>
+              Save as Quote
+            </button>
             <button (click)="BookShipmentSubmit()"  color="warn" mat-raised-button
                     matStepperNext>
               Book Shipment

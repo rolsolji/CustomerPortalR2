@@ -52,6 +52,7 @@ import { ReferenceByClient } from '../../../../Entities/ReferenceByClient';
 import {environment} from '../../../../../environments/environment';
 import {MatDialog, MatDialogConfig} from '@angular/material/dialog';
 import { ConfirmAlertDialogComponent } from '../confirm-alert-dialog/confirm-alert-dialog.component';
+import { SaveQuoteParameters,BOlProductsList,BOLAccesorial,SellRate,AccountInvoiceCost } from '../../../../Entities/SaveQuoteParameters';
 
 @Component({
   selector: 'vex-form-add-ship',
@@ -145,6 +146,9 @@ export class FormAddShipComponent implements OnInit {
   gDefaultoriginpostalcode = '';
   gDefaultdestpostalcode = '';
   gDefaultpickupdate = '';
+
+  saveQuoteParameters: SaveQuoteParameters;
+  selectedRateFromQuotes: Rate;
 
   originSelectedCountry: PostalData = {
     CityCode: '',
@@ -583,36 +587,15 @@ export class FormAddShipComponent implements OnInit {
     (this.productsAndAccessorialsFormGroup.get('products') as FormArray).removeAt(index);
   }
 
-  BookShipmentSubmit() {
-    // let test = this.shipInfoEquipment;
-    let counter = 0;
-    this.stepper._steps.forEach(step => {
-      if (step.hasError){
-        counter += 1;
-      }
-    });
-
-    let message;
-    if (counter > 0){
-      message = 'Please complete all required fields.';
-      this.openDialog(false, message);
-    }else if(this.costListFiltered.length === 0){
-      message = 'Please select a rate the shipment first.';
-      this.openDialog(false, message);
-    }else{
-      const fieldsHaveChanged = this.validateIfFieldsHaveChanged();
-      if (fieldsHaveChanged){
-        message = 'You have modified some value(s), that requires re-rate this shipment. If you will not re-rate, then this shipment will go to "Quote Modified" status. Do you want to proceed?';
-        this.openDialog(true, message);
-      }
-      else {
-        this.snackbar.open('Shipment booked.', null, {
-          duration: 5000
-        });
-      }      
-    }
-
-    
+  BookShipmentSubmit() {    
+    const RequiredFieldsValidationObj = this.CheckAllRequiredFields();
+    if (RequiredFieldsValidationObj.showWarningMessage){
+      this.openDialog(RequiredFieldsValidationObj.isConfirmDialog, RequiredFieldsValidationObj.message);
+    }else {
+      this.snackbar.open('Shipment booked.', null, {
+        duration: 5000
+      });
+    }        
   }
 
   addNewInternalNote(): void {
@@ -907,6 +890,9 @@ export class FormAddShipComponent implements OnInit {
     this.getQuoteButtonClicked = false;
 
     const selectedRate = this.ratesFiltered[index];
+
+    this.selectedRateFromQuotes = selectedRate;
+
     console.log(selectedRate);
     if (selectedRate != null){
       this.costListFiltered = [];
@@ -935,7 +921,7 @@ export class FormAddShipComponent implements OnInit {
 
       this.costListFiltered.push(accessorialInvoiceFuelCost);
 
-      const accessorials = selectedRate.Accessorials.filter(item => item.AccessorialCode != null && item.AccessorialCode != '');
+      const accessorials = selectedRate.Accessorials.filter(item => item.AccessorialCode != null && item.AccessorialCode !== '');
       accessorials.forEach(a => {
         const accessorialInvoice: AccountInvoiceCostList = {
           AccessorialCode: a.AccessorialCode,
@@ -945,8 +931,6 @@ export class FormAddShipComponent implements OnInit {
 
         this.costListFiltered.push(accessorialInvoice);
       });
-
-
 
       this.TotalShipmentCost = selectedRate.TotalCostWithOutTrueCost;
       this.confirmFormGroup.get('carrier').setValue(selectedRate.CarrierName);
@@ -1444,5 +1428,257 @@ export class FormAddShipComponent implements OnInit {
 
     return bFieldsHaveChanged;
   }
+
+  SaveAsQuote() {
+    if (this.ShipmentByLadingObject == null){
+      // Insert as new quote
+      const RequiredFieldsValidationObj = this.CheckAllRequiredFields();
+      if (RequiredFieldsValidationObj.showWarningMessage){
+        this.openDialog(RequiredFieldsValidationObj.isConfirmDialog, RequiredFieldsValidationObj.message);
+      }else{
+        this.saveNewQuote();
+      }
+    }else{
+      // Update quote
+
+    }
+
+  }
+
+  async saveNewQuote(){
+
+    this.spinnerMessage = 'Saving quote';
+    this.showSpinner = true;
+
+    const selectedRate = this.selectedRateFromQuotes; // Selected rate
+
+    console.log('save quote start',selectedRate);
+
+    const arrayProducts = this.productsAndAccessorialsFormGroup.get('products').value;
+    const productList: BOlProductsList[] = [];
+    arrayProducts.forEach(p => {
+      const prod : BOlProductsList = {
+        Description: p.ProductDescription,
+        Pallets: p.Pallets,
+        Pieces: p.Pieces,
+        Hazmat: p.HazMat,
+        NMFC: p.NmfcNumber,
+        Class: p.ProductClass,
+        Weight: p.Weight,
+        Height: p.Height,
+        Lenght: p.Length,
+        Width: p.Width,
+        PackageTypeID: p.PackageTypeID,
+        PCF: p.PCF,
+        selectedProduct: {},
+        Status: 1,
+        SelectedProductClass: {},
+        Stackable: p.Stackable
+      }
+
+      console.log('p', p);
+
+      console.log('prod', prod);
+
+      productList.push(prod);
+    });
+
+    const accountInvoiceCostList: AccountInvoiceCost[] = [];
+
+    selectedRate.Accessorials.forEach(a => {
+      const accountInvoiceCost: AccountInvoiceCost = {
+        AccessorialID: a.AccessorialID,
+        RatedCost: a.AccessorialCharge,
+        BilledCost: a.AccessorialCharge,
+        Description: a.AccessorialDescription,
+        CostStatus: 1 // Ask
+      }
+      accountInvoiceCostList.push(accountInvoiceCost);
+    })
+
+    // Ask
+    // Freight
+    const accountInvoiceFreight: AccountInvoiceCost = {
+      AccessorialID: 22,
+      RatedCost: selectedRate.GrossAmount,
+      BilledCost: selectedRate.GrossAmount,
+      Description: 'Freight',
+      CostStatus: 1
+    }
+    accountInvoiceCostList.push(accountInvoiceFreight);
+
+    // Fuel
+    const accountInvoiceFuel: AccountInvoiceCost = {
+      AccessorialID: 23,
+      RatedCost: selectedRate.FuelCost,
+      BilledCost: selectedRate.FuelCost,
+      Description: 'Fuel',
+      CostStatus: 1
+    }
+    accountInvoiceCostList.push(accountInvoiceFuel);
+
+    // Discount
+    const accountInvoiceDiscount: AccountInvoiceCost = {
+      AccessorialID: 24,
+      RatedCost: -1 * selectedRate.Discount,
+      BilledCost: -1 * selectedRate.Discount,
+      Description: 'Discount',
+      CostStatus: 1
+    }
+    accountInvoiceCostList.push(accountInvoiceDiscount);
+
+    const sellRate: SellRate = {
+      SCAC: selectedRate.CarrierID,
+      CarrierName: selectedRate.CarrierName,
+      AccountInvoiceCostList: accountInvoiceCostList
+    }
+
+    const bolAccesorials: BOLAccesorial[] = [];
+    this.accessorials.forEach(a => {
+      const acc: BOLAccesorial = {
+        AccesorialID: a.AccessorialID,
+        IsAccesorial: true
+      }
+      bolAccesorials.push(acc);
+    })
+
+    console.log('Prod', productList)
+
+    this.saveQuoteParameters = {
+        ClientId: this.ClientID,
+        PickupDate: String.Format('/Date({0})/',this.originAndDestinationFormGroup.get('originpickupdate').value.getTime()),
+        OrgName: this.originAndDestinationFormGroup.get('originname').value,
+        OrgAdr1: this.originAndDestinationFormGroup.get('originadddress1').value,
+        OrgCity: Number(this.OriginPostalData.CityID),
+        OrgState: Number(this.OriginPostalData.StateId),
+        OrgCountry: Number(this.OriginPostalData.CountryId),
+        DestName: this.originAndDestinationFormGroup.get('destname').value,
+        DestAdr1: this.originAndDestinationFormGroup.get('destadddress1').value,
+        DestCity: Number(this.DestinationPostalData.CityID),
+        DestState: Number(this.DestinationPostalData.StateId),
+        DestCountry: Number(this.DestinationPostalData.CountryId),
+        CarrierCode: selectedRate.CarrierID,
+        CarrierName: selectedRate.CarrierName,
+        TransTime: selectedRate.TransitTime,
+        CarrierType: selectedRate.CarrierType,
+        OriginTerminalName: selectedRate.OriginTerminalName,
+        OriginTerminalAdd1: selectedRate.OriginTerminalAddress1,
+        OriginTerminalAdd2: selectedRate.OriginTerminalAddress2,
+        OriginTerminalCity: selectedRate.OriginTerminalCity,
+        OriginTerminalState: selectedRate.OriginTerminalState,
+        OriginTerminalZip: selectedRate.OriginTerminalZip,
+        OriginTerminalContactPerson: selectedRate.OriginTerminalContactName,
+        OriginTerminalFreePhone: selectedRate.OriginTerminalFreePhone,
+        OriginTerminalPhone: selectedRate.OriginTerminalPhoneNo,
+        OriginTerminalEmail: selectedRate.OriginTerminalEmail,
+        DestTerminalName: selectedRate.DestTerminalName,
+        DestTerminalAdd1: selectedRate.DestTerminalAddress1,
+        DestTerminalAdd2: selectedRate.DestTerminalAddress2,
+        DestTerminalCity: selectedRate.DestTerminalCity,
+        DestTerminalState: selectedRate.DestTerminalState,
+        DestTerminalZip: selectedRate.DestTerminalZip,
+        DestTerminalContactPerson: selectedRate.DestTerminalContactName,
+        DestTerminalFreePhone: selectedRate.DestTerminalFreePhone,
+        DestTerminalPhone: selectedRate.DestTerminalPhoneNo,
+        DestTerminalEmail: selectedRate.DestTerminalEmail,
+        OriginTerminalFax: selectedRate.OriginTerminalFaxNo,
+        DestTerminalFax: selectedRate.DestTerminalFaxNo,
+        // Ask
+        ServiceLevelID: 1, // ask selectedRate.ServiceLevelCode,
+        BOlProductsList: productList,
+        BOLAccesorialList: bolAccesorials,
+        BOLDispatchNotesList: [],
+        BuyRates: null,
+        SellRates: sellRate,
+
+        LoggedInUserId: 1,
+        OrgCityName:this.OriginPostalData.CityName,
+        OrgStateCode:this.OriginPostalData.StateCode,
+        OrgCountryCode:this.OriginPostalData.CountryCode,
+        OrgZipCode:this.OriginPostalData.PostalCode,
+        DestCityName:this.DestinationPostalData.CityName,
+        DestStateCode:this.DestinationPostalData.StateCode,
+        DestCountryCode:this.DestinationPostalData.CountryCode,
+        DestZipCode:this.DestinationPostalData.PostalCode,
+        OrgLocation:String.Format('{0},{1}{2}',this.OriginPostalData.CityName,this.OriginPostalData.StateCode,this.OriginPostalData.PostalCode),
+        DestLocation:String.Format('{0},{1}{2}',this.DestinationPostalData.CityName,this.DestinationPostalData.StateCode,this.DestinationPostalData.PostalCode),
+        SalesPersonList: [],
+        BolDocumentsList: [],
+        TrackingDetailsList: [],
+        ServiceLevelName:selectedRate.ServiceLevel,
+        ServiceLevelCode:selectedRate.SaasServiceLevelCode,
+        RatingResultId:selectedRate.RatingResultId,
+        Mode: selectedRate.ModeType, // "LTL"
+        BOLStopLists: [],
+        CostWithCustomerPercentage: selectedRate.CostWithCustomerPercentage,
+        WaterfallList: [],
+        orgTerminalCityStateZipCode:String.Format('{0},{1},{2}',selectedRate.OriginTerminalCity,selectedRate.OriginTerminalState,selectedRate.OriginTerminalZipCode),
+        destTerminalCityStateZipCode:String.Format('{0},{1},{2}',selectedRate.DestTerminalCity,selectedRate.DestTerminalState,selectedRate.DestTerminalZipCode),
+        WaterfallDetailsList:null
+    };
+
+    console.log('saveQuoteParameters',this.saveQuoteParameters)
+
+    const responseData = await this.httpService.saveQuote(this.saveQuoteParameters);
+    if (!String.IsNullOrWhiteSpace(responseData.ClientLadingNo))
+    {
+      this.messageService.SendQuoteParameter(responseData.ClientLadingNo);
+      this.messageService.SendLadingIDParameter(responseData.LadingID.toString());
+      this.snackbar.open('Quote is saved successfully with LoadNo ' + responseData.ClientLadingNo, null, {
+        duration: 5000
+      });
+    }
+    else{
+      this.snackbar.open('There was an error, try again.', null, {
+        duration: 5000
+      });
+    }
+
+    this.showSpinner = false;
+  }
+
+  CheckAllRequiredFields(){
+    let RequiredFieldsValidationObj = {
+      showWarningMessage: false,
+      message: '',
+      isConfirmDialog: false
+    }
+    
+    let counter = 0;
+    this.stepper._steps.forEach(step => {
+      if (step.hasError){
+        counter += 1;
+      }
+    });
+
+    // let message;
+    if (counter > 0){
+      RequiredFieldsValidationObj.showWarningMessage = true;
+      RequiredFieldsValidationObj.message = 'Please complete all required fields.';
+      RequiredFieldsValidationObj.isConfirmDialog = false;
+      // message = 'Please complete all required fields.';
+      // showWarningMessage = true;
+      // this.openDialog(false, message);
+    }else if(this.costListFiltered.length === 0){
+      RequiredFieldsValidationObj.showWarningMessage = true;
+      RequiredFieldsValidationObj.message = 'Please select a rate the shipment first.';
+      RequiredFieldsValidationObj.isConfirmDialog = false;
+      // message = 'Please select a rate the shipment first.';
+      // this.openDialog(false, message);
+    }else{
+      const fieldsHaveChanged = this.validateIfFieldsHaveChanged();
+      if (fieldsHaveChanged){
+        RequiredFieldsValidationObj.showWarningMessage = true;
+        RequiredFieldsValidationObj.message = 'You have modified some value(s), that requires re-rate this shipment. If you will not re-rate, then this shipment will go to "Quote Modified" status. Do you want to proceed?';
+        RequiredFieldsValidationObj.isConfirmDialog = true;
+        // message = 'You have modified some value(s), that requires re-rate this shipment. If you will not re-rate, then this shipment will go to "Quote Modified" status. Do you want to proceed?';
+        // this.openDialog(true, message);
+      }  
+    }
+
+    return RequiredFieldsValidationObj;
+  }
+
+
 
 }

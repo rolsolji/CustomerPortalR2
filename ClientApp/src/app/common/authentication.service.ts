@@ -6,6 +6,7 @@ import {environment} from '../../environments/environment';
 import {Router} from '@angular/router';
 import {Client} from '../Entities/client.model';
 import {MatSnackBar} from '@angular/material/snack-bar';
+import {MasUser} from '../Entities/mas-user.model';
 
 @Injectable({
   providedIn: 'root'
@@ -19,6 +20,7 @@ export class AuthenticationService {
     private snackbar: MatSnackBar
   ) {
     this.baseEndpoint = environment.baseEndpoint;
+    this.loading$.next(false);
     this.init();
   }
 
@@ -30,7 +32,6 @@ export class AuthenticationService {
   public loading$: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
 
   public init(): boolean {
-    this.loading$.next(false);
     const ticket = this.getTicketFromStorage();
     const user = this.getUserFromStorage();
     const clients = this.getClientsForUserFromStorage();
@@ -54,6 +55,7 @@ export class AuthenticationService {
   }
 
   public async doLogin(username: string, password: string) {
+    this.loading$.next(true);
     return new Promise((resolve, reject) => {
 
       this.http
@@ -75,12 +77,13 @@ export class AuthenticationService {
               localStorage.setItem('authenticatedUser', JSON.stringify(user));
 
               await this.getClientsForUser(user.UserID);
+              const masUser = await this.getMasUser(user.UserID);
+              localStorage.setItem('masUser', JSON.stringify(masUser));
 
               const defaultClient = this.clientsForUser$.value.find(
                 (client: Client) => client.ClientID === user.ClientID);
               localStorage.setItem('defaultClient', JSON.stringify(defaultClient));
               this.defaultClient$.next(defaultClient);
-
             }
 
             resolve({ticket, status: true, user});
@@ -98,22 +101,25 @@ export class AuthenticationService {
   public logout() {
     this.clearSession();
     this.router.navigate(['login']);
+    window.location.reload();
   }
 
   private clearSession() {
     this.authenticatedUser$.next(null);
     this.ticket$.next(null);
+    this.clientsForUser$.next(null);
     this.authState$.next(false);
+    this.defaultClient$.next(null);
+    this.loading$.next(false);
     localStorage.removeItem('authenticatedUser');
     localStorage.removeItem('ticket');
     localStorage.removeItem('defaultClient');
     localStorage.removeItem('clientsForUser');
+    localStorage.clear();
   }
 
   public async getClientsForUser(userID: number) {
     const ticket = this.ticket$.value;
-
-    console.log(ticket);
 
     const httpHeaders = new HttpHeaders({
       Ticket : ticket
@@ -154,5 +160,23 @@ export class AuthenticationService {
 
   public getClientsForUserFromStorage(): Client[] {
     return JSON.parse(localStorage.getItem('clientsForUser'));
+  }
+
+  public getMasUserFromStorage(): MasUser {
+    return JSON.parse(localStorage.getItem('masUser'));
+  }
+
+  public async getMasUser(userId): Promise<MasUser> {
+    const ticket = this.ticket$.value;
+
+    const httpHeaders = new HttpHeaders({
+      Ticket : ticket
+    });
+
+    return await this.http.get<MasUser>(`${this.baseEndpoint}Services/MASUserService.svc/json//GetMasUserByID?UserID=${userId}`
+      , {
+        headers: httpHeaders
+      }
+    ).toPromise();
   }
 }

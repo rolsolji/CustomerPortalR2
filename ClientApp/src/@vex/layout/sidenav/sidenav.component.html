@@ -17,6 +17,26 @@
   </div>
 
   <vex-scrollbar class="flex-auto">
+    <div class="subheading">Client</div>
+    <form style="width: 100%; padding: 0 24px;" class="client-form" [formGroup]="clientsForm">
+      <mat-form-field style="width: 100%;" appearance="outline" class="vex-flex-form-field">
+        <input name="client"
+               formControlName="client"
+               type="text"
+               matInput
+               placeholder="Pick One"
+               style="color: #a1a2b6;"
+               [matAutocomplete]="clientAutoComplete">
+        <mat-autocomplete #clientAutoComplete="matAutocomplete">
+          <mat-option *ngFor="let client of filteredOptions | async"
+                      [value]="client.ClientName"
+                      (onSelectionChange)="onChange($event)"
+                      style="font-size: 12px">
+            {{client.ClientName}}
+          </mat-option>
+        </mat-autocomplete>
+      </mat-form-field>
+    </form>
     <div class="sidenav-items">
       <vex-sidenav-item *ngFor="let item of items; trackBy: trackByRoute"
                         [item]="item"

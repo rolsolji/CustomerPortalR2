@@ -12,6 +12,10 @@ import { DatePipe } from '@angular/common';
 import {HttpErrorInterceptor} from './common/http-error-interceptor';
 import {AuthenticationService} from './common/authentication.service';
 import {MatSnackBar} from '@angular/material/snack-bar';
+import {MatSelectModule} from '@angular/material/select';
+import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
+import {MatInputModule} from '@angular/material/input';
+import {MatFormFieldModule} from '@angular/material/form-field';
 
 @NgModule({
   declarations: [AppComponent],
@@ -21,6 +25,10 @@ import {MatSnackBar} from '@angular/material/snack-bar';
     BrowserAnimationsModule,
     HttpClientModule,
     FormsModule,
+    MatSelectModule,
+    MatProgressSpinnerModule,
+    MatInputModule,
+    MatFormFieldModule,
 
     // Vex
     VexModule,

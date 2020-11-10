@@ -1,13 +1,19 @@
-<form (ngSubmit)="save()" [formGroup]="form">
+<mat-progress-spinner
+  [diameter]="50"
+  *ngIf="!form || originCountries == null
+          || statesAndCities == null || masUserStatus == null"
+  mode="indeterminate"
+  color="accent">
+</mat-progress-spinner>
+<form (ngSubmit)="save()"
+      [formGroup]="form"
+      *ngIf="form && originCountries !== null
+          && statesAndCities !== null && masUserStatus !== null">
   <div fxLayout="row" fxLayoutAlign="start center" mat-dialog-title>
 
     <h2 *ngIf="form.get('firstName').value || form.get('lastName').value"
         class="headline m-0"
         fxFlex="auto">{{ form.get('firstName').value + ' ' + form.get('lastName').value }}</h2>
-
-    <button [matMenuTriggerFor]="settingsMenu" class="text-secondary" mat-icon-button type="button">
-      <mat-icon [icIcon]="icMoreVert"></mat-icon>
-    </button>
 
     <button class="text-secondary" mat-dialog-close mat-icon-button type="button">
       <mat-icon [icIcon]="icClose"></mat-icon>
@@ -19,54 +25,138 @@
   <mat-dialog-content fxLayout="column">
     <div class="flex flex-col sm:flex-row">
       <mat-form-field class="mt-6 flex-auto">
-        <mat-label>First Name</mat-label>
-        <input cdkFocusInitial formControlName="firstName" matInput>
+        <mat-label>Username</mat-label>
+        <input cdkFocusInitial formControlName="username" matInput>
 
-        <mat-icon [icIcon]="icPerson" class="mr-3" matPrefix></mat-icon>
+
       </mat-form-field>
 
       <mat-form-field class="sm:mt-6 sm:ml-6 flex-auto">
         <mat-label>Last Name</mat-label>
         <input cdkFocusInitial formControlName="lastName" matInput>
 
-        <mat-icon [icIcon]="icPerson" class="mr-3" matPrefix></mat-icon>
+
       </mat-form-field>
     </div>
-
-    <mat-form-field class="flex-auto">
-      <mat-label>Street</mat-label>
-      <input formControlName="street" matInput>
-
-      <mat-icon [icIcon]="icEditLocation" class="mr-3" matPrefix></mat-icon>
-    </mat-form-field>
 
     <div class="flex flex-col sm:flex-row">
-      <mat-form-field class="flex-auto">
-        <mat-label>Zipcode</mat-label>
-        <input formControlName="zipcode" matInput>
+      <mat-form-field class="mt-6 flex-auto">
+        <mat-label>FirstName</mat-label>
+        <input cdkFocusInitial formControlName="firstName" matInput>
 
-        <mat-icon [icIcon]="icMyLocation" class="mr-3" matPrefix></mat-icon>
+
       </mat-form-field>
 
-      <mat-form-field class="sm:ml-6 flex-auto">
-        <mat-label>City</mat-label>
-        <input formControlName="city" matInput>
+      <mat-form-field class="sm:mt-6 sm:ml-6 flex-auto">
+        <mat-label>Address 2</mat-label>
+        <input cdkFocusInitial formControlName="address2" matInput>
 
-        <mat-icon [icIcon]="icLocationCity" class="mr-3" matPrefix></mat-icon>
+
       </mat-form-field>
     </div>
 
-    <mat-form-field class="flex-auto">
-      <mat-label>Phone Number</mat-label>
-      <input formControlName="phoneNumber" matInput>
+    <div class="flex flex-col sm:flex-row">
+      <mat-form-field class="mt-6 flex-auto">
+        <mat-label>Address 1</mat-label>
+        <input cdkFocusInitial formControlName="address" matInput>
 
-      <mat-icon [icIcon]="icPhone" class="mr-3" matPrefix></mat-icon>
-    </mat-form-field>
 
-    <mat-form-field class="flex-auto">
-      <mat-label>Notes</mat-label>
-      <textarea formControlName="notes" matInput></textarea>
-    </mat-form-field>
+      </mat-form-field>
+
+      <mat-form-field class="sm:mt-6 sm:ml-6 flex-auto">
+        <mat-label>Tender Email</mat-label>
+        <input cdkFocusInitial formControlName="tenderEmail" matInput>
+
+
+      </mat-form-field>
+    </div>
+
+    <div class="flex flex-col sm:flex-row">
+      <mat-form-field class="mt-6 flex-auto">
+        <mat-label>Country</mat-label>
+        <mat-select
+          (selectionChange)="setCountryStatesCities($event)"
+          [(ngModel)]="defaults.CountryID"
+          formControlName="country">
+          <mat-option *ngFor="let country of originCountries" [value]="country.CountryId">{{country.CountryName}}</mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <mat-form-field class="sm:mt-6 sm:ml-6 flex-auto">
+        <mat-label>Postal</mat-label>
+        <input cdkFocusInitial formControlName="postal" matInput>
+      </mat-form-field>
+    </div>
+
+    <div class="flex flex-col sm:flex-row">
+      <mat-form-field class="mt-6 flex-auto">
+        <mat-label>State</mat-label>
+        <input
+               formControlName="state"
+               type="text"
+               placeholder="Pick one"
+               matInput
+               [matAutocomplete]="stateAutoComplete"
+               required>
+        <mat-autocomplete
+          [displayWith]="displayState.bind(this)" #stateAutoComplete="matAutocomplete">
+          <mat-option *ngFor="let state of filteredStatesOptions | async"
+                      [value]="state">
+            {{state.StateName}}
+          </mat-option>
+        </mat-autocomplete>
+      </mat-form-field>
+
+      <mat-form-field class="sm:mt-6 sm:ml-6 flex-auto">
+        <mat-label>City</mat-label>
+        <input
+          formControlName="city"
+          type="text"
+          placeholder="Pick one"
+          matInput
+          [matAutocomplete]="cityAutoComplete">
+        <mat-autocomplete [displayWith]="displayCity.bind(this)" #cityAutoComplete="matAutocomplete">
+          <mat-option *ngFor="let city of filteredCitiesOptions | async"
+                      [value]="city">
+            {{city.CityName}}
+          </mat-option>
+        </mat-autocomplete>
+
+      </mat-form-field>
+    </div>
+
+    <div class="flex flex-col sm:flex-row">
+      <mat-form-field class="mt-6 flex-auto">
+        <mat-label>ContactName</mat-label>
+        <input cdkFocusInitial formControlName="contactName" matInput>
+
+
+      </mat-form-field>
+
+      <mat-form-field class="sm:mt-6 sm:ml-6 flex-auto">
+        <mat-label>Contact Phone</mat-label>
+        <input cdkFocusInitial formControlName="contactPhone" matInput>
+
+
+      </mat-form-field>
+    </div>
+
+    <div class="flex flex-col sm:flex-row">
+      <mat-form-field class="mt-6 flex-auto">
+        <mat-label>Contact Email</mat-label>
+        <input cdkFocusInitial formControlName="contactEmail" matInput>
+
+
+      </mat-form-field>
+
+      <mat-form-field class="sm:mt-6 sm:ml-6 flex-auto">
+        <mat-label>Status</mat-label>
+        <mat-select [(ngModel)]="defaults.Status"  formControlName="status">
+          <mat-option *ngFor="let stat of masUserStatus" [value]="stat.UserStatusID">{{stat.UserStatus}}</mat-option>
+        </mat-select>
+      </mat-form-field>
+    </div>
+
   </mat-dialog-content>
 
   <mat-dialog-actions align="end">

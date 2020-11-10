@@ -44,7 +44,6 @@ export class LoginComponent implements OnInit {
   }
 
   async send() {
-    this.authService.loading$.next(true);
     if (this.form.value && this.form.value.username && this.form.value.password) {
       const username = this.form.value.username;
       const password = this.form.value.password;

@@ -28,6 +28,7 @@ import {User} from '../Entities/user.model';
 import {environment} from '../../environments/environment';
 import {AuthenticationService} from './authentication.service';
 import { ReferenceByClient } from '../Entities/ReferenceByClient';
+import {MasUser} from '../Entities/mas-user.model';
 import { SendEmailParameters } from '../Entities/SendEmailParameters';
 import { SendEmailResponse } from '../Entities/SendEmailResponse';
 
@@ -61,6 +62,19 @@ export class HttpService{
           ).toPromise();
     }
 
+    getMasUserStatus() {
+      const ticket = this.token;
+      const httpHeaders = new HttpHeaders({
+        Ticket : ticket
+      });
+      return this.http.get(
+        this.baseEndpoint + 'Services/MASUserService.svc/json/GetMasUserStatus'
+        ,{
+          headers: httpHeaders
+        }
+      ).toPromise();
+    }
+
 
     async getMainToken(): Promise<string> {
 
@@ -89,9 +103,10 @@ export class HttpService{
         const httpHeaders = new HttpHeaders({
             Ticket : this.token
         });
-        return this.http.get(String.Format(this.baseEndpoint + 'Services/MASCityStatePostalService.svc/json//GetStateDataByCountryId?MASCountryId={0}&_={1}',countryId,keyId),{
+        countryId = countryId !== '' ? countryId : '1';
+        return this.http.get(String.Format(this.baseEndpoint + 'Services/MASCityStatePostalService.svc/json//GetStateDataByCountryId?MASCountryId={0}',countryId),{
             headers: httpHeaders
-          });
+          }).toPromise();
     }
 
     getPostalDataByPostalCode(postalCode:string, countryId:string, keyId:string){
@@ -146,6 +161,21 @@ export class HttpService{
           }
           ).toPromise();
     }
+
+    updateMasUser(masUser: MasUser){
+      const ticket = this.token;
+      const httpHeaders = new HttpHeaders({
+        Ticket : ticket
+      });
+      return this.http.post<any>(this.baseEndpoint + 'Services/MASUserService.svc/json/UpdateMasUser',
+        masUser
+        ,{
+          headers: httpHeaders
+        }
+      ).toPromise();
+    }
+
+
 
     getMasEquipment(keyId:string){
         const ticket = this.token;

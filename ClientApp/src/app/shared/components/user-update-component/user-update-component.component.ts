@@ -11,7 +11,13 @@ import icPerson from '@iconify/icons-ic/twotone-person';
 import icMyLocation from '@iconify/icons-ic/twotone-my-location';
 import icLocationCity from '@iconify/icons-ic/twotone-location-city';
 import icEditLocation from '@iconify/icons-ic/twotone-edit-location';
-import {User} from '../../../Entities/user.model';
+import {MasUser} from '../../../Entities/mas-user.model';
+import {HttpService} from '../../../common/http.service';
+import {PostalData} from '../../../Entities/PostalData';
+import {debounceTime, distinctUntilChanged, map, startWith, switchMap} from 'rxjs/operators';
+import {BehaviorSubject, Observable} from 'rxjs';
+import {Client} from '../../../Entities/client.model';
+import _ from 'lodash';
 
 @Component({
   selector: 'vex-user-update-component',
@@ -32,93 +38,211 @@ export class UserUpdateComponentComponent implements OnInit {
   icDelete = icDelete;
 
   icPerson = icPerson;
-  icMyLocation = icMyLocation;
-  icLocationCity = icLocationCity;
-  icEditLocation = icEditLocation;
   icPhone = icPhone;
 
-  constructor(@Inject(MAT_DIALOG_DATA) public defaults: User,
+
+  keyId = '1593399730488';
+  originCountries: object = null;
+  statesAndCities: PostalData[] = null;
+  masUserStatus: object = null;
+  filteredStatesOptions: Observable<PostalData[]>;
+  filteredCitiesOptions: Observable<PostalData[]>;
+
+
+  public states: BehaviorSubject<PostalData[]> = new BehaviorSubject<PostalData[]>(null);
+  public cities: BehaviorSubject<PostalData[]> = new BehaviorSubject<PostalData[]>(null);
+
+
+  constructor(@Inject(MAT_DIALOG_DATA) public defaults: MasUser,
               private dialogRef: MatDialogRef<UserUpdateComponentComponent>,
-              private fb: FormBuilder) {
+              private fb: FormBuilder,
+              private httpService: HttpService) {
   }
 
-  ngOnInit() {
+  async ngOnInit() {
+    this.originCountries = await this.httpService.getCountryList(this.keyId);
+    this.statesAndCities = [];
+    if (this.defaults.CountryID) {
+      this.statesAndCities = await this.httpService.getPostalDataByPostalCode('', this.defaults.CountryID.toString(), this.keyId);
+    }
+    this.masUserStatus = await this.httpService.getMasUserStatus();
     this.form = this.fb.group({
-      // id: [UserUpdateComponentComponent.id++],
-      // firstName: [this.defaults.FirstName || ''],
-      // lastName: [this.defaults. || ''],
-      // street: this.defaults. || '',
-      // city: this.defaults.city || '',
-      // zipcode: this.defaults.zipcode || '',
-      // phoneNumber: this.defaults.phoneNumber || '',
-      // notes: this.defaults.notes || ''
+      id: [UserUpdateComponentComponent.id++],
+      firstName: [this.defaults.FirstName || '' ],
+      lastName: [this.defaults.LastName || ''],
+      address2: this.defaults.Address2 || '',
+      address: this.defaults.Address || '',
+      tenderEmail: this.defaults.TenderEmail || '',
+      postal: this.defaults.PostalCode || '',
+      country: this.defaults.CountryName || '',
+      username: this.defaults.UserNickName || '',
+      state: this.getStateNameById(this.defaults.StateID || '') || '',
+      city: this.getCityNameById(this.defaults.CityId || '') || '',
+      contactName: this.defaults.ContactName || '',
+      contactPhone: this.defaults.ContactPhone || '',
+      contactEmail: this.defaults.ContactEmail || '',
+      status: this.defaults.Status || ''
     });
+
+    this.filteredStatesOptions = this.form.get('state').valueChanges.pipe(
+      startWith(''),
+      debounceTime(400),
+      distinctUntilChanged(),
+      switchMap(val => {
+        return this._filterStates(val || '')
+      })
+    );
+    this.filteredCitiesOptions = this.form.get('city').valueChanges.pipe(
+      startWith(''),
+      debounceTime(400),
+      distinctUntilChanged(),
+      switchMap(val => {
+        return this._filterCities(val || '')
+      }));
+
+    this.form.get('postal').valueChanges.subscribe(value => {
+      this._changeStateAndCity(value)
+    })
   }
 
-  save() {
-    this.updateUser();
+  private _filterStates(value: string | PostalData): Observable<PostalData[]> {
+    if (value) {
+      const filterValue = (typeof value === 'string') ? value.toLowerCase() : value.StateName.toLowerCase();
+      if (filterValue.length >= 4) {
+        this.states.next(this.statesAndCities.filter(
+          (option: PostalData) => option.StateName.toLowerCase().indexOf(filterValue) === 0));
+        this.states.next(this.getUniqueListBy(this.states.value, 'StateName'));
+        return this.states.asObservable();
+      }
+    }
+    this.states.next([]);
+    return this.states.asObservable();
   }
 
-  updateUser() {
-    const user = this.form.value;
-    // user.id = this.defaults.id;
-    // https://beta-customer.r2logistics.com/Services/MASUserService.svc/json/UpdateMasUser
-    // POST
+  private _changeStateAndCity(value) {
+    if (value) {
+      const filterValue = value;
+      if (filterValue.length >= 4 && (typeof value === 'string')) {
+        const stateAndCity = this.statesAndCities.filter(
+          (option: PostalData) => option.PostalCode.toLowerCase().indexOf(filterValue) === 0);
+        if (stateAndCity && stateAndCity[0]) {
+          this.form.get('state').setValue(stateAndCity[0]);
+          this.form.get('city').setValue(stateAndCity[0]);
+        }
+      }
+    }
+  }
 
-    // fetch("https://beta-customer.r2logistics.com/Services/MASUserService.svc/json//GetMasUserByID?UserID=17932", {
-    //   "headers": {
-    //     "accept": "*/*",
-    //     "accept-language": "en-US,en;q=0.9",
-    //     "content-type": "application/json",
-    //     "sec-fetch-dest": "empty",
-    //     "sec-fetch-mode": "cors",
-    //     "sec-fetch-site": "same-origin",
-    //     "ticket": "03D1C7F735B706C4B2B9AE4D522AAC7A42C296E0E75DF231F23030D81389177155789AFF86B7751D7F24EEBC6DEC1D5CAB81B6A865C5519FDF6F67EFE311D2C9BF0F897347C30B9951B75C485E80370EE6C3417D5ABE90120154801C0D53C19C4D4BC481DECD93EFFC960E6E0E15DD42E194DBB08B9AF5A16640ED5615A63C316A99372667AE60BCC591B67E5F7EC6D89202972658E67A8DC30A5DFE0CF1ACD1"
-    //   },
-    //   "referrer": "https://beta-customer.r2logistics.com/MainPage.aspx",
-    //   "referrerPolicy": "strict-origin-when-cross-origin",
-    //   "body": null,
-    //   "method": "GET",
-    //   "mode": "cors",
-    //   "credentials": "include"
-    // });
+  private _filterCities(value: string | PostalData): Observable<PostalData[]> {
+    if (value) {
+      const filterValue = (typeof value === 'string') ? value.toLowerCase() : value.CityName.toLowerCase();
 
-    // fetch("https://beta-customer.r2logistics.com/Services/MASCityStatePostalService.svc/json//GetStateDataByCountryId?MASCountryId=1", {
-    //   "headers": {
-    //     "accept": "*/*",
-    //     "accept-language": "en-US,en;q=0.9",
-    //     "content-type": "application/json",
-    //     "sec-fetch-dest": "empty",
-    //     "sec-fetch-mode": "cors",
-    //     "sec-fetch-site": "same-origin",
-    //     "ticket": "03D1C7F735B706C4B2B9AE4D522AAC7A42C296E0E75DF231F23030D81389177155789AFF86B7751D7F24EEBC6DEC1D5CAB81B6A865C5519FDF6F67EFE311D2C9BF0F897347C30B9951B75C485E80370EE6C3417D5ABE90120154801C0D53C19C4D4BC481DECD93EFFC960E6E0E15DD42E194DBB08B9AF5A16640ED5615A63C316A99372667AE60BCC591B67E5F7EC6D89202972658E67A8DC30A5DFE0CF1ACD1"
-    //   },
-    //   "referrer": "https://beta-customer.r2logistics.com/MainPage.aspx",
-    //   "referrerPolicy": "strict-origin-when-cross-origin",
-    //   "body": null,
-    //   "method": "GET",
-    //   "mode": "cors",
-    //   "credentials": "include"
-    // });
+      if (filterValue.length >= 4) {
+        this.cities.next(this.statesAndCities.filter(
+          (option: PostalData) => option.CityName.toLowerCase().indexOf(filterValue) === 0));
+        this.cities.next(this.getUniqueListBy(this.cities.value, 'CityName'));
+        return this.cities.asObservable();
+      }
+    }
+    this.cities.next([]);
+    return this.cities.asObservable();
+  }
 
-    // fetch("https://beta-customer.r2logistics.com/Services/MASUserService.svc/json/GetMasUserStatus", {
-    //   "headers": {
-    //     "accept": "*/*",
-    //     "accept-language": "en-US,en;q=0.9",
-    //     "content-type": "application/json",
-    //     "sec-fetch-dest": "empty",
-    //     "sec-fetch-mode": "cors",
-    //     "sec-fetch-site": "same-origin",
-    //     "ticket": "03D1C7F735B706C4B2B9AE4D522AAC7A42C296E0E75DF231F23030D81389177155789AFF86B7751D7F24EEBC6DEC1D5CAB81B6A865C5519FDF6F67EFE311D2C9BF0F897347C30B9951B75C485E80370EE6C3417D5ABE90120154801C0D53C19C4D4BC481DECD93EFFC960E6E0E15DD42E194DBB08B9AF5A16640ED5615A63C316A99372667AE60BCC591B67E5F7EC6D89202972658E67A8DC30A5DFE0CF1ACD1"
-    //   },
-    //   "referrer": "https://beta-customer.r2logistics.com/MainPage.aspx",
-    //   "referrerPolicy": "strict-origin-when-cross-origin",
-    //   "body": null,
-    //   "method": "GET",
-    //   "mode": "cors",
-    //   "credentials": "include"
-    // });
-    this.dialogRef.close(user);
+  getUniqueListBy(arr: PostalData[], key): PostalData[] {
+    return [...new Map(arr.map(item => [item[key], item])).values()]
+  }
+
+  displayState(value?): string {
+    if (this.statesAndCities !== null  && value && typeof value === 'string') {
+      const selectedState = this.statesAndCities.find(state => state.StateName === value);
+      if (selectedState) {
+        return selectedState.StateName.trim()
+      }
+    } else if (value && value.StateName) {
+      return value.StateName.trim();
+    }
+    return undefined;
+  }
+
+  displayCity(value): string {
+    if (this.statesAndCities !== null  && value && typeof value === 'string') {
+      const selectedState = this.statesAndCities.find(city => city.CityName.trim() === value.trim());
+      if (selectedState) {
+        return selectedState.CityName.trim()
+      }
+    } else if (value && value.CityName) {
+      return value.CityName.trim();
+    }
+    return undefined;
+  }
+
+  getStateNameById(stateId) {
+    if (this.statesAndCities && this.statesAndCities.length > 0) {
+      return this.statesAndCities.find(states => states.StateId === stateId).StateName
+    }
+    return undefined;
+  }
+
+  getCityNameById(cityId) {
+    if (this.statesAndCities && this.statesAndCities.length > 0) {
+      return this.statesAndCities.find(city => city.CityID === cityId).CityName
+    }
+    return undefined;
+  }
+
+  async setCountryStatesCities(event) {
+    this.statesAndCities = null;
+    const countryId = event.source.value;
+    this.statesAndCities = await this.httpService.getPostalDataByPostalCode('', countryId.toString(), this.keyId);
+  }
+
+  getPostalIdByCode(postalCode: string): number {
+    if (this.statesAndCities && this.statesAndCities.length > 0) {
+      const postalData =  this.statesAndCities.find(postal => postal.PostalCode === postalCode);
+      // tslint:disable-next-line:radix
+      return parseInt(postalData.PostalID);
+    }
+  }
+
+  async save() {
+    await this.updateUser();
+  }
+
+  mapUser() {
+    const user: MasUser = this.defaults;
+    const state = this.form.get('state').value;
+    const city = this.form.get('city').value;
+    const country = this.form.get('country').value;
+    const postalCode = this.form.get('postal').value;
+
+    user.FirstName = this.form.get('firstName').value;
+    user.LastName = this.form.get('lastName').value;
+    user.Address = this.form.get('address').value;
+    user.Address2 = this.form.get('address2').value;
+    user.TenderEmail = this.form.get('tenderEmail').value;
+    user.PostalCode = postalCode;
+    user.PostalId = this.getPostalIdByCode(postalCode);
+    // tslint:disable-next-line:radix
+    user.CountryID = parseInt(country);
+    user.UserNickName = this.form.get('username').value;
+    user.ContactName = this.form.get('contactName').value;
+    user.ContactPhone = this.form.get('contactPhone').value;
+    user.ContactEmail = this.form.get('contactEmail').value;
+    user.Status = this.form.get('status').value;
+    user.StateID = state.StateId;
+    user.StateName = state.StateName;
+    user.CityId = city.CityID;
+    user.CityName = city.CityName;
+
+    return user;
+  }
+
+  async updateUser() {
+    const updatedUser = this.mapUser();
+
+    await this.httpService.updateMasUser(updatedUser);
+
+    this.dialogRef.close(updatedUser);
   }
 
 }

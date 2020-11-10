@@ -24,6 +24,7 @@ import {CustomerCreateUpdateComponent} from '../../../../../app/pages/apps/aio-t
 import {Customer} from '../../../../../app/pages/apps/aio-table/interfaces/customer.model';
 import {User} from '../../../../../app/Entities/user.model';
 import {MatDialog} from '@angular/material/dialog';
+import {UserUpdateComponentComponent} from '../../../../../app/shared/components/user-update-component/user-update-component.component';
 
 export interface OnlineStatus {
   id: 'online' | 'away' | 'dnd' | 'offline';
@@ -121,9 +122,12 @@ export class ToolbarUserDropdownComponent implements OnInit {
     this.authService.logout();
   }
 
-  updateUser() {
-    this.dialog.open(CustomerCreateUpdateComponent, {
-      data: this.authService.getUserFromStorage()
+  async updateUser() {
+    const user = this.authService.getUserFromStorage();
+    const masUser = await this.authService.getMasUser(user.UserID);
+
+    this.dialog.open(UserUpdateComponentComponent, {
+      data: masUser
     }).afterClosed().subscribe((updatedUser: User) => {
       /**
        * Customer is the updated customer (if the user pressed Save - otherwise it's null)
@@ -133,8 +137,9 @@ export class ToolbarUserDropdownComponent implements OnInit {
          * Here we are updating our local array.
          * You would probably make an HTTP request here.
          */
-        console.log(updatedUser);
+        localStorage.setItem('masUser', JSON.stringify(updatedUser));
       }
-    })
+    });
+    this.close();
   }
 }

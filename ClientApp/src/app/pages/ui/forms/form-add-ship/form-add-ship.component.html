@@ -868,19 +868,22 @@
                     </div>
                   </div>    
         
-                  <div *ngIf="getQuoteButtonClicked && ratesCounter > 0 && !showSpinner" class="text-center">
+                  <div *ngIf="getQuoteButtonClicked && !showSpinner" class="text-center">
                     <div fxLayout="row" fxLayoutGap="8px" class="py-2 freightRatesView">                      
                       <div fxFlex="70%" class="ratesSectionTitle">
                         <div><h2 class="allRatesTab-labelText">ALL QUOTES ({{ratesCounter}})</h2></div>
+                        <div *ngIf="ratesCounter == null || ratesCounter == 0" class="noRatesFoundText">
+                          <label>{{noRatesFoundText}}</label>
+                        </div>
                       </div>
                       <div fxFlex="30%" class="closeRatesSection">
                         <div>
                           <button mat-button class="button--small" type="button" (click)="clearRatesSection()">Close</button>           
                         </div>
-                      </div>  
+                      </div>                        
                     </div>
         
-                    <div class="ratesAccordionSection">
+                    <div *ngIf="ratesCounter > 0" class="ratesAccordionSection">
                       <mat-accordion class="rates-accordion" multi> 
                         <div *ngFor="let rate of ratesFiltered; let j = index">              
                           <mat-expansion-panel [expanded]="false" (opened)="addRateOpened(j)" (closed)="removeRateClosed(j)">

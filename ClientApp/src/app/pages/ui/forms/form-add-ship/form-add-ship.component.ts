@@ -142,6 +142,10 @@ export class FormAddShipComponent implements OnInit {
 
   carrierSelected: string;
 
+  gDefaultoriginpostalcode = '';
+  gDefaultdestpostalcode = '';
+  gDefaultpickupdate = '';
+
   originSelectedCountry: PostalData = {
     CityCode: '',
     CityID: '',
@@ -203,6 +207,7 @@ export class FormAddShipComponent implements OnInit {
   ForceToReRate = false;
   accessorialsUsedToRate: AccessorialBase[] = [];
   productsUsedToRate: any[] = [];
+  noRatesFoundText = null;
 
   pcoAutoCompleteOptions: Observable<PostalData[]>;
   pcdAutoCompleteOptions: Observable<PostalData[]>;
@@ -761,6 +766,21 @@ export class FormAddShipComponent implements OnInit {
   }
 
   async getQuote() {
+
+    let counter = 0;
+    this.stepper._steps.forEach(step => {
+      if (step.hasError){
+        counter += 1;
+      }
+    });
+
+    let message;
+    if (counter > 0){
+      message = 'Please complete all required fields.';
+      this.openDialog(false, message);
+      return;
+    }
+
     this.getQuoteButtonClicked = true;
     this.showSpinner = true;
     const test = await this.getShipmentRates();
@@ -819,8 +839,7 @@ export class FormAddShipComponent implements OnInit {
     console.log(objRate);
 
     this.rates = await this.ratesService.postRates(objRate);
-    console.log( this.rates);
-
+    // console.log( this.rates);    
     if ( this.rates != null &&  this.rates.length > 0){
       this.ratesFiltered =  this.rates.filter(rate => rate.CarrierCost > 0);
       console.log(this.ratesFiltered);
@@ -844,10 +863,18 @@ export class FormAddShipComponent implements OnInit {
 
       this.clientTLWeightLimit = (this.clientDefaultData.TLWeightLimit == null ? 0 : this.clientDefaultData.TLWeightLimit) + 'lb';
     }
+    else{
+      this.noRatesFoundText = 'No rates found.';
+    }
 
     this.ForceToReRate = false;
     this.productsUsedToRate = arrayProducts;
     this.accessorialsUsedToRate = this.accessorials;
+
+    // Set default values again for origin and destination postcodes, also for pickup date
+    this.gDefaultoriginpostalcode = this.originAndDestinationFormGroup.get('originpostalcode').value;
+    this.gDefaultdestpostalcode = this.originAndDestinationFormGroup.get('destpostalcode').value;
+    this.gDefaultpickupdate = this.originAndDestinationFormGroup.get('originpickupdate').value.toString();
 
   }
 
@@ -1030,10 +1057,11 @@ export class FormAddShipComponent implements OnInit {
     let defaultpickupdate = null;
     let defaultdestpostalcode = null;
     let defaultdeststatename = null;
+    let defaultDestExpDelDate = null;
 
     if (this.ShipmentByLadingObject == null){
       return;
-    }
+    }        
 
     defaultoriginpostalcode = this.ShipmentByLadingObject.OrgZipCode.trim() + '-' + this.ShipmentByLadingObject.OrgCityName.trim();
     defaultoriginstatename = this.ShipmentByLadingObject.OrgStateName.trim();
@@ -1044,8 +1072,9 @@ export class FormAddShipComponent implements OnInit {
     defaultdestpostalcode = this.ShipmentByLadingObject.DestZipCode.trim() + '-' + this.ShipmentByLadingObject.DestCityName.trim();
     defaultdeststatename = this.ShipmentByLadingObject.DestStateName.trim();
 
-    // let tempOriginPD: PostalData;
-    // let tempDestPD: PostalData;
+    this.gDefaultoriginpostalcode = defaultoriginpostalcode;
+    this.gDefaultdestpostalcode = defaultdestpostalcode;
+    this.gDefaultpickupdate = defaultpickupdate;
 
     const tempOriginPD: PostalData = {
       CityCode: '',
@@ -1086,6 +1115,54 @@ export class FormAddShipComponent implements OnInit {
     this.originAndDestinationFormGroup.controls.originpickupdate.setValue(defaultpickupdate, {onlySelf: false});
     this.originAndDestinationFormGroup.controls.destpostalcode.setValue(defaultdestpostalcode, {onlySelf: false});
     this.originAndDestinationFormGroup.controls.deststatename.setValue(defaultdeststatename, {onlySelf: false});
+
+    this.originAndDestinationFormGroup.controls.originname.setValue(this.ShipmentByLadingObject.OrgName, {onlySelf: false});
+    this.originAndDestinationFormGroup.controls.originadddress1.setValue(this.ShipmentByLadingObject.OrgAdr1, {onlySelf: false});
+    this.originAndDestinationFormGroup.controls.originadddress2.setValue(this.ShipmentByLadingObject.OrgAdr2, {onlySelf: false});
+    this.originAndDestinationFormGroup.controls.origincountry.setValue(this.ShipmentByLadingObject.OrgCountry, {onlySelf: false});
+    this.originAndDestinationFormGroup.controls.origincontact.setValue(this.ShipmentByLadingObject.OriginContactPerson, {onlySelf: false});
+    this.originAndDestinationFormGroup.controls.originphone.setValue(this.ShipmentByLadingObject.OriginContactPhone, {onlySelf: false});
+    this.originAndDestinationFormGroup.controls.originemail.setValue(this.ShipmentByLadingObject.OriginEmail, {onlySelf: false});
+    this.originAndDestinationFormGroup.controls.originpickupopen.setValue(this.ShipmentByLadingObject.RequestedPickupTimeFrom != null
+      && this.ShipmentByLadingObject.RequestedPickupTimeFrom !== '' ? this.ShipmentByLadingObject.RequestedPickupTimeFrom : null,
+      {onlySelf: false});
+      this.originAndDestinationFormGroup.controls.originpickupclose.setValue(this.ShipmentByLadingObject.RequestedPickupTimeTo != null
+        && this.ShipmentByLadingObject.RequestedPickupTimeTo !== '' ? this.ShipmentByLadingObject.RequestedPickupTimeTo : null,
+        {onlySelf: false});
+
+    this.originAndDestinationFormGroup.controls.destname.setValue(this.ShipmentByLadingObject.DestName, {onlySelf: false});
+    this.originAndDestinationFormGroup.controls.destadddress1.setValue(this.ShipmentByLadingObject.DestAdr1, {onlySelf: false});
+    this.originAndDestinationFormGroup.controls.destadddress2.setValue(this.ShipmentByLadingObject.DestAdr2, {onlySelf: false});
+    this.originAndDestinationFormGroup.controls.destcountry.setValue(this.ShipmentByLadingObject.DestCountry, {onlySelf: false});
+    this.originAndDestinationFormGroup.controls.destcontact.setValue(this.ShipmentByLadingObject.DestContactPerson, {onlySelf: false});
+    this.originAndDestinationFormGroup.controls.destphone.setValue(this.ShipmentByLadingObject.DestContactPhone, {onlySelf: false});
+    this.originAndDestinationFormGroup.controls.destemail.setValue(this.ShipmentByLadingObject.DestEmail, {onlySelf: false});
+
+
+    const tempDestExpDelDate = moment.utc(this.ShipmentByLadingObject.PickupDate);
+    defaultDestExpDelDate = new Date(this.datepipe.transform(tempDestExpDelDate.toString().replace(/(^.*\()|([+-].*$)/g, ''),'MM/dd/yyyy'));
+    this.originAndDestinationFormGroup.controls.destexpdeldate.setValue(defaultDestExpDelDate, {onlySelf: false});
+    
+    this.originAndDestinationFormGroup.controls.destdelapptfrom.setValue(this.ShipmentByLadingObject.DeliveryAppointmentTimeFrom, {onlySelf: false});
+    this.originAndDestinationFormGroup.controls.destdelapptto.setValue(this.ShipmentByLadingObject.DeliveryAppointmentTimeTo, {onlySelf: false});
+
+    // --
+
+    // -- Set values for Shipment Info fields
+    this.shipmentInfoFormGroup.controls.equipment.setValue(this.ShipmentByLadingObject.EquipmentID, {onlySelf: false});
+    this.shipmentInfoFormGroup.controls.priority.setValue(this.ShipmentByLadingObject.PriorityID, {onlySelf: false});
+    this.shipmentInfoFormGroup.controls.servicelevel.setValue(this.ShipmentByLadingObject.ServiceLevelID, {onlySelf: false});
+    this.shipmentInfoFormGroup.controls.customerref.setValue(this.ShipmentByLadingObject.Ref1Value, {onlySelf: false});
+    this.shipmentInfoFormGroup.controls.r2order.setValue(this.ShipmentByLadingObject.Ref2Value, {onlySelf: false});
+    this.shipmentInfoFormGroup.controls.r2pronumber.setValue(this.ShipmentByLadingObject.Ref3Value, {onlySelf: false});
+    this.shipmentInfoFormGroup.controls.r2pronumber.setValue(this.ShipmentByLadingObject.Ref3Value, {onlySelf: false});
+    this.shipmentInfoFormGroup.controls.shipmentvalue.setValue(this.ShipmentByLadingObject.ShipmentValue, {onlySelf: false});
+    this.shipmentInfoFormGroup.controls.valueperpound.setValue(this.ShipmentByLadingObject.ValuePerPound, {onlySelf: false});
+    this.shipmentInfoFormGroup.controls.paymentterms.setValue(this.ShipmentByLadingObject.PaymentTermID, {onlySelf: false});
+    this.shipmentInfoFormGroup.controls.shipmentinfo.setValue(this.ShipmentByLadingObject.TrackingNumber, {onlySelf: false});
+    this.shipmentInfoFormGroup.controls.pronumber.setValue(this.ShipmentByLadingObject.ProNumber, {onlySelf: false});
+    this.shipmentInfoFormGroup.controls.mode.setValue(this.ShipmentByLadingObject.Mode, {onlySelf: false});
+    this.shipmentInfoFormGroup.controls.r2refno.setValue(this.ShipmentByLadingObject.BrokerReferenceNo, {onlySelf: false});    
     // --
 
     // -- Set default values "Products and Accesorials" step
@@ -1109,6 +1186,7 @@ export class FormAddShipComponent implements OnInit {
         (this.productsAndAccessorialsFormGroup.controls.products as FormArray).at(currentProductIndex).get('Weight').setValue(p.Weight);
         (this.productsAndAccessorialsFormGroup.controls.products as FormArray).at(currentProductIndex).get('Stackable').setValue(p.Stackable);
         (this.productsAndAccessorialsFormGroup.controls.products as FormArray).at(currentProductIndex).get('Hazmat').setValue(p.Hazmat);
+        (this.productsAndAccessorialsFormGroup.controls.products as FormArray).at(currentProductIndex).get('ProductDescription').setValue(p.Description);
 
         counter += 1;
       });
@@ -1259,24 +1337,24 @@ export class FormAddShipComponent implements OnInit {
     }
     else // costs have been already obtained, so compare current values with previous ones
     {
-      // // Validate if origin postal code has changed
-      // const defaultoriginpostalcode = this.ShipmentByLadingObject.OrgZipCode.trim() + '-' + this.ShipmentByLadingObject.OrgCityName.trim();
-      // if (defaultoriginpostalcode !== this.originAndDestinationFormGroup.get('originpostalcode').value){
-      //   return true;
-      // }
+      // Validate if origin postal code has changed
+      //const defaultoriginpostalcode = this.ShipmentByLadingObject.OrgZipCode.trim() + '-' + this.ShipmentByLadingObject.OrgCityName.trim();
+      if (this.gDefaultoriginpostalcode !== this.originAndDestinationFormGroup.get('originpostalcode').value){
+        return true;
+      }
 
-      // // Validate if destination postal code has changed
-      // const defaultdestpostalcode = this.ShipmentByLadingObject.DestZipCode.trim() + '-' + this.ShipmentByLadingObject.DestCityName.trim();
-      // if (defaultdestpostalcode !== this.originAndDestinationFormGroup.get('destpostalcode').value){
-      //   return true;
-      // }
+      // Validate if destination postal code has changed
+      //const defaultdestpostalcode = this.ShipmentByLadingObject.DestZipCode.trim() + '-' + this.ShipmentByLadingObject.DestCityName.trim();
+      if (this.gDefaultdestpostalcode !== this.originAndDestinationFormGroup.get('destpostalcode').value){
+        return true;
+      }
 
-      // // Validate if origin pickup date has changed
+      // Validate if origin pickup date has changed
       // const tempPickupDate = moment.utc(this.ShipmentByLadingObject.PickupDate);
       // const defaultpickupdate = new Date(this.datepipe.transform(tempPickupDate.toString().replace(/(^.*\()|([+-].*$)/g, ''),'MM/dd/yyyy'));      
-      // if (defaultpickupdate !== this.originAndDestinationFormGroup.get('originpickupdate').value){
-      //   return true;
-      // }
+      if (this.gDefaultpickupdate.toString() !== this.originAndDestinationFormGroup.get('originpickupdate').value.toString()){
+        return true;
+      }
 
       // Validate if data in products has changed
       if (this.ShipmentByLadingObject.BOlProductsList != null && this.ShipmentByLadingObject.BOlProductsList.length > 0){

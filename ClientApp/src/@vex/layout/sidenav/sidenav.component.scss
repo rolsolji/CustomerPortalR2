@@ -64,3 +64,69 @@
 .sidenav-items {
   padding-top: var(--padding);
 }
+
+.subheading {
+  box-sizing: border-box;
+  color: var(--sidenav-item-color);
+  font: var(--font-caption);
+  margin-top: var(--padding);
+  padding: var(--padding-12) var(--padding);
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.client-form {
+  input {
+    color: var(--sidenav-item-color);
+    &::placeholder {
+      color: var(--sidenav-item-color);
+    }
+  }
+  //input outline color
+  ::ng-deep .mat-form-field-appearance-outline .mat-form-field-outline {
+    color: var(--sidenav-item-color);
+  }
+
+  //mat-input focused color
+  ::ng-deep .mat-form-field-appearance-outline.mat-focused .mat-form-field-outline-thick {
+    color: var(--sidenav-item-color);
+  }
+
+  // mat-input carent color
+  ::ng-deep .mat-input-element {
+    caret-color: var(--sidenav-item-color);
+  }
+
+  ::ng-deep .mat-input-element::placeholder {
+    caret-color: var(--sidenav-item-color);
+  }
+
+  // mat-input error carent color
+  ::ng-deep .mat-form-field-invalid .mat-input-element, .mat-warn .mat-input-element {
+    caret-color: var(--sidenav-item-color);
+  }
+
+  // mat-label normal state style
+  ::ng-deep .mat-form-field-label {
+    color: var(--sidenav-item-color);
+  }
+
+  // mat-label focused style
+  ::ng-deep .mat-form-field.mat-focused .mat-form-field-label {
+    color: var(--sidenav-item-color);
+  }
+
+  ::ng-deep .mat-form-field-placeholder{
+
+    color: var(--sidenav-item-color);
+  }
+
+  ::ng-deep .mat-focused .mat-form-field-placeholder{
+
+    color: var(--sidenav-item-color);
+  }
+
+  .mat-focused .placeholder {
+    color: var(--sidenav-item-color);
+  }
+}

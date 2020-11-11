@@ -43,7 +43,7 @@ import outlineSave from '@iconify/icons-ic/outline-save';
 import outlinePrint from '@iconify/icons-ic/outline-print';
 import outlineEmail from '@iconify/icons-ic/outline-email';
 import { StepperSelectionEvent } from '@angular/cdk/stepper';
-import { ShipmentByLading } from '../../../../Entities/ShipmentByLading';
+import { ShipmentByLading, BOlProductsListSBL, AccountInvoiceCostListSBL, BOLAccesorialListSBL, SellRatesSBL  } from '../../../../Entities/ShipmentByLading';
 import * as moment from 'moment';
 import {AuthenticationService} from '../../../../common/authentication.service';
 import {STEPPER_GLOBAL_OPTIONS} from '@angular/cdk/stepper';
@@ -53,6 +53,8 @@ import {environment} from '../../../../../environments/environment';
 import {MatDialog, MatDialogConfig} from '@angular/material/dialog';
 import { ConfirmAlertDialogComponent } from '../confirm-alert-dialog/confirm-alert-dialog.component';
 import { SaveQuoteParameters,BOlProductsList,BOLAccesorial,SellRate,AccountInvoiceCost } from '../../../../Entities/SaveQuoteParameters';
+import { SaveQuoteData,BOlProductsListSQD,BOLAccesorialListSQD,AccountInvoiceCostListSQD, SellRatesSQD } from '../../../../Entities/SaveQuoteData';
+
 
 @Component({
   selector: 'vex-form-add-ship',
@@ -97,7 +99,8 @@ export class FormAddShipComponent implements OnInit {
   }
 
   keyId = '1593399730488';
-  ClientID = this.authenticationService.getDefaultClient().ClientID;
+  ClientID = this.authenticationService.getDefaultClient().ClientID;  
+  UserIDLoggedIn = this.authenticationService.authenticatedUser$.value.UserID;
 
   // localLadingIdParameter: string;
 
@@ -148,6 +151,7 @@ export class FormAddShipComponent implements OnInit {
   gDefaultpickupdate = '';
 
   saveQuoteParameters: SaveQuoteParameters;
+  saveQuoteData: SaveQuoteData;
   selectedRateFromQuotes: Rate;
 
   originSelectedCountry: PostalData = {
@@ -207,6 +211,9 @@ export class FormAddShipComponent implements OnInit {
   ReferenceByClientField1 = '';
   ReferenceByClientField2 = '';
   ReferenceByClientField3 = '';
+  ReferenceByClientIDField1 = 0;
+  ReferenceByClientIDField2 = 0;
+  ReferenceByClientIDField3 = 0;
 
   ForceToReRate = false;
   accessorialsUsedToRate: AccessorialBase[] = [];
@@ -297,7 +304,7 @@ export class FormAddShipComponent implements OnInit {
       originstatename: [null, Validators.required],
       origincontact: [null],
       originphone: [null],
-      originemail: [null, Validators.required],
+      originemail: [null],
       // originnotes: [null],
       originpickupdate: [null, Validators.required],
       originpickupopen: [null],
@@ -310,7 +317,7 @@ export class FormAddShipComponent implements OnInit {
       deststatename: [null, Validators.required],
       destcontact: [null],
       destphone: [null],
-      destemail: [null, Validators.required],
+      destemail: [null],
       // destnotes: [null],
       destexpdeldate: [null],
       destdelapptfrom: [null],
@@ -601,7 +608,7 @@ export class FormAddShipComponent implements OnInit {
   addNewInternalNote(): void {
     const note = {
       NoteId: (this.internalNotes as InternalNote[]).length + 1,
-      UserId: 1,
+      UserId: this.UserIDLoggedIn,
       UserName: 'Admin',
       NoteText: this.shipmentInfoFormGroup.get('internalnote').value.trim(),
       Date: new Date()
@@ -777,6 +784,10 @@ export class FormAddShipComponent implements OnInit {
 
     const pickupDate = this.OriginPickupDate;
     const arrayProducts = this.productsAndAccessorialsFormGroup.get('products').value;
+
+    if (this.confirmFormGroup.get('carrier').value == null || this.confirmFormGroup.get('carrier').value === ''){
+      this.carrierSelected = '';
+    }
 
     const objRate = {
       ClientID: this.ClientID,
@@ -998,19 +1009,22 @@ export class FormAddShipComponent implements OnInit {
   async StepperSelectionChange(event: StepperSelectionEvent){
     console.log(event);
 
-    if (event.selectedIndex == 2) // shipment info step selected
+    if (event.selectedIndex === 2) // shipment info step selected
     {
         // -- Get Shipment Errors
         this.ReferenceByClientOptions = await this.httpService.GetReferenceByClient(this.ClientID, this.keyId);
         if (this.ReferenceByClientOptions != null && this.ReferenceByClientOptions.length > 0){
           this.ReferenceByClientField1 = this.ReferenceByClientOptions[0].Description.trim();
+          this.ReferenceByClientIDField1 = this.ReferenceByClientOptions[0].ReferenceID;
 
           if (this.ReferenceByClientOptions.length > 1){
             this.ReferenceByClientField2 = this.ReferenceByClientOptions[1].Description.trim();
+            this.ReferenceByClientIDField2 = this.ReferenceByClientOptions[1].ReferenceID;
           }
 
           if (this.ReferenceByClientOptions.length > 2){
             this.ReferenceByClientField3 = this.ReferenceByClientOptions[2].Description.trim();
+            this.ReferenceByClientIDField3 = this.ReferenceByClientOptions[2].ReferenceID;
           }
         }
         else{ // If we can't get fields from API then set R2 fields as default
@@ -1069,7 +1083,7 @@ export class FormAddShipComponent implements OnInit {
       CountryName: '',
       IsActive: '',
       PostalCode: this.ShipmentByLadingObject.OrgZipCode.trim(),
-      PostalID: '',
+      PostalID: this.ShipmentByLadingObject.OrgZip.toString(),
       StateCode: this.ShipmentByLadingObject.OrgStateCode.trim(),
       StateId: this.ShipmentByLadingObject.OrgState.toString(),
       StateName: this.ShipmentByLadingObject.OrgStateName.trim(),
@@ -1084,7 +1098,7 @@ export class FormAddShipComponent implements OnInit {
       CountryName: '',
       IsActive: '',
       PostalCode: this.ShipmentByLadingObject.DestZipCode.trim(),
-      PostalID: '',
+      PostalID: this.ShipmentByLadingObject.DestZip.toString(),
       StateCode: this.ShipmentByLadingObject.DestStateCode.trim(),
       StateId: this.ShipmentByLadingObject.DestState.toString(),
       StateName: this.ShipmentByLadingObject.DestStateName.trim(),
@@ -1132,20 +1146,19 @@ export class FormAddShipComponent implements OnInit {
 
     // --
 
-    // -- Set values for Shipment Info fields
-    this.shipmentInfoFormGroup.controls.equipment.setValue(this.ShipmentByLadingObject.EquipmentID, {onlySelf: false});
-    this.shipmentInfoFormGroup.controls.priority.setValue(this.ShipmentByLadingObject.PriorityID, {onlySelf: false});
-    this.shipmentInfoFormGroup.controls.servicelevel.setValue(this.ShipmentByLadingObject.ServiceLevelID, {onlySelf: false});
+    // -- Set values for Shipment Info fields    
+    this.shipmentInfoFormGroup.get('equipment').setValue(this.ShipmentByLadingObject.EquipmentID == null ? 7 : this.ShipmentByLadingObject.EquipmentID); //-- need to check this one
+    this.shipmentInfoFormGroup.get('priority').setValue(this.ShipmentByLadingObject.PriorityID == null ? 0 : this.ShipmentByLadingObject.PriorityID); //-- need to check this one
+    this.shipmentInfoFormGroup.get('servicelevel').setValue(this.ShipmentByLadingObject.ServiceLevelID == null ? 1 : this.ShipmentByLadingObject.ServiceLevelID);
+    this.shipmentInfoFormGroup.get('paymentterms').setValue(this.ShipmentByLadingObject.PaymentTermID == null ? 5 : this.ShipmentByLadingObject.PaymentTermID); //-- need to check this one
+    this.shipmentInfoFormGroup.get('mode').setValue(this.ShipmentByLadingObject.Mode == null ? 'LTL' : this.ShipmentByLadingObject.Mode);    
     this.shipmentInfoFormGroup.controls.customerref.setValue(this.ShipmentByLadingObject.Ref1Value, {onlySelf: false});
     this.shipmentInfoFormGroup.controls.r2order.setValue(this.ShipmentByLadingObject.Ref2Value, {onlySelf: false});
-    this.shipmentInfoFormGroup.controls.r2pronumber.setValue(this.ShipmentByLadingObject.Ref3Value, {onlySelf: false});
-    this.shipmentInfoFormGroup.controls.r2pronumber.setValue(this.ShipmentByLadingObject.Ref3Value, {onlySelf: false});
+    this.shipmentInfoFormGroup.controls.r2pronumber.setValue(this.ShipmentByLadingObject.Ref3Value, {onlySelf: false});    
     this.shipmentInfoFormGroup.controls.shipmentvalue.setValue(this.ShipmentByLadingObject.ShipmentValue, {onlySelf: false});
-    this.shipmentInfoFormGroup.controls.valueperpound.setValue(this.ShipmentByLadingObject.ValuePerPound, {onlySelf: false});
-    this.shipmentInfoFormGroup.controls.paymentterms.setValue(this.ShipmentByLadingObject.PaymentTermID, {onlySelf: false});
+    this.shipmentInfoFormGroup.controls.valueperpound.setValue(this.ShipmentByLadingObject.ValuePerPound, {onlySelf: false});   
     this.shipmentInfoFormGroup.controls.shipmentinfo.setValue(this.ShipmentByLadingObject.TrackingNumber, {onlySelf: false});
-    this.shipmentInfoFormGroup.controls.pronumber.setValue(this.ShipmentByLadingObject.ProNumber, {onlySelf: false});
-    this.shipmentInfoFormGroup.controls.mode.setValue(this.ShipmentByLadingObject.Mode, {onlySelf: false});
+    this.shipmentInfoFormGroup.controls.pronumber.setValue(this.ShipmentByLadingObject.ProNumber, {onlySelf: false});    
     this.shipmentInfoFormGroup.controls.r2refno.setValue(this.ShipmentByLadingObject.BrokerReferenceNo, {onlySelf: false});    
     // --
 
@@ -1403,15 +1416,15 @@ export class FormAddShipComponent implements OnInit {
       }
 
       if (this.ShipmentByLadingObject.BOLAccesorialList != null && this.ShipmentByLadingObject.BOLAccesorialList.length > 0){
-        if (this.ShipmentByLadingObject.BOLAccesorialList.length !== this.accessorialArray.length)
+        if (this.ShipmentByLadingObject.BOLAccesorialList.length !== this.accessorials.length)
         {
           // accessorials selected are different from the ones previously selected, so return true to re-rate
           return true;
         }else{
-          let accessorialArrayFound: AccessorialDetail[];
+          let accessorialArrayFound: AccessorialBase[];
           let accessorialHasChanged = false;
           this.ShipmentByLadingObject.BOLAccesorialList.forEach(BOLAccesorial => {
-            accessorialArrayFound = this.accessorialArray.filter(item => item.AccessorialID === BOLAccesorial.AccesorialID);
+            accessorialArrayFound = this.accessorials.filter(item => item.AccessorialID === BOLAccesorial.AccesorialID);
             if (accessorialArrayFound == null || accessorialArrayFound.length === 0){
               accessorialHasChanged = true;
               return true; // Previous accessorial selected not found in current list of accessorials, so return true (re-rate)
@@ -1429,20 +1442,19 @@ export class FormAddShipComponent implements OnInit {
     return bFieldsHaveChanged;
   }
 
-  SaveAsQuote() {
-    if (this.ShipmentByLadingObject == null){
-      // Insert as new quote
-      const RequiredFieldsValidationObj = this.CheckAllRequiredFields();
-      if (RequiredFieldsValidationObj.showWarningMessage){
-        this.openDialog(RequiredFieldsValidationObj.isConfirmDialog, RequiredFieldsValidationObj.message);
-      }else{
-        this.saveNewQuote();
-      }
+  SaveAsQuote() {    
+    const RequiredFieldsValidationObj = this.CheckAllRequiredFields();
+    if (RequiredFieldsValidationObj.showWarningMessage){
+       this.openDialog(RequiredFieldsValidationObj.isConfirmDialog, RequiredFieldsValidationObj.message);
     }else{
-      // Update quote
-
-    }
-
+      if (this.ShipmentByLadingObject == null){
+        // Insert as new quote
+        this.saveNewQuote();
+      }else{
+        // Update quote
+        this.updateQuote();
+      }
+    }  
   }
 
   async saveNewQuote(){
@@ -1450,14 +1462,549 @@ export class FormAddShipComponent implements OnInit {
     this.spinnerMessage = 'Saving quote';
     this.showSpinner = true;
 
-    const selectedRate = this.selectedRateFromQuotes; // Selected rate
+    // Start here rs
+    // const selectedRate = this.selectedRateFromQuotes; // Selected rate
 
-    console.log('save quote start',selectedRate);
+    // console.log('save quote start',selectedRate);
+
+    // const arrayProducts = this.productsAndAccessorialsFormGroup.get('products').value;
+    // const productList: BOlProductsListSQD[] = [];
+    // let productsCounter = 1;
+    // arrayProducts.forEach(p => {
+    //   const prod : BOlProductsListSQD = {
+    //     BOLProductID: productsCounter,
+    //     Description: p.ProductDescription,
+    //     Pallets: p.Pallets,
+    //     Pieces: p.Pieces,
+    //     Hazmat: p.HazMat,
+    //     NMFC: p.NmfcNumber,
+    //     Class: p.ProductClass,
+    //     Weight: p.Weight,
+    //     Height: p.Height,
+    //     Lenght: p.Length,
+    //     Width: p.Width,
+    //     PackageTypeID: p.PackageTypeID,
+    //     PCF: p.PCF,
+    //     selectedProduct: {},
+    //     Status: 1,
+    //     SelectedProductClass: {},
+    //     Stackable: p.Stackable,
+    //     PortCode: 'C'
+    //   }
+
+    //   console.log('p', p);
+
+    //   console.log('prod', prod);
+
+    //   productList.push(prod);
+
+    //   productsCounter = productsCounter + 1;
+    // });
+
+    // const accountInvoiceCostList: AccountInvoiceCostListSQD[] = [];
+
+    // selectedRate.Accessorials.forEach(a => {
+    //   const accountInvoiceCost: AccountInvoiceCostListSQD = {
+    //     AccessorialID: a.AccessorialID,
+    //     AccessorialCode: a.AccessorialCode,
+    //     RatedCost: a.AccessorialCharge,
+    //     BilledCost: a.AccessorialCharge,
+    //     Description: a.AccessorialDescription,
+    //     CostStatus: 1 // Ask
+    //   }
+    //   accountInvoiceCostList.push(accountInvoiceCost);
+    // })
+
+    // // Ask
+    // // Freight
+    // const accountInvoiceFreight: AccountInvoiceCostListSQD = {
+    //   AccessorialID: 22,
+    //   RatedCost: selectedRate.GrossAmount,
+    //   BilledCost: selectedRate.GrossAmount,
+    //   Description: 'Freight',
+    //   AccessorialCode: 'FRT',
+    //   CostStatus: 1
+    // }
+    // accountInvoiceCostList.push(accountInvoiceFreight);
+
+    // // Fuel
+    // const accountInvoiceFuel: AccountInvoiceCostListSQD = {
+    //   AccessorialID: 23,
+    //   RatedCost: selectedRate.FuelCost,
+    //   BilledCost: selectedRate.FuelCost,
+    //   Description: 'Fuel',
+    //   AccessorialCode: 'FSC',
+    //   CostStatus: 1
+    // }
+    // accountInvoiceCostList.push(accountInvoiceFuel);
+
+    // // Discount
+    // const accountInvoiceDiscount: AccountInvoiceCostListSQD = {
+    //   AccessorialID: 24,
+    //   RatedCost: -1 * selectedRate.Discount,
+    //   BilledCost: -1 * selectedRate.Discount,
+    //   Description: 'Discount',
+    //   AccessorialCode: 'DIS',
+    //   CostStatus: 1
+    // }
+    // accountInvoiceCostList.push(accountInvoiceDiscount);
+
+    // const sellRate: SellRatesSQD = {
+    //   SCAC: selectedRate.CarrierID,
+    //   CarrierName: selectedRate.CarrierName,
+    //   AccountInvoiceCostList: accountInvoiceCostList
+    // }
+
+    // const bolAccesorials: BOLAccesorialListSQD[] = [];
+    // this.accessorials.forEach(a => {
+    //   const acc: BOLAccesorialListSQD = {
+    //     AccesorialID: a.AccessorialID,
+    //     IsAccesorial: true
+    //   }
+    //   bolAccesorials.push(acc);
+    // })
+
+    // console.log('Prod', productList)
+
+    // End here rs
+
+    this.saveQuoteData = {
+      ClientId: 8473,
+      PickupDate: '/Date(1604901600000)/',
+      DeliveryDate: null,
+      OrgName: 'aaa',
+      OrgAdr1: 'aaa',
+      OrgAdr2: null,
+      OrgCity: 85839,
+      OrgState: 33,
+      OrgZip: 19205236,
+      OrgCountry: 1,
+      DestName: 'bbb',
+      DestAdr1: 'bbb',
+      DestAdr2: null,
+      DestCity: 90454,
+      DestState: 63,
+      DestZip: 19229270,
+      DestCountry: 1,
+      BillToName: 'R2 LOGISTICS ',
+      BillToAdr1: '10739 DEERWOOD PARK BLVD',
+      BillToAdr2: 'SUITE 103',
+      BillToState: 59,
+      BillToCity: 100326,
+      BillToZip: 19215714,
+      BillToCountry: 1,
+      CarrierCode: 'UPGF',
+      CarrierName: 'UPS FREIGHT',
+      ProNumber: '333',
+      SplNotes: 'special instructions',
+      Ref1ID: 3759,
+      Ref2ID: 3760,
+      Ref3ID: 3761,
+      Ref1Value: 'cr',
+      Ref2Value: 'r2o',
+      Ref3Value: 'r2prono',
+      TransTime: '2',
+      ShipCost: 139.86,
+      FreightCost: 126,
+      FuelCost: 13.86,
+      AccsCost: 0,
+      ShipperNotes: '',
+      PaymentTermID: 5,
+      OriginContactPerson: null,
+      OriginContactPhone: '1111111111',
+      DestContactPerson: null,
+      DestContactPhone: '22222222222',
+      OriginEmail: 'asd',
+      DestEmail: 'asd2',
+      EquipmentID: 7,
+      ShipmentValue: '111',
+      ValuePerPound: '222',
+      PriorityID: 0,
+      CarrierType: 'Direct',
+      QuoteNumber: '',
+      OriginTerminalAdd1: '240A SKIP LN',
+      OriginTerminalCity: 'BAY SHORE',
+      OriginTerminalState: 'NY',
+      OriginTerminalZip: '11706',
+      OriginTerminalFreePhone: '000-000-0000',
+      OriginTerminalPhone: '631-667-5656',
+      DestTerminalAdd1: '601 W 172ND ST',
+      DestTerminalCity: 'SOUTH HOLLAND',
+      DestTerminalState: 'IL',
+      DestTerminalZip: '60473',
+      DestTerminalFreePhone: '000-000-0000',
+      DestTerminalPhone: '708-210-3810',
+      OriginTerminalFax: '631-667-0024',
+      DestTerminalFax: '708-210-9924',
+      RequestedPickupDateFrom: '/Date(1604901600000)/',
+      RequestedPickupTimeFrom: null,
+      RequestedPickupTimeTo: null,
+      OrgFaxNo: null,
+      DestFaxNo: null,
+      RequestedDeliveryDate: null,
+      ServiceLevelID: 1,
+      Miles: 803,
+      BrokerCarrierCode: null,
+      BrokerReferenceNo: 'r2refno',
+      ShipmentErrorID: 0,
+      BOlProductsList: [
+        {
+          BOLProductID: 1,
+          Description: 'desc',
+          Pallets: '1',
+          Pieces: '1',
+          Hazmat: undefined,
+          NMFC: '123asd',
+          Class: '50',
+          Weight: '333',
+          Height: '33',
+          Lenght: '33',
+          Width: '33',
+          PackageTypeID: 3,
+          PCF: '16.01',
+          selectedProduct: {
+          },
+          Status: 1,
+          SelectedProductClass: {
+          },
+          Stackable: true,
+          PortCode: 'C',
+        },
+      ],
+      BOLAccesorialList: [
+      ],
+      BOLDispatchNotesList: [
+      ],
+      BuyRates: {
+        AccountInvoiceCostList: [
+        ],
+      },
+      SellRates: {
+        SCAC: 'UPGF',
+        CarrierName: 'UPS FREIGHT',
+        AccountInvoiceCostList: [
+          {
+            AccessorialID: 40,
+            AccessorialCode: 'SSC',
+            RatedCost: 0,
+            BilledCost: 0,
+            Description: 'SINGLE SHIPMENT',
+            CostStatus: 1,
+          },
+          {
+            AccessorialID: 22,
+            RatedCost: 126,
+            BilledCost: 126,
+            Description: 'Freight',
+            AccessorialCode: 'FRT',
+            CostStatus: 1,
+          },
+          {
+            AccessorialID: 23,
+            RatedCost: 13.86,
+            BilledCost: 13.86,
+            Description: 'Fuel',
+            AccessorialCode: 'FSC',
+            CostStatus: 1,
+          },
+          {
+            AccessorialID: 24,
+            RatedCost: 0,
+            BilledCost: 0,
+            Description: 'Discount',
+            AccessorialCode: 'DIS',
+            CostStatus: 1,
+          },
+        ],
+      },
+      RefNo: 1,
+      LoggedInUserId: 1,
+      OrgCityName: 'ATLANTIC BEACH                ',
+      OrgStateCode: 'NY ',
+      OrgCountryCode: 'USA',
+      OrgZipCode: '11509',
+      OrgPostWithCity: '11509-ATLANTIC BEACH                ',
+      DestCityName: 'CHICAGO HEIGHTS               ',
+      DestStateCode: 'IL ',
+      DestCountryCode: 'USA',
+      DestZipCode: '60411',
+      DestStateName: 'ILLINOIS                 ',
+      DestPostalWithCity: '60411-CHICAGO HEIGHTS               ',
+      BillToStateName: 'FLORIDA                  ',
+      BillToPostalWithCity: '32256-100326',
+      SellProfileID: 11868,
+      OrgLocation: 'ATLANTIC BEACH                ,NY 11509',
+      DestLocation: 'CHICAGO HEIGHTS               ,IL 60411',
+      BillToCityName: 'JACKSONVILLE                  ',
+      BillToStateCode: '59',
+      BillToCountryCode: '1',
+      BillToZipCode: '32256',
+      SalesPersonList: [
+      ],
+      BolDocumentsList: [
+      ],
+      TrackingDetailsList: [
+      ],
+      ServiceLevelName: 'UPS Standard LTL',
+      ServiceLevelCode: 'STD',
+      RatingResultId: 45309867,
+      Mode: 'LTL',
+      BOLStopLists: [
+      ],
+      CostWithCustomerPercentage: 0,
+      WaterfallList: [
+      ],
+      orgTerminalCityStateZipCode: 'BAY SHORE,NY,11706',
+      destTerminalCityStateZipCode: 'SOUTH HOLLAND,IL,60473',
+      WaterfallDetailsList: [
+      ],
+      StatusReasonCodeId: 0,
+    }
+
+    // this.saveQuoteData = {
+    //   ClientId: this.ClientID,
+    //   PickupDate: String.Format('/Date({0})/',this.originAndDestinationFormGroup.get('originpickupdate').value.getTime()),
+    //   DeliveryDate: null,
+    //   OrgName: this.originAndDestinationFormGroup.get('originname').value,
+    //   OrgAdr1: this.originAndDestinationFormGroup.get('originadddress1').value,
+    //   OrgAdr2: this.originAndDestinationFormGroup.get('originadddress2').value,      
+    //   OrgCity: Number(this.OriginPostalData.CityID),
+    //   OrgState: Number(this.OriginPostalData.StateId),
+    //   OrgZip: Number(this.OriginPostalData.PostalID),
+    //   OrgCountry: Number(this.OriginPostalData.CountryId),
+    //   DestName: this.originAndDestinationFormGroup.get('destname').value,
+    //   DestAdr1: this.originAndDestinationFormGroup.get('destadddress1').value,
+    //   DestAdr2: this.originAndDestinationFormGroup.get('destadddress2').value,
+    //   DestCity: Number(this.DestinationPostalData.CityID),
+    //   DestState: Number(this.DestinationPostalData.StateId),
+    //   DestZip: Number(this.DestinationPostalData.PostalID),
+    //   DestCountry: Number(this.DestinationPostalData.CountryId),
+    //   BillToName: this.clientDefaultData.BillToName,
+    //   BillToAdr1: this.clientDefaultData.BillToAddress1,
+    //   BillToAdr2: this.clientDefaultData.BillToAddress2,
+    //   BillToState: this.clientDefaultData.BillToState,
+    //   BillToCity: this.clientDefaultData.BillToCity,
+    //   BillToZip: this.clientDefaultData.BillToPostal,
+    //   BillToCountry: this.clientDefaultData.BillToCountry,
+    //   CarrierCode: selectedRate.CarrierID,
+    //   CarrierName: selectedRate.CarrierName,
+    //   ProNumber: this.shipmentInfoFormGroup.get('pronumber').value.trim(),
+    //   SplNotes: this.shipmentInfoFormGroup.get('specialinstructions').value,
+    //   Ref1ID: this.ReferenceByClientIDField1,
+    //   Ref2ID: this.ReferenceByClientIDField2,
+    //   Ref3ID: this.ReferenceByClientIDField3,
+    //   Ref1Value: this.shipmentInfoFormGroup.get('customerref').value.trim(),
+    //   Ref2Value: this.shipmentInfoFormGroup.get('r2order').value.trim(),
+    //   Ref3Value: this.shipmentInfoFormGroup.get('r2pronumber').value.trim(),
+    //   TransTime: selectedRate.TransitTime,
+    //   ShipCost: selectedRate.TotalCost,
+    //   FreightCost: selectedRate.FreightCost,
+    //   FuelCost: selectedRate.FuelCost,
+    //   AccsCost: selectedRate.TotalAccCost,
+    //   ShipperNotes: '',
+    //   PaymentTermID: this.shipmentInfoFormGroup.get('paymentterms').value,
+    //   OriginContactPerson: this.originAndDestinationFormGroup.get('origincontact').value,
+    //   OriginContactPhone: this.originAndDestinationFormGroup.get('originphone').value,
+    //   DestContactPerson: this.originAndDestinationFormGroup.get('destcontact').value,
+    //   DestContactPhone: this.originAndDestinationFormGroup.get('destphone').value,
+    //   OriginEmail: this.originAndDestinationFormGroup.get('originemail').value,
+    //   DestEmail: this.originAndDestinationFormGroup.get('destemail').value,
+    //   EquipmentID: this.shipmentInfoFormGroup.get('equipment').value,
+    //   ShipmentValue: this.shipmentInfoFormGroup.get('shipmentvalue').value,
+    //   ValuePerPound: this.shipmentInfoFormGroup.get('valueperpound').value,
+    //   PriorityID: this.shipmentInfoFormGroup.get('priority').value,
+    //   CarrierType: selectedRate.CarrierType,
+    //   QuoteNumber: '',
+    //   OriginTerminalAdd1: selectedRate.OriginTerminalAddress1,
+    //   OriginTerminalCity: selectedRate.OriginTerminalCity,
+    //   OriginTerminalState: selectedRate.OriginTerminalState,
+    //   OriginTerminalZip: selectedRate.OriginTerminalZip,      
+    //   OriginTerminalFreePhone: selectedRate.OriginTerminalFreePhone,
+    //   OriginTerminalPhone: selectedRate.OriginTerminalPhoneNo,
+    //   DestTerminalAdd1: selectedRate.DestTerminalAddress1,
+    //   DestTerminalCity: selectedRate.DestTerminalCity,
+    //   DestTerminalState: selectedRate.DestTerminalState,
+    //   DestTerminalZip: selectedRate.DestTerminalZip,
+    //   DestTerminalFreePhone: selectedRate.DestTerminalFreePhone,
+    //   DestTerminalPhone: selectedRate.DestTerminalPhoneNo,
+    //   OriginTerminalFax:  selectedRate.OriginTerminalFaxNo,
+    //   DestTerminalFax: selectedRate.DestTerminalFaxNo,
+    //   RequestedPickupDateFrom: this.originAndDestinationFormGroup.get('originpickupdate').value != null ? String.Format('/Date({0})/',this.originAndDestinationFormGroup.get('originpickupdate').value.getTime()) : null,
+    //   RequestedPickupTimeFrom: this.originAndDestinationFormGroup.get('originpickupopen').value,
+    //   RequestedPickupTimeTo: this.originAndDestinationFormGroup.get('originpickupclose').value,
+    //   OrgFaxNo: null,
+    //   DestFaxNo: null,
+    //   RequestedDeliveryDate: this.originAndDestinationFormGroup.get('destexpdeldate').value != null ? String.Format('/Date({0})/',this.originAndDestinationFormGroup.get('destexpdeldate').value.getTime()) : null,
+    //   ServiceLevelID: this.shipmentInfoFormGroup.get('servicelevel').value,
+    //   Miles: selectedRate.LaneWiseMiles,
+    //   BrokerCarrierCode: null,
+    //   BrokerReferenceNo: this.shipmentInfoFormGroup.get('r2refno').value,
+    //   ShipmentErrorID: 0, 
+    //   BOlProductsList: productList,
+    //   BOLAccesorialList: bolAccesorials,
+    //   BOLDispatchNotesList: [],
+    //   BuyRates: {
+    //     AccountInvoiceCostList: []
+    //   },
+    //   SellRates: sellRate,
+    //   RefNo: selectedRate.ReferenceNo,
+    //   LoggedInUserId: this.UserIDLoggedIn, // Continue HERERS  
+    //   OrgCityName: this.OriginPostalData.CityName,
+    //   OrgStateCode: this.OriginPostalData.StateCode,
+    //   OrgCountryCode: this.OriginPostalData.CountryCode,
+    //   OrgZipCode: this.OriginPostalData.PostalCode,
+    //   OrgPostWithCity: this.OriginPostalData.PostalCode + '-' + this.OriginPostalData.CityName,
+    //   DestCityName: this.DestinationPostalData.CityName,
+    //   DestStateCode: this.DestinationPostalData.StateCode,
+    //   DestCountryCode: this.DestinationPostalData.CountryCode,
+    //   DestZipCode: this.DestinationPostalData.PostalCode,
+    //   DestStateName: this.DestinationPostalData.StateName,
+    //   DestPostalWithCity: this.DestinationPostalData.PostalCode + '-' + this.DestinationPostalData.CityName,
+    //   BillToStateName: this.clientDefaultData.BillToStateName,
+    //   BillToPostalWithCity: this.clientDefaultData.BillToPostalCode + '-' +  this.clientDefaultData.BillToCity,
+    //   SellProfileID: selectedRate.ProfileID,
+    //   OrgLocation:String.Format('{0},{1}{2}',this.OriginPostalData.CityName,this.OriginPostalData.StateCode,this.OriginPostalData.PostalCode),
+    //   DestLocation:String.Format('{0},{1}{2}',this.DestinationPostalData.CityName,this.DestinationPostalData.StateCode,this.DestinationPostalData.PostalCode),
+    //   BillToCityName: this.clientDefaultData.BillToCityName.toString(),
+    //   BillToStateCode: this.clientDefaultData.BillToState.toString(),
+    //   BillToCountryCode: this.clientDefaultData.BillToCountry.toString(),
+    //   BillToZipCode: this.clientDefaultData.BillToPostalCode,
+    //   SalesPersonList: [],
+    //   BolDocumentsList: [],
+    //   TrackingDetailsList: [],
+    //   ServiceLevelName:selectedRate.ServiceLevel,
+    //   ServiceLevelCode:selectedRate.SaasServiceLevelCode,
+    //   RatingResultId: selectedRate.RatingResultId,
+    //   Mode: this.shipmentInfoFormGroup.get('mode').value,
+    //   BOLStopLists: [],
+    //   CostWithCustomerPercentage: selectedRate.CostWithCustomerPercentage,
+    //   WaterfallList: [],
+    //   orgTerminalCityStateZipCode:String.Format('{0},{1},{2}',selectedRate.OriginTerminalCity,selectedRate.OriginTerminalState,selectedRate.OriginTerminalZipCode),
+    //   destTerminalCityStateZipCode:String.Format('{0},{1},{2}',selectedRate.DestTerminalCity,selectedRate.DestTerminalState,selectedRate.DestTerminalZipCode),
+    //   WaterfallDetailsList: [],
+    //   StatusReasonCodeId: 0 // Check if we need to get the StatusReasonCodeList
+    // }
+
+    // this.saveQuoteParameters = {
+    //     ClientId: this.ClientID,
+    //     PickupDate: String.Format('/Date({0})/',this.originAndDestinationFormGroup.get('originpickupdate').value.getTime()),
+    //     OrgName: this.originAndDestinationFormGroup.get('originname').value,
+    //     OrgAdr1: this.originAndDestinationFormGroup.get('originadddress1').value,
+    //     OrgAdr2: this.originAndDestinationFormGroup.get('originadddress2').value,
+    //     OrgCity: Number(this.OriginPostalData.CityID),
+    //     OrgState: Number(this.OriginPostalData.StateId),
+    //     OrgStateCode: this.OriginPostalData.StateCode,
+    //     OrgStateName: this.OriginPostalData.StateName,
+    //     OrgCountry: Number(this.OriginPostalData.CountryId),
+    //     DestName: this.originAndDestinationFormGroup.get('destname').value,
+    //     DestAdr1: this.originAndDestinationFormGroup.get('destadddress1').value,
+    //     DestCity: Number(this.DestinationPostalData.CityID),
+    //     DestState: Number(this.DestinationPostalData.StateId),
+    //     DestStateCode: this.DestinationPostalData.StateCode,
+    //     DestStateName: this.DestinationPostalData.StateName,
+    //     DestCountry: Number(this.DestinationPostalData.CountryId),
+    //     CarrierCode: selectedRate.CarrierID,
+    //     CarrierName: selectedRate.CarrierName,
+    //     TransTime: selectedRate.TransitTime,
+    //     CarrierType: selectedRate.CarrierType,
+    //     OriginTerminalName: selectedRate.OriginTerminalName,
+    //     OriginTerminalAdd1: selectedRate.OriginTerminalAddress1,
+    //     OriginTerminalAdd2: selectedRate.OriginTerminalAddress2,
+    //     OriginTerminalCity: selectedRate.OriginTerminalCity,
+    //     OriginTerminalState: selectedRate.OriginTerminalState,
+    //     OriginTerminalZip: selectedRate.OriginTerminalZip,
+    //     OriginTerminalContactPerson: selectedRate.OriginTerminalContactName,
+    //     OriginTerminalFreePhone: selectedRate.OriginTerminalFreePhone,
+    //     OriginTerminalPhone: selectedRate.OriginTerminalPhoneNo,
+    //     OriginTerminalEmail: selectedRate.OriginTerminalEmail,
+    //     DestTerminalName: selectedRate.DestTerminalName,
+    //     DestTerminalAdd1: selectedRate.DestTerminalAddress1,
+    //     DestTerminalAdd2: selectedRate.DestTerminalAddress2,
+    //     DestTerminalCity: selectedRate.DestTerminalCity,
+    //     DestTerminalState: selectedRate.DestTerminalState,
+    //     DestTerminalZip: selectedRate.DestTerminalZip,
+    //     DestTerminalContactPerson: selectedRate.DestTerminalContactName,
+    //     DestTerminalFreePhone: selectedRate.DestTerminalFreePhone,
+    //     DestTerminalPhone: selectedRate.DestTerminalPhoneNo,
+    //     DestTerminalEmail: selectedRate.DestTerminalEmail,
+    //     OriginTerminalFax: selectedRate.OriginTerminalFaxNo,
+    //     DestTerminalFax: selectedRate.DestTerminalFaxNo,
+        
+    //     BOlProductsList: productList,
+    //     BOLAccesorialList: bolAccesorials,
+    //     BOLDispatchNotesList: [],
+    //     BuyRates: null,
+    //     SellRates: sellRate,
+
+    //     LoggedInUserId: this.UserIDLoggedIn,
+    //     OrgCityName:this.OriginPostalData.CityName,        
+    //     OrgCountryCode:this.OriginPostalData.CountryCode,
+    //     OrgZipCode:this.OriginPostalData.PostalCode,
+    //     OrgZip: Number(this.OriginPostalData.PostalID),
+    //     DestCityName:this.DestinationPostalData.CityName,        
+    //     DestCountryCode:this.DestinationPostalData.CountryCode,
+    //     DestZip: Number(this.DestinationPostalData.PostalID),
+    //     DestZipCode:this.DestinationPostalData.PostalCode,
+    //     OrgLocation:String.Format('{0},{1}{2}',this.OriginPostalData.CityName,this.OriginPostalData.StateCode,this.OriginPostalData.PostalCode),
+    //     DestLocation:String.Format('{0},{1}{2}',this.DestinationPostalData.CityName,this.DestinationPostalData.StateCode,this.DestinationPostalData.PostalCode),
+    //     SalesPersonList: [],
+    //     BolDocumentsList: [],
+    //     TrackingDetailsList: [],
+    //     ServiceLevelName:selectedRate.ServiceLevel,
+    //     ServiceLevelCode:selectedRate.SaasServiceLevelCode,
+    //     RatingResultId:selectedRate.RatingResultId,        
+    //     BOLStopLists: [],
+    //     CostWithCustomerPercentage: selectedRate.CostWithCustomerPercentage,
+    //     WaterfallList: [],
+    //     orgTerminalCityStateZipCode:String.Format('{0},{1},{2}',selectedRate.OriginTerminalCity,selectedRate.OriginTerminalState,selectedRate.OriginTerminalZipCode),
+    //     destTerminalCityStateZipCode:String.Format('{0},{1},{2}',selectedRate.DestTerminalCity,selectedRate.DestTerminalState,selectedRate.DestTerminalZipCode),
+    //     WaterfallDetailsList:null,
+    //     Mode: this.shipmentInfoFormGroup.get('mode').value,
+    //     EquipmentID: this.shipmentInfoFormGroup.get('equipment').value,
+    //     PriorityID: this.shipmentInfoFormGroup.get('priority').value,
+    //     ServiceLevelID: this.shipmentInfoFormGroup.get('servicelevel').value,
+    //     PaymentTermID: this.shipmentInfoFormGroup.get('paymentterms').value,
+    //     OriginContactPerson: this.originAndDestinationFormGroup.get('origincontact').value,
+    //     OriginContactPhone: this.originAndDestinationFormGroup.get('originphone').value,
+    //     OriginEmail: this.originAndDestinationFormGroup.get('originemail').value,
+    //     DestContactPerson: this.originAndDestinationFormGroup.get('destcontact').value,
+    //     DestContactPhone: this.originAndDestinationFormGroup.get('destphone').value,
+    //     RequestedPickupTimeFrom: this.originAndDestinationFormGroup.get('originpickupopen').value,
+    //     RequestedPickupTimeTo: this.originAndDestinationFormGroup.get('originpickupclose').value
+    // };
+
+    console.log('saveQuoteParameters',this.saveQuoteData)
+
+    const responseData = await this.httpService.saveNewQuote(this.saveQuoteData);
+    if (responseData != null && !String.IsNullOrWhiteSpace(responseData.ClientLadingNo))
+    {
+      this.messageService.SendQuoteParameter(responseData.ClientLadingNo);
+      this.messageService.SendLadingIDParameter(responseData.LadingID.toString());
+      this.snackbar.open('Quote saved successfully with LoadNo ' + responseData.ClientLadingNo, null, {
+        duration: 5000
+      });
+    }
+    else{
+      this.snackbar.open('There was an error, try again.', null, {
+        duration: 5000
+      });
+    }
+
+    this.showSpinner = false;
+  }
+
+  async updateQuote(){
+    this.spinnerMessage = 'Saving quote';
+    this.showSpinner = true;
+
+    const selectedRate = this.selectedRateFromQuotes; // Selected rate
+    console.log('Quote has been rerated, selectedRate: ',selectedRate);
 
     const arrayProducts = this.productsAndAccessorialsFormGroup.get('products').value;
-    const productList: BOlProductsList[] = [];
+    const productList: BOlProductsListSBL[] = [];
     arrayProducts.forEach(p => {
-      const prod : BOlProductsList = {
+      const prod : BOlProductsListSBL = {
+        BOLProductID: p.BOLProductID,
         Description: p.ProductDescription,
         Pallets: p.Pallets,
         Pieces: p.Pieces,
@@ -1471,160 +2018,189 @@ export class FormAddShipComponent implements OnInit {
         PackageTypeID: p.PackageTypeID,
         PCF: p.PCF,
         selectedProduct: {},
-        Status: 1,
+        Status: 2, // *
         SelectedProductClass: {},
-        Stackable: p.Stackable
-      }
-
-      console.log('p', p);
-
-      console.log('prod', prod);
+        AddProductToParent: false, // *
+        Stackable: p.Stackable,
+        PortCode: 'C',
+        HazmatContact: null,
+        LadingID: this.ShipmentByLadingObject.LadingID
+      }      
 
       productList.push(prod);
     });
 
-    const accountInvoiceCostList: AccountInvoiceCost[] = [];
+    this.ShipmentByLadingObject.BOlProductsList = productList; // Update products
 
-    selectedRate.Accessorials.forEach(a => {
-      const accountInvoiceCost: AccountInvoiceCost = {
-        AccessorialID: a.AccessorialID,
-        RatedCost: a.AccessorialCharge,
-        BilledCost: a.AccessorialCharge,
-        Description: a.AccessorialDescription,
-        CostStatus: 1 // Ask
-      }
-      accountInvoiceCostList.push(accountInvoiceCost);
-    })
+    // -- Update Origin and Destination fields
+    this.ShipmentByLadingObject.OrgName = this.originAndDestinationFormGroup.get('originname').value;
+    this.ShipmentByLadingObject.OrgAdr1 = this.originAndDestinationFormGroup.get('originadddress1').value;
+    this.ShipmentByLadingObject.OrgAdr2 = this.originAndDestinationFormGroup.get('originadddress2').value;
 
-    // Ask
-    // Freight
-    const accountInvoiceFreight: AccountInvoiceCost = {
-      AccessorialID: 22,
-      RatedCost: selectedRate.GrossAmount,
-      BilledCost: selectedRate.GrossAmount,
-      Description: 'Freight',
-      CostStatus: 1
-    }
-    accountInvoiceCostList.push(accountInvoiceFreight);
-
-    // Fuel
-    const accountInvoiceFuel: AccountInvoiceCost = {
-      AccessorialID: 23,
-      RatedCost: selectedRate.FuelCost,
-      BilledCost: selectedRate.FuelCost,
-      Description: 'Fuel',
-      CostStatus: 1
-    }
-    accountInvoiceCostList.push(accountInvoiceFuel);
-
-    // Discount
-    const accountInvoiceDiscount: AccountInvoiceCost = {
-      AccessorialID: 24,
-      RatedCost: -1 * selectedRate.Discount,
-      BilledCost: -1 * selectedRate.Discount,
-      Description: 'Discount',
-      CostStatus: 1
-    }
-    accountInvoiceCostList.push(accountInvoiceDiscount);
-
-    const sellRate: SellRate = {
-      SCAC: selectedRate.CarrierID,
-      CarrierName: selectedRate.CarrierName,
-      AccountInvoiceCostList: accountInvoiceCostList
+    if (this.ShipmentByLadingObject.OrgZipCode !== this.OriginPostalData.PostalCode){
+      this.ShipmentByLadingObject.OrgCity = Number(this.OriginPostalData.CityID);
+      this.ShipmentByLadingObject.OrgState = Number(this.OriginPostalData.StateId);
+      this.ShipmentByLadingObject.OrgCountry = Number(this.OriginPostalData.CountryId);
+      this.ShipmentByLadingObject.OrgZip = Number(this.OriginPostalData.PostalID);      
     }
 
-    const bolAccesorials: BOLAccesorial[] = [];
+    this.ShipmentByLadingObject.OriginContactPerson = this.originAndDestinationFormGroup.get('origincontact').value;
+    this.ShipmentByLadingObject.OriginContactPhone = this.originAndDestinationFormGroup.get('originphone').value;
+    this.ShipmentByLadingObject.OriginEmail = this.originAndDestinationFormGroup.get('originemail').value;
+
+    this.ShipmentByLadingObject.DestName = this.originAndDestinationFormGroup.get('destname').value;
+    this.ShipmentByLadingObject.DestAdr1 = this.originAndDestinationFormGroup.get('destadddress1').value;
+    this.ShipmentByLadingObject.DestAdr2 = this.originAndDestinationFormGroup.get('destadddress2').value;
+
+    if (this.ShipmentByLadingObject.DestZipCode !== this.DestinationPostalData.PostalCode){
+      this.ShipmentByLadingObject.DestCity = Number(this.DestinationPostalData.CityID);
+      this.ShipmentByLadingObject.DestState = Number(this.DestinationPostalData.StateId);
+      this.ShipmentByLadingObject.DestCountry = Number(this.DestinationPostalData.CountryId);
+      this.ShipmentByLadingObject.DestZip = Number(this.DestinationPostalData.PostalID);
+    }
+
+    this.ShipmentByLadingObject.DestContactPerson = this.originAndDestinationFormGroup.get('destcontact').value;
+    this.ShipmentByLadingObject.DestContactPhone = this.originAndDestinationFormGroup.get('destphone').value;
+    this.ShipmentByLadingObject.DestEmail = this.originAndDestinationFormGroup.get('destemail').value;
+
+    this.ShipmentByLadingObject.PickupDate = String.Format('/Date({0})/',this.originAndDestinationFormGroup.get('originpickupdate').value.getTime());
+    this.ShipmentByLadingObject.RequestedPickupTimeFrom = this.originAndDestinationFormGroup.get('originpickupopen').value;
+    this.ShipmentByLadingObject.RequestedPickupTimeTo = this.originAndDestinationFormGroup.get('originpickupclose').value;   
+
+    this.ShipmentByLadingObject.ExpectedDeliveryDate = String.Format('/Date({0})/',this.originAndDestinationFormGroup.get('destexpdeldate').value.getTime());
+    this.ShipmentByLadingObject.DeliveryAppointmentTimeFrom = this.originAndDestinationFormGroup.get('destdelapptfrom').value;
+    this.ShipmentByLadingObject.DeliveryAppointmentTimeTo = this.originAndDestinationFormGroup.get('destdelapptto').value;   
+    // --
+
+    // -- Update Shipment Information fields
+    this.ShipmentByLadingObject.ProNumber = this.shipmentInfoFormGroup.get('pronumber').value.trim();
+    this.ShipmentByLadingObject.SplNotes = this.shipmentInfoFormGroup.get('specialinstructions').value;   
+    this.ShipmentByLadingObject.Ref1Value = this.shipmentInfoFormGroup.get('customerref').value.trim();
+    this.ShipmentByLadingObject.Ref2Value = this.shipmentInfoFormGroup.get('r2order').value.trim();
+    this.ShipmentByLadingObject.Ref3Value = this.shipmentInfoFormGroup.get('r2pronumber').value.trim();
+    this.ShipmentByLadingObject.PaymentTermID = this.shipmentInfoFormGroup.get('paymentterms').value;
+    this.ShipmentByLadingObject.ShipmentValue = this.shipmentInfoFormGroup.get('shipmentvalue').value;
+    this.ShipmentByLadingObject.ValuePerPound = this.shipmentInfoFormGroup.get('valueperpound').value;
+    this.ShipmentByLadingObject.PriorityID = this.shipmentInfoFormGroup.get('priority').value;
+	  this.ShipmentByLadingObject.ServiceLevelID = this.shipmentInfoFormGroup.get('servicelevel').value;
+	  this.ShipmentByLadingObject.BrokerReferenceNo = this.shipmentInfoFormGroup.get('r2refno').value;
+	  this.ShipmentByLadingObject.Mode = this.shipmentInfoFormGroup.get('mode').value;
+    // --
+
+    const bolAccesorials: BOLAccesorialListSBL[] = [];
     this.accessorials.forEach(a => {
-      const acc: BOLAccesorial = {
+      const acc: BOLAccesorialListSBL = {
         AccesorialID: a.AccessorialID,
         IsAccesorial: true
       }
       bolAccesorials.push(acc);
     })
 
-    console.log('Prod', productList)
+    this.ShipmentByLadingObject.BOLAccesorialList = bolAccesorials;
 
-    this.saveQuoteParameters = {
-        ClientId: this.ClientID,
-        PickupDate: String.Format('/Date({0})/',this.originAndDestinationFormGroup.get('originpickupdate').value.getTime()),
-        OrgName: this.originAndDestinationFormGroup.get('originname').value,
-        OrgAdr1: this.originAndDestinationFormGroup.get('originadddress1').value,
-        OrgCity: Number(this.OriginPostalData.CityID),
-        OrgState: Number(this.OriginPostalData.StateId),
-        OrgCountry: Number(this.OriginPostalData.CountryId),
-        DestName: this.originAndDestinationFormGroup.get('destname').value,
-        DestAdr1: this.originAndDestinationFormGroup.get('destadddress1').value,
-        DestCity: Number(this.DestinationPostalData.CityID),
-        DestState: Number(this.DestinationPostalData.StateId),
-        DestCountry: Number(this.DestinationPostalData.CountryId),
-        CarrierCode: selectedRate.CarrierID,
-        CarrierName: selectedRate.CarrierName,
-        TransTime: selectedRate.TransitTime,
-        CarrierType: selectedRate.CarrierType,
-        OriginTerminalName: selectedRate.OriginTerminalName,
-        OriginTerminalAdd1: selectedRate.OriginTerminalAddress1,
-        OriginTerminalAdd2: selectedRate.OriginTerminalAddress2,
-        OriginTerminalCity: selectedRate.OriginTerminalCity,
-        OriginTerminalState: selectedRate.OriginTerminalState,
-        OriginTerminalZip: selectedRate.OriginTerminalZip,
-        OriginTerminalContactPerson: selectedRate.OriginTerminalContactName,
-        OriginTerminalFreePhone: selectedRate.OriginTerminalFreePhone,
-        OriginTerminalPhone: selectedRate.OriginTerminalPhoneNo,
-        OriginTerminalEmail: selectedRate.OriginTerminalEmail,
-        DestTerminalName: selectedRate.DestTerminalName,
-        DestTerminalAdd1: selectedRate.DestTerminalAddress1,
-        DestTerminalAdd2: selectedRate.DestTerminalAddress2,
-        DestTerminalCity: selectedRate.DestTerminalCity,
-        DestTerminalState: selectedRate.DestTerminalState,
-        DestTerminalZip: selectedRate.DestTerminalZip,
-        DestTerminalContactPerson: selectedRate.DestTerminalContactName,
-        DestTerminalFreePhone: selectedRate.DestTerminalFreePhone,
-        DestTerminalPhone: selectedRate.DestTerminalPhoneNo,
-        DestTerminalEmail: selectedRate.DestTerminalEmail,
-        OriginTerminalFax: selectedRate.OriginTerminalFaxNo,
-        DestTerminalFax: selectedRate.DestTerminalFaxNo,
-        // Ask
-        ServiceLevelID: 1, // ask selectedRate.ServiceLevelCode,
-        BOlProductsList: productList,
-        BOLAccesorialList: bolAccesorials,
-        BOLDispatchNotesList: [],
-        BuyRates: null,
-        SellRates: sellRate,
+    if (selectedRate != null && selectedRate.CarrierID != null){
+      const accountInvoiceCostList: AccountInvoiceCostListSBL[] = [];
 
-        LoggedInUserId: 1,
-        OrgCityName:this.OriginPostalData.CityName,
-        OrgStateCode:this.OriginPostalData.StateCode,
-        OrgCountryCode:this.OriginPostalData.CountryCode,
-        OrgZipCode:this.OriginPostalData.PostalCode,
-        DestCityName:this.DestinationPostalData.CityName,
-        DestStateCode:this.DestinationPostalData.StateCode,
-        DestCountryCode:this.DestinationPostalData.CountryCode,
-        DestZipCode:this.DestinationPostalData.PostalCode,
-        OrgLocation:String.Format('{0},{1}{2}',this.OriginPostalData.CityName,this.OriginPostalData.StateCode,this.OriginPostalData.PostalCode),
-        DestLocation:String.Format('{0},{1}{2}',this.DestinationPostalData.CityName,this.DestinationPostalData.StateCode,this.DestinationPostalData.PostalCode),
-        SalesPersonList: [],
-        BolDocumentsList: [],
-        TrackingDetailsList: [],
-        ServiceLevelName:selectedRate.ServiceLevel,
-        ServiceLevelCode:selectedRate.SaasServiceLevelCode,
-        RatingResultId:selectedRate.RatingResultId,
-        Mode: selectedRate.ModeType, // "LTL"
-        BOLStopLists: [],
-        CostWithCustomerPercentage: selectedRate.CostWithCustomerPercentage,
-        WaterfallList: [],
-        orgTerminalCityStateZipCode:String.Format('{0},{1},{2}',selectedRate.OriginTerminalCity,selectedRate.OriginTerminalState,selectedRate.OriginTerminalZipCode),
-        destTerminalCityStateZipCode:String.Format('{0},{1},{2}',selectedRate.DestTerminalCity,selectedRate.DestTerminalState,selectedRate.DestTerminalZipCode),
-        WaterfallDetailsList:null
-    };
+      selectedRate.Accessorials.forEach(a => {
+        const accountInvoiceCost: AccountInvoiceCostListSBL = {
+          AccessorialID: a.AccessorialID,
+          AccessorialCode: a.AccessorialCode,
+          RatedCost: a.AccessorialCharge,
+          BilledCost: a.AccessorialCharge,
+          Description: a.AccessorialDescription,
+          CostStatus: 1 // Ask
+        }
+        accountInvoiceCostList.push(accountInvoiceCost);
+      })
+  
+      // Ask
+      // Freight
+      const accountInvoiceFreight: AccountInvoiceCostListSBL = {
+        AccessorialID: 22,
+        RatedCost: selectedRate.GrossAmount,
+        BilledCost: selectedRate.GrossAmount,
+        Description: 'Freight',
+        AccessorialCode: 'FRT',
+        CostStatus: 1
+      }
+      accountInvoiceCostList.push(accountInvoiceFreight);
+  
+      // Fuel
+      const accountInvoiceFuel: AccountInvoiceCostListSBL = {
+        AccessorialID: 23,
+        RatedCost: selectedRate.FuelCost,
+        BilledCost: selectedRate.FuelCost,
+        Description: 'Fuel',
+        AccessorialCode: 'FSC',
+        CostStatus: 1
+      }
+      accountInvoiceCostList.push(accountInvoiceFuel);
+  
+      // Discount
+      const accountInvoiceDiscount: AccountInvoiceCostListSBL = {
+        AccessorialID: 24,
+        RatedCost: -1 * selectedRate.Discount,
+        BilledCost: -1 * selectedRate.Discount,
+        Description: 'Discount',
+        AccessorialCode: 'DIS',
+        CostStatus: 1
+      }
+      accountInvoiceCostList.push(accountInvoiceDiscount);
+  
+      this.ShipmentByLadingObject.SellRates.SCAC = selectedRate.CarrierID;
+      this.ShipmentByLadingObject.SellRates.CarrierName = selectedRate.CarrierName;
+      this.ShipmentByLadingObject.SellRates.AccountInvoiceCostList = accountInvoiceCostList;      
 
-    console.log('saveQuoteParameters',this.saveQuoteParameters)
+      this.ShipmentByLadingObject.CarrierCode = selectedRate.CarrierID;
+      this.ShipmentByLadingObject.CarrierName = selectedRate.CarrierName;
+      this.ShipmentByLadingObject.TransTime = selectedRate.TransitTime;
+      this.ShipmentByLadingObject.CarrierType = selectedRate.CarrierType;
+      
+      this.ShipmentByLadingObject.ShipCost = selectedRate.TotalCost;
+      this.ShipmentByLadingObject.FreightCost = selectedRate.FreightCost;
+      this.ShipmentByLadingObject.FuelCost = selectedRate.FuelCost;
+      this.ShipmentByLadingObject.AccsCost = selectedRate.TotalAccCost;
 
-    const responseData = await this.httpService.saveQuote(this.saveQuoteParameters);
-    if (!String.IsNullOrWhiteSpace(responseData.ClientLadingNo))
+      this.ShipmentByLadingObject.OriginTerminalName = selectedRate.OriginTerminalName;
+      this.ShipmentByLadingObject.OriginTerminalAdd1 = selectedRate.OriginTerminalAddress1;
+      this.ShipmentByLadingObject.OriginTerminalAdd2 = selectedRate.OriginTerminalAddress2;
+      this.ShipmentByLadingObject.OriginTerminalCity = selectedRate.OriginTerminalCity;
+      this.ShipmentByLadingObject.OriginTerminalState = selectedRate.OriginTerminalState;
+      this.ShipmentByLadingObject.OriginTerminalZip = selectedRate.OriginTerminalZip;
+      this.ShipmentByLadingObject.OriginTerminalContactPerson = selectedRate.OriginTerminalContactName;
+      this.ShipmentByLadingObject.OriginTerminalFreePhone = selectedRate.OriginTerminalFreePhone;
+      this.ShipmentByLadingObject.OriginTerminalPhone = selectedRate.OriginTerminalPhoneNo;
+      this.ShipmentByLadingObject.OriginTerminalEmail = selectedRate.OriginTerminalEmail;
+      this.ShipmentByLadingObject.DestTerminalName = selectedRate.DestTerminalName;
+      this.ShipmentByLadingObject.DestTerminalAdd1 = selectedRate.DestTerminalAddress1;
+      this.ShipmentByLadingObject.DestTerminalAdd2 = selectedRate.DestTerminalAddress2;
+      this.ShipmentByLadingObject.DestTerminalCity = selectedRate.DestTerminalCity;
+      this.ShipmentByLadingObject.DestTerminalState = selectedRate.DestTerminalState;
+      this.ShipmentByLadingObject.DestTerminalZip = selectedRate.DestTerminalZip;
+      this.ShipmentByLadingObject.DestTerminalContactPerson = selectedRate.DestTerminalContactName;
+      this.ShipmentByLadingObject.DestTerminalFreePhone = selectedRate.DestTerminalFreePhone;
+      this.ShipmentByLadingObject.DestTerminalPhone = selectedRate.DestTerminalPhoneNo;
+      this.ShipmentByLadingObject.DestTerminalEmail = selectedRate.DestTerminalEmail;
+      this.ShipmentByLadingObject.OriginTerminalFax = selectedRate.OriginTerminalFaxNo;
+      this.ShipmentByLadingObject.DestTerminalFax = selectedRate.DestTerminalFaxNo;
+      this.ShipmentByLadingObject.ServiceLevelName = selectedRate.ServiceLevel;
+      this.ShipmentByLadingObject.ServiceLevelCode = selectedRate.SaasServiceLevelCode;
+      this.ShipmentByLadingObject.RatingResultId = selectedRate.RatingResultId;
+      this.ShipmentByLadingObject.Miles = selectedRate.LaneWiseMiles;
+      this.ShipmentByLadingObject.RefNo = selectedRate.ReferenceNo;
+      this.ShipmentByLadingObject.SellProfileID = selectedRate.ProfileID;
+      this.ShipmentByLadingObject.CostWithCustomerPercentage = selectedRate.CostWithCustomerPercentage,
+	    this.ShipmentByLadingObject.orgTerminalCityStateZipCode = String.Format('{0},{1},{2}',selectedRate.OriginTerminalCity,selectedRate.OriginTerminalState,selectedRate.OriginTerminalZipCode);
+      this.ShipmentByLadingObject.destTerminalCityStateZipCode = String.Format('{0},{1},{2}',selectedRate.DestTerminalCity,selectedRate.DestTerminalState,selectedRate.DestTerminalZipCode);
+
+    }
+    
+    const responseData = await this.httpService.UpdateBOLHDR(this.ShipmentByLadingObject);
+    if (responseData != null && !String.IsNullOrWhiteSpace(this.ShipmentByLadingObject.ClientLadingNo))
     {
-      this.messageService.SendQuoteParameter(responseData.ClientLadingNo);
-      this.messageService.SendLadingIDParameter(responseData.LadingID.toString());
-      this.snackbar.open('Quote is saved successfully with LoadNo ' + responseData.ClientLadingNo, null, {
+      this.messageService.SendQuoteParameter(this.ShipmentByLadingObject.ClientLadingNo);
+      this.messageService.SendLadingIDParameter(this.ShipmentByLadingObject.LadingID.toString());
+      this.snackbar.open('Quote saved successfully', null, {
         duration: 5000
       });
     }
@@ -1635,7 +2211,9 @@ export class FormAddShipComponent implements OnInit {
     }
 
     this.showSpinner = false;
+
   }
+
 
   CheckAllRequiredFields(){
     let RequiredFieldsValidationObj = {
@@ -1655,24 +2233,17 @@ export class FormAddShipComponent implements OnInit {
     if (counter > 0){
       RequiredFieldsValidationObj.showWarningMessage = true;
       RequiredFieldsValidationObj.message = 'Please complete all required fields.';
-      RequiredFieldsValidationObj.isConfirmDialog = false;
-      // message = 'Please complete all required fields.';
-      // showWarningMessage = true;
-      // this.openDialog(false, message);
+      RequiredFieldsValidationObj.isConfirmDialog = false;     
     }else if(this.costListFiltered.length === 0){
       RequiredFieldsValidationObj.showWarningMessage = true;
       RequiredFieldsValidationObj.message = 'Please select a rate the shipment first.';
-      RequiredFieldsValidationObj.isConfirmDialog = false;
-      // message = 'Please select a rate the shipment first.';
-      // this.openDialog(false, message);
+      RequiredFieldsValidationObj.isConfirmDialog = false;     
     }else{
       const fieldsHaveChanged = this.validateIfFieldsHaveChanged();
       if (fieldsHaveChanged){
         RequiredFieldsValidationObj.showWarningMessage = true;
-        RequiredFieldsValidationObj.message = 'You have modified some value(s), that requires re-rate this shipment. If you will not re-rate, then this shipment will go to "Quote Modified" status. Do you want to proceed?';
-        RequiredFieldsValidationObj.isConfirmDialog = true;
-        // message = 'You have modified some value(s), that requires re-rate this shipment. If you will not re-rate, then this shipment will go to "Quote Modified" status. Do you want to proceed?';
-        // this.openDialog(true, message);
+        RequiredFieldsValidationObj.message = 'You have modified some value(s), that requires re-rate this shipment. If you will not re-rate, then this shipment will go to "Quote Modified" status. Do you want to re-rate?';
+        RequiredFieldsValidationObj.isConfirmDialog = true;       
       }  
     }
 

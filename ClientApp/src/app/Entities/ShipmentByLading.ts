@@ -33,6 +33,8 @@ export interface BOlProductsListSBL {
     StopID?: any;
     Weight: number;
     Width: number;
+    selectedProduct: {},
+    SelectedProductClass: {}
 }
 
 export interface BolInfoList {
@@ -48,10 +50,27 @@ export interface BolInfoList {
     TimeCritical: boolean;
 }
 
+export interface AccountInvoiceCostListSBL {
+    AccCarrierCostSeq?: number;
+    AccClientCostSeq?: number;
+    AccInvoiceDetailsCostSeq?: number;
+    AccessorialCode: string;
+    AccessorialID?: number;
+    BilledCost: number;
+    BuyCostSeq?: number;
+    CostDetailID?: number;
+    CostStatus?: number;
+    Description: string;
+    InvDetailID?: number;
+    PaidCost?: number;
+    RatedCost?: number;
+    SellCostSeq?: number;
+} 
+
 export interface BuyRatesSBL {
     AccountInfoID?: any;
     AccountInvoiceAuditList?: any;
-    AccountInvoiceCostList: any[];
+    AccountInvoiceCostList: AccountInvoiceCostListSBL[];
     AccountInvoiceDetail?: any;
     AccountPaymentMasterId?: any;
     AuditStatusID?: any;
@@ -132,7 +151,7 @@ export interface BuyRatesSBL {
 export interface SellRatesSBL {
     AccountInfoID?: any;
     AccountInvoiceAuditList?: any;
-    AccountInvoiceCostList: any[];
+    AccountInvoiceCostList: AccountInvoiceCostListSBL[];
     AccountInvoiceDetail?: any;
     AccountPaymentMasterId?: any;
     AuditStatusID?: any;
@@ -210,6 +229,11 @@ export interface SellRatesSBL {
     VoucherTypeID?: any;
 }
 
+export interface BOLAccesorialListSBL {
+    AccesorialID: number;
+    IsAccesorial?: boolean;
+}
+
 export interface ShipmentByLading {
     AccountInfoID?: any;
     AccountNumber?: any;
@@ -218,7 +242,7 @@ export interface ShipmentByLading {
     ActualShipDate?: any;
     AddDate?: any;
     AddedBy: string;
-    BOLAccesorialList: any[];
+    BOLAccesorialList: BOLAccesorialListSBL[];
     BOLDispatchNotesList: any[];
     BOLStatus: string;
     BOLStopLists?: any;
@@ -375,7 +399,7 @@ export interface ShipmentByLading {
     PaymentTermID?: any;
     PickupApiCallStatusId?: any;
     PickupApiCallStatusName: string;
-    PickupDate: Date;
+    PickupDate: string;
     PickupNumber: string;
     PickupTime: string;
     PriorityID?: any;
@@ -437,4 +461,7 @@ export interface ShipmentByLading {
     PickupDateWithFormat: string;
     DeliveryDateWithFormat: string;
     RequestedDeliveryDateWithFormat: string;
+    orgTerminalCityStateZipCode: string;
+    destTerminalCityStateZipCode: string;
 }
+

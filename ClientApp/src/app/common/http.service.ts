@@ -30,6 +30,7 @@ import {AuthenticationService} from './authentication.service';
 import { ReferenceByClient } from '../Entities/ReferenceByClient';
 import { SendEmailParameters } from '../Entities/SendEmailParameters';
 import { SendEmailResponse } from '../Entities/SendEmailResponse';
+import { SaveQuoteData } from '../Entities/SaveQuoteData'; 
 
 @Injectable({
     providedIn: 'root'
@@ -234,6 +235,18 @@ export class HttpService{
         ).toPromise();
     }
 
+    saveNewQuote(parameters:SaveQuoteData){
+        const ticket = this.token;
+        const httpHeaders = new HttpHeaders({
+            Ticket : ticket
+        });
+        return this.http.post<SaveQuoteResponse>(this.baseEndpoint + 'Services/BOLHDRService.svc/json/SaveQuote',parameters
+        ,{
+            headers: httpHeaders
+        }
+        ).toPromise();
+    }
+
     getMasShipmentPriority(){
         const ticket = this.token;
         const httpHeaders = new HttpHeaders({
@@ -377,5 +390,17 @@ export class HttpService{
             headers: httpHeaders
           }
           ).toPromise();
+    }
+
+    UpdateBOLHDR(parameters:ShipmentByLading){
+        const ticket = this.token;
+        const httpHeaders = new HttpHeaders({
+            Ticket : ticket
+        });
+        return this.http.post<Object>(this.baseEndpoint + 'Services/BOLHDRService.svc/json/UpdateBOLHDR',parameters
+        ,{
+            headers: httpHeaders
+        }
+        ).toPromise();
     }
 }

@@ -67,6 +67,21 @@ export interface SaveQuoteParameters {
   orgTerminalCityStateZipCode:  string;
   destTerminalCityStateZipCode: string;
   WaterfallDetailsList:         any[];
+  EquipmentID?:                 number;
+  PriorityID?:                  number;
+  OrgAdr2?:                     string;
+  DestZip?:                     number;
+  OrgZip?:                      number;
+  PaymentTermID?:               number;
+  OrgStateName?:                string;
+  DestStateName?:               string;
+  OriginContactPerson?:         string;
+  OriginContactPhone?:          string;
+  DestContactPerson?:           string;
+  DestContactPhone?:            string;
+  OriginEmail?:                 string;
+  RequestedPickupTimeFrom?:     string;
+  RequestedPickupTimeTo?:       string;
 }
 
 export interface BOlProductsList {

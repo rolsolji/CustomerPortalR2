@@ -40,6 +40,7 @@ export class HttpErrorInterceptor implements HttpInterceptor {
               (typeof error.error.ErrorMessage === 'string' || error.error.ErrorMessage instanceof String)) {
               errorMsg = `Error Code: ${error.status},  Message: ${error.error.ErrorMessage}`;
               this.authenticationService.loading$.next(false);
+              this.authenticationService.requestFailed$.next(true);
               this.snackbar.open(error.error.ErrorMessage, '', {
                 duration: 5000
               });

@@ -657,7 +657,7 @@ export class FormQuickQuoteComponent implements OnInit {
             this.ratesFiltered =  this.rates.filter(rate => rate.CarrierCost > 0);
             console.log(this.ratesFiltered);
             this.ratesCounter = this.ratesFiltered.length;
-            this.snackbar.open(this.ratesCounter + ' rates retuned.', null, {
+            this.snackbar.open(this.ratesCounter + ' rates returned.', null, {
               duration: 5000
             });
 

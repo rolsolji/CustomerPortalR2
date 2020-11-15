@@ -1,0 +1,8 @@
+.user-update-form {
+  input, mat-select {
+    font-size: 12px;
+  }
+  ::ng-deep .mat-form-field-wrapper{
+    margin-bottom: -1.05em;
+  }
+}

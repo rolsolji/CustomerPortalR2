@@ -77,7 +77,7 @@ export class SidenavComponent implements OnInit {
         (option: Client) => option.ClientName.toLowerCase().indexOf(filterValue) === 0));
       return this.clientsForUser$.asObservable();
     }
-    this.clientsForUser$.next(this.authenticationService.getClientsForUserFromStorage());
+    this.clientsForUser$.next([]);
     return this.clientsForUser$.asObservable();
   }
 

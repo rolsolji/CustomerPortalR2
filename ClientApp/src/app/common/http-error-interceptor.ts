@@ -27,10 +27,10 @@ export class HttpErrorInterceptor implements HttpInterceptor {
 
             if (error && error.error
               && error.error.ErrorMessage
-              && error.error.ErrorMessage === 'Your Access is Expired.') {
+              && error.error.ErrorMessage === 'Your Access has expired.') {
               errorMsg = `Error Code: ${error.status},  Message: ${error.error.ErrorMessage}`;
               this.authenticationService.logout();
-              this.snackbar.open('Your Access is Expired. Log in again.', '', {
+              this.snackbar.open('Your Access has expired. Log in again.', '', {
                 duration: 5000
               });
             }
@@ -40,6 +40,7 @@ export class HttpErrorInterceptor implements HttpInterceptor {
               (typeof error.error.ErrorMessage === 'string' || error.error.ErrorMessage instanceof String)) {
               errorMsg = `Error Code: ${error.status},  Message: ${error.error.ErrorMessage}`;
               this.authenticationService.loading$.next(false);
+              this.authenticationService.requestFailed$.next(true);
               this.snackbar.open(error.error.ErrorMessage, '', {
                 duration: 5000
               });

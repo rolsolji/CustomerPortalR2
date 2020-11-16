@@ -32,6 +32,7 @@ import {MasUser} from '../Entities/mas-user.model';
 import { SendEmailParameters } from '../Entities/SendEmailParameters';
 import { SendEmailResponse } from '../Entities/SendEmailResponse';
 import { SaveQuoteData } from '../Entities/SaveQuoteData'; 
+import { StatusReason } from '../Entities/StatusReason'; 
 
 @Injectable({
     providedIn: 'root'
@@ -433,4 +434,17 @@ export class HttpService{
         }
         ).toPromise();
     }
+
+    GetStatusReasonCode(keyId:string){
+        const ticket = this.token;
+        const httpHeaders = new HttpHeaders({
+            Ticket : ticket
+        });
+        return this.http.get<StatusReason[]>(String.Format(this.baseEndpoint + 'Services/BOLHDRService.svc/json/GetStatusReasonCode?_={1}',keyId)
+        ,{
+            headers: httpHeaders
+          }
+          ).toPromise();
+    }
+    
 }

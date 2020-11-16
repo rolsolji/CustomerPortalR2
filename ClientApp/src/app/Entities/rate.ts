@@ -91,6 +91,7 @@ export interface Rate {
     EquipmentCharges?: any;
     Equipments?: any;
     ExcludeReason: string;
+    ExpectedDeliveryDate?: string;
     FreightCost: number;
     FuelCost: number;
     FuelRate: number;

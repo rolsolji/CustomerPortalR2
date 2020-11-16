@@ -256,6 +256,9 @@ export interface ShipmentByLading {
     BillToFaxNo: string;
     BillToID: number;
     BillToName: string;
+    BillToPostalWithCity: string;
+    OrgLocation: string;
+    DestLocation: string;
     BillToState: number;
     BillToStateCode?: any;
     BillToStateName: string;
@@ -305,6 +308,7 @@ export interface ShipmentByLading {
     DestFaxNo: string;
     DestID?: any;
     DestName: string;
+    DestPostalWithCity: string;
     DestState: number;
     DestStateCode: string;
     DestStateName: string;
@@ -373,6 +377,7 @@ export interface ShipmentByLading {
     OrgFaxNo: string;
     OrgID?: any;
     OrgName: string;
+    OrgPostWithCity: string;
     OrgState: number;
     OrgStateCode: string;
     OrgStateName: string;

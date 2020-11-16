@@ -21,6 +21,7 @@ export class AuthenticationService {
   ) {
     this.baseEndpoint = environment.baseEndpoint;
     this.loading$.next(false);
+    this.requestFailed$.next(false);
     this.init();
   }
 
@@ -30,6 +31,7 @@ export class AuthenticationService {
   public clientsForUser$: BehaviorSubject<Client[]> = new BehaviorSubject<Client[]>(null);
   public defaultClient$: BehaviorSubject<Client> = new BehaviorSubject<Client>(null);
   public loading$: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
+  public requestFailed$: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
 
   public init(): boolean {
     const ticket = this.getTicketFromStorage();

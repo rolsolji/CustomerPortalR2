@@ -129,6 +129,7 @@ export class FormShipmentBoardComponent implements OnInit {
 
   showSpinner = false;
   showSpinnerGrid = false;
+  showDefaultTitle = false;
 
   getQuotesParameters: GetQuotesParameters;
 
@@ -162,7 +163,8 @@ export class FormShipmentBoardComponent implements OnInit {
   ClientID = 11992;
   pageSize = 20;
   currentPage = 1;
-  totalRows: number;
+  currentRows = 0
+  totalRows = 0;
   pageSizeOptions: number[] = [5, 10, 20, 50];
   dataSource: MatTableDataSource<Quote> | null;
   selection = new SelectionModel<Quote>(true, []);
@@ -170,12 +172,14 @@ export class FormShipmentBoardComponent implements OnInit {
   StatusOptions: Status[];
   StatusOptionsString: string[] = [];
   StatusSelectec: string[];
+  SpotQuotedId = 13; //Spot Quoted
   EquipmentOptions: object;
   quoteIdParameter: string;
-  totalQuotedStatus: string;
-  totalBookedStatus: string;
-  totalInTransitStatus: string;
-  totalDeliveredStatus: string;
+  
+  totalBookedStatus: string = '--';
+  totalPickupRequestedStatus: string = '--';
+  totalInTransitStatus: string = '--';
+  totalOutForDeliveryStatus: string = '--';
 
   shipmentInformation: ShipmentByLading;
   ReferenceByClientOptions: ReferenceByClient[];
@@ -270,12 +274,24 @@ export class FormShipmentBoardComponent implements OnInit {
 
     this.ShipmentModeOptions = await this.httpService.getShipmentMode(this.keyId);
     this.StatusOptions = await this.httpService.getBOLStatus(this.keyId);
+    console.log(this.StatusOptions);
+    this.StatusOptions = this.StatusOptions.filter(s =>
+      s.BOLStatusID === 10 //Quoted
+      || s.BOLStatusID === 14 //Quote Modified
+      || s.BOLStatusID === 2 //Booked
+      || s.BOLStatusID === 15 //Pickup Requested
+      || s.BOLStatusID === 1 //In Transit
+      || s.BOLStatusID === 9 //Out For Delivery
+      || s.BOLStatusID === 6 //Delivery
+      || s.BOLStatusID === 16 //Cancel
+    );
 
+    console.log(this.StatusOptions);
     // Get total per status
-    this.totalQuotedStatus = '11';
     this.totalBookedStatus = '22';
+    this.totalPickupRequestedStatus = '11';
     this.totalInTransitStatus = '33';
-    this.totalDeliveredStatus = '44';
+    this.totalOutForDeliveryStatus = '44';
 
     this.EquipmentOptions = await this.httpService.getMasEquipment(this.keyId);
     this.StatusOptions.forEach(s => this.StatusOptionsString.push(s.Status));
@@ -327,6 +343,7 @@ export class FormShipmentBoardComponent implements OnInit {
       ShipmentType: null
     }
 
+    this.showDefaultTitle = true;
     this.fromShipDate = null;
     this.toShipDate = null;
     this.fromDeliveryDate = null;
@@ -374,6 +391,9 @@ export class FormShipmentBoardComponent implements OnInit {
       this.getQuotesParameters.PageNumber = 1;
       this.quotes = [];
     }
+    else if (parameter !== '')
+      this.showDefaultTitle = false;
+
     this.showSpinner = true;
 
     if (this.fromShipDate != null)
@@ -395,8 +415,11 @@ export class FormShipmentBoardComponent implements OnInit {
       )
     );
 
-    if (!String.IsNullOrWhiteSpace(parameter) && parameter !== 'loadmore' && parameter !== 'clearfilters' )
+    if (!String.IsNullOrWhiteSpace(parameter) && parameter !== 'loadmore' && parameter !== 'clearfilters' && parameter !== 'S' )
       this.getQuotesParameters.BOlStatusIDList.push(parameter);
+
+    if (this.getQuotesParameters.BOlStatusIDList.indexOf(s => s === '10') > 0)
+      this.getQuotesParameters.BOlStatusIDList.push(this.SpotQuotedId);
 
     // Get parameter quote and clean variable
     this.messageService.SharedQuoteParameter.subscribe(message => this.quoteIdParameter = message)
@@ -418,6 +441,9 @@ export class FormShipmentBoardComponent implements OnInit {
 
     this.quotesResponse = await this.httpService.searchBOLHDRForJason(this.getQuotesParameters);
 
+    console.log(this.quotesResponse);
+
+
     this.quotesResponse.forEach(element => {
       if (!String.IsNullOrWhiteSpace(element.ActualShipDate)){
         element.ActualShipDateWithFormat = this.datepipe.transform(element.ActualShipDate.replace(/(^.*\()|([+-].*$)/g, ''),'MM/dd/yyyy');
@@ -426,6 +452,11 @@ export class FormShipmentBoardComponent implements OnInit {
       if (!String.IsNullOrWhiteSpace(element.ExpectedDeliveryDate)){
         element.ExpectedDeliveryDateWithFormat = this.datepipe.transform(element.ExpectedDeliveryDate.replace(/(^.*\()|([+-].*$)/g, ''),'MM/dd/yyyy');
       }
+
+      if (element.Status === 13){
+        element.BOLStatus = 'Quoted';
+      }
+
       this.quotes.push(element);
     });
 
@@ -436,6 +467,7 @@ export class FormShipmentBoardComponent implements OnInit {
 
     if (this.quotes != null && this.quotes.length > 0){
       this.totalRows = this.quotes[0].TotalRowCount;
+      this.currentRows = this.quotes.length;
     }
 
     this.showSpinner = false;

@@ -57,6 +57,7 @@ import { UtilitiesService } from '../../../../common/utilities.service';
 import baselineAddCircleOutline from '@iconify/icons-ic/baseline-add-circle-outline';
 import {AuthenticationService} from '../../../../common/authentication.service';
 import {environment} from '../../../../../environments/environment';
+import moment from 'moment';
 
 export interface CountryState {
   name: string;
@@ -634,11 +635,16 @@ export class FormQuickQuoteComponent implements OnInit {
       this.rates = await this.ratesService.postRates(objRate);
 
       this.rates.forEach(r => {
-        if (!String.IsNullOrWhiteSpace(r.TransitTime)){
-          let today = new Date();
-          const days: number = +r.TransitTime;
-          today = this.utilitiesService.AddBusinessDays(today, days);
-          r.ETA = String.Format('{0} (ETA)', this.datepipe.transform(today,'yyyy-MM-dd'));
+        if (!String.IsNullOrWhiteSpace(r.ExpectedDeliveryDate)){
+          let expDelDate = null;
+          const tempExpDelDate = moment.utc(r.ExpectedDeliveryDate);
+          expDelDate = new Date(this.datepipe.transform(tempExpDelDate.toString().replace(/(^.*\()|([+-].*$)/g, ''),'MM/dd/yyyy'));
+          r.ETA = String.Format('{0} (ETA)', this.datepipe.transform(expDelDate,'MM/dd/yyyy')); 
+
+          // let today = new Date();
+          // const days: number = +r.TransitTime;
+          // today = this.utilitiesService.AddBusinessDays(today, days);
+          // r.ETA = String.Format('{0} (ETA)', this.datepipe.transform(today,'yyyy-MM-dd'));
         }
         else {
           r.ETA = String.Empty;

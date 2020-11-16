@@ -348,19 +348,19 @@ export class FormAddShipComponent implements OnInit {
       priority: [0],
       customerref: [null],
       r2order: [null],
-      r2pronumber: [null],
-      paymentterms: [5],
-      shipmentinfo: [null],
-      pronumber: [null],
-      mode: ['LTL', Validators.required],
+      r2pronumber: [{ value: null, disabled: true }],
+      paymentterms: [{ value: 5, disabled: true }],
+      shipmentinfo: [{ value: null, disabled: true }],
+      pronumber: [{ value: null, disabled: true }],
+      mode: [{ value: 'LTL', disabled: true }, Validators.required],
       shipmentvalue: [null],
       valueperpound: [null],
       os_d: [null],
       servicelevel: [1, Validators.required],
-      r2refno: [null],
+      r2refno: [{ value: null, disabled: true }],
       statuscode: [null],
       specialinstructions: [null],
-      internalnote: [null]
+      internalnote: [{ value: null, disabled: true }]
     });
     // --
 
@@ -617,17 +617,20 @@ export class FormAddShipComponent implements OnInit {
   }
 
   addNewInternalNote(): void {
-    const note = {
-      NoteId: (this.internalNotes as InternalNote[]).length + 1,
-      UserId: this.UserIDLoggedIn,
-      UserName: 'Admin',
-      NoteText: this.shipmentInfoFormGroup.get('internalnote').value.trim(),
-      Date: new Date()
-    };
-
-    this.internalNotes.push(note);
-    this.shipmentInfoFormGroup.get('internalnote').setValue('');
-    this.showInternalNotesTitle = true;
+    const internalNoteText = this.shipmentInfoFormGroup.get('internalnote').value;
+    if (internalNoteText != null && internalNoteText.length > 0){
+      const note = {
+        NoteId: (this.internalNotes as InternalNote[]).length + 1,
+        UserId: this.UserIDLoggedIn,
+        UserName: 'Admin',
+        NoteText: internalNoteText.trim(),
+        Date: new Date()
+      };
+  
+      this.internalNotes.push(note);
+      this.shipmentInfoFormGroup.get('internalnote').setValue('');
+      this.showInternalNotesTitle = true;
+    }    
   }
 
   removeInternalNote(index: number): void {
@@ -1125,13 +1128,13 @@ export class FormAddShipComponent implements OnInit {
     this.originAndDestinationFormGroup.controls.destpostalcode.setValue(defaultdestpostalcode, {onlySelf: false});
     this.originAndDestinationFormGroup.controls.deststatename.setValue(defaultdeststatename, {onlySelf: false});
 
-    this.originAndDestinationFormGroup.controls.originname.setValue(this.ShipmentByLadingObject.OrgName, {onlySelf: false});
-    this.originAndDestinationFormGroup.controls.originadddress1.setValue(this.ShipmentByLadingObject.OrgAdr1, {onlySelf: false});
-    this.originAndDestinationFormGroup.controls.originadddress2.setValue(this.ShipmentByLadingObject.OrgAdr2, {onlySelf: false});
+    this.originAndDestinationFormGroup.controls.originname.setValue(this.ShipmentByLadingObject.OrgName === 'NA' ? '' : this.ShipmentByLadingObject.OrgName, {onlySelf: false});
+    this.originAndDestinationFormGroup.controls.originadddress1.setValue(this.ShipmentByLadingObject.OrgAdr1 === 'NA' ? '' : this.ShipmentByLadingObject.OrgAdr1, {onlySelf: false});
+    this.originAndDestinationFormGroup.controls.originadddress2.setValue(this.ShipmentByLadingObject.OrgAdr2 === 'NA' ? '' : this.ShipmentByLadingObject.OrgAdr2, {onlySelf: false});
     this.originAndDestinationFormGroup.controls.origincountry.setValue(this.ShipmentByLadingObject.OrgCountry, {onlySelf: false});
-    this.originAndDestinationFormGroup.controls.origincontact.setValue(this.ShipmentByLadingObject.OriginContactPerson, {onlySelf: false});
-    this.originAndDestinationFormGroup.controls.originphone.setValue(this.ShipmentByLadingObject.OriginContactPhone, {onlySelf: false});
-    this.originAndDestinationFormGroup.controls.originemail.setValue(this.ShipmentByLadingObject.OriginEmail, {onlySelf: false});
+    this.originAndDestinationFormGroup.controls.origincontact.setValue(this.ShipmentByLadingObject.OriginContactPerson === 'NA' ? '' : this.ShipmentByLadingObject.OriginContactPerson, {onlySelf: false});
+    this.originAndDestinationFormGroup.controls.originphone.setValue(this.ShipmentByLadingObject.OriginContactPhone === 'NA' ? '' : this.ShipmentByLadingObject.OriginContactPhone, {onlySelf: false});
+    this.originAndDestinationFormGroup.controls.originemail.setValue(this.ShipmentByLadingObject.OriginEmail === 'NA' ? '' : this.ShipmentByLadingObject.OriginEmail, {onlySelf: false});
     this.originAndDestinationFormGroup.controls.originpickupopen.setValue(this.ShipmentByLadingObject.RequestedPickupTimeFrom != null
       && this.ShipmentByLadingObject.RequestedPickupTimeFrom !== '' ? this.ShipmentByLadingObject.RequestedPickupTimeFrom : null,
       {onlySelf: false});
@@ -1139,13 +1142,13 @@ export class FormAddShipComponent implements OnInit {
         && this.ShipmentByLadingObject.RequestedPickupTimeTo !== '' ? this.ShipmentByLadingObject.RequestedPickupTimeTo : null,
         {onlySelf: false});
 
-    this.originAndDestinationFormGroup.controls.destname.setValue(this.ShipmentByLadingObject.DestName, {onlySelf: false});
-    this.originAndDestinationFormGroup.controls.destadddress1.setValue(this.ShipmentByLadingObject.DestAdr1, {onlySelf: false});
-    this.originAndDestinationFormGroup.controls.destadddress2.setValue(this.ShipmentByLadingObject.DestAdr2, {onlySelf: false});
+    this.originAndDestinationFormGroup.controls.destname.setValue(this.ShipmentByLadingObject.DestName === 'NA' ? '' : this.ShipmentByLadingObject.DestName, {onlySelf: false});
+    this.originAndDestinationFormGroup.controls.destadddress1.setValue(this.ShipmentByLadingObject.DestAdr1 === 'NA' ? '' : this.ShipmentByLadingObject.DestAdr1, {onlySelf: false});
+    this.originAndDestinationFormGroup.controls.destadddress2.setValue(this.ShipmentByLadingObject.DestAdr2 === 'NA' ? '' : this.ShipmentByLadingObject.DestAdr2, {onlySelf: false});
     this.originAndDestinationFormGroup.controls.destcountry.setValue(this.ShipmentByLadingObject.DestCountry, {onlySelf: false});
-    this.originAndDestinationFormGroup.controls.destcontact.setValue(this.ShipmentByLadingObject.DestContactPerson, {onlySelf: false});
-    this.originAndDestinationFormGroup.controls.destphone.setValue(this.ShipmentByLadingObject.DestContactPhone, {onlySelf: false});
-    this.originAndDestinationFormGroup.controls.destemail.setValue(this.ShipmentByLadingObject.DestEmail, {onlySelf: false});
+    this.originAndDestinationFormGroup.controls.destcontact.setValue(this.ShipmentByLadingObject.DestContactPerson === 'NA' ? '' : this.ShipmentByLadingObject.DestContactPerson, {onlySelf: false});
+    this.originAndDestinationFormGroup.controls.destphone.setValue(this.ShipmentByLadingObject.DestContactPhone === 'NA' ? '' : this.ShipmentByLadingObject.DestContactPhone, {onlySelf: false});
+    this.originAndDestinationFormGroup.controls.destemail.setValue(this.ShipmentByLadingObject.DestEmail === 'NA' ? '' : this.ShipmentByLadingObject.DestEmail, {onlySelf: false});
 
 
     const tempDestExpDelDate = moment.utc(this.ShipmentByLadingObject.PickupDate);
@@ -1163,15 +1166,15 @@ export class FormAddShipComponent implements OnInit {
     this.shipmentInfoFormGroup.get('servicelevel').setValue(this.ShipmentByLadingObject.ServiceLevelID == null ? 1 : this.ShipmentByLadingObject.ServiceLevelID);
     this.shipmentInfoFormGroup.get('paymentterms').setValue(this.ShipmentByLadingObject.PaymentTermID == null ? 5 : this.ShipmentByLadingObject.PaymentTermID); //-- need to check this one
     this.shipmentInfoFormGroup.get('mode').setValue(this.ShipmentByLadingObject.Mode == null ? 'LTL' : this.ShipmentByLadingObject.Mode);    
-    this.shipmentInfoFormGroup.controls.customerref.setValue(this.ShipmentByLadingObject.Ref1Value, {onlySelf: false});
-    this.shipmentInfoFormGroup.controls.r2order.setValue(this.ShipmentByLadingObject.Ref2Value, {onlySelf: false});
-    this.shipmentInfoFormGroup.controls.r2pronumber.setValue(this.ShipmentByLadingObject.Ref3Value, {onlySelf: false});    
-    this.shipmentInfoFormGroup.controls.shipmentvalue.setValue(this.ShipmentByLadingObject.ShipmentValue, {onlySelf: false});
-    this.shipmentInfoFormGroup.controls.valueperpound.setValue(this.ShipmentByLadingObject.ValuePerPound, {onlySelf: false});   
-    this.shipmentInfoFormGroup.controls.shipmentinfo.setValue(this.ShipmentByLadingObject.TrackingNumber, {onlySelf: false});
-    this.shipmentInfoFormGroup.controls.pronumber.setValue(this.ShipmentByLadingObject.ProNumber, {onlySelf: false});    
-    this.shipmentInfoFormGroup.controls.r2refno.setValue(this.ShipmentByLadingObject.BrokerReferenceNo, {onlySelf: false});  
-    this.shipmentInfoFormGroup.controls.specialinstructions.setValue(this.ShipmentByLadingObject.SplNotes, {onlySelf: false});       
+    this.shipmentInfoFormGroup.controls.customerref.setValue(this.ShipmentByLadingObject.Ref1Value === 'NA' ? '' : this.ShipmentByLadingObject.Ref1Value, {onlySelf: false});
+    this.shipmentInfoFormGroup.controls.r2order.setValue(this.ShipmentByLadingObject.Ref2Value === 'NA' ? '' : this.ShipmentByLadingObject.Ref2Value, {onlySelf: false});
+    this.shipmentInfoFormGroup.controls.r2pronumber.setValue(this.ShipmentByLadingObject.Ref3Value === 'NA' ? '' : this.ShipmentByLadingObject.Ref3Value, {onlySelf: false});    
+    this.shipmentInfoFormGroup.controls.shipmentvalue.setValue(this.ShipmentByLadingObject.ShipmentValue === 'NA' ? '' : this.ShipmentByLadingObject.ShipmentValue, {onlySelf: false});
+    this.shipmentInfoFormGroup.controls.valueperpound.setValue(this.ShipmentByLadingObject.ValuePerPound === 'NA' ? '' : this.ShipmentByLadingObject.ValuePerPound, {onlySelf: false});   
+    this.shipmentInfoFormGroup.controls.shipmentinfo.setValue(this.ShipmentByLadingObject.TrackingNumber === 'NA' ? '' : this.ShipmentByLadingObject.TrackingNumber, {onlySelf: false});
+    this.shipmentInfoFormGroup.controls.pronumber.setValue(this.ShipmentByLadingObject.ProNumber === 'NA' ? '' : this.ShipmentByLadingObject.ProNumber, {onlySelf: false});    
+    this.shipmentInfoFormGroup.controls.r2refno.setValue(this.ShipmentByLadingObject.BrokerReferenceNo === 'NA' ? '' : this.ShipmentByLadingObject.BrokerReferenceNo, {onlySelf: false});  
+    this.shipmentInfoFormGroup.controls.specialinstructions.setValue(this.ShipmentByLadingObject.SplNotes === 'NA' ? '' : this.ShipmentByLadingObject.SplNotes, {onlySelf: false});       
     // --
 
     // -- Set default values "Products and Accesorials" step
@@ -1195,7 +1198,7 @@ export class FormAddShipComponent implements OnInit {
         (this.productsAndAccessorialsFormGroup.controls.products as FormArray).at(currentProductIndex).get('Weight').setValue(p.Weight);
         (this.productsAndAccessorialsFormGroup.controls.products as FormArray).at(currentProductIndex).get('Stackable').setValue(p.Stackable);
         (this.productsAndAccessorialsFormGroup.controls.products as FormArray).at(currentProductIndex).get('Hazmat').setValue(p.Hazmat);
-        (this.productsAndAccessorialsFormGroup.controls.products as FormArray).at(currentProductIndex).get('ProductDescription').setValue(p.Description);
+        (this.productsAndAccessorialsFormGroup.controls.products as FormArray).at(currentProductIndex).get('ProductDescription').setValue(p.Description === 'NA' ? '' : p.Description);
 
         counter += 1;
       });
@@ -1915,7 +1918,7 @@ export class FormAddShipComponent implements OnInit {
       });
     }
     else{
-      this.snackbar.open('There was an error, try again.', null, {
+      this.snackbar.open('Error saving as quote.', null, {
         duration: 5000
       });
     }

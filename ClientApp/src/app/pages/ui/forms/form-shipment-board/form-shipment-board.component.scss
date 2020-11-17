@@ -92,6 +92,7 @@ mat-chip {
 
 .quotedStatus{
   background-color: #D8531D;
+  background-image: linear-gradient(to left, #D8531D , #ECA98E);
 }
 
 .defaultStatus.bookedStatus:after {
@@ -107,6 +108,7 @@ mat-chip {
 
 .bookedStatus{
   background-color: #00CC7B;
+  background-image: linear-gradient(to left, #00CC7B , #80E6BD);
 }
 
 .defaultStatus.inTransitStatus:after {
@@ -122,9 +124,26 @@ mat-chip {
 
 .inTransitStatus{
   background-color: #A666B7;
+  background-image: linear-gradient(to left, #A666B7 , #E1CBE7);
 }
 
-.defaultStatus.delivered:after {
+.defaultStatus.outForDelivered:after {
+  content: '';
+  border-left: 16px solid #83CFF6;
+  border-top: 42px solid transparent;
+  border-bottom: 42px solid transparent;
+  position: absolute;
+  top: 0;
+  left: 100%;
+  z-index: 20;
+}
+
+.outForDelivered{
+  background-color: #83CFF6;
+  background-image: linear-gradient(to left, #83CFF6 , #CDECFB);
+}
+
+.defaultStatus.deliveredStatus:after {
   content: '';
   border-left: 16px solid #F3C343;
   border-top: 42px solid transparent;
@@ -135,11 +154,26 @@ mat-chip {
   z-index: 20;
 }
 
-.delivered{
+.deliveredStatus{
   background-color: #F3C343;
+  background-image: linear-gradient(to left, #F3C343 , #FAE6AF);
 }
 
+.defaultStatus.pickupRequestedStatus:after {
+  content: '';
+  border-left: 16px solid #2A99D6;
+  border-top: 42px solid transparent;
+  border-bottom: 42px solid transparent;
+  position: absolute;
+  top: 0;
+  left: 100%;
+  z-index: 20;
+}
 
+.pickupRequestedStatus{
+  background-color: #2A99D6;
+  background-image: linear-gradient(to left, #2A99D6 , #92CBE9);
+}
 
 
 

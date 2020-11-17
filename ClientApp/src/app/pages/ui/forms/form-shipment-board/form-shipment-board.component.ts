@@ -173,13 +173,16 @@ export class FormShipmentBoardComponent implements OnInit {
   StatusOptionsString: string[] = [];
   StatusSelectec: string[];
   SpotQuotedId = 13; //Spot Quoted
+  QuotedModifiedId = 14; //Quote Modified
   EquipmentOptions: object;
   quoteIdParameter: string;
   
+  totalQuotedStatus: string = '--';
   totalBookedStatus: string = '--';
   totalPickupRequestedStatus: string = '--';
   totalInTransitStatus: string = '--';
   totalOutForDeliveryStatus: string = '--';
+  totalDeliveredStatus: string = '--';
 
   shipmentInformation: ShipmentByLading;
   ReferenceByClientOptions: ReferenceByClient[];
@@ -288,10 +291,12 @@ export class FormShipmentBoardComponent implements OnInit {
 
     console.log(this.StatusOptions);
     // Get total per status
+    this.totalQuotedStatus = '22';
     this.totalBookedStatus = '22';
     this.totalPickupRequestedStatus = '11';
     this.totalInTransitStatus = '33';
     this.totalOutForDeliveryStatus = '44';
+    this.totalDeliveredStatus = '22';
 
     this.EquipmentOptions = await this.httpService.getMasEquipment(this.keyId);
     this.StatusOptions.forEach(s => this.StatusOptionsString.push(s.Status));
@@ -418,8 +423,11 @@ export class FormShipmentBoardComponent implements OnInit {
     if (!String.IsNullOrWhiteSpace(parameter) && parameter !== 'loadmore' && parameter !== 'clearfilters' && parameter !== 'S' )
       this.getQuotesParameters.BOlStatusIDList.push(parameter);
 
-    if (this.getQuotesParameters.BOlStatusIDList.indexOf(s => s === '10') > 0)
+    if (this.getQuotesParameters.BOlStatusIDList.indexOf(s => s === '10') > 0){
       this.getQuotesParameters.BOlStatusIDList.push(this.SpotQuotedId);
+      this.getQuotesParameters.BOlStatusIDList.push(this.QuotedModifiedId);
+    }
+      
 
     // Get parameter quote and clean variable
     this.messageService.SharedQuoteParameter.subscribe(message => this.quoteIdParameter = message)
@@ -453,7 +461,7 @@ export class FormShipmentBoardComponent implements OnInit {
         element.ExpectedDeliveryDateWithFormat = this.datepipe.transform(element.ExpectedDeliveryDate.replace(/(^.*\()|([+-].*$)/g, ''),'MM/dd/yyyy');
       }
 
-      if (element.Status === 13){
+      if (element.Status === 13 || element.Status === 14){
         element.BOLStatus = 'Quoted';
       }
 

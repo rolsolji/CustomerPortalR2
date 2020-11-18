@@ -130,6 +130,7 @@ export class FormShipmentBoardComponent implements OnInit {
   showSpinner = false;
   showSpinnerGrid = false;
   showDefaultTitle = false;
+  defaultFilterText = String.Empty;
 
   getQuotesParameters: GetQuotesParameters;
 
@@ -169,14 +170,13 @@ export class FormShipmentBoardComponent implements OnInit {
   dataSource: MatTableDataSource<Quote> | null;
   selection = new SelectionModel<Quote>(true, []);
   ShipmentModeOptions: object;
-  StatusOptions: Status[];
+  StatusOptions: Status[] = [];
   StatusOptionsString: string[] = [];
   StatusSelectec: string[];
   SpotQuotedId = 13; //Spot Quoted
   QuotedModifiedId = 14; //Quote Modified
   EquipmentOptions: object;
   quoteIdParameter: string;
-  
   totalQuotedStatus: string = '--';
   totalBookedStatus: string = '--';
   totalPickupRequestedStatus: string = '--';
@@ -235,7 +235,7 @@ export class FormShipmentBoardComponent implements OnInit {
   auditLog:[];
   auditLogIsEnabled: boolean = false;
 
-  
+  quoteSelected: Quote;
   //#endregion
 
   @ViewChild('statusInput') statusInput: ElementRef<HTMLInputElement>;
@@ -353,7 +353,15 @@ export class FormShipmentBoardComponent implements OnInit {
     this.toShipDate = null;
     this.fromDeliveryDate = null;
     this.toDeliveryDate = null;
-    this.statusSelected = [];
+
+    this.statusSelected = this.StatusOptions.filter(s =>
+      s.BOLStatusID === 2 //Booked
+      || s.BOLStatusID === 15 //Pickup Requested
+      || s.BOLStatusID === 1 //In Transit
+      || s.BOLStatusID === 9 //Out For Delivery
+    );
+
+    this.defaultFilterText = 'Select Mode: LTL / Status Selected: Booked, Pickup Requested, In Transit, Out For Delivery';
   }
 
   // SearchModal Open/Close
@@ -488,7 +496,7 @@ export class FormShipmentBoardComponent implements OnInit {
         return this.StatusOptionsString.filter(status => status.toLowerCase().indexOf(filterValue) === 0);
   }
 
-  quoteSelected: Quote;
+  
 
   async GetQuoteInfo(rowSelected:Quote){
     if (rowSelected == null){

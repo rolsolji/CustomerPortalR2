@@ -78,7 +78,7 @@ mat-chip {
   position: absolute;
   top: 0;
   left: 100%;
-  z-index: 20;
+  z-index: 1;
 }
 
 .defaultStatusCenterLabels {
@@ -103,7 +103,7 @@ mat-chip {
   position: absolute;
   top: 0;
   left: 100%;
-  z-index: 20;
+  z-index: 1;
 }
 
 .bookedStatus{
@@ -119,7 +119,7 @@ mat-chip {
   position: absolute;
   top: 0;
   left: 100%;
-  z-index: 20;
+  z-index: 1;
 }
 
 .inTransitStatus{
@@ -135,7 +135,7 @@ mat-chip {
   position: absolute;
   top: 0;
   left: 100%;
-  z-index: 20;
+  z-index: 1;
 }
 
 .outForDelivered{
@@ -151,7 +151,7 @@ mat-chip {
   position: absolute;
   top: 0;
   left: 100%;
-  z-index: 20;
+  z-index: 1;
 }
 
 .deliveredStatus{
@@ -167,7 +167,7 @@ mat-chip {
   position: absolute;
   top: 0;
   left: 100%;
-  z-index: 20;
+  z-index: 1;
 }
 
 .pickupRequestedStatus{

@@ -16,6 +16,7 @@ import {MatSelectModule} from '@angular/material/select';
 import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
 import {MatInputModule} from '@angular/material/input';
 import {MatFormFieldModule} from '@angular/material/form-field';
+import {MatTableModule} from "@angular/material/table";
 
 @NgModule({
   declarations: [AppComponent],
@@ -29,7 +30,7 @@ import {MatFormFieldModule} from '@angular/material/form-field';
     MatProgressSpinnerModule,
     MatInputModule,
     MatFormFieldModule,
-
+    MatTableModule,
     // Vex
     VexModule,
     CustomLayoutModule

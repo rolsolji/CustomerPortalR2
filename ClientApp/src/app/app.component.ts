@@ -141,7 +141,7 @@ export class AppComponent {
             //   {
             //     type: 'link',
             //     label: 'LTL/TL Shipment Board',
-            //     route: '/shipmentboard/LTLTL' 
+            //     route: '/shipmentboard/LTLTL'
             //   }
             //   // ,
             //   // {
@@ -154,7 +154,7 @@ export class AppComponent {
           {
             type: 'link',
             label: 'Location',
-            route: '/apps/calendar2',
+            route: '/locations/list',
             icon: icBaselineLocationOn,
             badge: {
               value: '12',
@@ -165,7 +165,7 @@ export class AppComponent {
           {
             type: 'link',
             label: 'Products',
-            route: '/apps/chat2',
+            route: '/products/list',
             icon: icBaselineDvr,
             badge: {
               value: '16',

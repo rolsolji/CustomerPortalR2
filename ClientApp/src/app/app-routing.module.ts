@@ -3,6 +3,7 @@ import { RouterModule, Routes, CanActivate } from '@angular/router';
 import { VexRoutes } from '../@vex/interfaces/vex-route.interface';
 import { CustomLayoutComponent } from './custom-layout/custom-layout.component';
 import {AuthGuardService as AuthGuard} from './common/auth-guard.service';
+import { LocationListComponent } from './pages/location/location-list.component'
 
 const childrenRoutes: VexRoutes = [
   {
@@ -17,11 +18,11 @@ const childrenRoutes: VexRoutes = [
       path: '',
       loadChildren: () => import('./pages/ui/forms/form-quick-quote/form-quick-quote.module').then(m => m.FormQuickQuoteModule),
       canActivate: [AuthGuard]
-  },  
-  {    
-    path: 'ui/forms/form-add-ship',            
+  },
+  {
+    path: 'ui/forms/form-add-ship',
     loadChildren: () => import('./pages/ui/forms/form-add-ship/form-add-ship.module').then(m => m.FormAddShipModule),
-  },  
+  },
   // {
   //   // path: '',
   //   // loadChildren: () => import('./pages/dashboards/dashboard-analytics/dashboard-analytics.module').then(m => m.DashboardAnalyticsModule),
@@ -44,6 +45,17 @@ const childrenRoutes: VexRoutes = [
     ],
     canActivate: [AuthGuard]
   },
+  {
+      path:'locations',
+      children:[
+        {
+          path: 'list',
+          //loadChildren: () => import('./pages/location/location-list.module').then(m => m.LocationListModule)
+          component: LocationListComponent
+        },
+      ],
+      canActivate: [AuthGuard]
+    },
   {
     path: 'apps',
     children: [

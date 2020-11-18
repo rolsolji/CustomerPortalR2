@@ -4,6 +4,19 @@
 
             <div fxLayout="row"  fxLayout.lt-sm="column" fxLayoutGap="5px">
                 
+                <button (click)="search('10')">
+                    <div class="defaultStatus quotedStatus">
+                        <div class="defaultStatusCenterLabels">
+                            <div>
+                                Quoted
+                            </div>
+                            <div>
+                                <p>{{totalQuotedStatus}}</p>
+                            </div>
+                        </div>
+                    </div>
+                </button>
+
                 <button (click)="search('2')">
                     <div class="defaultStatus bookedStatus">
                         <div class="defaultStatusCenterLabels">
@@ -18,7 +31,7 @@
                 </button>
 
                 <button (click)="search('15')">
-                    <div class="defaultStatus quotedStatus">
+                    <div class="defaultStatus pickupRequestedStatus">
                         <div class="defaultStatusCenterLabels">
                             <div>
                                 Pickup Requested
@@ -44,13 +57,26 @@
                 </button>
                 
                 <button (click)="search('9')">
-                    <div class="defaultStatus delivered">
+                    <div class="defaultStatus outForDelivered">
                         <div class="defaultStatusCenterLabels">
                             <div>
                                 Out For Delivery
                             </div>
                             <div>
                                 <p>{{totalOutForDeliveryStatus}}</p>
+                            </div>
+                        </div>
+                    </div>
+                </button>
+
+                <button (click)="search('6')">
+                    <div class="defaultStatus deliveredStatus">
+                        <div class="defaultStatusCenterLabels">
+                            <div>
+                                Delivered
+                            </div>
+                            <div>
+                                <p>{{totalDeliveredStatus}}</p>
                             </div>
                         </div>
                     </div>

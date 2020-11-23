@@ -169,4 +169,5 @@ export interface SelectedProductSQD {
         destTerminalCityStateZipCode: string;
         WaterfallDetailsList: any[];
         StatusReasonCodeId: number;
+        Status: number;
     }

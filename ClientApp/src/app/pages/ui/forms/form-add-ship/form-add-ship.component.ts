@@ -225,6 +225,12 @@ export class FormAddShipComponent implements OnInit {
   productsUsedToRate: any[] = [];
   noRatesFoundText = null;
 
+  gbProductHasChanged = false;
+
+  ExpectedDeliveryDateCalculated: string;
+  LoadNumber: string;
+  ShowSaveAsQuoteButton = false;
+
   ShipmentAccessorialsStored: BOLAccesorialListSBL[];
 
   pcoAutoCompleteOptions: Observable<PostalData[]>;
@@ -434,7 +440,7 @@ export class FormAddShipComponent implements OnInit {
     this.ShipmentErrorOptions = await this.httpService.getShipmentError(this.keyId);
 
     // -- Get Status Reasons
-    this.StatusReasons = await this.httpService.GetStatusReasonCode(this.keyId);
+    this.StatusReasons = await this.httpService.GetStatusReasonCode(this.keyId);    
 
     // Get equipment description by default
     this.fetchEquipment(7);
@@ -458,6 +464,7 @@ export class FormAddShipComponent implements OnInit {
     if (localLadingIdParameter != null && localLadingIdParameter.length > 0){
       // -- Get Service Level Options
       this.ShipmentByLadingObject = await this.httpService.GetShipmentByLadingID(localLadingIdParameter, this.keyId);
+            
       this.setDefaultValuesInSteps()
 
       // -- Get Shipment Costs
@@ -465,12 +472,16 @@ export class FormAddShipComponent implements OnInit {
       this.AccountInvoiceCostList = this.ShipmentCostObject.SellRates.AccountInvoiceCostList;
       // this.clientDefaultData = await this.httpService.getClientDefaultsByClient(this.ClientID, this.keyId);
 
-      if ( this.AccountInvoiceCostList != null &&  this.AccountInvoiceCostList.length > 0){
-        this.costListFiltered =  this.AccountInvoiceCostList.filter(item => item.AccessorialCode != null && item.AccessorialCode !== '');
-      }
+      // if ( this.AccountInvoiceCostList != null &&  this.AccountInvoiceCostList.length > 0){
+      //   this.costListFiltered =  this.AccountInvoiceCostList.filter(item => item.BilledCost > 0);
+      // }
 
+      this.costListFiltered = this.AccountInvoiceCostList;
+      
       this.clientTLWeightLimit = (this.clientDefaultData.TLWeightLimit == null ? 0 : this.clientDefaultData.TLWeightLimit) + 'lb';
       this.TotalShipmentCost = this.ShipmentCostObject.SellRates.TotalBilledAmount;
+    }else{
+      this.ShowSaveAsQuoteButton = true; // Show SaveAsQuote Button
     }
     // --
 
@@ -617,11 +628,12 @@ export class FormAddShipComponent implements OnInit {
     if (RequiredFieldsValidationObj.showWarningMessage){
       this.openDialog(RequiredFieldsValidationObj.isConfirmDialog, RequiredFieldsValidationObj.message);
     }else {
-      this.updateQuote(true);
-      // this.snackbar.open('Shipment booked.', null, {
-      //   duration: 5000
-      // });
-    }        
+      if (this.ShipmentByLadingObject == null){
+        this.saveNewQuoteAndBookShipment(true);
+      }else{
+        this.updateQuote(true);
+      }
+    }
   }
 
   addNewInternalNote(): void {
@@ -858,7 +870,8 @@ export class FormAddShipComponent implements OnInit {
     // console.log( this.rates);    
     if ( this.rates != null &&  this.rates.length > 0){
       this.ratesFiltered =  this.rates.filter(rate => rate.CarrierCost > 0);
-      console.log(this.ratesFiltered);
+      //this.ratesFiltered =  this.rates;
+      //console.log(this.ratesFiltered);
       this.ratesCounter = this.ratesFiltered.length;
       this.snackbar.open(this.ratesCounter + ' rates returned.', null, {
         duration: 5000
@@ -867,10 +880,9 @@ export class FormAddShipComponent implements OnInit {
 
       this.rates.forEach(r => {
         if (!String.IsNullOrWhiteSpace(r.TransitTime)){
-          let today = new Date();
-          const days: number = +r.TransitTime;
-          today = this.utilitiesService.AddBusinessDays(today, days);
-          r.ETA = String.Format('{0} (ETA)', this.datepipe.transform(today,'yyyy-MM-dd'));
+          let expDelDate = null;
+          expDelDate = this.ConverteJsonDateToLocalTimeZone(r.ExpectedDeliveryDate);
+          r.ETA = String.Format('{0} (ETA)', this.datepipe.transform(expDelDate,'MM/dd/yyyy'));         
         }
         else {
           r.ETA = String.Empty;
@@ -953,8 +965,8 @@ export class FormAddShipComponent implements OnInit {
       }
 
       this.costListFiltered.push(accessorialInvoiceFuelCost);
-
-      const accessorials = selectedRate.Accessorials.filter(item => item.AccessorialCode != null && item.AccessorialCode !== '');
+     
+      const accessorials = selectedRate.Accessorials.filter(a => a.AccessorialCharge > 0);
       accessorials.forEach(a => {
         const accessorialInvoice: AccountInvoiceCostList = {
           AccessorialCode: a.AccessorialCode,
@@ -962,11 +974,11 @@ export class FormAddShipComponent implements OnInit {
           BilledCost: a.AccessorialCharge
         }
 
-        this.costListFiltered.push(accessorialInvoice);
+        this.costListFiltered.push(accessorialInvoice);                       
       });
 
       this.TotalShipmentCost = selectedRate.TotalCostWithOutTrueCost;
-      this.confirmFormGroup.get('carrier').setValue(selectedRate.CarrierName);
+      this.confirmFormGroup.get('carrier').setValue(selectedRate.CarrierName);      
     }
 
 
@@ -1071,7 +1083,7 @@ export class FormAddShipComponent implements OnInit {
     this.clearRatesSection()
   }
 
-  setDefaultValuesInSteps() {
+  async setDefaultValuesInSteps() {
     let defaultoriginpostalcode = null;
     let defaultoriginstatename = null;
     let defaultpickupdate = null;
@@ -1079,15 +1091,29 @@ export class FormAddShipComponent implements OnInit {
     let defaultdeststatename = null;
     let defaultDestExpDelDate = null;
 
-    if (this.ShipmentByLadingObject == null){
+    if (this.ShipmentByLadingObject == null){      
       return;
     }        
 
+    this.LoadNumber = this.ShipmentByLadingObject.ClientLadingNo;
+    this.ShowSaveAsQuoteButton = (this.ShipmentByLadingObject.Status === 18 || this.ShipmentByLadingObject.Status === 17
+      || this.ShipmentByLadingObject.Status === 12
+      || this.ShipmentByLadingObject.Status === 10
+      || this.ShipmentByLadingObject.Status === 13
+      || this.ShipmentByLadingObject.Status === 14
+      || this.ShipmentByLadingObject.Status === 11 ? true : false);
     defaultoriginpostalcode = this.ShipmentByLadingObject.OrgZipCode.trim() + '-' + this.ShipmentByLadingObject.OrgCityName.trim();
     defaultoriginstatename = this.ShipmentByLadingObject.OrgStateName.trim();
 
-    const tempPickupDate = moment.utc(this.ShipmentByLadingObject.PickupDate);
-    defaultpickupdate = new Date(this.datepipe.transform(tempPickupDate.toString().replace(/(^.*\()|([+-].*$)/g, ''),'MM/dd/yyyy'));
+    // const tempPickupDate = moment.utc(this.ShipmentByLadingObject.PickupDate);
+    // const strTempPickupDate = this.datepipe.transform(tempPickupDate.toString().replace(/(^.*\()|([+-].*$)/g, ''),'MM/dd/yyyy')
+    // defaultpickupdate = new Date(strTempPickupDate);
+    const strTempPickupDate = this.ConverteJsonDateToLocalTimeZone(this.ShipmentByLadingObject.PickupDate);
+    defaultpickupdate = new Date(strTempPickupDate);
+    
+
+    // -- Calculate Expected Develiry Date
+    this.ExpectedDeliveryDateCalculated = await this.httpService.CalculateExpectedDeliveryDate(this.keyId, this.ShipmentByLadingObject.TransTime, strTempPickupDate);    
 
     defaultdestpostalcode = this.ShipmentByLadingObject.DestZipCode.trim() + '-' + this.ShipmentByLadingObject.DestCityName.trim();
     defaultdeststatename = this.ShipmentByLadingObject.DestStateName.trim();
@@ -1157,10 +1183,10 @@ export class FormAddShipComponent implements OnInit {
     this.originAndDestinationFormGroup.controls.destcontact.setValue(this.ShipmentByLadingObject.DestContactPerson === 'NA' ? '' : this.ShipmentByLadingObject.DestContactPerson, {onlySelf: false});
     this.originAndDestinationFormGroup.controls.destphone.setValue(this.ShipmentByLadingObject.DestContactPhone === 'NA' ? '' : this.ShipmentByLadingObject.DestContactPhone, {onlySelf: false});
     this.originAndDestinationFormGroup.controls.destemail.setValue(this.ShipmentByLadingObject.DestEmail === 'NA' ? '' : this.ShipmentByLadingObject.DestEmail, {onlySelf: false});
-
-
-    const tempDestExpDelDate = moment.utc(this.ShipmentByLadingObject.PickupDate);
-    defaultDestExpDelDate = new Date(this.datepipe.transform(tempDestExpDelDate.toString().replace(/(^.*\()|([+-].*$)/g, ''),'MM/dd/yyyy'));
+     
+     defaultDestExpDelDate = new Date(this.ConverteJsonDateToLocalTimeZone(this.ExpectedDeliveryDateCalculated));
+    // const tempDestExpDelDate = moment.utc(this.ExpectedDeliveryDateCalculated);
+    // defaultDestExpDelDate = new Date(this.datepipe.transform(tempDestExpDelDate.toString().replace(/(^.*\()|([+-].*$)/g, ''),'MM/dd/yyyy'));    
     this.originAndDestinationFormGroup.controls.destexpdeldate.setValue(defaultDestExpDelDate, {onlySelf: false});
     
     this.originAndDestinationFormGroup.controls.destdelapptfrom.setValue(this.ShipmentByLadingObject.DeliveryAppointmentTimeFrom, {onlySelf: false});
@@ -1169,7 +1195,7 @@ export class FormAddShipComponent implements OnInit {
     // --
 
     // -- Set values for Shipment Info fields    
-    this.shipmentInfoFormGroup.get('equipment').setValue(this.ShipmentByLadingObject.EquipmentID == null ? 7 : this.ShipmentByLadingObject.EquipmentID); //-- need to check this one
+    this.shipmentInfoFormGroup.get('equipment').setValue(this.ShipmentByLadingObject.EquipmentID == null || this.ShipmentByLadingObject.EquipmentID === 1 ? 7 : this.ShipmentByLadingObject.EquipmentID); //-- need to check this one
     this.shipmentInfoFormGroup.get('priority').setValue(this.ShipmentByLadingObject.PriorityID == null ? 0 : this.ShipmentByLadingObject.PriorityID); //-- need to check this one
     this.shipmentInfoFormGroup.get('servicelevel').setValue(this.ShipmentByLadingObject.ServiceLevelID == null ? 1 : this.ShipmentByLadingObject.ServiceLevelID);
     this.shipmentInfoFormGroup.get('paymentterms').setValue(this.ShipmentByLadingObject.PaymentTermID == null ? 5 : this.ShipmentByLadingObject.PaymentTermID); //-- need to check this one
@@ -1224,15 +1250,18 @@ export class FormAddShipComponent implements OnInit {
             this.accessorials.push(accessorial);
             this.accessorialIds.push(AvailableAccesorial.AccessorialID);
 
+            this.accessorialsUsedToRate.push(accessorial);
+
             AvailableAccesorial.Selected = true;
           }
         });
       });
 
-      this.ShipmentAccessorialsStored = this.ShipmentByLadingObject.BOLAccesorialList // Assign accessorials to global variable
+      this.ShipmentAccessorialsStored = this.ShipmentByLadingObject.BOLAccesorialList // Assign accessorials to global variable                  
+
     }
 
-    this.accessorialsSelectedQty = this.ShipmentByLadingObject.BOLAccesorialList.length; // Quantiry of accessorials selected
+    this.accessorialsSelectedQty = this.ShipmentByLadingObject.BOLAccesorialList.length; // Quantity of accessorials selected
 
     // --
 
@@ -1273,8 +1302,14 @@ export class FormAddShipComponent implements OnInit {
       
         if (this.productsUsedToRate != null && this.productsUsedToRate.length > 0){
           let productHasChanged = false;
+          let currentProductIndex = 0;
           this.productsUsedToRate.forEach(p => {
-            const currentProductIndex = (this.productsAndAccessorialsFormGroup.controls.products as FormArray).length - 1;
+            if (currentProductIndex > (this.productsAndAccessorialsFormGroup.controls.products as FormArray).length - 1){
+              productHasChanged = true;
+              return true;
+            }
+
+            //const currentProductIndex = (this.productsAndAccessorialsFormGroup.controls.products as FormArray).length - 1;
             if (p.Pallets !== (this.productsAndAccessorialsFormGroup.controls.products as FormArray).at(currentProductIndex).get('Pallets').value){
               productHasChanged = true;
               return true;
@@ -1324,9 +1359,12 @@ export class FormAddShipComponent implements OnInit {
               productHasChanged = true;
               return true;
             }
+
+            currentProductIndex = currentProductIndex + 1;
           });
 
           if (productHasChanged){
+            this.gbProductHasChanged = true;
             return true;
           }
 
@@ -1379,10 +1417,23 @@ export class FormAddShipComponent implements OnInit {
       }
 
       // Validate if data in products has changed
-      if (this.ShipmentByLadingObject.BOlProductsList != null && this.ShipmentByLadingObject.BOlProductsList.length > 0){
+      let productsToEvaluate;
+      if (this.productsUsedToRate != null && this.productsUsedToRate.length > 0){
+        productsToEvaluate = this.productsUsedToRate;
+      }else{
+        productsToEvaluate = this.ShipmentByLadingObject.BOlProductsList;
+      }
+      
+      if (productsToEvaluate != null && productsToEvaluate.length > 0){
+        //let currentProductIndex = (this.productsAndAccessorialsFormGroup.controls.products as FormArray).length - 1;
+        let currentProductIndex = 0;
         let productHasChanged = false;
-        this.ShipmentByLadingObject.BOlProductsList.forEach(p => {
-          const currentProductIndex = (this.productsAndAccessorialsFormGroup.controls.products as FormArray).length - 1;
+        productsToEvaluate.forEach(p => {          
+          if (currentProductIndex > (this.productsAndAccessorialsFormGroup.controls.products as FormArray).length - 1){
+            productHasChanged = true;
+            return true;
+          }
+
           if (p.Pallets !== (this.productsAndAccessorialsFormGroup.controls.products as FormArray).at(currentProductIndex).get('Pallets').value){
             productHasChanged = true;
             return true;
@@ -1393,25 +1444,44 @@ export class FormAddShipComponent implements OnInit {
             return true;
           }
 
+          
           if (p.PackageTypeID !== (this.productsAndAccessorialsFormGroup.controls.products as FormArray).at(currentProductIndex).get('PackageTypeID').value){
             productHasChanged = true;
             return true;
           }
 
-          if (p.Class !== (this.productsAndAccessorialsFormGroup.controls.products as FormArray).at(currentProductIndex).get('ProductClass').value){
-            productHasChanged = true;
-            return true;
+          if (this.productsUsedToRate != null && this.productsUsedToRate.length > 0){
+            if (p.ProductClass !== (this.productsAndAccessorialsFormGroup.controls.products as FormArray).at(currentProductIndex).get('ProductClass').value){
+              productHasChanged = true;
+              return true;
+            }
+  
+            if (p.NmfcNumber !== (this.productsAndAccessorialsFormGroup.controls.products as FormArray).at(currentProductIndex).get('NmfcNumber').value){
+              productHasChanged = true;
+              return true;
+            }
+  
+            if (p.Length !== (this.productsAndAccessorialsFormGroup.controls.products as FormArray).at(currentProductIndex).get('Length').value){
+              productHasChanged = true;
+              return true;
+            }
+          }else{
+            if (p.Class !== (this.productsAndAccessorialsFormGroup.controls.products as FormArray).at(currentProductIndex).get('ProductClass').value){
+              productHasChanged = true;
+              return true;
+            }
+  
+            if (p.NMFC !== (this.productsAndAccessorialsFormGroup.controls.products as FormArray).at(currentProductIndex).get('NmfcNumber').value){
+              productHasChanged = true;
+              return true;
+            }
+  
+            if (p.Lenght !== (this.productsAndAccessorialsFormGroup.controls.products as FormArray).at(currentProductIndex).get('Length').value){
+              productHasChanged = true;
+              return true;
+            }
           }
-
-          if (p.NMFC !== (this.productsAndAccessorialsFormGroup.controls.products as FormArray).at(currentProductIndex).get('NmfcNumber').value){
-            productHasChanged = true;
-            return true;
-          }
-
-          if (p.Lenght !== (this.productsAndAccessorialsFormGroup.controls.products as FormArray).at(currentProductIndex).get('Length').value){
-            productHasChanged = true;
-            return true;
-          }
+          
 
           if (p.Width !== (this.productsAndAccessorialsFormGroup.controls.products as FormArray).at(currentProductIndex).get('Width').value){
             productHasChanged = true;
@@ -1432,6 +1502,8 @@ export class FormAddShipComponent implements OnInit {
             productHasChanged = true;
             return true;
           }
+
+          currentProductIndex = currentProductIndex + 1;
         });
 
         if (productHasChanged){
@@ -1440,27 +1512,52 @@ export class FormAddShipComponent implements OnInit {
 
       }
 
-      if (this.ShipmentAccessorialsStored != null && this.ShipmentAccessorialsStored.length > 0){
-        if (this.ShipmentAccessorialsStored.length !== this.accessorials.length)
+      if (this.accessorialsUsedToRate != null && this.accessorialsUsedToRate.length > 0){
+        if (this.accessorialsUsedToRate.length !== this.accessorials.length)
         {
           // accessorials selected are different from the ones previously selected, so return true to re-rate
           return true;
         }else{
-          let accessorialArrayFound: AccessorialBase[];
+          let accessorialsFound : AccessorialBase[] = [];
           let accessorialHasChanged = false;
-          this.ShipmentAccessorialsStored.forEach(BOLAccesorial => {
-            accessorialArrayFound = this.accessorials.filter(item => item.AccessorialID === BOLAccesorial.AccesorialID);
-            if (accessorialArrayFound == null || accessorialArrayFound.length === 0){
-              accessorialHasChanged = true;
-              return true; // Previous accessorial selected not found in current list of accessorials, so return true (re-rate)
+          this.accessorialsUsedToRate.forEach(Acc => {
+            if (this.accessorials != null && this.accessorials.length > 0){
+              accessorialsFound = this.accessorials.filter(item => item.AccessorialID === Acc.AccessorialID);
+              if (accessorialsFound == null || accessorialsFound.length === 0){
+                accessorialHasChanged = true;
+                return true; // Previous accessorial selected not found in current list of accessorials, so return true (re-rate)
+              }
             }
           });
 
           if (accessorialHasChanged){
             return true;
           }
+
         }
       }
+
+      // if (this.ShipmentAccessorialsStored != null && this.ShipmentAccessorialsStored.length > 0){
+      //   if (this.ShipmentAccessorialsStored.length !== this.accessorials.length)
+      //   {
+      //     // accessorials selected are different from the ones previously selected, so return true to re-rate
+      //     return true;
+      //   }else{
+      //     let accessorialArrayFound: AccessorialBase[];
+      //     let accessorialHasChanged = false;
+      //     this.ShipmentAccessorialsStored.forEach(BOLAccesorial => {
+      //       accessorialArrayFound = this.accessorials.filter(item => item.AccessorialID === BOLAccesorial.AccesorialID);
+      //       if (accessorialArrayFound == null || accessorialArrayFound.length === 0){
+      //         accessorialHasChanged = true;
+      //         return true; // Previous accessorial selected not found in current list of accessorials, so return true (re-rate)
+      //       }
+      //     });
+
+      //     if (accessorialHasChanged){
+      //       return true;
+      //     }
+      //   }
+      // }
 
     }
 
@@ -1474,7 +1571,7 @@ export class FormAddShipComponent implements OnInit {
     }else{
       if (this.ShipmentByLadingObject == null){
         // Insert as new quote
-        this.saveNewQuote();
+        this.saveNewQuoteAndBookShipment(false);
       }else{
         // Update quote
         this.updateQuote();
@@ -1482,7 +1579,7 @@ export class FormAddShipComponent implements OnInit {
     }  
   }
 
-  async saveNewQuote(){
+  async saveNewQuoteAndBookShipment(IsBookShipment){
 
     this.spinnerMessage = 'Saving quote';
     
@@ -1599,199 +1696,6 @@ export class FormAddShipComponent implements OnInit {
       statusReasonCodeId = this.StatusReasons[0].StatusReasonCodeId; // Take First by default  
     }
 
-    // this.saveQuoteData = {
-    //   ClientId: 8473,
-    //   PickupDate: '/Date(1604901600000)/',
-    //   DeliveryDate: null,
-    //   OrgName: 'aaa',
-    //   OrgAdr1: 'aaa',
-    //   OrgAdr2: null,
-    //   OrgCity: 85839,
-    //   OrgState: 33,
-    //   OrgZip: 19205236,
-    //   OrgCountry: 1,
-    //   DestName: 'bbb',
-    //   DestAdr1: 'bbb',
-    //   DestAdr2: null,
-    //   DestCity: 90454,
-    //   DestState: 63,
-    //   DestZip: 19229270,
-    //   DestCountry: 1,
-    //   BillToName: 'R2 LOGISTICS ',
-    //   BillToAdr1: '10739 DEERWOOD PARK BLVD',
-    //   BillToAdr2: 'SUITE 103',
-    //   BillToState: 59,
-    //   BillToCity: 100326,
-    //   BillToZip: 19215714,
-    //   BillToCountry: 1,
-    //   CarrierCode: 'UPGF',
-    //   CarrierName: 'UPS FREIGHT',
-    //   ProNumber: '333',
-    //   SplNotes: 'special instructions',
-    //   Ref1ID: 3759,
-    //   Ref2ID: 3760,
-    //   Ref3ID: 3761,
-    //   Ref1Value: 'cr',
-    //   Ref2Value: 'r2o',
-    //   Ref3Value: 'r2prono',
-    //   TransTime: '2',
-    //   ShipCost: 139.86,
-    //   FreightCost: 126,
-    //   FuelCost: 13.86,
-    //   AccsCost: 0,
-    //   ShipperNotes: '',
-    //   PaymentTermID: 5,
-    //   OriginContactPerson: null,
-    //   OriginContactPhone: '1111111111',
-    //   DestContactPerson: null,
-    //   DestContactPhone: '22222222222',
-    //   OriginEmail: 'asd',
-    //   DestEmail: 'asd2',
-    //   EquipmentID: 7,
-    //   ShipmentValue: '111',
-    //   ValuePerPound: '222',
-    //   PriorityID: 0,
-    //   CarrierType: 'Direct',
-    //   QuoteNumber: '',
-    //   OriginTerminalAdd1: '240A SKIP LN',
-    //   OriginTerminalCity: 'BAY SHORE',
-    //   OriginTerminalState: 'NY',
-    //   OriginTerminalZip: '11706',
-    //   OriginTerminalFreePhone: '000-000-0000',
-    //   OriginTerminalPhone: '631-667-5656',
-    //   DestTerminalAdd1: '601 W 172ND ST',
-    //   DestTerminalCity: 'SOUTH HOLLAND',
-    //   DestTerminalState: 'IL',
-    //   DestTerminalZip: '60473',
-    //   DestTerminalFreePhone: '000-000-0000',
-    //   DestTerminalPhone: '708-210-3810',
-    //   OriginTerminalFax: '631-667-0024',
-    //   DestTerminalFax: '708-210-9924',
-    //   RequestedPickupDateFrom: '/Date(1604901600000)/',
-    //   RequestedPickupTimeFrom: null,
-    //   RequestedPickupTimeTo: null,
-    //   OrgFaxNo: null,
-    //   DestFaxNo: null,
-    //   RequestedDeliveryDate: null,
-    //   ServiceLevelID: 1,
-    //   Miles: 803,
-    //   BrokerCarrierCode: null,
-    //   BrokerReferenceNo: 'r2refno',
-    //   ShipmentErrorID: 0,
-    //   BOlProductsList: [
-    //     {
-    //       BOLProductID: 1,
-    //       Description: 'desc',
-    //       Pallets: '1',
-    //       Pieces: '1',
-    //       Hazmat: undefined,
-    //       NMFC: '123asd',
-    //       Class: '50',
-    //       Weight: '333',
-    //       Height: '33',
-    //       Lenght: '33',
-    //       Width: '33',
-    //       PackageTypeID: 3,
-    //       PCF: '16.01',
-    //       selectedProduct: {
-    //       },
-    //       Status: 1,
-    //       SelectedProductClass: {
-    //       },
-    //       Stackable: true,
-    //       PortCode: 'C',
-    //     },
-    //   ],
-    //   BOLAccesorialList: [
-    //   ],
-    //   BOLDispatchNotesList: [
-    //   ],
-    //   BuyRates: {
-    //     AccountInvoiceCostList: [
-    //     ],
-    //   },
-    //   SellRates: {
-    //     SCAC: 'UPGF',
-    //     CarrierName: 'UPS FREIGHT',
-    //     AccountInvoiceCostList: [
-    //       {
-    //         AccessorialID: 40,
-    //         AccessorialCode: 'SSC',
-    //         RatedCost: 0,
-    //         BilledCost: 0,
-    //         Description: 'SINGLE SHIPMENT',
-    //         CostStatus: 1,
-    //       },
-    //       {
-    //         AccessorialID: 22,
-    //         RatedCost: 126,
-    //         BilledCost: 126,
-    //         Description: 'Freight',
-    //         AccessorialCode: 'FRT',
-    //         CostStatus: 1,
-    //       },
-    //       {
-    //         AccessorialID: 23,
-    //         RatedCost: 13.86,
-    //         BilledCost: 13.86,
-    //         Description: 'Fuel',
-    //         AccessorialCode: 'FSC',
-    //         CostStatus: 1,
-    //       },
-    //       {
-    //         AccessorialID: 24,
-    //         RatedCost: 0,
-    //         BilledCost: 0,
-    //         Description: 'Discount',
-    //         AccessorialCode: 'DIS',
-    //         CostStatus: 1,
-    //       },
-    //     ],
-    //   },
-    //   RefNo: 1,
-    //   LoggedInUserId: 1,
-    //   OrgCityName: 'ATLANTIC BEACH                ',
-    //   OrgStateCode: 'NY ',
-    //   OrgCountryCode: 'USA',
-    //   OrgZipCode: '11509',
-    //   OrgPostWithCity: '11509-ATLANTIC BEACH                ',
-    //   DestCityName: 'CHICAGO HEIGHTS               ',
-    //   DestStateCode: 'IL ',
-    //   DestCountryCode: 'USA',
-    //   DestZipCode: '60411',
-    //   DestStateName: 'ILLINOIS                 ',
-    //   DestPostalWithCity: '60411-CHICAGO HEIGHTS               ',
-    //   BillToStateName: 'FLORIDA                  ',
-    //   BillToPostalWithCity: '32256-100326',
-    //   SellProfileID: 11868,
-    //   OrgLocation: 'ATLANTIC BEACH                ,NY 11509',
-    //   DestLocation: 'CHICAGO HEIGHTS               ,IL 60411',
-    //   BillToCityName: 'JACKSONVILLE                  ',
-    //   BillToStateCode: '59',
-    //   BillToCountryCode: '1',
-    //   BillToZipCode: '32256',
-    //   SalesPersonList: [
-    //   ],
-    //   BolDocumentsList: [
-    //   ],
-    //   TrackingDetailsList: [
-    //   ],
-    //   ServiceLevelName: 'UPS Standard LTL',
-    //   ServiceLevelCode: 'STD',
-    //   RatingResultId: 45309867,
-    //   Mode: 'LTL',
-    //   BOLStopLists: [
-    //   ],
-    //   CostWithCustomerPercentage: 0,
-    //   WaterfallList: [
-    //   ],
-    //   orgTerminalCityStateZipCode: 'BAY SHORE,NY,11706',
-    //   destTerminalCityStateZipCode: 'SOUTH HOLLAND,IL,60473',
-    //   WaterfallDetailsList: [
-    //   ],
-    //   StatusReasonCodeId: statusReasonCodeId
-    // }
-
     this.saveQuoteData = {
       ClientId: this.ClientID,
       PickupDate: String.Format('/Date({0})/',this.originAndDestinationFormGroup.get('originpickupdate').value.getTime()),
@@ -1819,14 +1723,14 @@ export class FormAddShipComponent implements OnInit {
       BillToCountry: this.clientDefaultData.BillToCountry,
       CarrierCode: selectedRate.CarrierID,
       CarrierName: selectedRate.CarrierName,
-      ProNumber: this.shipmentInfoFormGroup.get('pronumber').value.trim(),
+      ProNumber: this.shipmentInfoFormGroup.get('pronumber').value,
       SplNotes: this.shipmentInfoFormGroup.get('specialinstructions').value,
       Ref1ID: this.ReferenceByClientIDField1,
       Ref2ID: this.ReferenceByClientIDField2,
       Ref3ID: this.ReferenceByClientIDField3,
       Ref1Value: this.shipmentInfoFormGroup.get('customerref').value.trim(),
       Ref2Value: this.shipmentInfoFormGroup.get('r2order').value.trim(),
-      Ref3Value: this.shipmentInfoFormGroup.get('r2pronumber').value.trim(),
+      Ref3Value: this.shipmentInfoFormGroup.get('r2pronumber').value,
       TransTime: selectedRate.TransitTime,
       ShipCost: selectedRate.TotalCost,
       FreightCost: selectedRate.FreightCost,
@@ -1913,23 +1817,48 @@ export class FormAddShipComponent implements OnInit {
       orgTerminalCityStateZipCode:String.Format('{0},{1},{2}',selectedRate.OriginTerminalCity,selectedRate.OriginTerminalState,selectedRate.OriginTerminalZipCode),
       destTerminalCityStateZipCode:String.Format('{0},{1},{2}',selectedRate.DestTerminalCity,selectedRate.DestTerminalState,selectedRate.DestTerminalZipCode),
       WaterfallDetailsList: [],
-      StatusReasonCodeId: statusReasonCodeId
+      StatusReasonCodeId: statusReasonCodeId,
+      Status: (IsBookShipment ? 2 : 10)
     }
 
-    const responseData = await this.httpService.saveNewQuote(this.saveQuoteData);
-    if (responseData != null && !String.IsNullOrWhiteSpace(responseData.ClientLadingNo))
-    {
-      this.messageService.SendQuoteParameter(responseData.ClientLadingNo);
-      this.messageService.SendLadingIDParameter(responseData.LadingID.toString());
-      this.snackbar.open('Quote saved successfully with LoadNo ' + responseData.ClientLadingNo, null, {
-        duration: 5000
-      });
+    if (IsBookShipment){
+      const responseData = await this.httpService.OpenShipment(this.saveQuoteData);
+      if (responseData != null && !String.IsNullOrWhiteSpace(responseData.ClientLadingNo))
+      {
+        this.messageService.SendQuoteParameter(responseData.ClientLadingNo);
+        this.messageService.SendLadingIDParameter(responseData.LadingID.toString());
+        this.snackbar.open('Shipment Booked with LoadNo ' + responseData.ClientLadingNo, null, {
+          duration: 5000
+        });
+        const bolPrintURL = String.Format(environment.baseEndpoint + 'Handlers/PrintBOLHandler.ashx?LadingID={0}&ClientID={1}&Ticket={2}',
+        responseData.LadingID.toString(),this.ClientID.toString(), this.securityToken);
+        // this.router.([bolPrintURL]);
+        // window.open(bolPrintURL, '_blank');
+        this.router.navigate(['../../../shipmentboard/LTLTL/'], { relativeTo: this.route });
+      }
+      else{
+        this.snackbar.open('Error booking the shipment.', null, {
+          duration: 5000
+        });
+      }
+    }else{
+      const responseData = await this.httpService.saveNewQuote(this.saveQuoteData);
+      if (responseData != null && !String.IsNullOrWhiteSpace(responseData.ClientLadingNo))
+      {
+        this.messageService.SendQuoteParameter(responseData.ClientLadingNo);
+        this.messageService.SendLadingIDParameter(responseData.LadingID.toString());
+        this.snackbar.open('Quote saved successfully with LoadNo ' + responseData.ClientLadingNo, null, {
+          duration: 5000
+        });
+        this.router.navigate(['../../../shipmentboard/LTLTL/'], { relativeTo: this.route });
+      }
+      else{
+        this.snackbar.open('Error saving as quote.', null, {
+          duration: 5000
+        });
+      }
     }
-    else{
-      this.snackbar.open('Error saving as quote.', null, {
-        duration: 5000
-      });
-    }
+    
 
     this.showSpinner = false;
   }
@@ -1951,9 +1880,16 @@ export class FormAddShipComponent implements OnInit {
 
     const arrayProducts = this.productsAndAccessorialsFormGroup.get('products').value;
     const productList: BOlProductsListSBL[] = [];
+    
     arrayProducts.forEach(p => {
+      
+      let tempProductID = 0;
+      if (localShipmentByLadingObject.BOlProductsList != null && localShipmentByLadingObject.BOlProductsList.length > 0){
+        tempProductID = localShipmentByLadingObject.BOlProductsList[0].BOLProductID;
+      }
+
       const prod : BOlProductsListSBL = {
-        BOLProductID: p.BOLProductID,
+        BOLProductID: tempProductID,
         Description: p.ProductDescription,
         Pallets: p.Pallets,
         Pieces: p.Pieces,
@@ -2022,6 +1958,7 @@ export class FormAddShipComponent implements OnInit {
     // --
 
     // -- Update Shipment Information fields
+    localShipmentByLadingObject.EquipmentID = this.shipmentInfoFormGroup.get('equipment').value;
     localShipmentByLadingObject.ProNumber = this.shipmentInfoFormGroup.get('pronumber').value.trim();
     localShipmentByLadingObject.SplNotes = this.shipmentInfoFormGroup.get('specialinstructions').value;   
     localShipmentByLadingObject.Ref1Value = this.shipmentInfoFormGroup.get('customerref').value.trim();
@@ -2070,59 +2007,160 @@ export class FormAddShipComponent implements OnInit {
     localShipmentByLadingObject.LoggedInUserId = this.UserIDLoggedIn;
 
     if (selectedRate != null && selectedRate.CarrierID != null){
-      const accountInvoiceCostList: AccountInvoiceCostListSBL[] = [];
 
-      selectedRate.Accessorials.forEach(a => {
+      // -- accountInvoiceCostListBuyRates
+      const accountInvoiceCostListBuyRates: AccountInvoiceCostListSBL[] = [];
+
+      // -- accountInvoiceCostListSellRates
+      const accountInvoiceCostListSellRates: AccountInvoiceCostListSBL[] = [];
+
+      const filteredSelectRateAccessorials = selectedRate.Accessorials.filter(acc => acc.AccessorialCharge > 0);
+      filteredSelectRateAccessorials.forEach(a => {
+
+        let tempCostDetailID = 0;
+        const filteredCostList = this.ShipmentCostObject.BuyRates.AccountInvoiceCostList.filter(item => item.Description === a.AccessorialDescription);
+        if (filteredCostList != null && filteredCostList.length > 0){
+          tempCostDetailID = filteredCostList[0].CostDetailID;
+        }
+
         const accountInvoiceCost: AccountInvoiceCostListSBL = {
           AccessorialID: a.AccessorialID,
           AccessorialCode: a.AccessorialCode,
           RatedCost: a.AccessorialCharge,
           BilledCost: a.AccessorialCharge,
           Description: a.AccessorialDescription,
-          CostStatus: 1 // Ask
+          CostStatus: 1,
+          CostDetailID: tempCostDetailID
         }
-        accountInvoiceCostList.push(accountInvoiceCost);
-      })
-  
-      // Ask
+        accountInvoiceCostListBuyRates.push(accountInvoiceCost);
+
+        let tempCostDetailIDSR = 0;
+        const filteredCostListSR = this.ShipmentCostObject.BuyRates.AccountInvoiceCostList.filter(item => item.Description === a.AccessorialDescription);
+        if (filteredCostListSR != null && filteredCostListSR.length > 0){
+          tempCostDetailIDSR = filteredCostListSR[0].CostDetailID;
+        }
+
+        const accountInvoiceCostSR: AccountInvoiceCostListSBL = {
+          AccessorialID: a.AccessorialID,
+          AccessorialCode: a.AccessorialCode,
+          RatedCost: a.AccessorialCharge,
+          BilledCost: a.AccessorialCharge,
+          Description: a.AccessorialDescription,
+          CostStatus: 1,
+          CostDetailID: tempCostDetailIDSR
+        }
+        accountInvoiceCostListSellRates.push(accountInvoiceCostSR);
+      });
+        
       // Freight
+      let FRTCostDetailID = 0;
+      const filteredCostListFRT = this.ShipmentCostObject.BuyRates.AccountInvoiceCostList.filter(item => item.AccessorialID === 22 && item.AccessorialCode === 'FRT');
+      if (filteredCostListFRT != null && filteredCostListFRT.length > 0){
+        FRTCostDetailID = filteredCostListFRT[0].CostDetailID;
+      }
       const accountInvoiceFreight: AccountInvoiceCostListSBL = {
         AccessorialID: 22,
         RatedCost: selectedRate.GrossAmount,
         BilledCost: selectedRate.GrossAmount,
         Description: 'Freight',
         AccessorialCode: 'FRT',
-        CostStatus: 1
+        CostStatus: 1,
+        CostDetailID: FRTCostDetailID
       }
-      accountInvoiceCostList.push(accountInvoiceFreight);
+      accountInvoiceCostListBuyRates.push(accountInvoiceFreight);
   
       // Fuel
+      let FSCCostDetailID = 0;
+      const filteredCostListFSC = this.ShipmentCostObject.BuyRates.AccountInvoiceCostList.filter(item => item.AccessorialID === 23 && item.AccessorialCode === 'FSC');
+      if (filteredCostListFSC != null && filteredCostListFSC.length > 0){
+        FSCCostDetailID = filteredCostListFSC[0].CostDetailID;
+      }
       const accountInvoiceFuel: AccountInvoiceCostListSBL = {
         AccessorialID: 23,
         RatedCost: selectedRate.FuelCost,
         BilledCost: selectedRate.FuelCost,
         Description: 'Fuel',
         AccessorialCode: 'FSC',
-        CostStatus: 1
+        CostStatus: 1,
+        CostDetailID: FSCCostDetailID
       }
-      accountInvoiceCostList.push(accountInvoiceFuel);
+      accountInvoiceCostListBuyRates.push(accountInvoiceFuel);
   
       // Discount
+      let DISCostDetailID = 0;
+      const filteredCostListDIS = this.ShipmentCostObject.BuyRates.AccountInvoiceCostList.filter(item => item.AccessorialID === 24 && item.AccessorialCode === 'DIS');
+      if (filteredCostListDIS != null && filteredCostListDIS.length > 0){
+        DISCostDetailID = filteredCostListDIS[0].CostDetailID;
+      }
       const accountInvoiceDiscount: AccountInvoiceCostListSBL = {
         AccessorialID: 24,
         RatedCost: -1 * selectedRate.Discount,
         BilledCost: -1 * selectedRate.Discount,
         Description: 'Discount',
         AccessorialCode: 'DIS',
-        CostStatus: 1
+        CostStatus: 1,
+        CostDetailID: DISCostDetailID
       }
-      accountInvoiceCostList.push(accountInvoiceDiscount);
+      accountInvoiceCostListBuyRates.push(accountInvoiceDiscount);
+      // --
+        
+      // Freight
+      let FRTCostDetailIDSR = 0;
+      const filteredCostListSRFRT = this.ShipmentCostObject.SellRates.AccountInvoiceCostList.filter(item => item.AccessorialID === 22 && item.AccessorialCode === 'FRT');
+      if (filteredCostListSRFRT != null && filteredCostListSRFRT.length > 0){
+        FRTCostDetailIDSR = filteredCostListSRFRT[0].CostDetailID;
+      }
+      const accountInvoiceFreightSR: AccountInvoiceCostListSBL = {
+        AccessorialID: 22,
+        RatedCost: selectedRate.GrossAmount,
+        BilledCost: selectedRate.GrossAmount,
+        Description: 'Freight',
+        AccessorialCode: 'FRT',
+        CostStatus: 1,
+        CostDetailID: FRTCostDetailIDSR
+      }
+      accountInvoiceCostListSellRates.push(accountInvoiceFreightSR);
+  
+      // Fuel
+      let FSCCostDetailIDSR = 0;
+      const filteredCostListSRFSC = this.ShipmentCostObject.SellRates.AccountInvoiceCostList.filter(item => item.AccessorialID === 23 && item.AccessorialCode === 'FSC');
+      if (filteredCostListSRFSC != null && filteredCostListSRFSC.length > 0){
+        FSCCostDetailIDSR = filteredCostListSRFSC[0].CostDetailID;
+      }
+      const accountInvoiceFuelSR: AccountInvoiceCostListSBL = {
+        AccessorialID: 23,
+        RatedCost: selectedRate.FuelCost,
+        BilledCost: selectedRate.FuelCost,
+        Description: 'Fuel',
+        AccessorialCode: 'FSC',
+        CostStatus: 1,
+        CostDetailID: FSCCostDetailIDSR
+      }
+      accountInvoiceCostListSellRates.push(accountInvoiceFuelSR);
+  
+      // Discount
+      let DISCostDetailIDSR = 0;
+      const filteredCostListSRDIS = this.ShipmentCostObject.SellRates.AccountInvoiceCostList.filter(item => item.AccessorialID === 24 && item.AccessorialCode === 'DIS');
+      if (filteredCostListSRDIS != null && filteredCostListSRDIS.length > 0){
+        DISCostDetailIDSR = filteredCostListSRDIS[0].CostDetailID;
+      }
+      const accountInvoiceDiscountSR: AccountInvoiceCostListSBL = {
+        AccessorialID: 24,
+        RatedCost: -1 * selectedRate.Discount,
+        BilledCost: -1 * selectedRate.Discount,
+        Description: 'Discount',
+        AccessorialCode: 'DIS',
+        CostStatus: 1,
+        CostDetailID: DISCostDetailIDSR
+      }
+      accountInvoiceCostListSellRates.push(accountInvoiceDiscountSR);
+      // --
   
       // -- Sell and Buy rates
       localShipmentByLadingObject.SellRates.SCAC = selectedRate.CarrierID;
       localShipmentByLadingObject.SellRates.CarrierName = selectedRate.CarrierName;
-      localShipmentByLadingObject.SellRates.AccountInvoiceCostList = accountInvoiceCostList;   
-      localShipmentByLadingObject.BuyRates.AccountInvoiceCostList = accountInvoiceCostList;   
+      localShipmentByLadingObject.SellRates.AccountInvoiceCostList = accountInvoiceCostListBuyRates;   
+      localShipmentByLadingObject.BuyRates.AccountInvoiceCostList = accountInvoiceCostListSellRates;   
                    
       localShipmentByLadingObject.SellRates.BolNumber = this.ShipmentCostObject.SellRates.BolNumber;
       localShipmentByLadingObject.SellRates.CarrierName = this.ShipmentCostObject.SellRates.CarrierName;
@@ -2304,6 +2342,68 @@ export class FormAddShipComponent implements OnInit {
     return RequiredFieldsValidationObj;
   }
 
+  ConverteJsonDateToLocalTimeZone(JsonDate: string) {
+    let d = new Date();
+    let ShipDate;
+    let offset = d.getTimezoneOffset();
+
+    let JsonDateDate;
+    if (JsonDate.toString().indexOf('Date(') === -1) {
+        JsonDateDate = new Date(JsonDate);
+        JsonDateDate = JsonDateDate.getTime();
+
+        JsonDateDate = parseInt(offset.toString()) * 60000 * (-1) + parseInt(JsonDate);
+
+        JsonDateDate = '\/Date(' + JsonDate.toString() + ')\/';
+    }
+
+    if (JsonDate.toString().indexOf('-') !== -1) {
+
+        let timeoffsetfromservicedate = JsonDate.toString().substring(JsonDate.toString().indexOf('-') + 1, JsonDate.toString().indexOf(')/'));
+
+        let leftOffSetHour = parseInt(timeoffsetfromservicedate.toString().substring(0, 2)) * 60;
+        let offsethour = parseInt(leftOffSetHour.toString()) + parseInt(timeoffsetfromservicedate.toString().substring(2, 4));
+
+        let totalmillsecond = parseInt(offset.toString()) * 60000 + parseInt(parseInt(JsonDate.toString().substring(6)).toString()) - parseInt(offsethour.toString()) * 60000;
+
+        ShipDate = new Date(totalmillsecond);
+    }
+    else {
+        let totalmillsecond;
+        if (JsonDate.toString().indexOf('+') > 0) {
+
+            let timeoffsetfromservicedate = JsonDate.toString().substring(JsonDate.toString().indexOf('+') + 1, JsonDate.toString().indexOf(')/'));
+
+            let leftoffsethour = parseInt(timeoffsetfromservicedate.toString().substring(0, 2)) * 60;
+            let offsethour = parseInt(leftoffsethour.toString()) + parseInt(timeoffsetfromservicedate.toString().substring(2, 4));
+
+            totalmillsecond = parseInt(offset.toString()) * 60000 + parseInt(parseInt(JsonDate.toString().substring(6)).toString()) + parseInt(offsethour.toString()) * 60000;
+
+            ShipDate = new Date(totalmillsecond);
+        }
+        else {
+            totalmillsecond = parseInt(parseInt(JsonDate.toString().substring(6)).toString());
+
+
+            let utcMonth = new Date(totalmillsecond).getUTCMonth() + 1;
+            let utcDay = new Date(totalmillsecond).getUTCDate();
+            let utcYear = new Date(totalmillsecond).getUTCFullYear()
+
+            let formatedUtcShipDate = utcMonth + '/' + utcDay + '/' + utcYear;
+
+            ShipDate = new Date(formatedUtcShipDate);
+        }
+
+    }
+
+
+    let getMonth = ShipDate.getMonth() + 1;
+    let getDay = ShipDate.getDate();
+    let getYear = ShipDate.getFullYear()
+
+    let formatedShipDate = getMonth + '/' + getDay + '/' + getYear;
+    return formatedShipDate;
+  } 
 
 
 }

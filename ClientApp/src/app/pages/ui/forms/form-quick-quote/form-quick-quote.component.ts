@@ -116,6 +116,8 @@ export class FormQuickQuoteComponent implements OnInit {
   clientDefaultData: ClientDefaultData;
   clientTLWeightLimit: string;
   carrierImageUrl = environment.baseEndpoint +'Handlers/CarrierLogoHandler.ashx?carrierID=';
+  UserIDLoggedIn = this.authenticationService.authenticatedUser$.value.UserID;  
+
 
   icPhone = icPhone;
   icCamera = icCamera;
@@ -637,9 +639,12 @@ export class FormQuickQuoteComponent implements OnInit {
       this.rates.forEach(r => {
         if (!String.IsNullOrWhiteSpace(r.ExpectedDeliveryDate)){
           let expDelDate = null;
-          const tempExpDelDate = moment.utc(r.ExpectedDeliveryDate);
-          expDelDate = new Date(this.datepipe.transform(tempExpDelDate.toString().replace(/(^.*\()|([+-].*$)/g, ''),'MM/dd/yyyy'));
-          r.ETA = String.Format('{0} (ETA)', this.datepipe.transform(expDelDate,'MM/dd/yyyy')); 
+          // const tempExpDelDate = moment.utc(r.ExpectedDeliveryDate);
+          // expDelDate = new Date(this.datepipe.transform(tempExpDelDate.toString().replace(/(^.*\()|([+-].*$)/g, ''),'MM/dd/yyyy'));         
+          // r.ETA = String.Format('{0} (ETA)', this.datepipe.transform(expDelDate,'MM/dd/yyyy'));
+          
+          expDelDate = this.ConverteJsonDateToLocalTimeZone(r.ExpectedDeliveryDate);
+          r.ETA = String.Format('{0} (ETA)', this.datepipe.transform(expDelDate,'MM/dd/yyyy'));
 
           // let today = new Date();
           // const days: number = +r.TransitTime;
@@ -661,6 +666,7 @@ export class FormQuickQuoteComponent implements OnInit {
       // console.log( this.rates);
       if ( this.rates != null &&  this.rates.length > 0){
             this.ratesFiltered =  this.rates.filter(rate => rate.CarrierCost > 0);
+            // this.ratesFiltered =  this.rates;
             console.log(this.ratesFiltered);
             this.ratesCounter = this.ratesFiltered.length;
             this.snackbar.open(this.ratesCounter + ' rates returned.', null, {
@@ -855,7 +861,7 @@ export class FormQuickQuoteComponent implements OnInit {
         BuyRates: null,
         SellRates: sellRate,
 
-        LoggedInUserId: 1,
+        LoggedInUserId: this.UserIDLoggedIn,
         OrgCityName:this.OriginPostalData.CityName,
         OrgStateCode:this.OriginPostalData.StateCode,
         OrgCountryCode:this.OriginPostalData.CountryCode,
@@ -878,7 +884,8 @@ export class FormQuickQuoteComponent implements OnInit {
         WaterfallList: [],
         orgTerminalCityStateZipCode:String.Format('{0},{1},{2}',selectedRate.OriginTerminalCity,selectedRate.OriginTerminalState,selectedRate.OriginTerminalZipCode),
         destTerminalCityStateZipCode:String.Format('{0},{1},{2}',selectedRate.DestTerminalCity,selectedRate.DestTerminalState,selectedRate.DestTerminalZipCode),
-        WaterfallDetailsList:null
+        WaterfallDetailsList:null,
+        EquipmentID: null
     };
 
     console.log('saveQuoteParameters',this.saveQuoteParameters)
@@ -946,5 +953,69 @@ export class FormQuickQuoteComponent implements OnInit {
     this.messageService.SendQuoteParameter(String.Empty); // Clean LadingId parameter
     this.router.navigate(['/ui/forms/form-add-ship/'], { relativeTo: this.route });
   }
+
+  ConverteJsonDateToLocalTimeZone(JsonDate: string) {
+    let d = new Date();
+    let ShipDate;
+    let offset = d.getTimezoneOffset();
+
+    let JsonDateDate;
+    if (JsonDate.toString().indexOf('Date(') === -1) {
+        JsonDateDate = new Date(JsonDate);
+        JsonDateDate = JsonDateDate.getTime();
+
+        JsonDateDate = parseInt(offset.toString()) * 60000 * (-1) + parseInt(JsonDate);
+
+        JsonDateDate = '\/Date(' + JsonDate.toString() + ')\/';
+    }
+
+    if (JsonDate.toString().indexOf('-') !== -1) {
+
+        let timeoffsetfromservicedate = JsonDate.toString().substring(JsonDate.toString().indexOf('-') + 1, JsonDate.toString().indexOf(')/'));
+
+        let leftOffSetHour = parseInt(timeoffsetfromservicedate.toString().substring(0, 2)) * 60;
+        let offsethour = parseInt(leftOffSetHour.toString()) + parseInt(timeoffsetfromservicedate.toString().substring(2, 4));
+
+        let totalmillsecond = parseInt(offset.toString()) * 60000 + parseInt(parseInt(JsonDate.toString().substring(6)).toString()) - parseInt(offsethour.toString()) * 60000;
+
+        ShipDate = new Date(totalmillsecond);
+    }
+    else {
+        let totalmillsecond;
+        if (JsonDate.toString().indexOf('+') > 0) {
+
+            let timeoffsetfromservicedate = JsonDate.toString().substring(JsonDate.toString().indexOf('+') + 1, JsonDate.toString().indexOf(')/'));
+
+            let leftoffsethour = parseInt(timeoffsetfromservicedate.toString().substring(0, 2)) * 60;
+            let offsethour = parseInt(leftoffsethour.toString()) + parseInt(timeoffsetfromservicedate.toString().substring(2, 4));
+
+            totalmillsecond = parseInt(offset.toString()) * 60000 + parseInt(parseInt(JsonDate.toString().substring(6)).toString()) + parseInt(offsethour.toString()) * 60000;
+
+            ShipDate = new Date(totalmillsecond);
+        }
+        else {
+            totalmillsecond = parseInt(parseInt(JsonDate.toString().substring(6)).toString());
+
+
+            let utcMonth = new Date(totalmillsecond).getUTCMonth() + 1;
+            let utcDay = new Date(totalmillsecond).getUTCDate();
+            let utcYear = new Date(totalmillsecond).getUTCFullYear()
+
+            let formatedUtcShipDate = utcMonth + '/' + utcDay + '/' + utcYear;
+
+            ShipDate = new Date(formatedUtcShipDate);
+        }
+
+    }
+
+
+    let getMonth = ShipDate.getMonth() + 1;
+    let getDay = ShipDate.getDate();
+    let getYear = ShipDate.getFullYear()
+
+    let formatedShipDate = getMonth + '/' + getDay + '/' + getYear;
+    return formatedShipDate;
+  } 
+
 
 }

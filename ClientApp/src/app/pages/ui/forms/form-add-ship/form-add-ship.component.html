@@ -8,6 +8,10 @@
 
 <div @stagger class="qcForms p-gutter" vexContainer>  
   <div @fadeInUp class="card overflow-hidden">
+    <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="5px" class="LoadNumberSection" *ngIf="LoadNumber != null && LoadNumber.length > 0">
+      <p>Load No: {{LoadNumber}}</p>
+    </div>
+
     <mat-horizontal-stepper #stepper="matHorizontalStepper" [linear]="false" (selectionChange)="StepperSelectionChange($event)">
       <ng-template matStepperIcon="edit">
         <mat-icon [icIcon]="icDoneAll"></mat-icon>
@@ -1127,7 +1131,7 @@
 
           <div class="actions" fxLayout="row" fxLayoutAlign="end center" fxLayoutGap="8px">
             <button color="primary" mat-button matStepperPrevious type="button" (click)="previousFromLastStep()">Previous</button>
-            <button (click)="SaveAsQuote()"  color="warn" mat-raised-button>
+            <button (click)="SaveAsQuote()"  color="warn" mat-raised-button *ngIf="ShowSaveAsQuoteButton">
               Save as Quote
             </button>
             <button (click)="BookShipmentSubmit()"  color="warn" mat-raised-button

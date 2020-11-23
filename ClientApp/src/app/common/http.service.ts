@@ -440,11 +440,35 @@ export class HttpService{
         const httpHeaders = new HttpHeaders({
             Ticket : ticket
         });
-        return this.http.get<StatusReason[]>(String.Format(this.baseEndpoint + 'Services/BOLHDRService.svc/json/GetStatusReasonCode?_={1}',keyId)
+        return this.http.get<StatusReason[]>(String.Format(this.baseEndpoint + 'Services/BOLHDRService.svc/json/GetStatusReasonCode?_={0}',keyId)
         ,{
             headers: httpHeaders
           }
           ).toPromise();
+    }
+
+    CalculateExpectedDeliveryDate(keyId:string, transitdays:string, pickupdate: string){
+        const ticket = this.token;
+        const httpHeaders = new HttpHeaders({
+            Ticket : ticket
+        });
+        return this.http.get<string>(String.Format(this.baseEndpoint + 'Services/BOLHDRService.svc/json//CalculateExpectedDeliveryDate?transitdays={0}&pickupdate={1}&_={2}',transitdays,pickupdate,keyId)
+        ,{
+            headers: httpHeaders
+          }
+          ).toPromise();
+    }
+
+    OpenShipment(parameters:SaveQuoteData){
+        const ticket = this.token;
+        const httpHeaders = new HttpHeaders({
+            Ticket : ticket
+        });
+        return this.http.post<SaveQuoteResponse>(this.baseEndpoint + 'Services/BOLHDRService.svc/json/OpenShipment',parameters
+        ,{
+            headers: httpHeaders
+        }
+        ).toPromise();
     }
     
 }

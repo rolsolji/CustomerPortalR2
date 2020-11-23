@@ -33,6 +33,7 @@ import { SendEmailParameters } from '../Entities/SendEmailParameters';
 import { SendEmailResponse } from '../Entities/SendEmailResponse';
 import { SaveQuoteData } from '../Entities/SaveQuoteData'; 
 import { StatusReason } from '../Entities/StatusReason'; 
+import { TrackingDetails } from '../Entities/TrackingDetails'; 
 
 @Injectable({
     providedIn: 'root'
@@ -368,7 +369,7 @@ export class HttpService{
         const httpHeaders = new HttpHeaders({
             Ticket : ticket
         });
-        return this.http.get<any>(String.Format(this.baseEndpoint + 'Services/BOLHDRService.svc/json/GetTrackingDetailsByLadingID?LadingID={0}&_={1}', landingId, keyId)
+        return this.http.get<TrackingDetails[]>(String.Format(this.baseEndpoint + 'Services/BOLHDRService.svc/json/GetTrackingDetailsByLadingID?LadingID={0}&_={1}', landingId, keyId)
         ,{
             headers: httpHeaders
           }

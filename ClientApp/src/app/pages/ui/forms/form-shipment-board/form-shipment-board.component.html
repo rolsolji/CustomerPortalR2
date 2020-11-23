@@ -201,7 +201,7 @@
                                     <mat-form-field appearance="outline">
                                         <mat-label>Select Shipment Type</mat-label>
                                         <mat-select [(ngModel)]="getQuotesParameters.ShipmentType">
-                                            <mat-option value="ALL">ALL</mat-option>
+                                            <mat-option value="">ALL</mat-option>
                                             <mat-option value="International">International</mat-option>
                                             <mat-option value="Domestic">Domestic</mat-option>
                                         </mat-select>
@@ -257,7 +257,7 @@
                 <ng-container *ngFor="let column of columns; trackBy: trackByProperty">
                 <ng-container *ngIf="column.type === 'text'" [matColumnDef]="column.property">
                     <th *matHeaderCellDef class="grid-mat-cell grid-header-cell uppercase" mat-header-cell mat-sort-header> {{ column.label }}</th>
-                    <td *matCellDef="let row" [ngClass]="column.cssClasses" mat-cell>{{ row[column.property] }}</td>
+                    <td *matCellDef="let row" [ngClass]="column.cssClasses" [style.color]="getFontColor(row[column.property])" mat-cell>{{ row[column.property] }}</td>
                 </ng-container>
                 </ng-container>
 
@@ -318,6 +318,21 @@
                                     <hr class="horizontal-title-line">    
                                     <div class="div-container div-container-content">
                                         <p *ngIf="shipmentInformation != null">Tracking Number: {{shipmentInformation.TrackingNumber}}</p>
+                                        <p *ngIf="TrackingDetailsLists != null && TrackingDetailsLists.length > 0">Current Status: {{TrackingDetailsLists[0].CurrentStatus}}</p>
+                                        <table mat-table [dataSource]=dataSourceTracking  *ngIf="TrackingDetailsLists != null && TrackingDetailsLists.length > 0">
+                                            <ng-container matColumnDef="StatusDate">
+                                                <th mat-header-cell *matHeaderCellDef>Status Date</th>
+                                                <td mat-cell *matCellDef="let row"> {{row.StatusDate}} </td>
+                                            </ng-container>
+                                            
+                                            <ng-container matColumnDef="Description">
+                                                <th mat-header-cell *matHeaderCellDef>Description</th>
+                                                <td mat-cell *matCellDef="let row"> {{row.StatusDescription}} </td>
+                                            </ng-container>
+
+                                            <tr mat-header-row *matHeaderRowDef="displayedColumnsTracking"></tr>
+                                            <tr mat-row *matRowDef="let row; columns: displayedColumnsTracking;"></tr>
+                                        </table>
                                     </div>
                                 </div>
                                 <div class="vertical-line"></div>

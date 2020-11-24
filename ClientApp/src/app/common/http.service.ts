@@ -31,8 +31,10 @@ import { ReferenceByClient } from '../Entities/ReferenceByClient';
 import {MasUser} from '../Entities/mas-user.model';
 import { SendEmailParameters } from '../Entities/SendEmailParameters';
 import { SendEmailResponse } from '../Entities/SendEmailResponse';
-import { SaveQuoteData } from '../Entities/SaveQuoteData'; 
-import { StatusReason } from '../Entities/StatusReason'; 
+import { SaveQuoteData } from '../Entities/SaveQuoteData';
+import { StatusReason } from '../Entities/StatusReason';
+import {GetLocationsParameters} from "../Entities/GetLocationsParameters";
+import {Location} from "../Entities/Location";
 
 @Injectable({
     providedIn: 'root'
@@ -78,6 +80,19 @@ export class HttpService{
     }
 
 
+    getMasLocations(parameters: GetLocationsParameters){
+        const ticket = this.token;
+        const httpHeaders = new HttpHeaders({
+            Ticket : ticket
+        });
+        console.log(parameters);
+        return this.http.post<Location[]>(this.baseEndpoint + 'Services/MasLocationService.svc/json/GetMasLocation', parameters
+            ,{
+                headers: httpHeaders
+            }
+        ).toPromise();
+    }
+
     async getMainToken(): Promise<string> {
 
         return new Promise((resolve, reject) => {
@@ -98,8 +113,6 @@ export class HttpService{
 
        })
     }
-
-
 
     getStateDataByCountryId(countryId:string, keyId:string){
         const httpHeaders = new HttpHeaders({
@@ -446,5 +459,5 @@ export class HttpService{
           }
           ).toPromise();
     }
-    
+
 }

@@ -86,13 +86,13 @@
             </div>
             
             <div fxLayout="row" fxLayoutAlign="space-between" class="py-2 pr-2">  
-                <div fxLayoutAlign="start end">
+                <div fxLayoutAlign="start end" fxFlex="80%">
                     <div *ngIf="showDefaultTitle">
                         <span class="filterTitle">Default filters:</span> <span class="filterDefault" >{{defaultFilterText}}</span>
                     </div>
                 </div>
 
-                <div fxLayout="row" fxLayoutAlign="end center" class="py-2 pr-2">
+                <div fxLayout="row" fxLayoutAlign="end end" fxFlex="20%" class="pt-2">
                     <div class="spinnerSection" *ngIf="showSpinner">
                         <div class="center-me">
                           <mat-progress-spinner diameter="50" color="warn" mode="indeterminate"></mat-progress-spinner>
@@ -100,15 +100,16 @@
                         </div>
                     </div>
     
-                    <div *ngIf=!showSpinner>{{currentRows}} of {{totalRows}}</div>
-    
                     <div *ngIf=!showSpinner>
-                          
-                        <button (click)="close('open')" mat-button>
-                            <mat-icon [icIcon]="icFilterList"></mat-icon>
+                        <button (click)="close('open')" class="moreFilterButton" mat-button>
+                            <span>More Filter Options </span>
+                            <mat-icon [icIcon]="icFilterList" color="black"></mat-icon>
                         </button>
+                        <div fxLayoutAlign="end end">
+                            <span>{{currentRows}} of {{totalRows}}</span>
+                        </div>
                     </div>
-                 
+                    
                      <mat-sidenav #searchModal position="end" class="search-container" (click)="close('search')">
                         <button (click)="$event.stopPropagation()">
                             <div class="ml-2 mr-2">
@@ -257,7 +258,7 @@
                 <ng-container *ngFor="let column of columns; trackBy: trackByProperty">
                 <ng-container *ngIf="column.type === 'text'" [matColumnDef]="column.property">
                     <th *matHeaderCellDef class="grid-mat-cell grid-header-cell uppercase" mat-header-cell mat-sort-header> {{ column.label }}</th>
-                    <td *matCellDef="let row" [ngClass]="column.cssClasses" [style.color]="getFontColor(row[column.property])" mat-cell>{{ row[column.property] }}</td>
+                    <td *matCellDef="let row" [ngClass]="column.cssClasses" [style.color]="getFontColor(row[column.property])" [style.font-weight]="getFontWeight(row[column.property])" mat-cell>{{ row[column.property] }}</td>
                 </ng-container>
                 </ng-container>
 

@@ -24,6 +24,9 @@ import { MatButtonToggleModule } from '@angular/material/button-toggle';
 
 @NgModule({
   declarations: [AioTableComponent],
+  exports: [
+    AioTableComponent
+  ],
   imports: [
     CommonModule,
     AioTableRoutingModule,

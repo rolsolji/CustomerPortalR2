@@ -211,6 +211,7 @@ export class FormQuickQuoteComponent implements OnInit {
   topPosToStartShowing = 100;
 
   rightPanelImage: any = 'assets/img/demo/R2TestImage.png';
+  noRatesFoundText = null;
 
   //#region Origin Fields
 
@@ -594,7 +595,7 @@ export class FormQuickQuoteComponent implements OnInit {
 
       const objRate = {
         ClientID: this.ClientID,
-        ProfileID: 11868,
+        ProfileID: this.clientDefaultData.ProfileID,
         Products: arrayProducts,
         SourcePostalCode: this.OriginPostalData.PostalCode,
         SourceCityID: this.OriginPostalData.CityID,
@@ -635,47 +636,40 @@ export class FormQuickQuoteComponent implements OnInit {
       console.log(objRate);
 
       this.rates = await this.ratesService.postRates(objRate);
-
-      this.rates.forEach(r => {
-        if (!String.IsNullOrWhiteSpace(r.ExpectedDeliveryDate)){
-          let expDelDate = null;
-          // const tempExpDelDate = moment.utc(r.ExpectedDeliveryDate);
-          // expDelDate = new Date(this.datepipe.transform(tempExpDelDate.toString().replace(/(^.*\()|([+-].*$)/g, ''),'MM/dd/yyyy'));         
-          // r.ETA = String.Format('{0} (ETA)', this.datepipe.transform(expDelDate,'MM/dd/yyyy'));
-          
-          expDelDate = this.ConverteJsonDateToLocalTimeZone(r.ExpectedDeliveryDate);
-          r.ETA = String.Format('{0} (ETA)', this.datepipe.transform(expDelDate,'MM/dd/yyyy'));
-
-          // let today = new Date();
-          // const days: number = +r.TransitTime;
-          // today = this.utilitiesService.AddBusinessDays(today, days);
-          // r.ETA = String.Format('{0} (ETA)', this.datepipe.transform(today,'yyyy-MM-dd'));
-        }
-        else {
-          r.ETA = String.Empty;
-        }
-      });
-
-
-
-      // setTimeout(()=>{    //<<<---    using ()=> syntax
-      //   this.ratesCounter = 8;
-      //   this.showSpinner = false;
-      //   this.cd.markForCheck();
-      // }, 3000);
-      // console.log( this.rates);
       if ( this.rates != null &&  this.rates.length > 0){
-            this.ratesFiltered =  this.rates.filter(rate => rate.CarrierCost > 0);
-            // this.ratesFiltered =  this.rates;
-            console.log(this.ratesFiltered);
-            this.ratesCounter = this.ratesFiltered.length;
-            this.snackbar.open(this.ratesCounter + ' rates returned.', null, {
-              duration: 5000
-            });
+        this.rates.forEach(r => {
+          if (!String.IsNullOrWhiteSpace(r.ExpectedDeliveryDate)){
+            let expDelDate = null;
+            // const tempExpDelDate = moment.utc(r.ExpectedDeliveryDate);
+            // expDelDate = new Date(this.datepipe.transform(tempExpDelDate.toString().replace(/(^.*\()|([+-].*$)/g, ''),'MM/dd/yyyy'));         
+            // r.ETA = String.Format('{0} (ETA)', this.datepipe.transform(expDelDate,'MM/dd/yyyy'));
+            
+            expDelDate = this.ConverteJsonDateToLocalTimeZone(r.ExpectedDeliveryDate);
+            r.ETA = String.Format('{0} (ETA)', this.datepipe.transform(expDelDate,'MM/dd/yyyy'));
+  
+            // let today = new Date();
+            // const days: number = +r.TransitTime;
+            // today = this.utilitiesService.AddBusinessDays(today, days);
+            // r.ETA = String.Format('{0} (ETA)', this.datepipe.transform(today,'yyyy-MM-dd'));
+          }
+          else {
+            r.ETA = String.Empty;
+          }
+        });
 
-            this.clientTLWeightLimit = (this.clientDefaultData.TLWeightLimit == null ? 0 : this.clientDefaultData.TLWeightLimit) + 'lb';
-            // console.log(this.clientDefaultData);
-      }
+        this.ratesFiltered =  this.rates.filter(rate => rate.CarrierCost > 0);
+        // this.ratesFiltered =  this.rates;
+        console.log(this.ratesFiltered);
+        this.ratesCounter = this.ratesFiltered.length;
+        this.snackbar.open(this.ratesCounter + ' rates returned.', null, {
+          duration: 5000
+        });
+
+        this.clientTLWeightLimit = (this.clientDefaultData.TLWeightLimit == null ? 0 : this.clientDefaultData.TLWeightLimit) + 'lb';
+
+      }else{
+        this.noRatesFoundText = 'No rates found.';
+      }                 
   }
 
   //#region RatesOpened

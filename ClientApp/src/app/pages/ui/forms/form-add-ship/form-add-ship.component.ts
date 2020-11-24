@@ -825,7 +825,7 @@ export class FormAddShipComponent implements OnInit {
 
     const objRate = {
       ClientID: this.ClientID,
-      ProfileID: 11868,
+      ProfileID: this.clientDefaultData.ProfileID,
       Products: arrayProducts,
       SourcePostalCode: this.OriginPostalData.PostalCode,
       SourceCityID: this.OriginPostalData.CityID,
@@ -866,7 +866,7 @@ export class FormAddShipComponent implements OnInit {
 
     console.log(objRate);
 
-    this.rates = await this.ratesService.postRates(objRate);
+    this.rates = await this.httpService.postRates(objRate);
     // console.log( this.rates);    
     if ( this.rates != null &&  this.rates.length > 0){
       this.ratesFiltered =  this.rates.filter(rate => rate.CarrierCost > 0);
@@ -2328,7 +2328,7 @@ export class FormAddShipComponent implements OnInit {
       RequiredFieldsValidationObj.isConfirmDialog = false;     
     }else if(this.costListFiltered.length === 0){
       RequiredFieldsValidationObj.showWarningMessage = true;
-      RequiredFieldsValidationObj.message = 'Please select a rate the shipment first.';
+      RequiredFieldsValidationObj.message = 'Please rate the shipment first.';
       RequiredFieldsValidationObj.isConfirmDialog = false;     
     }else{
       const fieldsHaveChanged = this.validateIfFieldsHaveChanged();

@@ -383,12 +383,15 @@
             </div>
           </div>    
 
-          <div *ngIf="getQuoteButtonClicked && ratesCounter > 0 && !showSpinner">
+          <div *ngIf="getQuoteButtonClicked && !showSpinner">
             <div fxLayout="row" fxLayoutGap="8px" class="py-2 freightRatesView">
                 <div><h2 class="allRatesTab-labelText">ALL QUOTES ({{ratesCounter}})</h2></div>
+                <div *ngIf="ratesCounter == null || ratesCounter == 0" class="noRatesFoundText">
+                  <label>{{noRatesFoundText}}</label>
+                </div>
             </div>
 
-            <div class="ratesAccordionSection">
+            <div *ngIf="ratesCounter > 0" class="ratesAccordionSection">
               <mat-accordion class="rates-accordion" multi> 
                 <div *ngFor="let rate of ratesFiltered; let j = index">              
                   <mat-expansion-panel [expanded]="false" (opened)="addRateOpened(j)" (closed)="removeRateClosed(j)">

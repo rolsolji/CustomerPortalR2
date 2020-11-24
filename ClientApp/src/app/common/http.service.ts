@@ -34,6 +34,7 @@ import { SendEmailResponse } from '../Entities/SendEmailResponse';
 import { SaveQuoteData } from '../Entities/SaveQuoteData'; 
 import { StatusReason } from '../Entities/StatusReason'; 
 import { TrackingDetails } from '../Entities/TrackingDetails'; 
+import { Rate } from '../Entities/rate';
 
 @Injectable({
     providedIn: 'root'
@@ -471,5 +472,17 @@ export class HttpService{
         }
         ).toPromise();
     }
+
+    postRates(objRate: Object){
+        const ticket = this.token;
+        const httpHeaders = new HttpHeaders({
+            Ticket : ticket
+        });
+        return this.http.post<Rate[]>(this.baseEndpoint + 'Services/RatingEngineService.svc/json/RateShipment',objRate
+        ,{
+            headers: httpHeaders
+        }
+        ).toPromise();
+    }   
     
 }

@@ -431,15 +431,19 @@ export class FormShipmentBoardComponent implements OnInit {
     if (this.toDeliveryDate != null)
       this.getQuotesParameters.ToDeliveryDate = String.Format('/Date({0})/',this.toDeliveryDate.getTime());
 
-    this.getQuotesParameters.BOlStatusIDList = [];
-    this.statusSelected.forEach(s =>
-      this.getQuotesParameters.BOlStatusIDList.push(
-        s.BOLStatusID
-      )
-    );
-
-    if (!String.IsNullOrWhiteSpace(parameter) && parameter !== 'loadmore' && parameter !== 'clearfilters' && parameter !== 'S' )
+    if (!String.IsNullOrWhiteSpace(parameter) && parameter !== 'loadmore' && parameter !== 'clearfilters' && parameter !== 'S' ){
+      this.getQuotesParameters.BOlStatusIDList = [];
+      this.statusSelected = this.StatusOptions.filter(s => s.BOLStatusID.toString() === parameter);
       this.getQuotesParameters.BOlStatusIDList.push(parameter);
+    }
+    else{
+      this.getQuotesParameters.BOlStatusIDList = [];
+      this.statusSelected.forEach(s =>
+        this.getQuotesParameters.BOlStatusIDList.push(
+          s.BOLStatusID
+        )
+      );
+    }
 
     if (this.getQuotesParameters.BOlStatusIDList.indexOf(s => s === '10') > 0){
       this.getQuotesParameters.BOlStatusIDList.push(this.SpotQuotedId);
@@ -454,6 +458,8 @@ export class FormShipmentBoardComponent implements OnInit {
     {
       this.getQuotesParameters.FreeSearch = this.quoteIdParameter;
       this.getQuotesParameters.Mode = String.Empty;
+      this.getQuotesParameters.BOlStatusIDList = [];
+      this.statusSelected = [];
     }
 
     if (!String.IsNullOrWhiteSpace(parameter) && parameter === 'loadmore' )
@@ -720,6 +726,7 @@ export class FormShipmentBoardComponent implements OnInit {
 
   getFontColor(status: string){
     let color = 'black'
+
     if (status === 'Quoted'){
       color = '#D8531D';
     }
@@ -735,10 +742,35 @@ export class FormShipmentBoardComponent implements OnInit {
     else if (status === 'Out For Delivery'){
       color = '#83CFF6';
     }
-    else if (status === 'Delivery'){
+    else if (status === 'Delivered'){
       color = '#F3C343';
     }
 
     return color;
+  }
+
+  getFontWeight(status: string){
+    let fontWeight = 'normal';
+
+    if (status === 'Quoted'){
+      fontWeight = 'bold';
+    }
+    else if (status === 'Booked'){
+      fontWeight = 'bold';
+    }
+    else if (status === 'Pickup Requested'){
+      fontWeight = 'bold';
+    }
+    else if (status === 'In Transit'){
+      fontWeight = 'bold';
+    }
+    else if (status === 'Out For Delivery'){
+      fontWeight = 'bold';
+    }
+    else if (status === 'Delivered'){
+      fontWeight = 'bold';
+    }
+
+    return fontWeight;
   }
 }

@@ -3,7 +3,7 @@ import {fadeInUp400ms} from "../../../../../@vex/animations/fade-in-up.animation
 import {stagger40ms} from "../../../../../@vex/animations/stagger.animation";
 import {MAT_FORM_FIELD_DEFAULT_OPTIONS, MatFormFieldDefaultOptions} from "@angular/material/form-field";
 import {FormControl} from "@angular/forms";
-import {Observable, of, ReplaySubject} from "rxjs";
+import {Observable, ReplaySubject} from "rxjs";
 import {TableColumn} from "../../../../../@vex/interfaces/table-column.interface";
 import {MatTableDataSource} from "@angular/material/table";
 import {SelectionModel} from "@angular/cdk/collections";
@@ -13,7 +13,6 @@ import {MatSort} from "@angular/material/sort";
 import {MatDialog} from "@angular/material/dialog";
 import {filter} from "rxjs/operators";
 import {untilDestroyed} from "ngx-take-until-destroy";
-import {CustomerCreateUpdateComponent} from "../../../apps/aio-table/customer-create-update/customer-create-update.component";
 import {MatSelectChange} from "@angular/material/select";
 import icPhone from '@iconify/icons-ic/twotone-phone';
 import icMail from '@iconify/icons-ic/twotone-mail';
@@ -28,6 +27,7 @@ import icFolder from '@iconify/icons-ic/twotone-folder';
 import {HttpService} from "../../../../common/http.service";
 import {GetLocationsParameters} from '../../../../Entities/GetLocationsParameters';
 import {Location} from '../../../../Entities/Location';
+import {LocationCreateUpdateComponent} from "./location-create-update/location-create-update.component";
 
 @Component({
   selector: 'vex-locations-table',
@@ -111,8 +111,7 @@ export class LocationsTableComponent implements OnInit, AfterViewInit, OnDestroy
    * We are simulating this request here.
    */
   async getData() {
-    const responseData = await this.httpService.getMasLocations(this.getLocationsParameters);
-    return responseData;
+    return await this.httpService.getMasLocations(this.getLocationsParameters);
   }
 
   ngOnInit() {
@@ -137,7 +136,7 @@ export class LocationsTableComponent implements OnInit, AfterViewInit, OnDestroy
   }
 
   createCustomer() {
-    this.dialog.open(CustomerCreateUpdateComponent).afterClosed().subscribe((location: Location) => {
+    this.dialog.open(LocationCreateUpdateComponent).afterClosed().subscribe((location: Location) => {
       /**
        * Customer is the updated customer (if the user pressed Save - otherwise it's null)
        */
@@ -153,7 +152,7 @@ export class LocationsTableComponent implements OnInit, AfterViewInit, OnDestroy
   }
 
   updateCustomer(location: Location) {
-    this.dialog.open(CustomerCreateUpdateComponent, {
+    this.dialog.open(LocationCreateUpdateComponent, {
       data: location
     }).afterClosed().subscribe(updatedLocation => {
       /**

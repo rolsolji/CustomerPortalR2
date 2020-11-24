@@ -156,11 +156,6 @@ export class AppComponent {
             label: 'Location',
             route: '/locations/list',
             icon: icBaselineLocationOn,
-            badge: {
-              value: '12',
-              bgClass: 'bg-deep-purple',
-              textClass: 'text-deep-purple-contrast',
-            },
           },
           {
             type: 'link',

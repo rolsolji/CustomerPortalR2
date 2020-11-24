@@ -73,6 +73,7 @@ import { ReferenceByClient } from '../../../../Entities/ReferenceByClient';
 import {environment} from '../../../../../environments/environment';
 import { SendEmailParameters, InvoiceParameter } from '../../../../Entities/SendEmailParameters';
 import { SendEmailResponse } from '../../../../Entities/SendEmailResponse';
+import { TrackingDetails } from '../../../../Entities/TrackingDetails'
 
 @Component({
   selector: 'vex-form-shipment-board',
@@ -130,6 +131,7 @@ export class FormShipmentBoardComponent implements OnInit {
   showSpinner = false;
   showSpinnerGrid = false;
   showDefaultTitle = false;
+  defaultFilterText = String.Empty;
 
   getQuotesParameters: GetQuotesParameters;
 
@@ -167,16 +169,17 @@ export class FormShipmentBoardComponent implements OnInit {
   totalRows = 0;
   pageSizeOptions: number[] = [5, 10, 20, 50];
   dataSource: MatTableDataSource<Quote> | null;
+  dataSourceTracking: MatTableDataSource<TrackingDetails> | null;
+  displayedColumnsTracking: string[] = ['StatusDate', 'Description'];
   selection = new SelectionModel<Quote>(true, []);
-  ShipmentModeOptions: object;
-  StatusOptions: Status[];
+  ShipmentModeOptions: ShipmentMode[];
+  StatusOptions: Status[] = [];
   StatusOptionsString: string[] = [];
   StatusSelectec: string[];
   SpotQuotedId = 13; //Spot Quoted
   QuotedModifiedId = 14; //Quote Modified
   EquipmentOptions: object;
   quoteIdParameter: string;
-  
   totalQuotedStatus: string = '--';
   totalBookedStatus: string = '--';
   totalPickupRequestedStatus: string = '--';
@@ -186,6 +189,7 @@ export class FormShipmentBoardComponent implements OnInit {
 
   shipmentInformation: ShipmentByLading;
   ReferenceByClientOptions: ReferenceByClient[];
+  TrackingDetailsLists: TrackingDetails[];
 
   ReferenceByClientField1 = '';
   ReferenceByClientField2 = '';
@@ -235,7 +239,7 @@ export class FormShipmentBoardComponent implements OnInit {
   auditLog:[];
   auditLogIsEnabled: boolean = false;
 
-  
+  quoteSelected: Quote;
   //#endregion
 
   @ViewChild('statusInput') statusInput: ElementRef<HTMLInputElement>;
@@ -276,8 +280,15 @@ export class FormShipmentBoardComponent implements OnInit {
   async InitialLoadPage(){
 
     this.ShipmentModeOptions = await this.httpService.getShipmentMode(this.keyId);
+    let shipmentMode = this.ShipmentModeOptions.find(s => s.ModeCode === 'ALL');
+    let index = this.ShipmentModeOptions.indexOf(shipmentMode);
+    if (index !== -1){
+      this.ShipmentModeOptions.splice(index,1);
+    }
+    shipmentMode.ModeCode = '';
+    this.ShipmentModeOptions.push(shipmentMode);
+
     this.StatusOptions = await this.httpService.getBOLStatus(this.keyId);
-    console.log(this.StatusOptions);
     this.StatusOptions = this.StatusOptions.filter(s =>
       s.BOLStatusID === 10 //Quoted
       || s.BOLStatusID === 14 //Quote Modified
@@ -286,10 +297,9 @@ export class FormShipmentBoardComponent implements OnInit {
       || s.BOLStatusID === 1 //In Transit
       || s.BOLStatusID === 9 //Out For Delivery
       || s.BOLStatusID === 6 //Delivery
-      || s.BOLStatusID === 16 //Cancel
+      //|| s.BOLStatusID === 16 //Cancel
     );
 
-    console.log(this.StatusOptions);
     // Get total per status
     this.totalQuotedStatus = '22';
     this.totalBookedStatus = '22';
@@ -342,7 +352,7 @@ export class FormShipmentBoardComponent implements OnInit {
       ToDeliveryDate: null,
       IsIncludeSubClient: true,
       EquipmentID: 0,
-      Mode: 'LTL',
+      Mode: '',
       FreeSearch: null,
       Ref4Value: null,
       ShipmentType: null
@@ -353,7 +363,15 @@ export class FormShipmentBoardComponent implements OnInit {
     this.toShipDate = null;
     this.fromDeliveryDate = null;
     this.toDeliveryDate = null;
-    this.statusSelected = [];
+
+    this.statusSelected = this.StatusOptions.filter(s =>
+      s.BOLStatusID === 2 //Booked
+      || s.BOLStatusID === 15 //Pickup Requested
+      || s.BOLStatusID === 1 //In Transit
+      || s.BOLStatusID === 9 //Out For Delivery
+    );
+
+    this.defaultFilterText = 'Select Mode: ALL / Status Selected: Booked, Pickup Requested, In Transit, Out For Delivery';
   }
 
   // SearchModal Open/Close
@@ -488,7 +506,7 @@ export class FormShipmentBoardComponent implements OnInit {
         return this.StatusOptionsString.filter(status => status.toLowerCase().indexOf(filterValue) === 0);
   }
 
-  quoteSelected: Quote;
+  
 
   async GetQuoteInfo(rowSelected:Quote){
     if (rowSelected == null){
@@ -515,6 +533,14 @@ export class FormShipmentBoardComponent implements OnInit {
       if (this.shipmentInformation.RequestedDeliveryDate != null && !String.IsNullOrWhiteSpace(this.shipmentInformation.RequestedDeliveryDate.toString())){
         this.shipmentInformation.RequestedDeliveryDateWithFormat = this.datepipe.transform(this.shipmentInformation.RequestedDeliveryDate.toString().replace(/(^.*\()|([+-].*$)/g, ''),'MM/dd/yyyy');
       }
+    }
+
+    this.TrackingDetailsLists = await this.httpService.getTrackingDetailsByLadingID(rowSelected.LadingID.toString(), this.keyId);
+    console.log('TrackingDetailsLists',this.TrackingDetailsLists)
+    if (this.TrackingDetailsLists != null && this.TrackingDetailsLists.length > 0){
+      console.log('TrackingDetailsLists',this.TrackingDetailsLists)
+      this.dataSourceTracking = new MatTableDataSource();
+      this.dataSourceTracking.data = this.TrackingDetailsLists;
     }
 
     this.ReferenceByClientOptions = await this.httpService.GetReferenceByClient(this.shipmentInformation.ClientId, this.keyId);
@@ -544,21 +570,22 @@ export class FormShipmentBoardComponent implements OnInit {
       const BOLDocument = this.shipmentInformation.BolDocumentsList.find(d => d.DocType === 'BOL');
       if (BOLDocument !== null && BOLDocument.length > 0){
         this.bolDocumentURL = String.Format(environment.baseEndpoint + 'Handlers/DownLoadPODHandler.ashx?userToken={0}&clientID={1}&imageName={2}&docType={3}&TMWUrl={4}&Ticket={5}',
-                                              this.user.TokenString,this.shipmentInformation.ShortName,BOLDocument[0].FilePath,BOLDocument[0].DocType,BOLDocument[0].TMWUrl,this.securityToken) ;
+                                              this.user.TokenString,this.shipmentInformation.ShortName,BOLDocument[0].FilePath,BOLDocument[0].DocType,BOLDocument[0].TMWUrl,this.securityToken);
         this.bolDocumentURLIsEnabled = true;
       }
       
       const PODDocument = this.shipmentInformation.BolDocumentsList.find(d => d.DocType === 'POD');
       if (PODDocument !== null && PODDocument.length > 0){
         this.podDocumentURL = String.Format(environment.baseEndpoint + 'Handlers/DownLoadPODHandler.ashx?userToken={0}&clientID={1}&imageName={2}&docType={3}&TMWUrl={4}&Ticket={5}',
-                                              this.user.TokenString,this.shipmentInformation.ShortName,PODDocument[0].FilePath,PODDocument[0].DocType,PODDocument[0].TMWUrl,this.securityToken) ;
+                                              this.user.TokenString,this.shipmentInformation.ShortName,PODDocument[0].FilePath,PODDocument[0].DocType,PODDocument[0].TMWUrl,this.securityToken);
+                                              https://customer.r2logistics.com/Handlers/DownLoadPODHandler.ashx?userToken=132074&clientID=TU125&imageName=\TU125\RTS44670_29412623703_TU125POD.pdf&docType=POD&TMWUrl=&Ticket=003D162102968BE6E4800B08AC36E6D546D89B0158B1C189E5E3F22BDC9393019B56772A91D35934E9EC048DC456FEC03285BE3B9DA295E5FC41962BAA2DBF2E27D5106C90E58CA780C15C0727698C25BDE33F8D5354B675038AB7677B2D80CA5EBAAB5280A4F9F0A11E9004DF9DA5FB41A11D5386C0591473968C413DC78D691AA1A53813589261DB8E626CC8BC3D99D6F92E43C7A3F15CF1D1830985EA7CF1
         this.podDocumentURLIsEnabled = true;
       }
 
       const OTHDocument = this.shipmentInformation.BolDocumentsList.find(d => d.DocType === 'OTH');
       if (OTHDocument !== null && OTHDocument.length > 0){
         this.othDocumentURL = String.Format(environment.baseEndpoint + 'Handlers/DownLoadPODHandler.ashx?userToken={0}&clientID={1}&imageName={2}&docType={3}&TMWUrl={4}&Ticket={5}',
-                                              this.user.TokenString,this.shipmentInformation.ShortName,OTHDocument[0].FilePath,OTHDocument[0].DocType,OTHDocument[0].TMWUrl,this.securityToken) ;
+                                              this.user.TokenString,this.shipmentInformation.ShortName,OTHDocument[0].FilePath,OTHDocument[0].DocType,OTHDocument[0].TMWUrl,this.securityToken);
         this.othDocumentURLIsEnabled = true;
       }
     }
@@ -689,5 +716,29 @@ export class FormShipmentBoardComponent implements OnInit {
         duration: 5000
       });
     }
+  }
+
+  getFontColor(status: string){
+    let color = 'black'
+    if (status === 'Quoted'){
+      color = '#D8531D';
+    }
+    else if (status === 'Booked'){
+      color = '#00CC7B';
+    }
+    else if (status === 'Pickup Requested'){
+      color = '#2A99D6';
+    }
+    else if (status === 'In Transit'){
+      color = '#A666B7';
+    }
+    else if (status === 'Out For Delivery'){
+      color = '#83CFF6';
+    }
+    else if (status === 'Delivery'){
+      color = '#F3C343';
+    }
+
+    return color;
   }
 }

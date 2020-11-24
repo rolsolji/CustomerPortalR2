@@ -88,7 +88,7 @@
             <div fxLayout="row" fxLayoutAlign="space-between" class="py-2 pr-2">  
                 <div fxLayoutAlign="start end">
                     <div *ngIf="showDefaultTitle">
-                        <span class="filterTitle">Default filters:</span> <span class="filterDefault" >Select Mode: LTL</span>
+                        <span class="filterTitle">Default filters:</span> <span class="filterDefault" >{{defaultFilterText}}</span>
                     </div>
                 </div>
 
@@ -201,7 +201,7 @@
                                     <mat-form-field appearance="outline">
                                         <mat-label>Select Shipment Type</mat-label>
                                         <mat-select [(ngModel)]="getQuotesParameters.ShipmentType">
-                                            <mat-option value="ALL">ALL</mat-option>
+                                            <mat-option value="">ALL</mat-option>
                                             <mat-option value="International">International</mat-option>
                                             <mat-option value="Domestic">Domestic</mat-option>
                                         </mat-select>
@@ -234,148 +234,6 @@
                      </mat-sidenav>
                 </div>
             </div>
-
-            <!-- <div fxLayout="row" fxLayoutAlign="end center" class="py-2 pr-2">    
-                <div class="spinnerSection" *ngIf="showSpinner">
-                    <div class="center-me">
-                      <mat-progress-spinner diameter="50" color="warn" mode="indeterminate"></mat-progress-spinner>
-                      <p>Loading...</p>
-                    </div>
-                </div>
-
-                <div *ngIf=!showSpinner>{{currentRows}} of {{totalRows}}</div>
-
-                <div *ngIf=!showSpinner>
-                      
-                    <button (click)="close('open')" mat-button>
-                        <mat-icon [icIcon]="icFilterList"></mat-icon>
-                    </button>
-                </div>
-             
-                 <mat-sidenav #searchModal position="end" class="search-container" (click)="close('search')">
-                    <button (click)="$event.stopPropagation()">
-                        <div class="ml-2 mr-2">
-                            <mat-form-field appearance="outline">
-                                <mat-label>Shipper Name</mat-label>
-                                <input matInput [(ngModel)]="getQuotesParameters.OrgName" placeholder="">
-                            </mat-form-field>
-                        </div>
-                        <div class="ml-2 mr-2">
-                            <mat-form-field appearance="outline">
-                                <mat-label>Consignee Name</mat-label>
-                                <input matInput [(ngModel)]="getQuotesParameters.DestName" placeholder="">
-                            </mat-form-field>
-                        </div>
-                        <div fxLayout="row" fxLayoutGap="5px" class="ml-2 mr-2">
-                            <div fxFlex="130px">
-                                <mat-form-field appearance="outline">
-                                    <mat-label>Ship Date</mat-label>
-                                    <input [(ngModel)]="fromShipDate" (click)="shipdatefromDatepickerRef.open()" (focus)="shipdatefromDatepickerRef.open()" name="shipdatefrom"
-                                        [matDatepicker]="shipdatefromDatepickerRef" matInput readonly>
-                                    <mat-datepicker-toggle [for]="shipdatefromDatepickerRef" matSuffix></mat-datepicker-toggle>
-                                    <mat-datepicker #shipdatefromDatepickerRef></mat-datepicker>
-                                </mat-form-field>
-                            </div>
-                            <div fxFlex="120px">
-                                <mat-form-field appearance="outline">
-                                    <mat-label>To</mat-label>
-                                    <input [(ngModel)]="toShipDate" (click)="shipdatetoDatepickerRef.open()" (focus)="shipdatetoDatepickerRef.open()" name="shipdateto"
-                                    [matDatepicker]="shipdatetoDatepickerRef" matInput readonly>
-                                    <mat-datepicker-toggle [for]="shipdatetoDatepickerRef" matSuffix></mat-datepicker-toggle>
-                                    <mat-datepicker #shipdatetoDatepickerRef></mat-datepicker>
-                                </mat-form-field>
-                            </div>
-                        </div>
-                        <div fxLayout="row" fxLayoutGap="5px" class="ml-2 mr-2">
-                            <div fxFlex="130px">
-                                <mat-form-field appearance="outline">
-                                    <mat-label>Delivery Date</mat-label>
-                                    <input [(ngModel)]="fromDeliveryDate" (click)="deliverydatefromDatepickerRef.open()" (focus)="deliverydatefromDatepickerRef.open()" name="deliverydatefrom"
-                                        [matDatepicker]="deliverydatefromDatepickerRef" matInput readonly>
-                                    <mat-datepicker-toggle [for]="deliverydatefromDatepickerRef" matSuffix></mat-datepicker-toggle>
-                                    <mat-datepicker #deliverydatefromDatepickerRef></mat-datepicker>
-                                </mat-form-field>
-                            </div>
-                            <div fxFlex="120px">
-                                <mat-form-field appearance="outline">
-                                    <mat-label>To</mat-label>
-                                    <input [(ngModel)]="toDeliveryDate" (click)="deliverydatetoDatepickerRef.open()" (focus)="deliverydatetoDatepickerRef.open()" name="deliverydateto"
-                                    [matDatepicker]="deliverydatetoDatepickerRef" matInput readonly>
-                                    <mat-datepicker-toggle [for]="deliverydatetoDatepickerRef" matSuffix></mat-datepicker-toggle>
-                                    <mat-datepicker #deliverydatetoDatepickerRef></mat-datepicker>
-                                </mat-form-field>
-                            </div>
-                        </div>
-                        <div class="ml-2 mr-2">
-                            <mat-form-field appearance="outline">
-                                <mat-label>PO Number</mat-label>
-                                <input matInput [(ngModel)]="getQuotesParameters.PONumber" placeholder="">
-                            </mat-form-field>
-                        </div>
-                        <div class="ml-2 mr-2">
-                            <mat-form-field appearance="outline">
-                                <mat-label>BOL Number</mat-label>
-                                <input matInput [(ngModel)]="getQuotesParameters.LoadNo" placeholder="">
-                            </mat-form-field>
-                        </div>
-                        <div class="ml-2 mr-2">
-                            <mat-form-field appearance="outline">
-                                <mat-label>Pro Number</mat-label>
-                                <input matInput [(ngModel)]="getQuotesParameters.ProNumber" placeholder="">
-                            </mat-form-field>
-                        </div>
-                        <div class="ml-2 mr-2">
-                            <mat-form-field appearance="outline">
-                                <mat-label>Select Equipment</mat-label>
-                                <mat-select [(ngModel)]="getQuotesParameters.EquipmentID">
-                                    <mat-option *ngFor="let equipment of EquipmentOptions" [value]="equipment.EquipmentID">{{equipment.Description}}</mat-option>
-                                </mat-select>
-                            </mat-form-field>
-                        </div>
-                        <div class="ml-2 mr-2">
-                            <mat-form-field appearance="outline">
-                                <mat-label>Select Mode</mat-label>
-                                <mat-select [(ngModel)]="getQuotesParameters.Mode">
-                                    <mat-option *ngFor="let shipmentmode of ShipmentModeOptions" [value]="shipmentmode.ModeCode">{{shipmentmode.Mode}}</mat-option>
-                                </mat-select>
-                            </mat-form-field>
-                        </div>
-                            <div class="ml-2 mr-2">
-                                <mat-form-field appearance="outline">
-                                    <mat-label>Select Shipment Type</mat-label>
-                                    <mat-select [(ngModel)]="getQuotesParameters.ShipmentType">
-                                        <mat-option value="ALL">ALL</mat-option>
-                                        <mat-option value="International">International</mat-option>
-                                        <mat-option value="Domestic">Domestic</mat-option>
-                                    </mat-select>
-                                </mat-form-field>
-                            </div>
-                            <div class="ml-2 mr-2">
-                                <mat-form-field appearance="outline">
-                                    <mat-label>Search in Client Lading No/PO Number/Carrier BC</mat-label>
-                                    <input matInput [(ngModel)]="getQuotesParameters.FreeSearch" placeholder="">
-                                </mat-form-field>
-                            </div>
-                            <div class="ml-2 mr-2">
-                                <mat-form-field appearance="outline">
-                                    <mat-label>Select Status</mat-label>
-                                    <mat-select multiple [(value)]="statusSelected">
-                                        <mat-option *ngFor="let status of StatusOptions" [value]="status">{{status.Status}}</mat-option>
-                                    </mat-select>
-                                </mat-form-field>
-                            </div>
-
-                            <div fxLayout="row" fxLayoutAlign="end center" fxLayoutGap="8px" class="py-5 pr-2">
-                                <div *ngIf=!showSpinner>
-                                    <button [disabled]=showSpinner (click)="search('clearfilters')" mat-button type="button">Clear</button>
-                                    <button (click)="search('')" color="warn" mat-raised-button type="button">Search</button>
-                                </div>
-                            </div>   
-
-                        </button>
-                                         
-                 </mat-sidenav>
-            </div> -->
         </div>
     </div>
 
@@ -399,7 +257,7 @@
                 <ng-container *ngFor="let column of columns; trackBy: trackByProperty">
                 <ng-container *ngIf="column.type === 'text'" [matColumnDef]="column.property">
                     <th *matHeaderCellDef class="grid-mat-cell grid-header-cell uppercase" mat-header-cell mat-sort-header> {{ column.label }}</th>
-                    <td *matCellDef="let row" [ngClass]="column.cssClasses" mat-cell>{{ row[column.property] }}</td>
+                    <td *matCellDef="let row" [ngClass]="column.cssClasses" [style.color]="getFontColor(row[column.property])" mat-cell>{{ row[column.property] }}</td>
                 </ng-container>
                 </ng-container>
 
@@ -460,6 +318,21 @@
                                     <hr class="horizontal-title-line">    
                                     <div class="div-container div-container-content">
                                         <p *ngIf="shipmentInformation != null">Tracking Number: {{shipmentInformation.TrackingNumber}}</p>
+                                        <p *ngIf="TrackingDetailsLists != null && TrackingDetailsLists.length > 0">Current Status: {{TrackingDetailsLists[0].CurrentStatus}}</p>
+                                        <table mat-table [dataSource]=dataSourceTracking  *ngIf="TrackingDetailsLists != null && TrackingDetailsLists.length > 0">
+                                            <ng-container matColumnDef="StatusDate">
+                                                <th mat-header-cell *matHeaderCellDef>Status Date</th>
+                                                <td mat-cell *matCellDef="let row"> {{row.StatusDate}} </td>
+                                            </ng-container>
+                                            
+                                            <ng-container matColumnDef="Description">
+                                                <th mat-header-cell *matHeaderCellDef>Description</th>
+                                                <td mat-cell *matCellDef="let row"> {{row.StatusDescription}} </td>
+                                            </ng-container>
+
+                                            <tr mat-header-row *matHeaderRowDef="displayedColumnsTracking"></tr>
+                                            <tr mat-row *matRowDef="let row; columns: displayedColumnsTracking;"></tr>
+                                        </table>
                                     </div>
                                 </div>
                                 <div class="vertical-line"></div>

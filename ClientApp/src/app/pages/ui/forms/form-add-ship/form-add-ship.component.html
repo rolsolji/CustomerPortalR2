@@ -43,7 +43,7 @@
                     <div fxFlex="100%">
                       <mat-form-field>
                         <mat-label>Name</mat-label>
-                        <input name="originname" formControlName="originname" matInput required >
+                        <input name="originname" formControlName="originname" matInput maxlength="150" required >
                       </mat-form-field>
                     </div>                                 
                   </div>
@@ -51,13 +51,13 @@
                     <div fxFlex="50%">
                       <mat-form-field>
                         <mat-label>Address 1</mat-label>
-                        <textarea name="originadddress1" formControlName="originadddress1" matInput required rows="2" maxlength="250"></textarea>
+                        <textarea name="originadddress1" formControlName="originadddress1" matInput required rows="2" maxlength="150"></textarea>
                       </mat-form-field>
                     </div>  
                     <div fxFlex="50%">
                       <mat-form-field>
                         <mat-label>Address 2</mat-label>
-                        <textarea name="originadddress2" formControlName="originadddress2" matInput rows="2" maxlength="250"></textarea>
+                        <textarea name="originadddress2" formControlName="originadddress2" matInput rows="2" maxlength="110"></textarea>
                       </mat-form-field>
                     </div>                                 
                   </div>     
@@ -97,13 +97,13 @@
                     <div fxFlex="50%">
                       <mat-form-field>
                         <mat-label>Contact</mat-label>
-                        <input name="origincontact" formControlName="origincontact" matInput >
+                        <input name="origincontact" formControlName="origincontact" maxlength="110" matInput >
                       </mat-form-field>
                     </div>  
                     <div fxFlex="50%">
                       <mat-form-field>
                         <mat-label>Phone</mat-label>
-                        <input name="originphone" formControlName="originphone" matInput required >
+                        <input name="originphone" formControlName="originphone" matInput maxlength="110" required >
                       </mat-form-field>
                     </div>                                 
                   </div>  
@@ -111,8 +111,11 @@
                     <div fxFlex="50%">
                       <mat-form-field>
                         <mat-label>Email</mat-label>
-                        <input name="originemail" formControlName="originemail" matInput >
-                      </mat-form-field>
+                        <input name="originemail" type="email" formControlName="originemail" maxlength="225" matInput >  
+                        <div class="emailNotValid" *ngIf="originEmail.errors?.email">
+                          Email format not valid
+                        </div>                       
+                      </mat-form-field>                      
                     </div>                                                  
                   </div>   
                   <!-- <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="5px">                    
@@ -172,7 +175,7 @@
                     <div fxFlex="100%">
                       <mat-form-field>
                         <mat-label>Name</mat-label>
-                        <input name="destname" formControlName="destname" matInput required >
+                        <input name="destname" formControlName="destname" matInput maxlength="150" required >
                       </mat-form-field>
                     </div>                                 
                   </div>
@@ -180,13 +183,13 @@
                     <div fxFlex="50%">
                       <mat-form-field>
                         <mat-label>Address 1</mat-label>
-                        <textarea name="destadddress1" formControlName="destadddress1" matInput required rows="2" maxlength="250"></textarea>
+                        <textarea name="destadddress1" formControlName="destadddress1" matInput required rows="2" maxlength="150"></textarea>
                       </mat-form-field>
                     </div>  
                     <div fxFlex="50%">
                       <mat-form-field>
                         <mat-label>Address 2</mat-label>
-                        <textarea name="destadddress2" formControlName="destadddress2" matInput rows="2" maxlength="250"></textarea>
+                        <textarea name="destadddress2" formControlName="destadddress2" matInput rows="2" maxlength="110"></textarea>
                       </mat-form-field>
                     </div>                                 
                   </div>     
@@ -225,13 +228,13 @@
                     <div fxFlex="50%">
                       <mat-form-field>
                         <mat-label>Contact</mat-label>
-                        <input name="destcontact" formControlName="destcontact" matInput >
+                        <input name="destcontact" formControlName="destcontact" maxlength="110" matInput >
                       </mat-form-field>
                     </div>  
                     <div fxFlex="50%">
                       <mat-form-field>
                         <mat-label>Phone</mat-label>
-                        <input name="destphone" formControlName="destphone" matInput required >
+                        <input name="destphone" formControlName="destphone" maxlength="110" matInput required >
                       </mat-form-field>
                     </div>                                 
                   </div>  
@@ -239,7 +242,10 @@
                     <div fxFlex="50%">
                       <mat-form-field>
                         <mat-label>Email</mat-label>
-                        <input name="destemail" formControlName="destemail" matInput >
+                        <input name="destemail" type="email" formControlName="destemail" maxlength="225" matInput >
+                        <div class="emailNotValid" *ngIf="destEmail.errors?.email">
+                          Email format not valid
+                        </div>  
                       </mat-form-field>
                     </div>                                                  
                   </div>   

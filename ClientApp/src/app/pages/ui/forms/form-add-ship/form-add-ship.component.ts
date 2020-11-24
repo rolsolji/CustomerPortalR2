@@ -311,7 +311,7 @@ export class FormAddShipComponent implements OnInit {
       originstatename: [null, Validators.required],
       origincontact: [null],
       originphone: [null],
-      originemail: [null],
+      originemail: [null, Validators.email],
       // originnotes: [null],
       originpickupdate: [null, Validators.required],
       originpickupopen: [null],
@@ -324,7 +324,7 @@ export class FormAddShipComponent implements OnInit {
       deststatename: [null, Validators.required],
       destcontact: [null],
       destphone: [null],
-      destemail: [null],
+      destemail: [null, Validators.email],
       // destnotes: [null],
       destexpdeldate: [null],
       destdelapptfrom: [null],
@@ -528,6 +528,14 @@ export class FormAddShipComponent implements OnInit {
         }
       });     
   }
+
+  get originEmail() {
+    return this.originAndDestinationFormGroup.get('originemail');
+  } 
+
+  get destEmail() {
+    return this.originAndDestinationFormGroup.get('destemail');
+  } 
 
   pcoAutoCompleteFilter(val: string): Observable<any[]> {
     const CountryId = this.originSelectedCountry == null ? '1': this.originSelectedCountry.CountryId.toString();

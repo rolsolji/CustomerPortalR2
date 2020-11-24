@@ -35,6 +35,7 @@ import { SaveQuoteData } from '../Entities/SaveQuoteData';
 import { StatusReason } from '../Entities/StatusReason';
 import {GetLocationsParameters} from "../Entities/GetLocationsParameters";
 import {Location} from "../Entities/Location";
+import { TrackingDetails } from '../Entities/TrackingDetails';
 
 @Injectable({
     providedIn: 'root'
@@ -381,7 +382,7 @@ export class HttpService{
         const httpHeaders = new HttpHeaders({
             Ticket : ticket
         });
-        return this.http.get<any>(String.Format(this.baseEndpoint + 'Services/BOLHDRService.svc/json/GetTrackingDetailsByLadingID?LadingID={0}&_={1}', landingId, keyId)
+        return this.http.get<TrackingDetails[]>(String.Format(this.baseEndpoint + 'Services/BOLHDRService.svc/json/GetTrackingDetailsByLadingID?LadingID={0}&_={1}', landingId, keyId)
         ,{
             headers: httpHeaders
           }

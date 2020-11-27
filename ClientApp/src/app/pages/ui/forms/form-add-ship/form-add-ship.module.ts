@@ -26,7 +26,7 @@ import {MatTableModule} from '@angular/material/table';
 import { MatExpansionModule } from '@angular/material/expansion';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import {MatDialogModule} from '@angular/material/dialog';
-import { ConfirmAlertDialogComponent } from '../confirm-alert-dialog/confirm-alert-dialog.component';
+// import { ConfirmAlertDialogComponent } from '../confirm-alert-dialog/confirm-alert-dialog.component';
 
 
 
@@ -34,7 +34,7 @@ import { ConfirmAlertDialogComponent } from '../confirm-alert-dialog/confirm-ale
 
 
 @NgModule({
-  declarations: [FormAddShipComponent, ConfirmAlertDialogComponent
+  declarations: [FormAddShipComponent
 ],
   imports: [
     CommonModule,
@@ -63,8 +63,7 @@ import { ConfirmAlertDialogComponent } from '../confirm-alert-dialog/confirm-ale
     MatExpansionModule,
     MatProgressSpinnerModule,
     MatDialogModule
-  ],
-  entryComponents:[ConfirmAlertDialogComponent]
+  ]
 })
 export class FormAddShipModule {
 }

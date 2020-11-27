@@ -1,6 +1,7 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { UserUpdateComponentComponent } from './components/user-update-component/user-update-component.component';
+import { ConfirmAlertDialogComponent } from './confirm-alert-dialog/confirm-alert-dialog.component';
 import {MatIconModule} from '@angular/material/icon';
 import {IconModule} from '@visurel/iconify-angular';
 import {MatMenuModule} from '@angular/material/menu';
@@ -14,6 +15,7 @@ import {MatRadioModule} from '@angular/material/radio';
 import {MatSelectModule} from '@angular/material/select';
 import {MatAutocompleteModule} from '@angular/material/autocomplete';
 import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
+
 
 @NgModule({
     imports: [
@@ -33,10 +35,12 @@ import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
         MatProgressSpinnerModule,
     ],
   declarations: [
-    UserUpdateComponentComponent
+    UserUpdateComponentComponent,
+    ConfirmAlertDialogComponent
   ],
   exports: [
-    UserUpdateComponentComponent
+    UserUpdateComponentComponent,
+    ConfirmAlertDialogComponent
   ]
 })
 export class SharedModule { }

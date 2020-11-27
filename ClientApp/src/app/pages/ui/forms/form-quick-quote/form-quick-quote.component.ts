@@ -58,6 +58,10 @@ import baselineAddCircleOutline from '@iconify/icons-ic/baseline-add-circle-outl
 import {AuthenticationService} from '../../../../common/authentication.service';
 import {environment} from '../../../../../environments/environment';
 import moment from 'moment';
+//import { ConfirmAlertDialogComponent } from '../confirm-alert-dialog/confirm-alert-dialog.component';
+import { MatDialog, MatDialogConfig } from '@angular/material/dialog';
+import {ConfirmAlertDialogComponent} from '../../../../../app/shared/confirm-alert-dialog/confirm-alert-dialog.component';
+import data from '@iconify/icons-ic/twotone-group';
 
 export interface CountryState {
   name: string;
@@ -95,7 +99,8 @@ export class FormQuickQuoteComponent implements OnInit {
     private messageService: MessageService,
     private utilitiesService: UtilitiesService,
     public datepipe: DatePipe,
-    private authenticationService: AuthenticationService
+    private authenticationService: AuthenticationService,
+    private dialog: MatDialog
     ) {
     this.securityToken = this.authenticationService.ticket$.value;
   }
@@ -901,9 +906,19 @@ export class FormQuickQuoteComponent implements OnInit {
 
     this.showSpinner = false;
   }
-  onChangeProductWeight(index: number): void{
+  onChangeCalculatePCF(index: number): void{
     const product = this.quickQuoteFormGroup.get('products').value[index];
     const PCF = this.calculatePCF(product.Pallets, product.Length, product.Width, product.Height, product.Weight);
+    if (PCF != null) {
+      if (this.clientDefaultData.IsCalculateClassByPCF){
+        const pcfclass = this.EstimateClassFromPCF(PCF);
+        if (product.ProductClass !== pcfclass) {
+          this.openDialog(true, 'Selected class is ' + product.ProductClass + ' and Estimated class is ' + pcfclass + '. Do you want to change ?', index, pcfclass);          
+        }
+      }
+
+    }
+
     (this.quickQuoteFormGroup.controls.products as FormArray).at(index).get('PCF').setValue(PCF);
    }
 
@@ -1010,6 +1025,73 @@ export class FormQuickQuoteComponent implements OnInit {
     let formatedShipDate = getMonth + '/' + getDay + '/' + getYear;
     return formatedShipDate;
   } 
+
+  EstimateClassFromPCF(pCF) {
+
+    var PCF = pCF;
+    var newClass = 0;
+    
+    if (PCF < 1)
+        newClass = 500;
+    if (PCF >= 1 && PCF < 2)
+        newClass = 400;
+    if (PCF >= 2 && PCF < 3)
+        newClass = 300;
+    if (PCF >= 3 && PCF < 4)
+        newClass = 250;
+    if (PCF >= 4 && PCF < 5)
+        newClass = 200;
+    if (PCF >= 5 && PCF < 6)
+        newClass = 175;
+    if (PCF >= 6 && PCF < 7)
+        newClass = 150;
+    if (PCF >= 7 && PCF < 8)
+        newClass = 125;
+    if (PCF >= 8 && PCF < 9)
+        newClass = 110;
+    if (PCF >= 9 && PCF < 10.5)
+        newClass = 100;
+    if (PCF >= 10.5 && PCF < 12)
+        newClass = 92.5;
+    if (PCF >= 12 && PCF < 13.5)
+        newClass = 85;
+    if (PCF >= 13.5 && PCF < 15)
+        newClass = 77.5;
+    if (PCF >= 15 && PCF < 22.5)
+        newClass = 70;
+    if (PCF >= 22.5 && PCF < 30)
+        newClass = 65;
+    if (PCF >= 30 && PCF < 35)
+        newClass = 60;
+    if (PCF >= 35 && PCF < 50)
+        newClass = 55;
+    if (PCF >= 50)
+        newClass = 50;
+
+
+    return newClass;
+  }
+
+  openDialog(isConfirmDialog, pMessage, productIndex, pcfClass){
+    const dialogConfig = new MatDialogConfig();
+    dialogConfig.disableClose = true;
+    dialogConfig.autoFocus = true;
+
+    dialogConfig.data = {
+      title: 'Message',
+      message: pMessage,
+      confirmDialog: isConfirmDialog
+    };
+
+    const dialogRef = this.dialog.open(ConfirmAlertDialogComponent, dialogConfig);
+ 
+    dialogRef.afterClosed().subscribe((data: string) => {    
+      if (data != null && data === 'Accepted') {
+        (this.quickQuoteFormGroup.controls.products as FormArray).at(productIndex).get('ProductClass').setValue(pcfClass.toString());
+      }
+    });
+
+  }
 
 
 }

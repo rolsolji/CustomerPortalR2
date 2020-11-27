@@ -11,7 +11,7 @@ import { MatButton } from '@angular/material/button';
 })
 export class ConfirmAlertDialogComponent implements OnInit {
 
-  // alertConfirmFormGroup: FormGroup;
+  alertConfirmFormGroup: FormGroup;
   title: string;
   message: string;
   confirmDialog: boolean;
@@ -26,20 +26,20 @@ export class ConfirmAlertDialogComponent implements OnInit {
 
   ngOnInit(): void {
     // -- alertConfirmFormGroup fields
-    // this.alertConfirmFormGroup = this.fb.group({
-    //   emailToSendQuote: [this.title]
-    // });
+    this.alertConfirmFormGroup = this.fb.group({
+      // emailToSendQuote: [this.title]
+    });
     // --
     console.log('this.confirmDialog: ', this.confirmDialog);
   }
 
   alertConfirmOK(){
-    // this.dialogRef.close(this.alertConfirmFormGroup.value);
-    this.dialogRef.close();
+    this.dialogRef.close('Accepted');
+    //this.dialogRef.close();
   }
 
   close(){
-    this.dialogRef.close();
+    this.dialogRef.close('Cancel');
   }
 
 }

@@ -244,7 +244,7 @@
                     <div fxFlex="15%">
                       <mat-form-field fxFlex="none">
                         <mat-label>Pallet</mat-label>
-                        <input matInput type="number" maxlength="4" min="0" formControlName="Pallets" required>
+                        <input matInput type="number" maxlength="4" min="0" formControlName="Pallets" (change)="onChangeCalculatePCF(i)" required>
                       </mat-form-field>
                     </div>
                     <div fxFlex="15%">
@@ -298,19 +298,19 @@
                     <div fxFlex="15%">
                       <mat-form-field>
                         <mat-label>L</mat-label>
-                        <input matInput type="number" maxlength="4" min="0" formControlName="Length" required class="removeArrowsNumberInput">
+                        <input matInput type="number" maxlength="4" min="0" formControlName="Length" (change)="onChangeCalculatePCF(i)" required class="removeArrowsNumberInput">
                       </mat-form-field>
                     </div>  
                     <div fxFlex="15%">
                       <mat-form-field>
                         <mat-label>W</mat-label>
-                        <input matInput type="number" maxlength="4" min="0" formControlName="Width" required class="removeArrowsNumberInput">
+                        <input matInput type="number" maxlength="4" min="0" formControlName="Width" (change)="onChangeCalculatePCF(i)" required class="removeArrowsNumberInput">
                       </mat-form-field>
                     </div>  
                     <div fxFlex="15%">
                       <mat-form-field>
                         <mat-label>H</mat-label>
-                        <input matInput type="number" maxlength="4" min="0" formControlName="Height" required class="removeArrowsNumberInput">
+                        <input matInput type="number" maxlength="4" min="0" formControlName="Height" (change)="onChangeCalculatePCF(i)" required class="removeArrowsNumberInput">
                       </mat-form-field>
                     </div>
                     <div fxFlex="15%">
@@ -322,7 +322,7 @@
                     <div fxFlex="20%">
                       <mat-form-field>
                         <mat-label>Total Weight</mat-label>
-                        <input matInput type="number" maxlength="4" min="0" formControlName="Weight" (change)="onChangeProductWeight(i)" required>
+                        <input matInput type="number" maxlength="4" min="0" formControlName="Weight" (change)="onChangeCalculatePCF(i)" required>
                       </mat-form-field>
                     </div>  
                   </div>

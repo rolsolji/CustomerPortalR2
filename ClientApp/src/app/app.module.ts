@@ -16,6 +16,8 @@ import {MatSelectModule} from '@angular/material/select';
 import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
 import {MatInputModule} from '@angular/material/input';
 import {MatFormFieldModule} from '@angular/material/form-field';
+// import {MatDialogModule} from '@angular/material/dialog';
+// import { ConfirmAlertDialogComponent } from './pages/ui/forms/confirm-alert-dialog/confirm-alert-dialog.component';
 
 @NgModule({
   declarations: [AppComponent],
@@ -33,6 +35,8 @@ import {MatFormFieldModule} from '@angular/material/form-field';
     // Vex
     VexModule,
     CustomLayoutModule
+    // ,
+    // MatDialogModule
   ],
   providers: [
     DatePipe,
@@ -44,6 +48,9 @@ import {MatFormFieldModule} from '@angular/material/form-field';
       deps: [AuthenticationService, MatSnackBar]
     }
   ],
+  // entryComponents: [
+  //   ConfirmAlertDialogComponent
+  // ],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

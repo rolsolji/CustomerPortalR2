@@ -16,8 +16,10 @@ import {MatSelectModule} from '@angular/material/select';
 import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
 import {MatInputModule} from '@angular/material/input';
 import {MatFormFieldModule} from '@angular/material/form-field';
-// import {MatDialogModule} from '@angular/material/dialog';
-// import { ConfirmAlertDialogComponent } from './pages/ui/forms/confirm-alert-dialog/confirm-alert-dialog.component';
+import {MatTableModule} from "@angular/material/table";
+import {MatDatepickerModule} from "@angular/material/datepicker";
+import {MatNativeDateModule} from "@angular/material/core";
+import {MatAutocompleteModule} from "@angular/material/autocomplete";
 
 @NgModule({
   declarations: [AppComponent],
@@ -31,7 +33,10 @@ import {MatFormFieldModule} from '@angular/material/form-field';
     MatProgressSpinnerModule,
     MatInputModule,
     MatFormFieldModule,
-
+    MatTableModule,
+    MatDatepickerModule,
+    MatNativeDateModule,
+    MatAutocompleteModule,
     // Vex
     VexModule,
     CustomLayoutModule

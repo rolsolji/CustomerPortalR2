@@ -31,9 +31,12 @@ import { ReferenceByClient } from '../Entities/ReferenceByClient';
 import {MasUser} from '../Entities/mas-user.model';
 import { SendEmailParameters } from '../Entities/SendEmailParameters';
 import { SendEmailResponse } from '../Entities/SendEmailResponse';
-import { SaveQuoteData } from '../Entities/SaveQuoteData'; 
-import { StatusReason } from '../Entities/StatusReason'; 
-import { TrackingDetails } from '../Entities/TrackingDetails'; 
+import { SaveQuoteData } from '../Entities/SaveQuoteData';
+import { StatusReason } from '../Entities/StatusReason';
+import {GetLocationsParameters} from "../Entities/GetLocationsParameters";
+import {Location} from "../Entities/Location";
+import { TrackingDetails } from '../Entities/TrackingDetails';
+import {Country} from "../Entities/Country";
 import { Rate } from '../Entities/rate';
 
 @Injectable({
@@ -58,7 +61,7 @@ export class HttpService{
         const httpHeaders = new HttpHeaders({
             Ticket : ticket
         });
-        return this.http.get(
+        return this.http.get<Country[] | Country>(
           String.Format(this.baseEndpoint + 'Services/MASCityStatePostalService.svc/json/GetCountryList?_={0}',keyId)
         ,{
             headers: httpHeaders
@@ -79,6 +82,45 @@ export class HttpService{
       ).toPromise();
     }
 
+    // Locations Methods
+    getMasLocations(parameters: GetLocationsParameters){
+        const ticket = this.token;
+        const httpHeaders = new HttpHeaders({
+            Ticket : ticket
+        });
+        console.log(parameters);
+        return this.http.post<Location[]>(this.baseEndpoint + 'Services/MasLocationService.svc/json/GetMasLocation', parameters
+            ,{
+                headers: httpHeaders
+            }
+        ).toPromise();
+    }
+
+    UpdateMasLocation(parameters: GetLocationsParameters){
+        const ticket = this.token;
+        const httpHeaders = new HttpHeaders({
+            Ticket : ticket
+        });
+        console.log(parameters);
+        return this.http.post<Location[]>(this.baseEndpoint + 'Services/MasLocationService.svc/json/UpdateMasLocation', parameters
+            ,{
+                headers: httpHeaders
+            }
+        ).toPromise();
+    }
+
+    GetMasLocationType() {
+        const ticket = this.token;
+        const httpHeaders = new HttpHeaders({
+            Ticket : ticket
+        });
+        return this.http.get(
+            this.baseEndpoint + 'Services/MasLocationService.svc/json/GetMasLocationType'
+            ,{
+                headers: httpHeaders
+            }
+        ).toPromise();
+    }
 
     async getMainToken(): Promise<string> {
 
@@ -100,8 +142,6 @@ export class HttpService{
 
        })
     }
-
-
 
     getStateDataByCountryId(countryId:string, keyId:string){
         const httpHeaders = new HttpHeaders({

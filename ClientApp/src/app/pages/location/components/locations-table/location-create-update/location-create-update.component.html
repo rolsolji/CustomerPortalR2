@@ -1,17 +1,7 @@
-<form (ngSubmit)="save()" [formGroup]="form">
+<form (ngSubmit)="save()" [formGroup]="form" *ngIf="form">
   <div fxLayout="row" fxLayoutAlign="start center" mat-dialog-title>
-    <img *ngIf="form.get('imageSrc').value" [src]="form.get('imageSrc').value" class="avatar mr-5">
-
-    <h2 *ngIf="form.get('firstName').value || form.get('lastName').value"
-        class="headline m-0"
-        fxFlex="auto">{{ form.get('firstName').value + ' ' + form.get('lastName').value }}</h2>
-    <h2 *ngIf="!form.get('firstName').value && !form.get('lastName').value"
-        class="headline m-0"
-        fxFlex="auto">New Location</h2>
-
-    <button [matMenuTriggerFor]="settingsMenu" class="text-secondary" mat-icon-button type="button">
-      <mat-icon [icIcon]="icMoreVert"></mat-icon>
-    </button>
+    <h2 *ngIf="isCreateMode()" class="headline m-0" fxFlex="auto">New Location</h2>
+    <h2 *ngIf="isUpdateMode()" class="headline m-0" fxFlex="auto">Update Location</h2>
 
     <button class="text-secondary" mat-dialog-close mat-icon-button type="button">
       <mat-icon [icIcon]="icClose"></mat-icon>
@@ -23,53 +13,165 @@
   <mat-dialog-content fxLayout="column">
     <div class="flex flex-col sm:flex-row">
       <mat-form-field class="mt-6 flex-auto">
-        <mat-label>First Name</mat-label>
-        <input cdkFocusInitial formControlName="firstName" matInput>
+        <mat-label>Short Name</mat-label>
+        <input cdkFocusInitial formControlName="ShortName" matInput>
 
-        <mat-icon [icIcon]="icPerson" class="mr-3" matPrefix></mat-icon>
       </mat-form-field>
 
       <mat-form-field class="sm:mt-6 sm:ml-6 flex-auto">
-        <mat-label>Last Name</mat-label>
-        <input cdkFocusInitial formControlName="lastName" matInput>
+        <mat-label>Location Type</mat-label>
+        <mat-select [(value)]="this.locationTypeSelected">
+          <mat-option *ngFor="let locationType of this.locationTypes" [value]="locationType.LocationTypeID">
+            {{locationType.LocationType}}
+          </mat-option>
+        </mat-select>
 
-        <mat-icon [icIcon]="icPerson" class="mr-3" matPrefix></mat-icon>
       </mat-form-field>
     </div>
-
-    <mat-form-field class="flex-auto">
-      <mat-label>Street</mat-label>
-      <input formControlName="street" matInput>
-
-      <mat-icon [icIcon]="icEditLocation" class="mr-3" matPrefix></mat-icon>
-    </mat-form-field>
 
     <div class="flex flex-col sm:flex-row">
       <mat-form-field class="flex-auto">
-        <mat-label>Zipcode</mat-label>
-        <input formControlName="zipcode" matInput>
+        <mat-label>Location Name</mat-label>
+        <input formControlName="Name" matInput>
 
-        <mat-icon [icIcon]="icMyLocation" class="mr-3" matPrefix></mat-icon>
+      </mat-form-field>
+
+      <mat-form-field class="sm:ml-6 sm:mr-4" appearance="fill">
+        <mat-label>Active Date</mat-label>
+        <input formControlName="ActivateDate" matInput [matDatepicker]="picker">
+        <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+        <mat-datepicker #picker></mat-datepicker>
+
+      </mat-form-field>
+    </div>
+
+    <div class="flex flex-col sm:flex-row">
+      <mat-form-field class="flex-auto">
+        <mat-label>Address 1</mat-label>
+        <input formControlName="Address1" matInput>
+
+      </mat-form-field>
+
+      <div class="sm:ml-6 flex-auto">
+        <mat-checkbox color="primary" [checked]="this.checked"></mat-checkbox>
+        <mat-label class="pl-2">Is Active</mat-label>
+      </div>
+    </div>
+
+    <div class="flex flex-col sm:flex-row">
+      <mat-form-field class="flex-auto">
+        <mat-label>Address 2</mat-label>
+        <input formControlName="Address2" matInput>
+
+      </mat-form-field>
+
+      <mat-form-field class="sm:ml-6" appearance="fill">
+        <mat-label>Deactivation Date</mat-label>
+        <input formControlName="DeactivateDate" matInput [matDatepicker]="picker2">
+        <mat-datepicker-toggle matSuffix [for]="picker2"></mat-datepicker-toggle>
+        <mat-datepicker #picker2></mat-datepicker>
+
+      </mat-form-field>
+    </div>
+
+    <div class="flex flex-col sm:flex-row">
+      <mat-form-field class="flex-auto">
+        <mat-label>Country</mat-label>
+        <input type="text"
+               placeholder="Pick one"
+               aria-label="Number"
+               matInput
+               [formControl]="countryControl"
+               [matAutocomplete]="auto">
+        <mat-autocomplete #auto="matAutocomplete" (optionSelected)="onCountryChange($event)">
+          <mat-option *ngFor="let country of filteredOptions | async" [value]="country.CountryName">
+            {{country.CountryName}}
+          </mat-option>
+        </mat-autocomplete>
       </mat-form-field>
 
       <mat-form-field class="sm:ml-6 flex-auto">
-        <mat-label>City</mat-label>
-        <input formControlName="city" matInput>
+        <mat-label>Location Reference</mat-label>
+        <input formControlName="ReferenceCode" matInput>
 
-        <mat-icon [icIcon]="icLocationCity" class="mr-3" matPrefix></mat-icon>
+      </mat-form-field>
+    </div>
+
+    <div class="flex flex-col sm:flex-row">
+      <mat-form-field class="flex-auto">
+        <mat-label>Postal</mat-label>
+        <input formControlName="PostalCode" matInput>
+
+      </mat-form-field>
+
+      <mat-form-field class="sm:ml-6 flex-auto">
+        <mat-label>Inbound Account</mat-label>
+        <input formControlName="InAccountCode" matInput>
+
+      </mat-form-field>
+    </div>
+
+    <div class="flex flex-col sm:flex-row">
+      <mat-form-field class="flex-auto">
+        <mat-label>State</mat-label>
+        <input formControlName="StateCode" matInput>
+
+      </mat-form-field>
+
+      <mat-form-field class="sm:ml-6 flex-auto">
+        <mat-label>Outbound Account</mat-label>
+        <input formControlName="OutAccountCode" matInput>
+
+      </mat-form-field>
+    </div>
+
+    <div class="flex flex-col sm:flex-row">
+      <mat-form-field class="flex-auto">
+        <mat-label>City</mat-label>
+        <input formControlName="CityName" matInput>
+
+      </mat-form-field>
+
+      <mat-form-field class="sm:ml-6 flex-auto">
+        <mat-label>Created By</mat-label>
+        <input formControlName="CreatedBy" matInput>
+
+      </mat-form-field>
+    </div>
+
+    <div class="flex flex-col sm:flex-row">
+      <mat-form-field class="flex-auto">
+        <mat-label>Contact Name</mat-label>
+        <input formControlName="ContactName" matInput>
+
+      </mat-form-field>
+
+      <div class="sm:ml-6 flex-auto">
+        <mat-label>Approve</mat-label>
+        <br/>
+        <mat-checkbox class="sm:mr-6" color="primary" #c1 [checked]="!c.checked">Yes</mat-checkbox>
+        <mat-checkbox color="primary" #c [checked]="!c1.checked">No</mat-checkbox>
+
+      </div>
+    </div>
+
+    <div class="flex flex-col sm:flex-row">
+      <mat-form-field class="flex-auto">
+        <mat-label>Contact Phone</mat-label>
+        <input formControlName="ContactPhone" matInput>
+
+      </mat-form-field>
+
+      <mat-form-field class="sm:ml-6 flex-auto">
+        <mat-label>Contact Email</mat-label>
+        <input type="email" formControlName="ContactEmail" matInput>
+
       </mat-form-field>
     </div>
 
     <mat-form-field class="flex-auto">
-      <mat-label>Phone Number</mat-label>
-      <input formControlName="phoneNumber" matInput>
-
-      <mat-icon [icIcon]="icPhone" class="mr-3" matPrefix></mat-icon>
-    </mat-form-field>
-
-    <mat-form-field class="flex-auto">
       <mat-label>Notes</mat-label>
-      <textarea formControlName="notes" matInput></textarea>
+      <textarea formControlName="Notes" matInput></textarea>
     </mat-form-field>
   </mat-dialog-content>
 

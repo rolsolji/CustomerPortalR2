@@ -135,10 +135,10 @@ export class LocationsTableComponent implements OnInit, AfterViewInit, OnDestroy
     this.dataSource.sort = this.sort;
   }
 
-  createCustomer() {
+  createLocation() {
     this.dialog.open(LocationCreateUpdateComponent).afterClosed().subscribe((location: Location) => {
       /**
-       * Customer is the updated customer (if the user pressed Save - otherwise it's null)
+       * Location is the updated location (if the user pressed Save - otherwise it's null)
        */
       if (location) {
         /**
@@ -151,12 +151,12 @@ export class LocationsTableComponent implements OnInit, AfterViewInit, OnDestroy
     });
   }
 
-  updateCustomer(location: Location) {
+  updateLocation(location: Location) {
     this.dialog.open(LocationCreateUpdateComponent, {
       data: location
     }).afterClosed().subscribe(updatedLocation => {
       /**
-       * Customer is the updated customer (if the user pressed Save - otherwise it's null)
+       * Location is the updated location (if the user pressed Save - otherwise it's null)
        */
       if (updatedLocation) {
         /**
@@ -170,7 +170,7 @@ export class LocationsTableComponent implements OnInit, AfterViewInit, OnDestroy
     });
   }
 
-  deleteCustomer(location: Location) {
+  deleteLocation(location: Location) {
     /**
      * Here we are updating our local array.
      * You would probably make an HTTP request here.
@@ -180,12 +180,12 @@ export class LocationsTableComponent implements OnInit, AfterViewInit, OnDestroy
     this.subject$.next(this.locations);
   }
 
-  deleteCustomers(locations: Location[]) {
+  deleteLocations(locations: Location[]) {
     /**
      * Here we are updating our local array.
      * You would probably make an HTTP request here.
      */
-    locations.forEach(c => this.deleteCustomer(c));
+    locations.forEach(c => this.deleteLocation(c));
   }
 
   onFilterChange(value: string) {
@@ -237,7 +237,7 @@ export class LocationsTableComponent implements OnInit, AfterViewInit, OnDestroy
       LocationID: null,
       OrderBy: "",
       PageNumber: 1,
-      PageSize: 20,
+      PageSize: 200,
       Status: null,
     }
   }

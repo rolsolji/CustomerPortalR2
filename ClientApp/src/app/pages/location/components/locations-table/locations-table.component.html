@@ -16,7 +16,7 @@
                 </h2>
 
                 <div *ngIf="selection.hasValue()" class="mr-4 pr-4 border-r" fxFlex="none">
-                    <button (click)="deleteCustomers(selection.selected)"
+                    <button (click)="deleteLocations(selection.selected)"
                             color="primary"
                             mat-icon-button
                             matTooltip="Delete selected"
@@ -54,7 +54,7 @@
                     <mat-icon [icIcon]="icFilterList"></mat-icon>
                 </button>
 
-                <button (click)="createCustomer()"
+                <button (click)="createLocation()"
                         class="ml-4"
                         color="primary"
                         fxFlex="none"
@@ -190,7 +190,7 @@
                 </ng-container>
 
                 <tr *matHeaderRowDef="visibleColumns" mat-header-row></tr>
-                <tr (click)="updateCustomer(row)"
+                <tr (click)="updateLocation(row)"
                     *matRowDef="let row; columns: visibleColumns;"
                     @fadeInUp
                     class="hover:bg-hover trans-ease-out cursor-pointer"
@@ -215,11 +215,11 @@
 
 <mat-menu #actionsMenu="matMenu" xPosition="before" yPosition="below">
     <ng-template let-customer="customer" matMenuContent>
-        <button (click)="updateCustomer(customer)" mat-menu-item>
+        <button (click)="updateLocation(customer)" mat-menu-item>
             <mat-icon [icIcon]="icEdit"></mat-icon>
             <span>Modify</span>
         </button>
-        <button (click)="deleteCustomer(customer)" mat-menu-item>
+        <button (click)="deleteLocation(customer)" mat-menu-item>
             <mat-icon [icIcon]="icDelete"></mat-icon>
             <span>Delete</span>
         </button>

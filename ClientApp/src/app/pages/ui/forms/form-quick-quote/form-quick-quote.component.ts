@@ -62,6 +62,7 @@ import moment from 'moment';
 import { MatDialog, MatDialogConfig } from '@angular/material/dialog';
 import {ConfirmAlertDialogComponent} from '../../../../../app/shared/confirm-alert-dialog/confirm-alert-dialog.component';
 import data from '@iconify/icons-ic/twotone-group';
+import { SendEmailParameters, InvoiceParameter } from '../../../../Entities/SendEmailParameters'; 
 
 export interface CountryState {
   name: string;
@@ -1093,5 +1094,60 @@ export class FormQuickQuoteComponent implements OnInit {
 
   }
 
+  emailSendDocs: string = String.Empty;
 
+  async ValidateEmail(){
+
+    event.stopPropagation();
+    event.stopImmediatePropagation();
+    
+    const emailregx = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
+    this.sendEmailClicked = emailregx.test(this.emailSendDocs);
+  }
+
+  async SendDocsByEmail(index: number, sendEmail:boolean){
+    
+    event.stopPropagation();
+    event.stopImmediatePropagation();
+
+    console.log('para', index, sendEmail);
+
+    if (!sendEmail){
+      this.emailSendDocs = String.Empty;
+      return;
+    }
+
+    const emailregx = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
+
+    if(emailregx.test(this.emailSendDocs)){
+
+      const selectedRate = this.ratesFiltered[index];
+
+      console.log('rate', selectedRate);
+
+      let emailBOLParameters: SendEmailParameters;
+
+      let invoiceParameter: InvoiceParameter = {
+        InvoiceDetailIDs: []
+      };
+
+      emailBOLParameters = {
+        ClientID: 8473, //selectedRate.ProfileID,
+        CarrierID : selectedRate.CarrierID,
+        ApplicationID: 56,
+        EventID: 39,
+        EmailAddresses: this.emailSendDocs,
+        LadingID: 2387625, // selectedRate.ProfileID,
+        UserRowID: 1,
+        InvoiceParameter: invoiceParameter,
+        LadingIDs: [],
+      }
+
+      let emailRateQuoteResponse = this.httpService.SendEmailManually(emailBOLParameters);
+
+      this.snackbar.open('Send mail sucessfully', null, {
+        duration: 5000
+      });
+    }
+  }
 }

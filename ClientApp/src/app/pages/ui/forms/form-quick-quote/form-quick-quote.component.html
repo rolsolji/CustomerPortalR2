@@ -526,19 +526,18 @@
                                                                                                            
                           </div>
                           <div class="inner-rate-options-column sendEmailInputStyle" *ngIf="sendEmailClicked">
-                            <form [formGroup]="emailFormGroup">
                               <div >
                                 <mat-form-field appearance="standard" color="primary" style="width: 75%;" >
                                   <mat-label>Email</mat-label>
-                                  <input matInput name="emailToSendQuote" required formControlName="emailToSendQuote">
+                                  <input matInput type="email" required [(ngModel)]="emailSendDocs" (ngModelChange)="ValidateEmail()"
+                                          (keydown.tab)="ValidateEmail()">
                                 </mat-form-field>
                                
                                 <div>
-                                  <button color="primary" class="mr-1 mat-stroked-sent-email-button" mat-stroked-button type="button"  [disabled]="emailFormGroup.invalid" (click)="sendEmailClicked = false">Send</button>
-                                  <button color="primary"  class="mat-stroked-sent-email-button" mat-stroked-button type="button" (click)="sendEmailClicked = false">Cancel</button>                                   
+                                  <button color="primary" class="mr-1 mat-stroked-sent-email-button" mat-stroked-button type="button"  [disabled]="!sendEmailClicked" (click)="SendDocsByEmail(j,true)">Send</button>
+                                  <button color="primary"  class="mat-stroked-sent-email-button" mat-stroked-button type="button" (click)="SendDocsByEmail(j,false)">Cancel</button>                                   
                                 </div>
                               </div>                                                            
-                            </form>
                           </div>
                       </div>
                       <hr class="rateAddressesSplitLine" />

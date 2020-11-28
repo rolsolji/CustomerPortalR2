@@ -291,13 +291,11 @@ export class FormShipmentBoardComponent implements OnInit {
     this.StatusOptions = await this.httpService.getBOLStatus(this.keyId);
     this.StatusOptions = this.StatusOptions.filter(s =>
       s.BOLStatusID === 10 //Quoted
-      || s.BOLStatusID === 14 //Quote Modified
       || s.BOLStatusID === 2 //Booked
       || s.BOLStatusID === 15 //Pickup Requested
       || s.BOLStatusID === 1 //In Transit
       || s.BOLStatusID === 9 //Out For Delivery
       || s.BOLStatusID === 6 //Delivery
-      //|| s.BOLStatusID === 16 //Cancel
     );
 
     // Get total per status
@@ -365,13 +363,15 @@ export class FormShipmentBoardComponent implements OnInit {
     this.toDeliveryDate = null;
 
     this.statusSelected = this.StatusOptions.filter(s =>
-      s.BOLStatusID === 2 //Booked
+      s.BOLStatusID === 10 //Quoted
+      || s.BOLStatusID === 2 //Booked
       || s.BOLStatusID === 15 //Pickup Requested
       || s.BOLStatusID === 1 //In Transit
       || s.BOLStatusID === 9 //Out For Delivery
+      || s.BOLStatusID === 6 //Delivery
     );
 
-    this.defaultFilterText = 'Select Mode: ALL / Status Selected: Booked, Pickup Requested, In Transit, Out For Delivery';
+    this.defaultFilterText = 'Select Mode: All / Status Selected: All';
   }
 
   // SearchModal Open/Close
@@ -405,6 +405,7 @@ export class FormShipmentBoardComponent implements OnInit {
 
   async search(parameter:string){
 
+    let additionalFilters = false;
     // SearchModal
     this.close('close');
 
@@ -419,22 +420,32 @@ export class FormShipmentBoardComponent implements OnInit {
 
     this.showSpinner = true;
 
-    if (this.fromShipDate != null)
+    if (this.fromShipDate != null){
       this.getQuotesParameters.FromShipDate = String.Format('/Date({0})/',this.fromShipDate.getTime());
+      additionalFilters = true;
+    }
 
-    if (this.toShipDate != null)
+    if (this.toShipDate != null){
       this.getQuotesParameters.ToShipDate = String.Format('/Date({0})/',this.toShipDate.getTime());
+      additionalFilters = true;
+    }
 
-    if (this.fromDeliveryDate != null)
+    if (this.fromDeliveryDate != null){
       this.getQuotesParameters.FromDeliveryDate = String.Format('/Date({0})/',this.fromDeliveryDate.getTime());
+      additionalFilters = true;
+    }
 
-    if (this.toDeliveryDate != null)
+    if (this.toDeliveryDate != null){
       this.getQuotesParameters.ToDeliveryDate = String.Format('/Date({0})/',this.toDeliveryDate.getTime());
+      additionalFilters = true;
+    }
 
     if (!String.IsNullOrWhiteSpace(parameter) && parameter !== 'loadmore' && parameter !== 'clearfilters' && parameter !== 'S' ){
       this.getQuotesParameters.BOlStatusIDList = [];
       this.statusSelected = this.StatusOptions.filter(s => s.BOLStatusID.toString() === parameter);
       this.getQuotesParameters.BOlStatusIDList.push(parameter);
+      if (this.statusSelected !== null && this.statusSelected.length > 0)
+        this.defaultFilterText = String.Format('Status Selected: {0}', this.statusSelected[0].Status);
     }
     else{
       this.getQuotesParameters.BOlStatusIDList = [];
@@ -443,13 +454,23 @@ export class FormShipmentBoardComponent implements OnInit {
           s.BOLStatusID
         )
       );
+      if (this.statusSelected.length === 6)
+        this.defaultFilterText = 'Status Selected: All';
+      else{
+        this.defaultFilterText = 'Status Selected: ';
+        this.statusSelected.forEach(s =>
+          this.defaultFilterText += s.Status + ', '
+        );
+
+        this.defaultFilterText = this.defaultFilterText.substring(0, this.defaultFilterText.length - 2);
+
+      }
     }
 
     if (this.getQuotesParameters.BOlStatusIDList.indexOf(s => s === '10') > 0){
       this.getQuotesParameters.BOlStatusIDList.push(this.SpotQuotedId);
       this.getQuotesParameters.BOlStatusIDList.push(this.QuotedModifiedId);
     }
-      
 
     // Get parameter quote and clean variable
     this.messageService.SharedQuoteParameter.subscribe(message => this.quoteIdParameter = message)
@@ -460,6 +481,7 @@ export class FormShipmentBoardComponent implements OnInit {
       this.getQuotesParameters.Mode = String.Empty;
       this.getQuotesParameters.BOlStatusIDList = [];
       this.statusSelected = [];
+      //this.showDefaultTitle = false;
     }
 
     if (!String.IsNullOrWhiteSpace(parameter) && parameter === 'loadmore' )
@@ -471,10 +493,28 @@ export class FormShipmentBoardComponent implements OnInit {
       this.quotes = [];
     }
 
+    if(!String.IsNullOrWhiteSpace(this.getQuotesParameters.OrgName))
+      additionalFilters = true;
+    else if (!String.IsNullOrWhiteSpace(this.getQuotesParameters.OrgName))
+      additionalFilters = true;
+    else if (!String.IsNullOrWhiteSpace(this.getQuotesParameters.PONumber))
+      additionalFilters = true;
+    else if (!String.IsNullOrWhiteSpace(this.getQuotesParameters.LoadNo))
+      additionalFilters = true;
+    else if (!String.IsNullOrWhiteSpace(this.getQuotesParameters.ProNumber))
+      additionalFilters = true;
+    else if (this.getQuotesParameters.EquipmentID)
+      additionalFilters = true;
+    else if (!String.IsNullOrWhiteSpace(this.getQuotesParameters.FreeSearch))
+      additionalFilters = true;
+
+    console.log('Add filters', additionalFilters);
+    if (additionalFilters)
+      this.defaultFilterText += ' (+ additional filters)';
+
     this.quotesResponse = await this.httpService.searchBOLHDRForJason(this.getQuotesParameters);
 
     console.log(this.quotesResponse);
-
 
     this.quotesResponse.forEach(element => {
       if (!String.IsNullOrWhiteSpace(element.ActualShipDate)){

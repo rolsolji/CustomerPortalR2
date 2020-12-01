@@ -5,7 +5,6 @@ import {BehaviorSubject} from 'rxjs';
 import {environment} from '../../environments/environment';
 import {Router} from '@angular/router';
 import {Client} from '../Entities/client.model';
-import {MatSnackBar} from '@angular/material/snack-bar';
 import {MasUser} from '../Entities/mas-user.model';
 
 @Injectable({
@@ -16,8 +15,7 @@ export class AuthenticationService {
   private baseEndpoint: string;
   constructor (
     private http: HttpClient,
-    public router: Router,
-    private snackbar: MatSnackBar
+    public router: Router
   ) {
     this.baseEndpoint = environment.baseEndpoint;
     this.loading$.next(false);

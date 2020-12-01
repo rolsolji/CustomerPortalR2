@@ -42,10 +42,18 @@ export class SidenavComponent implements OnInit {
               private authenticationService: AuthenticationService,
               private fb: FormBuilder,
   ) {
-    this.clientsForUser$ = this.authenticationService.clientsForUser$;
   }
 
-  ngOnInit() {
+  async ngOnInit() {
+    let clientsForUserFromStorage = this.authenticationService.getClientsForUserFromStorage();
+    if (clientsForUserFromStorage) {
+      this.clientsForUser$.next(clientsForUserFromStorage);
+    } else {
+      clientsForUserFromStorage = await this.authenticationService.getClientsForUser(
+        this.authenticationService.getUserFromStorage().UserID
+      );
+      this.clientsForUser$.next(clientsForUserFromStorage);
+    }
     this.securityToken = this.authenticationService.ticket$.value;
     this.clientImage = `https://beta-customer.r2logistics.com/Handlers/ClientLogoHandler.ashx?ClientID=${this.authenticationService.getDefaultClient().ClientID}&id=e(${Math.random().toString().slice(2,11)})/&Ticket=${this.securityToken}`;
     this.defaultClient = this.authenticationService.getDefaultClient();

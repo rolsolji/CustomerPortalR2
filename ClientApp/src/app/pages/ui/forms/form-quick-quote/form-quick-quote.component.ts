@@ -703,17 +703,17 @@ export class FormQuickQuoteComponent implements OnInit {
   ////#endregion RatesOpened
 
   async shipQuote(index: number){
-    await this.save(index);
+    await this.save(index, true);
     this.router.navigate(['/ui/forms/form-add-ship/'], { relativeTo: this.route });
     // routerLink="/ui/forms/form-add-ship"
   }
 
   async saveQuote(index: number){
     await this.save(index);
-    this.router.navigate(['../shipmentboard/LTLTL/'], { relativeTo: this.route });
+    //this.router.navigate(['../shipmentboard/LTLTL/'], { relativeTo: this.route });
   }
 
-  async save(index: number){
+  async save(index: number, shipQuote: boolean = false){
 
     this.spinnerMessage = 'Saving quote';
     this.showSpinner = true;
@@ -893,11 +893,17 @@ export class FormQuickQuoteComponent implements OnInit {
     const responseData = await this.httpService.saveQuote(this.saveQuoteParameters);
     if (!String.IsNullOrWhiteSpace(responseData.ClientLadingNo))
     {
-      this.messageService.SendQuoteParameter(responseData.ClientLadingNo);
-      this.messageService.SendLadingIDParameter(responseData.LadingID.toString());
-      this.snackbar.open('Quote is saved successfully with LoadNo ' + responseData.ClientLadingNo, null, {
-        duration: 5000
-      });
+      
+
+      if (shipQuote){
+        this.messageService.SendQuoteParameter(responseData.ClientLadingNo);
+        this.messageService.SendLadingIDParameter(responseData.LadingID.toString());
+        this.snackbar.open('Quote saved successfully. Quote Number: ' + responseData.ClientLadingNo, null, {
+          duration: 5000
+        });  
+      }else{
+        this.openDialog(false, 'Quote saved successfully. Quote Number: ' + responseData.ClientLadingNo, null, null, true);
+      }            
     }
     else{
       this.snackbar.open('There was an error, try again.', null, {
@@ -913,7 +919,7 @@ export class FormQuickQuoteComponent implements OnInit {
     if (PCF != null) {
       if (this.clientDefaultData.IsCalculateClassByPCF){
         const pcfclass = this.EstimateClassFromPCF(PCF);
-        if (product.ProductClass !== pcfclass) {
+        if (product.ProductClass !== pcfclass.toString()) {
           this.openDialog(true, 'Selected class is ' + product.ProductClass + ' and Estimated class is ' + pcfclass + '. Do you want to change ?', index, pcfclass);          
         }
       }
@@ -1073,7 +1079,7 @@ export class FormQuickQuoteComponent implements OnInit {
     return newClass;
   }
 
-  openDialog(isConfirmDialog, pMessage, productIndex, pcfClass){
+  openDialog(isConfirmDialog, pMessage, productIndex = null, pcfClass = null, clearQuoteAndFields = false){
     const dialogConfig = new MatDialogConfig();
     dialogConfig.disableClose = true;
     dialogConfig.autoFocus = true;
@@ -1087,8 +1093,16 @@ export class FormQuickQuoteComponent implements OnInit {
     const dialogRef = this.dialog.open(ConfirmAlertDialogComponent, dialogConfig);
  
     dialogRef.afterClosed().subscribe((data: string) => {    
-      if (data != null && data === 'Accepted') {
-        (this.quickQuoteFormGroup.controls.products as FormArray).at(productIndex).get('ProductClass').setValue(pcfClass.toString());
+      if (data != null && data === 'Accepted') 
+      {
+        if (isConfirmDialog && productIndex != null && pcfClass != null){
+          (this.quickQuoteFormGroup.controls.products as FormArray).at(productIndex).get('ProductClass').setValue(pcfClass.toString());
+        }else if (!isConfirmDialog ){
+          if (clearQuoteAndFields){
+            this.clearQuoteAndFields();
+          }
+        }
+        
       }
     });
 

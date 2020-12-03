@@ -627,7 +627,8 @@ export class FormAddShipComponent implements OnInit {
   BookShipmentSubmit() {    
     const RequiredFieldsValidationObj = this.CheckAllRequiredFields();
     if (RequiredFieldsValidationObj.showWarningMessage){
-      this.openDialog(RequiredFieldsValidationObj.isConfirmDialog, RequiredFieldsValidationObj.message);
+      this.openDialog(RequiredFieldsValidationObj.isConfirmDialog, RequiredFieldsValidationObj.message,
+        RequiredFieldsValidationObj.yesNoActions, RequiredFieldsValidationObj.actionEvent, 'BookShipmentSubmit');
     }else {
       if (this.ShipmentByLadingObject == null){
         this.saveNewQuoteAndBookShipment(true);
@@ -1002,7 +1003,7 @@ export class FormAddShipComponent implements OnInit {
       if (this.clientDefaultData.IsCalculateClassByPCF){
         const pcfclass = this.EstimateClassFromPCF(PCF);
         if (product.ProductClass !== pcfclass) {
-          this.openDialog(true, 'Selected class is ' + product.ProductClass + ' and Estimated class is ' + pcfclass + '. Do you want to change ?', true, index, pcfclass);          
+          this.openDialog(true, 'Selected class is ' + product.ProductClass + ' and Estimated class is ' + pcfclass + '. Do you want to change ?', false, 'UpdateProductPCFClass', null, index, pcfclass);          
         }
       }
 
@@ -1288,7 +1289,7 @@ export class FormAddShipComponent implements OnInit {
 
   }
 
-  openDialog(isConfirmDialog, pMessage, UpdateProductPCFClass = false, productIndex = null, pcfClass = null){
+  openDialog(isConfirmDialog, pMessage, YesNoActions = false, actionEvent = null, method = null, productIndex = null, pcfClass = null){
     const dialogConfig = new MatDialogConfig();
     dialogConfig.disableClose = true;
     dialogConfig.autoFocus = true;
@@ -1296,16 +1297,40 @@ export class FormAddShipComponent implements OnInit {
     dialogConfig.data = {
       title: 'Message',
       message: pMessage,
-      confirmDialog: isConfirmDialog
+      confirmDialog: isConfirmDialog,
+      yesNoActions: YesNoActions
     };
 
     const dialogRef = this.dialog.open(ConfirmAlertDialogComponent, dialogConfig);
 
     dialogRef.afterClosed().subscribe((data: string) => {    
       if (data != null && data === 'Accepted') {
-        if (UpdateProductPCFClass){
-          (this.productsAndAccessorialsFormGroup.controls.products as FormArray).at(productIndex).get('ProductClass').setValue(pcfClass.toString());
-        }        
+        switch (actionEvent) {
+          case 'UpdateProductPCFClass':
+            (this.productsAndAccessorialsFormGroup.controls.products as FormArray).at(productIndex).get('ProductClass').setValue(pcfClass.toString());
+            break;
+          case 'ReRate':
+            this.confirmFormGroup.get('carrier').setValue(''); // clean current carrier to get all rates
+            this.getQuote();
+            break;
+        } 
+      }else if (data != null && data === 'No') {
+        if (actionEvent === 'ReRate'){
+          let bookShipment;
+          if (method === 'SaveAsQuote'){
+            bookShipment = false;
+          }else if (method === 'BookShipmentSubmit'){
+            bookShipment = true;
+          }
+
+          if (this.ShipmentByLadingObject == null){
+            // Insert as new quote
+            this.saveNewQuoteAndBookShipment(bookShipment, true);
+          }else{
+            // Update quote
+            this.updateQuote(bookShipment, true);
+          }
+        }
       }
     });
 
@@ -1586,7 +1611,8 @@ export class FormAddShipComponent implements OnInit {
   SaveAsQuote() {    
     const RequiredFieldsValidationObj = this.CheckAllRequiredFields();
     if (RequiredFieldsValidationObj.showWarningMessage){
-       this.openDialog(RequiredFieldsValidationObj.isConfirmDialog, RequiredFieldsValidationObj.message);
+       this.openDialog(RequiredFieldsValidationObj.isConfirmDialog, RequiredFieldsValidationObj.message,
+        RequiredFieldsValidationObj.yesNoActions, RequiredFieldsValidationObj.actionEvent, 'SaveAsQuote');
     }else{
       if (this.ShipmentByLadingObject == null){
         // Insert as new quote
@@ -1598,16 +1624,13 @@ export class FormAddShipComponent implements OnInit {
     }  
   }
 
-  async saveNewQuoteAndBookShipment(IsBookShipment){
+  async saveNewQuoteAndBookShipment(IsBookShipment = false, ModifiedQuote = false){
 
     this.spinnerMessage = 'Saving quote';
     
     this.showSpinner = true;
-
-    // Start here rs
-    const selectedRate = this.selectedRateFromQuotes; // Selected rate
-
-    console.log('save quote start',selectedRate);
+    
+    const selectedRate = this.selectedRateFromQuotes; // Selected rate    
 
     const arrayProducts = this.productsAndAccessorialsFormGroup.get('products').value;
     const productList: BOlProductsListSQD[] = [];
@@ -1837,7 +1860,28 @@ export class FormAddShipComponent implements OnInit {
       destTerminalCityStateZipCode:String.Format('{0},{1},{2}',selectedRate.DestTerminalCity,selectedRate.DestTerminalState,selectedRate.DestTerminalZipCode),
       WaterfallDetailsList: [],
       StatusReasonCodeId: statusReasonCodeId,
-      Status: (IsBookShipment ? 2 : 10)
+      Status: (IsBookShipment || ModifiedQuote ? 2 : 10)
+    }
+
+    if (ModifiedQuote){
+      try{
+        const responseData = await this.httpService.ModifiedQuote(this.saveQuoteData);
+        if (!this.authenticationService.requestFailed$.value){         
+          this.snackbar.open('Lading quote has been modified', null, {
+            duration: 5000
+          });
+          this.router.navigate(['../../../shipmentboard/LTLTL/'], { relativeTo: this.route });
+        }else{
+          this.snackbar.open('Error setting the record as modified.', null, {
+            duration: 5000
+          });
+        }      
+      }catch(e){
+        this.snackbar.open('Error setting the record as modified.', null, {
+          duration: 5000
+        });
+      }      
+      return;
     }
 
     if (IsBookShipment){
@@ -1882,13 +1926,18 @@ export class FormAddShipComponent implements OnInit {
     this.showSpinner = false;
   }
 
-  async updateQuote(bookShipment = false){
+  async updateQuote(bookShipment = false, ModifiedQuote = false){
     this.spinnerMessage = 'Saving quote';
 
     const localShipmentByLadingObject = this.ShipmentByLadingObject;
 
     if (bookShipment){
       this.spinnerMessage = 'Booking shipment';
+      localShipmentByLadingObject.Status = 2; // Booked
+    }
+
+    if (ModifiedQuote){
+      this.spinnerMessage = 'Saving quote as modified.';
       localShipmentByLadingObject.Status = 2; // Booked
     }
 
@@ -2301,6 +2350,30 @@ export class FormAddShipComponent implements OnInit {
 
     }
     
+    if (ModifiedQuote){
+      try{
+        const responseData = await this.httpService.ModifiedQuoteWithLadingData(localShipmentByLadingObject);
+        if (!this.authenticationService.requestFailed$.value){
+          this.messageService.SendQuoteParameter(localShipmentByLadingObject.ClientLadingNo);
+          this.messageService.SendLadingIDParameter(localShipmentByLadingObject.LadingID.toString());
+          this.snackbar.open('Lading quote has been modified', null, {
+            duration: 5000
+          });
+          this.router.navigate(['../../../shipmentboard/LTLTL/'], { relativeTo: this.route });
+        }else{
+          this.snackbar.open('Error setting the record as modified.', null, {
+            duration: 5000
+          });
+        }      
+      }catch(e){
+        this.snackbar.open('Error setting the record as modified.', null, {
+          duration: 5000
+        });
+      }
+
+      return;
+    }
+
     try{
       const responseData = await this.httpService.UpdateBOLHDR(localShipmentByLadingObject);
       if (!this.authenticationService.requestFailed$.value){
@@ -2330,7 +2403,9 @@ export class FormAddShipComponent implements OnInit {
     let RequiredFieldsValidationObj = {
       showWarningMessage: false,
       message: '',
-      isConfirmDialog: false
+      isConfirmDialog: false,
+      yesNoActions: false,
+      actionEvent: ''
     }
     
     let counter = 0;
@@ -2353,8 +2428,10 @@ export class FormAddShipComponent implements OnInit {
       const fieldsHaveChanged = this.validateIfFieldsHaveChanged();
       if (fieldsHaveChanged){
         RequiredFieldsValidationObj.showWarningMessage = true;
-        RequiredFieldsValidationObj.message = 'You have modified some value(s), that requires re-rate this shipment. If you will not re-rate, then this shipment will go to "Quote Modified" status. Do you want to re-rate?';
-        RequiredFieldsValidationObj.isConfirmDialog = true;       
+        RequiredFieldsValidationObj.message = 'You have modified some value(s) that may affect the rate of this shipment. If you do not click re-rate this may delay booking of this load and/or the quoted amount of this shipment. Do you want to re-rate?';
+        RequiredFieldsValidationObj.isConfirmDialog = true;
+        RequiredFieldsValidationObj.yesNoActions = true;
+        RequiredFieldsValidationObj.actionEvent = 'ReRate';
       }  
     }
 

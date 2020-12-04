@@ -289,6 +289,7 @@ export class FormShipmentBoardComponent implements OnInit {
     this.ShipmentModeOptions.push(shipmentMode);
 
     this.StatusOptions = await this.httpService.getBOLStatus(this.keyId);
+    console.log('status', this.StatusOptions);
     this.StatusOptions = this.StatusOptions.filter(s =>
       s.BOLStatusID === 10 //Quoted
       || s.BOLStatusID === 2 //Booked
@@ -467,11 +468,11 @@ export class FormShipmentBoardComponent implements OnInit {
       }
     }
 
-    if (this.getQuotesParameters.BOlStatusIDList.indexOf(s => s === '10') > 0){
+    if (this.getQuotesParameters.BOlStatusIDList.findIndex(s => s === 10) !== -1){
       this.getQuotesParameters.BOlStatusIDList.push(this.SpotQuotedId);
       this.getQuotesParameters.BOlStatusIDList.push(this.QuotedModifiedId);
     }
-
+    
     // Get parameter quote and clean variable
     this.messageService.SharedQuoteParameter.subscribe(message => this.quoteIdParameter = message)
 

@@ -472,7 +472,7 @@ export class FormShipmentBoardComponent implements OnInit {
       this.getQuotesParameters.BOlStatusIDList.push(this.SpotQuotedId);
       this.getQuotesParameters.BOlStatusIDList.push(this.QuotedModifiedId);
     }
-    
+
     // Get parameter quote and clean variable
     this.messageService.SharedQuoteParameter.subscribe(message => this.quoteIdParameter = message)
 
@@ -518,6 +518,7 @@ export class FormShipmentBoardComponent implements OnInit {
     console.log(this.quotesResponse);
 
     this.quotesResponse.forEach(element => {
+
       if (!String.IsNullOrWhiteSpace(element.ActualShipDate)){
         element.ActualShipDateWithFormat = this.datepipe.transform(element.ActualShipDate.replace(/(^.*\()|([+-].*$)/g, ''),'MM/dd/yyyy');
       }
@@ -529,6 +530,9 @@ export class FormShipmentBoardComponent implements OnInit {
       if (element.Status === 13 || element.Status === 14){
         element.BOLStatus = 'Quoted';
       }
+
+      element.OriginLocation = element.OriginLocation.replace(' ,', ' ');
+      element.DestinationLocation = element.DestinationLocation.replace(' ,', ' ');
 
       this.quotes.push(element);
     });

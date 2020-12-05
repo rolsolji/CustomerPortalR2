@@ -63,6 +63,7 @@ import { MatDialog, MatDialogConfig } from '@angular/material/dialog';
 import {ConfirmAlertDialogComponent} from '../../../../../app/shared/confirm-alert-dialog/confirm-alert-dialog.component';
 import data from '@iconify/icons-ic/twotone-group';
 import { SendEmailParameters, InvoiceParameter } from '../../../../Entities/SendEmailParameters'; 
+import { SaveQuoteResponse } from '../../../../Entities/SaveQuoteResponse';
 
 export interface CountryState {
   name: string;
@@ -188,7 +189,10 @@ export class FormQuickQuoteComponent implements OnInit {
     StateName: '',
    };
 
-   packageTypes: Object;
+   responseData: SaveQuoteResponse;
+   emailSendDocs: string = String.Empty;
+   enableSendEmailButton = false;
+   packageTypes: object;
    productPackageType: ProductPackageType[];
    originpostalcodeControl = new FormControl('');
    destinationpostalcodeControl = new FormControl('');
@@ -224,14 +228,14 @@ export class FormQuickQuoteComponent implements OnInit {
   postalData: PostalData[] = [];
   postalDataDest: PostalData[] = [];
   OriginPostalCode: string;
-  OriginStateName: String;
+  OriginStateName: string;
   OriginPostalData: PostalData;
   OriginPickupDate: string;
   //#endregion
 
   //#region Destination Fields
   DestinationPostalCode: string;
-  DestinationStateName: String;
+  DestinationStateName: string;
   DestinationPostalData: PostalData;
   //#endregion
 
@@ -438,6 +442,26 @@ export class FormQuickQuoteComponent implements OnInit {
         this.addProductFormGroup()
       ])
     });
+
+    this.pcoAutoCompleteOptions = this.quickQuoteFormGroup.get('originpostalcode').valueChanges
+      .pipe(
+        startWith(''),
+        debounceTime(400),
+        distinctUntilChanged(),
+        switchMap(val => {
+            return this.pcoAutoCompleteFilter(val || '')
+       })
+      );
+
+    this.pcdAutoCompleteOptions = this.quickQuoteFormGroup.get('destinationpostalcode').valueChanges
+      .pipe(
+        startWith(''),
+        debounceTime(400),
+        distinctUntilChanged(),
+        switchMap(val => {
+          return this.pcdAutoCompletefilter(val || '')
+        })
+      );
   }
 
   togglePassword() {
@@ -705,15 +729,18 @@ export class FormQuickQuoteComponent implements OnInit {
   async shipQuote(index: number){
     await this.save(index, true);
     this.router.navigate(['/ui/forms/form-add-ship/'], { relativeTo: this.route });
+    this.clearQuoteAndFields();
     // routerLink="/ui/forms/form-add-ship"
   }
 
   async saveQuote(index: number){
-    await this.save(index);
+    await this.save(index, false, 1);
+    this.clearQuoteAndFields();
     //this.router.navigate(['../shipmentboard/LTLTL/'], { relativeTo: this.route });
   }
 
-  async save(index: number, shipQuote: boolean = false){
+  // actions = 1:save / 2:ship / 3:print / 4:email
+  async save(index: number, shipQuote: boolean = false, action: number = 1){
 
     this.spinnerMessage = 'Saving quote';
     this.showSpinner = true;
@@ -890,20 +917,18 @@ export class FormQuickQuoteComponent implements OnInit {
 
     console.log('saveQuoteParameters',this.saveQuoteParameters)
 
-    const responseData = await this.httpService.saveQuote(this.saveQuoteParameters);
-    if (!String.IsNullOrWhiteSpace(responseData.ClientLadingNo))
+    this.responseData = await this.httpService.saveQuote(this.saveQuoteParameters);
+    if (!String.IsNullOrWhiteSpace(this.responseData.ClientLadingNo))
     {
-      
-
       if (shipQuote){
-        this.messageService.SendQuoteParameter(responseData.ClientLadingNo);
-        this.messageService.SendLadingIDParameter(responseData.LadingID.toString());
-        this.snackbar.open('Quote saved successfully. Quote Number: ' + responseData.ClientLadingNo, null, {
+        this.messageService.SendQuoteParameter(this.responseData.ClientLadingNo);
+        this.messageService.SendLadingIDParameter(this.responseData.LadingID.toString());
+        this.snackbar.open('Quote saved successfully. Quote Number: ' + this.responseData.ClientLadingNo, null, {
           duration: 5000
-        });  
+        });
       }else{
-        this.openDialog(false, 'Quote saved successfully. Quote Number: ' + responseData.ClientLadingNo, null, null, true);
-      }            
+        this.openDialog(false, 'Quote saved successfully. Quote Number: ' + this.responseData.ClientLadingNo + '. ' + (action === 4 ? 'Email has been sent.' : ''), null, null, true);
+      }
     }
     else{
       this.snackbar.open('There was an error, try again.', null, {
@@ -913,6 +938,7 @@ export class FormQuickQuoteComponent implements OnInit {
 
     this.showSpinner = false;
   }
+
   onChangeCalculatePCF(index: number): void{
     const product = this.quickQuoteFormGroup.get('products').value[index];
     const PCF = this.calculatePCF(product.Pallets, product.Length, product.Width, product.Height, product.Weight);
@@ -1031,7 +1057,7 @@ export class FormQuickQuoteComponent implements OnInit {
 
     let formatedShipDate = getMonth + '/' + getDay + '/' + getYear;
     return formatedShipDate;
-  } 
+  }
 
   EstimateClassFromPCF(pCF) {
 
@@ -1108,23 +1134,12 @@ export class FormQuickQuoteComponent implements OnInit {
 
   }
 
-  emailSendDocs: string = String.Empty;
-
   async ValidateEmail(){
-
-    event.stopPropagation();
-    event.stopImmediatePropagation();
-    
     const emailregx = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
-    this.sendEmailClicked = emailregx.test(this.emailSendDocs);
+    this.enableSendEmailButton = emailregx.test(this.emailSendDocs);
   }
 
   async SendDocsByEmail(index: number, sendEmail:boolean){
-    
-    event.stopPropagation();
-    event.stopImmediatePropagation();
-
-    console.log('para', index, sendEmail);
 
     if (!sendEmail){
       this.emailSendDocs = String.Empty;
@@ -1137,31 +1152,44 @@ export class FormQuickQuoteComponent implements OnInit {
 
       const selectedRate = this.ratesFiltered[index];
 
-      console.log('rate', selectedRate);
+      await this.save(index, false, 4);
 
-      let emailBOLParameters: SendEmailParameters;
+      if (!String.IsNullOrWhiteSpace(this.responseData.ClientLadingNo)){
+        let emailBOLParameters: SendEmailParameters;
 
-      let invoiceParameter: InvoiceParameter = {
-        InvoiceDetailIDs: []
-      };
+        const invoiceParameter: InvoiceParameter = {
+          InvoiceDetailIDs: []
+        };
 
-      emailBOLParameters = {
-        ClientID: 8473, //selectedRate.ProfileID,
-        CarrierID : selectedRate.CarrierID,
-        ApplicationID: 56,
-        EventID: 39,
-        EmailAddresses: this.emailSendDocs,
-        LadingID: 2387625, // selectedRate.ProfileID,
-        UserRowID: 1,
-        InvoiceParameter: invoiceParameter,
-        LadingIDs: [],
+        emailBOLParameters = {
+          ClientID: this.ClientID,
+          CarrierID : selectedRate.CarrierID,
+          ApplicationID: 56,
+          EventID: 39,
+          EmailAddresses: this.emailSendDocs,
+          LadingID: this.responseData.LadingID,
+          UserRowID: 1,
+          InvoiceParameter: invoiceParameter,
+          LadingIDs: [],
+        }
+
+        this.httpService.SendEmailManually(emailBOLParameters);
+
+        this.clearQuoteAndFields();
       }
+    }
+  }
 
-      let emailRateQuoteResponse = this.httpService.SendEmailManually(emailBOLParameters);
+  async printQuote(index: number){
+    await this.save(index, false, 3);
 
-      this.snackbar.open('Send mail sucessfully', null, {
-        duration: 5000
-      });
+    if (!String.IsNullOrWhiteSpace(this.responseData.ClientLadingNo)){
+      const ratequotePrintURL = String.Format(environment.baseEndpoint + 'Handlers/PrintQuoteHandler.ashx?LadingID={0}&Ticket={1}',
+                                        this.responseData.LadingID,this.securityToken);
+
+      window.open(ratequotePrintURL, '_blank');
+
+      this.clearQuoteAndFields();
     }
   }
 }

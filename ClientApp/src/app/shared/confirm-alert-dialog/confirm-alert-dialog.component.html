@@ -9,9 +9,10 @@
         <label>{{message}}</label>
     </mat-dialog-content>
 
-    <mat-dialog-actions>
-        <button color="primary" mat-raised-button (click)="close()" *ngIf="confirmDialog">Close</button>            
-        <button color="primary" mat-raised-button (click)="alertConfirmOK()">Accept</button> 
+    <mat-dialog-actions>                
+        <button color="primary" mat-raised-button (click)="alertConfirmAccept()">{{acceptButtonLabel}}</button>
+        <button color="primary" mat-raised-button (click)="alertConfirmNo()" *ngIf="yesNoActions">No</button>
+        <button color="primary" mat-raised-button (click)="close()" *ngIf="confirmDialog">Cancel</button>     
         <!-- <button mat-button mat-dialog-close type="button">Accept2</button>  -->
     </mat-dialog-actions>
 </form>

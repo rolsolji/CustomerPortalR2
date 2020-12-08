@@ -15,6 +15,9 @@ export class ConfirmAlertDialogComponent implements OnInit {
   title: string;
   message: string;
   confirmDialog: boolean;
+  yesNoActions: boolean;
+
+  acceptButtonLabel = 'Accept';
 
   constructor(private fb: FormBuilder,
     private dialogRef: MatDialogRef<ConfirmAlertDialogComponent>,
@@ -22,6 +25,7 @@ export class ConfirmAlertDialogComponent implements OnInit {
       this.title = data.title;
       this.message = data.message;
       this.confirmDialog = data.confirmDialog;
+      this.yesNoActions = data.yesNoActions;
   }
 
   ngOnInit(): void {
@@ -29,12 +33,21 @@ export class ConfirmAlertDialogComponent implements OnInit {
     this.alertConfirmFormGroup = this.fb.group({
       // emailToSendQuote: [this.title]
     });
-    // --
+    // --    
     console.log('this.confirmDialog: ', this.confirmDialog);
+
+    if (this.yesNoActions){
+      this.acceptButtonLabel = 'Yes';
+    }
   }
 
-  alertConfirmOK(){
+  alertConfirmAccept(){
     this.dialogRef.close('Accepted');
+    //this.dialogRef.close();
+  }
+
+  alertConfirmNo(){
+    this.dialogRef.close('No');
     //this.dialogRef.close();
   }
 

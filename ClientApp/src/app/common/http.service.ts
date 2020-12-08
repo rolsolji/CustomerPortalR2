@@ -539,4 +539,27 @@ export class HttpService{
         ).toPromise();
     }
 
+    ModifiedQuote(parameters:SaveQuoteData){
+        const ticket = this.token;
+        const httpHeaders = new HttpHeaders({
+            Ticket : ticket
+        });
+        return this.http.post<Object>(this.baseEndpoint + 'Services/BOLHDRService.svc/json/ModifiedQuote',parameters
+        ,{
+            headers: httpHeaders
+        }
+        ).toPromise();
+    }
+
+    ModifiedQuoteWithLadingData(parameters:ShipmentByLading){
+        const ticket = this.token;
+        const httpHeaders = new HttpHeaders({
+            Ticket : ticket
+        });
+        return this.http.post<Object>(this.baseEndpoint + 'Services/BOLHDRService.svc/json/ModifiedQuote',parameters
+        ,{
+            headers: httpHeaders
+        }
+        ).toPromise();
+    }
 }

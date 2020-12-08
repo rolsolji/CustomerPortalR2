@@ -517,7 +517,7 @@
                             <button mat-icon-button matTooltip="Save Quote" (click)="saveQuote(j)">
                               <mat-icon [icIcon]="outlineSave"></mat-icon>
                             </button>
-                            <button mat-icon-button matTooltip="Print">
+                            <button mat-icon-button matTooltip="Print" (click)="printQuote(j)">
                               <mat-icon [icIcon]="outlinePrint"></mat-icon>
                             </button>
                             <button mat-icon-button matTooltip="Send Email" (click)="sendEmailClicked = true">
@@ -534,7 +534,7 @@
                                 </mat-form-field>
                                
                                 <div>
-                                  <button color="primary" class="mr-1 mat-stroked-sent-email-button" mat-stroked-button type="button"  [disabled]="!sendEmailClicked" (click)="SendDocsByEmail(j,true)">Send</button>
+                                  <button color="primary" class="mr-1 mat-stroked-sent-email-button" mat-stroked-button type="button"  [disabled]="!enableSendEmailButton" (click)="SendDocsByEmail(j,true)">Send</button>
                                   <button color="primary"  class="mat-stroked-sent-email-button" mat-stroked-button type="button" (click)="SendDocsByEmail(j,false)">Cancel</button>                                   
                                 </div>
                               </div>                                                            

@@ -8,7 +8,6 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatRadioModule } from '@angular/material/radio';
 import { MatSelectModule } from '@angular/material/select';
-import { LocationCreateUpdateComponent } from './location-create-update.component';
 import { MatMenuModule } from '@angular/material/menu';
 import { IconModule } from '@visurel/iconify-angular';
 import { MatDividerModule } from '@angular/material/divider';
@@ -17,6 +16,7 @@ import {MatDatepickerModule} from "@angular/material/datepicker";
 import {MatNativeDateModule} from "@angular/material/core";
 import {MatAutocompleteModule} from "@angular/material/autocomplete";
 import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
+import {LocationSearchModalComponent} from "./location-search-modal.component";
 
 @NgModule({
   imports: [
@@ -27,20 +27,14 @@ import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
     MatInputModule,
     MatButtonModule,
     MatIconModule,
-    MatRadioModule,
-    MatSelectModule,
     MatMenuModule,
     IconModule,
     MatDividerModule,
-    MatCheckboxModule,
-    MatDatepickerModule,
-    MatNativeDateModule,
-    MatAutocompleteModule,
     MatProgressSpinnerModule
   ],
-  declarations: [LocationCreateUpdateComponent],
-  entryComponents: [LocationCreateUpdateComponent],
-  exports: [LocationCreateUpdateComponent]
+  declarations: [LocationSearchModalComponent],
+  entryComponents: [LocationSearchModalComponent],
+  exports: [LocationSearchModalComponent]
 })
-export class LocationCreateUpdateModule {
+export class LocationSearchModalModule {
 }

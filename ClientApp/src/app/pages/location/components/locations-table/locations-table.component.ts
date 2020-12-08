@@ -23,11 +23,11 @@ import icSearch from '@iconify/icons-ic/twotone-search';
 import icAdd from '@iconify/icons-ic/twotone-add';
 import icFilterList from '@iconify/icons-ic/twotone-filter-list';
 import icMoreHoriz from '@iconify/icons-ic/twotone-more-horiz';
-import icFolder from '@iconify/icons-ic/twotone-folder';
 import {HttpService} from "../../../../common/http.service";
 import {GetLocationsParameters} from '../../../../Entities/GetLocationsParameters';
 import {Location} from '../../../../Entities/Location';
 import {LocationCreateUpdateComponent} from "./location-create-update/location-create-update.component";
+import {LocationSearchModalComponent} from "./location-search-modal/location-search-modal.component";
 
 @Component({
   selector: 'vex-locations-table',
@@ -74,7 +74,6 @@ export class LocationsTableComponent implements OnInit, AfterViewInit, OnDestroy
   ];
 
   pageSize = 20;
-  pageIndex = 1;
   pageSizeOptions: number[] = [5, 10, 20, 50];
   dataSource: MatTableDataSource<Location> | null;
   selection = new SelectionModel<Location>(true, []);
@@ -91,7 +90,6 @@ export class LocationsTableComponent implements OnInit, AfterViewInit, OnDestroy
   icAdd = icAdd;
   icFilterList = icFilterList;
   icMoreHoriz = icMoreHoriz;
-  icFolder = icFolder;
 
   @ViewChild(MatPaginator, { static: true }) paginator: MatPaginator;
   @ViewChild(MatSort, { static: true }) sort: MatSort;
@@ -135,6 +133,12 @@ export class LocationsTableComponent implements OnInit, AfterViewInit, OnDestroy
     this.dataSource.sort = this.sort;
   }
 
+  searchLocationModal() {
+    this.dialog.open(LocationSearchModalComponent).afterClosed().subscribe((locations: Location[]) => {
+      this.subject$.next(locations)
+    });
+  }
+
   createLocation() {
     this.dialog.open(LocationCreateUpdateComponent).afterClosed().subscribe((location: Location) => {
       /**
@@ -158,6 +162,7 @@ export class LocationsTableComponent implements OnInit, AfterViewInit, OnDestroy
       /**
        * Location is the updated location (if the user pressed Save - otherwise it's null)
        */
+      console.log(updatedLocation);
       if (updatedLocation) {
         /**
          * Here we are updating our local array.
@@ -178,6 +183,8 @@ export class LocationsTableComponent implements OnInit, AfterViewInit, OnDestroy
     this.locations.splice(this.locations.findIndex((existingLocation) => existingLocation === location), 1);
     this.selection.deselect(location);
     this.subject$.next(this.locations);
+
+    this.httpService.DeleteMasLocationType(location.LocationID);
   }
 
   deleteLocations(locations: Location[]) {
@@ -235,6 +242,11 @@ export class LocationsTableComponent implements OnInit, AfterViewInit, OnDestroy
       ClientId: 1,
       IsAccending: false,
       LocationID: null,
+      Name: null,
+      ShortName: null,
+      ContactName: null,
+      ContactEmail: null,
+      ContactPhone: null,
       OrderBy: "",
       PageNumber: 1,
       PageSize: 200,

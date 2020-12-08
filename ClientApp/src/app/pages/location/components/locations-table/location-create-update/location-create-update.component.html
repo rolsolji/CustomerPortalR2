@@ -1,4 +1,10 @@
-<form (ngSubmit)="save()" [formGroup]="form" *ngIf="form">
+<mat-progress-spinner
+        [diameter]="50"
+        *ngIf="!form || originCountries == null || statesAndCities == null"
+        mode="indeterminate"
+        color="accent">
+</mat-progress-spinner>
+<form (ngSubmit)="save()" [formGroup]="form" *ngIf="form && originCountries !== null && statesAndCities !== null">
   <div fxLayout="row" fxLayoutAlign="start center" mat-dialog-title>
     <h2 *ngIf="isCreateMode()" class="headline m-0" fxFlex="auto">New Location</h2>
     <h2 *ngIf="isUpdateMode()" class="headline m-0" fxFlex="auto">Update Location</h2>
@@ -77,14 +83,17 @@
     <div class="flex flex-col sm:flex-row">
       <mat-form-field class="flex-auto">
         <mat-label>Country</mat-label>
-        <input type="text"
-               placeholder="Pick one"
-               aria-label="Number"
-               matInput
-               [formControl]="countryControl"
-               [matAutocomplete]="auto">
-        <mat-autocomplete #auto="matAutocomplete" (optionSelected)="onCountryChange($event)">
-          <mat-option *ngFor="let country of filteredOptions | async" [value]="country.CountryName">
+        <input
+          formControlName="country"
+          type="text"
+          placeholder="Country"
+          matInput
+          [matAutocomplete]="countryAutoComplete"
+          required>
+        <mat-autocomplete
+                [displayWith]="displayCountry.bind(this)" #countryAutoComplete="matAutocomplete" (optionSelected)="setCountryStatesCities($event)">
+          <mat-option *ngFor="let country of filteredCountriesOptions | async"
+                      [value]="country">
             {{country.CountryName}}
           </mat-option>
         </mat-autocomplete>
@@ -114,7 +123,20 @@
     <div class="flex flex-col sm:flex-row">
       <mat-form-field class="flex-auto">
         <mat-label>State</mat-label>
-        <input formControlName="StateCode" matInput>
+        <input
+                formControlName="state"
+                type="text"
+                placeholder="State"
+                matInput
+                [matAutocomplete]="stateAutoComplete"
+                required>
+        <mat-autocomplete
+                [displayWith]="displayState.bind(this)" #stateAutoComplete="matAutocomplete">
+          <mat-option *ngFor="let state of filteredStatesOptions | async"
+                      [value]="state">
+            {{state.StateName}}
+          </mat-option>
+        </mat-autocomplete>
 
       </mat-form-field>
 
@@ -128,7 +150,18 @@
     <div class="flex flex-col sm:flex-row">
       <mat-form-field class="flex-auto">
         <mat-label>City</mat-label>
-        <input formControlName="CityName" matInput>
+        <input
+                formControlName="city"
+                type="text"
+                placeholder="Pick one"
+                matInput
+                [matAutocomplete]="cityAutoComplete">
+        <mat-autocomplete [displayWith]="displayCity.bind(this)" #cityAutoComplete="matAutocomplete">
+          <mat-option *ngFor="let city of filteredCitiesOptions | async"
+                      [value]="city">
+            {{city.CityName}}
+          </mat-option>
+        </mat-autocomplete>
 
       </mat-form-field>
 

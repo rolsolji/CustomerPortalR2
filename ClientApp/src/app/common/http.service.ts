@@ -61,7 +61,7 @@ export class HttpService{
         const httpHeaders = new HttpHeaders({
             Ticket : ticket
         });
-        return this.http.get<Country[] | Country>(
+        return this.http.get<PostalData[] | Country>(
           String.Format(this.baseEndpoint + 'Services/MASCityStatePostalService.svc/json/GetCountryList?_={0}',keyId)
         ,{
             headers: httpHeaders
@@ -88,7 +88,6 @@ export class HttpService{
         const httpHeaders = new HttpHeaders({
             Ticket : ticket
         });
-        console.log(parameters);
         return this.http.post<Location[]>(this.baseEndpoint + 'Services/MasLocationService.svc/json/GetMasLocation', parameters
             ,{
                 headers: httpHeaders
@@ -96,7 +95,7 @@ export class HttpService{
         ).toPromise();
     }
 
-    UpdateMasLocation(parameters: GetLocationsParameters){
+    UpdateMasLocation(parameters: Location){
         const ticket = this.token;
         const httpHeaders = new HttpHeaders({
             Ticket : ticket
@@ -116,6 +115,19 @@ export class HttpService{
         });
         return this.http.get(
             this.baseEndpoint + 'Services/MasLocationService.svc/json/GetMasLocationType'
+            ,{
+                headers: httpHeaders
+            }
+        ).toPromise();
+    }
+
+    DeleteMasLocationType(locationId) {
+        const ticket = this.token;
+        const httpHeaders = new HttpHeaders({
+            Ticket : ticket
+        });
+        return this.http.get(
+            this.baseEndpoint + `Services/MasLocationService.svc/json/DeleteMasLocation?LocationID=${locationId}`
             ,{
                 headers: httpHeaders
             }
@@ -219,7 +231,9 @@ export class HttpService{
       ).toPromise();
     }
 
-
+    getUserFromStorage() {
+        return this.authenticationService.getUserFromStorage();
+    }
 
     getMasEquipment(keyId:string){
         const ticket = this.token;
@@ -523,6 +537,6 @@ export class HttpService{
             headers: httpHeaders
         }
         ).toPromise();
-    }   
-    
+    }
+
 }

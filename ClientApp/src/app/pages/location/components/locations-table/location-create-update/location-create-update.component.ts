@@ -1,6 +1,6 @@
-import { Component, Inject, OnInit } from '@angular/core';
+import {Component, Inject, OnInit} from '@angular/core';
 import {FormBuilder, FormControl, FormGroup} from '@angular/forms';
-import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
+import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material/dialog';
 import icMoreVert from '@iconify/icons-ic/twotone-more-vert';
 import icClose from '@iconify/icons-ic/twotone-close';
 import icPrint from '@iconify/icons-ic/twotone-print';
@@ -8,14 +8,15 @@ import icDownload from '@iconify/icons-ic/twotone-cloud-download';
 import icDelete from '@iconify/icons-ic/twotone-delete';
 import icPhone from '@iconify/icons-ic/twotone-phone';
 import icPerson from '@iconify/icons-ic/twotone-person';
-import icMyLocation from '@iconify/icons-ic/twotone-my-location';
-import icEditLocation from '@iconify/icons-ic/twotone-edit-location';
 import {Location} from '../../../../../Entities/Location';
 import {HttpService} from "../../../../../common/http.service";
 import {DatePipe} from "@angular/common";
 import {Country} from "../../../../../Entities/Country";
-import {Observable} from "rxjs";
-import {map, startWith} from "rxjs/operators";
+import {BehaviorSubject, Observable} from "rxjs";
+import {debounceTime, distinctUntilChanged, startWith, switchMap} from "rxjs/operators";
+import {PostalData} from "../../../../../Entities/PostalData";
+import {String} from "typescript-string-operations";
+import {User} from "../../../../../Entities/user.model";
 
 @Component({
   selector: 'vex-location-create-update',
@@ -25,6 +26,8 @@ import {map, startWith} from "rxjs/operators";
 export class LocationCreateUpdateComponent implements OnInit {
 
   static id = 100;
+
+  keyId = '1593399730488';
 
   form: FormGroup;
   mode: 'create' | 'update' = 'create';
@@ -37,27 +40,23 @@ export class LocationCreateUpdateComponent implements OnInit {
   icDelete = icDelete;
 
   icPerson = icPerson;
-  icMyLocation = icMyLocation;
-  icEditLocation = icEditLocation;
   icPhone = icPhone;
 
   checked: boolean = true;
 
   locationTypes: {} = [];
-  countries: Country[] | Country  = [];
   locationTypeSelected: null;
-  countryControl = new FormControl();
-  options: Country[] | Country = [];
-  filteredOptions: Observable<Country[]>;
+  originCountries: PostalData[] | Country = [];
+  statesAndCities: PostalData[] = [];
+  filteredCountriesOptions: Observable<PostalData[]>;
+  filteredStatesOptions: Observable<PostalData[]>;
+  filteredCitiesOptions: Observable<PostalData[]>;
 
-  private _filter(value: string): Country[] {
-    if (Array.isArray(this.options)) {
-      const filteredValue = value.toLowerCase();
-      return this.options.filter(option => {
-        return option.CountryName.toLowerCase().includes(filteredValue)
-      });
-    }
-  }
+  user: User;
+
+  public countries: BehaviorSubject<PostalData[]> = new BehaviorSubject<PostalData[]>(null);
+  public states: BehaviorSubject<PostalData[]> = new BehaviorSubject<PostalData[]>(null);
+  public cities: BehaviorSubject<PostalData[]> = new BehaviorSubject<PostalData[]>(null);
 
   constructor(private httpService : HttpService, @Inject(MAT_DIALOG_DATA) public defaults: any,
               private dialogRef: MatDialogRef<LocationCreateUpdateComponent>,
@@ -73,14 +72,15 @@ export class LocationCreateUpdateComponent implements OnInit {
     }
 
     this.locationTypes = await this.httpService.GetMasLocationType();
-    this.options = await this.httpService.getCountryList(null);
+    this.originCountries = await this.httpService.getCountryList(this.keyId);
+    this.user = this.httpService.getUserFromStorage();
+    this.statesAndCities = [];
 
-    this.filteredOptions = this.countryControl.valueChanges
-        .pipe(
-            startWith(''),
-            map(value => this._filter(value))
-        );
-
+    if (this.defaults.CountryId) {
+      this.statesAndCities = await this.httpService.getPostalDataByPostalCode('', this.defaults.CountryId.toString(), this.keyId);
+    } else {
+      this.statesAndCities = await this.httpService.getPostalDataByPostalCode('', '1', this.keyId);
+    }
     const activateDate = this.defaults.ActivateDate ?
         new FormControl(new Date(this.datepipe.transform(this.defaults.ActivateDate?.toString().replace(/(^.*\()|([+-].*$)/g, '')))) : null;
     const DeactivateDate = this.defaults.DeactivateDate ?
@@ -93,13 +93,13 @@ export class LocationCreateUpdateComponent implements OnInit {
       Address1: this.defaults.Address1 || '',
       Address2: this.defaults.Address2 || '',
       DeactivateDate: DeactivateDate || '',
-      CountryName: this.defaults.CountryName || '',
+      country: this.getCountryNameById(this.defaults.CountryId || 1) || '',
       ReferenceCode: this.defaults.ReferenceCode || '',
       PostalCode: this.defaults.PostalCode || '',
       InAccountCode: this.defaults.InAccountCode || '',
-      StateCode: this.defaults.StateCode || '',
+      state: this.getStateNameById(this.defaults.StateId || '') || '',
       OutAccountCode: this.defaults.OutAccountCode || '',
-      CityName: this.defaults.CityName || '',
+      city: this.getCityNameById(this.defaults.CityId || '') || '',
       CreatedBy: new FormControl({value: this.defaults.CreatedBy, disabled: this.isUpdateMode()}) || '',
       ContactName: this.defaults.ContactName || '',
       ContactPhone: this.defaults.ContactPhone || '',
@@ -108,72 +108,60 @@ export class LocationCreateUpdateComponent implements OnInit {
     });
     this.checked = this.defaults.Status || true;
     this.locationTypeSelected = this.defaults.LocationTypeID || null;
-    this.setDefaultCountry();
-    // this.currentCountry = this.defaults.CountryName || '';
+
+    this.filteredCountriesOptions = this.form.get('country').valueChanges.pipe(
+        startWith(''),
+        debounceTime(400),
+        distinctUntilChanged(),
+        switchMap(val => {
+          return this._filterCountries(val || '')
+        })
+    );
+    this.filteredStatesOptions = this.form.get('state').valueChanges.pipe(
+        startWith(''),
+        debounceTime(400),
+        distinctUntilChanged(),
+        switchMap(val => {
+          return this._filterStates(val || '')
+        })
+    );
+    this.filteredCitiesOptions = this.form.get('city').valueChanges.pipe(
+        startWith(''),
+        debounceTime(400),
+        distinctUntilChanged(),
+        switchMap(val => {
+          return this._filterCities(val || '')
+        }));
+
+    this.form.get('PostalCode').valueChanges.subscribe(value => {
+      this._changeStateAndCity(value)
+    });
   }
 
   save() {
     if (this.mode === 'create') {
-      this.createCustomer();
+      this.createLocation();
     } else if (this.mode === 'update') {
-      this.updateCustomer();
+      this.updateLocation().then(locationData => {
+        console.log(locationData)
+        this.httpService.UpdateMasLocation(locationData).then(() => {
+          this.dialogRef.close(locationData);
+        })
+      });
     }
   }
 
-  createCustomer() {
+  async createLocation() {
     const location = this.form.value;
 
-    // console.log(location)
+    await this.mapLocation(location);
 
     this.dialogRef.close(location);
   }
 
-  async updateCustomer() {
-    const location = this.form.value;
-    const updatedLocation = new Location(location);
-    // console.log(updatedLocation)
-    location.LocationID = this.defaults.LocationID;
-    location.BaseCurrency = this.defaults.BaseCurrency;
-    location.BilltoLocationID = this.defaults.BilltoLocationID;
-    location.BusinessSize = this.defaults.BusinessSize;
-    // Missing auto complete for city
-    location.CityId = this.defaults.CityId;
-    location.ClientId = this.defaults.ClientId;
-    // Missing auto complete for country
-    location.CountryId = this.defaults.CountryId;
-
-    // Missing created by info
-    location.CreatedBy = this.defaults.CreatedBy;
-    location.CreatedDate = this.defaults.CreatedDate;
-    location.FaxNumber = this.defaults.FaxNumber;
-    location.LocationGroup = this.defaults.LocationGroup;
-    location.LocationGroupID = this.defaults.LocationGroupID;
-
-    // Missing info from the select
-    location.LocationType = this.defaults.LocationType;
-    location.LocationTypeID = this.defaults.LocationTypeID;
-
-    // Missing info updated by
-    location.ModifiedBy = this.defaults.ModifiedBy;
-    location.ModifiedDate = this.defaults.ModifiedDate;
-    location.PickupCloseTime = this.defaults.PickupCloseTime;
-    location.PickupStartTime = this.defaults.PickupStartTime;
-
-    // Missing information from the postal
-    location.PostalID = this.defaults.PostalID;
-
-    location.ShipperID = this.defaults.ShipperID;
-    location.StateId = this.defaults.StateId;
-    location.StateName = this.defaults.StateName;
-
-    // Missing info from the checkbox
-    location.Status = this.defaults.Status;
-    location.UserID = this.defaults.UserID;
-    location.UserToken = this.defaults.UserToken;
-
-    await this.httpService.getMasLocations(location)
-
-    this.dialogRef.close(location);
+  async updateLocation(): Promise<Location> {
+    let location = this.form.value;
+    return await this.mapLocation(location);
   }
 
   isCreateMode() {
@@ -184,22 +172,202 @@ export class LocationCreateUpdateComponent implements OnInit {
     return this.mode === 'update';
   }
 
-  setDefaultCountry() {
-    if (Array.isArray(this.options)){
-      this.options.map(country => {
-        this.countries[country.CountryName] = country.CountryId;
-      });
-      const currentCountry: Country = this.options.find(country => {
-        return country.CountryName = this.defaults.CountryName
-      });
-      console.log(this.countries);
-      this.countryControl.setValue( currentCountry.CountryName );
+  async setCountryStatesCities(event) {
+    this.statesAndCities = null;
+    const countryId = event.option.value.CountryId;
+    this.statesAndCities = await this.httpService.getPostalDataByPostalCode('', countryId.toString(), this.keyId);
+  }
+
+  private _changeStateAndCity(value) {
+    if (value) {
+      const filterValue = value;
+      if (filterValue.length >= 4 && (typeof value === 'string')) {
+        const stateAndCity = this.statesAndCities.filter(
+            (option: PostalData) => option.PostalCode.toLowerCase().indexOf(filterValue) === 0);
+        if (stateAndCity && stateAndCity[0]) {
+          this.form.get('state').setValue(stateAndCity[0]);
+          this.form.get('city').setValue(stateAndCity[0]);
+        }
+      }
     }
   }
 
-  async onCountryChange(event) {
-    const countryId = this.countries[event.option.value];
-    const countryStates = await this.httpService.getStateDataByCountryId(countryId, null);
-    console.log(countryStates);
+  private _filterCountries(value: string | PostalData): Observable<PostalData[]> {
+    if (value) {
+      const filterValue = (typeof value === 'string') ? value.toLowerCase() : value.CountryName.toLowerCase();
+      if (filterValue.length >= 3) {
+        if (Array.isArray(this.originCountries)) {
+          this.countries.next(this.originCountries.filter(
+              (option: PostalData) => option.CountryName.toLowerCase().indexOf(filterValue) === 0));
+          this.countries.next(this.getUniqueListBy(this.countries.value, 'CountryName'));
+        }
+      }
+    }
+    return this.countries.asObservable();
+  }
+
+  private _filterStates(value: string | PostalData): Observable<PostalData[]> {
+    if (value) {
+      const filterValue = (typeof value === 'string') ? value.toLowerCase() : value.StateName.toLowerCase();
+      if (filterValue.length >= 4) {
+        this.states.next(this.statesAndCities.filter(
+            (option: PostalData) => option.StateName.toLowerCase().indexOf(filterValue) === 0));
+        this.states.next(this.getUniqueListBy(this.states.value, 'StateName'));
+        return this.states.asObservable();
+      }
+    }
+    this.states.next([]);
+    return this.states.asObservable();
+  }
+
+  private _filterCities(value: string | PostalData): Observable<PostalData[]> {
+    if (value) {
+      const filterValue = (typeof value === 'string') ? value.toLowerCase() : value.CityName.toLowerCase();
+
+      if (filterValue.length >= 4) {
+        this.cities.next(this.statesAndCities.filter(
+            (option: PostalData) => option.CityName.toLowerCase().indexOf(filterValue) === 0));
+        this.cities.next(this.getUniqueListBy(this.cities.value, 'CityName'));
+        return this.cities.asObservable();
+      }
+    }
+    this.cities.next([]);
+    return this.cities.asObservable();
+  }
+
+  getUniqueListBy(arr: PostalData[], key): PostalData[] {
+    return [...new Map(arr.map(item => [item[key], item])).values()]
+  }
+
+  getCountryNameById(countryId) {
+    if (Array.isArray(this.originCountries) && this.originCountries && this.originCountries.length > 0) {
+      return this.originCountries.find(country => country.CountryId === countryId);
+    }
+    return undefined;
+  }
+
+  getStateNameById(stateId) {
+    if (this.statesAndCities && this.statesAndCities.length > 0) {
+      return this.statesAndCities.find(states => states.StateId === stateId)?.StateName
+    }
+    return undefined;
+  }
+
+  getCityNameById(cityId) {
+    if (this.statesAndCities && this.statesAndCities.length > 0) {
+      return this.statesAndCities.find(city => city.CityID === cityId)?.CityName
+    }
+    return undefined;
+  }
+
+  displayState(value?): string {
+    if (this.statesAndCities !== null  && value && typeof value === 'string') {
+      const selectedState = this.statesAndCities.find(state => state.StateName === value);
+      if (selectedState) {
+        return selectedState.StateName.trim()
+      }
+    } else if (value && value.StateName) {
+      return value.StateName.trim();
+    }
+    return undefined;
+  }
+
+  displayCity(value): string {
+    if (this.statesAndCities !== null  && value && typeof value === 'string') {
+      const selectedCity = this.statesAndCities.find(city => city.CityName.trim() === value.trim());
+      if (selectedCity) {
+        return selectedCity.CityName.trim()
+      }
+    } else if (value && value.CityName) {
+      return value.CityName.trim();
+    }
+    return undefined;
+  }
+
+  displayCountry(value): string {
+    if (Array.isArray(this.originCountries) && this.originCountries !== null  && value && typeof value === 'string') {
+      const selectedCountry = this.originCountries.find(country => country.CountryName.trim() === value.trim());
+      if (selectedCountry) {
+        return selectedCountry.CountryName.trim()
+      }
+    } else if (value && value.CountryName) {
+      return value.CountryName.trim();
+    }
+    return undefined;
+  }
+
+  async mapLocation(locationData): Promise<Location> {
+    const location = this.defaults;
+    location.ActivateDate = String.Format('/Date({0})/',locationData.ActivateDate.getTime()) ?? this.defaults.ActivateDate;
+    location.Address1 = locationData.Address1 ?? this.defaults.Address1;
+    location.Address2 = locationData.Address2 ?? this.defaults.Address2;
+
+    if (locationData.city instanceof Object) {
+      location.CityId = locationData.city.CityId ?? this.defaults.CityId;
+      location.CityName = locationData.city.CityName ?? this.defaults.CityName;
+    } else {
+      location.CityId = this.defaults.CityId;
+      location.CityName = locationData.city ?? this.defaults.CityName;
+    }
+
+    location.ContactEmail = locationData.ContactEmail ?? this.defaults.ContactEmail;
+    location.ContactName = locationData.ContactName ?? this.defaults.ContactName;
+    location.ContactPhone = locationData.ContactPhone ?? this.defaults.ContactPhone;
+    if (locationData.country.CountryName) {
+      location.CountryId = locationData.country.CountryId ?? this.defaults.CountryId;
+      location.CountryName = locationData.country.CountryName ?? this.defaults.CountryName;
+    }
+    location.DeactivateDate = locationData.DeactivateDate instanceof Date
+        ? String.Format('/Date({0})/',locationData.DeactivateDate.getTime())
+        : this.defaults.DeactivateDate;
+    location.InAccountCode = locationData.InAccountCode ?? this.defaults.InAccountCode;
+    location.Name = locationData.Name ?? this.defaults.Name;
+    location.Notes = locationData.Notes ?? this.defaults.Notes;
+    location.OutAccountCode = locationData.OutAccountCode ?? this.defaults.OutAccountCode;
+
+    const postalCode = await this.httpService.getPostalDataByPostalCode(locationData.PostalCode, location.CountryId.toString(), this.keyId);
+    if (postalCode[0]) {
+      location.PostalCode = locationData.PostalCode ?? this.defaults.PostalCode;
+      location.PostalID = postalCode[0].PostalID ?? this.defaults.PostalID;
+    } else {
+      location.PostalCode = locationData.PostalCode ?? this.defaults.PostalCode;
+      location.PostalID = locationData.PostalID ?? this.defaults.PostalID;
+    }
+    location.ReferenceCode = locationData.ReferenceCode ?? this.defaults.ReferenceCode;
+    location.ShortName = locationData.ShortName ?? this.defaults.ShortName;
+
+    if (locationData.state instanceof Object) {
+      location.StateCode = locationData.state.StateCode ?? this.defaults.StateCode;
+      location.StateId = locationData.state.StateId ?? this.defaults.StateId;
+      location.StateName = locationData.state.StateName ?? this.defaults.StateName;
+    } else {
+      location.StateCode = postalCode[0].StateCode ?? this.defaults.StateCode;
+      location.StateId = postalCode[0].StateId ?? this.defaults.StateId;
+      location.StateName = postalCode[0].StateName ?? this.defaults.StateName;
+    }
+
+    location.CreatedBy = this.defaults.CreatedBy;
+    location.CreatedDate = this.defaults.CreatedDate;
+    location.BaseCurrency = this.defaults.BaseCurrency;
+    location.BilltoLocationID = this.defaults.BilltoLocationID;
+    location.BusinessSize = this.defaults.BusinessSize;
+    location.ClientId = this.defaults.ClientId;
+    location.FaxNumber = this.defaults.FaxNumber;
+    location.LocationGroup = this.defaults.LocationGroup;
+    location.LocationGroupID = this.defaults.LocationGroupID;
+    location.LocationID = this.defaults.LocationID;
+    location.LocationType = this.defaults.LocationType;
+    location.LocationTypeID = this.defaults.LocationTypeID;
+    location.ModifiedBy = this.user.UserName ?? this.defaults.ModifiedBy;
+    const currentTime = new Date();
+    location.ModifiedDate = String.Format('/Date({0})/', currentTime.getTime()) ?? this.defaults.ModifiedDate;
+    location.PickupCloseTime = this.defaults.PickupCloseTime;
+    location.PickupStartTime = this.defaults.PickupStartTime;
+    location.ShipperID = this.defaults.ShipperID;
+    location.Status = this.defaults.Status;
+    location.UserID = this.defaults.UserID;
+    location.UserToken = this.defaults.UserToken;
+
+    return location;
   }
 }

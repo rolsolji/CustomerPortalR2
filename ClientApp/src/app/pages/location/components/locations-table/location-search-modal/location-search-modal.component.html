@@ -1,0 +1,61 @@
+<mat-progress-spinner
+        [diameter]="50"
+        *ngIf="!form"
+        mode="indeterminate"
+        color="accent">
+</mat-progress-spinner>
+<form (ngSubmit)="save()" [formGroup]="form" *ngIf="form">
+  <div fxLayout="row" fxLayoutAlign="start center" mat-dialog-title>
+    <h2 class="headline m-0" fxFlex="auto">Search</h2>
+
+    <button class="text-secondary" mat-dialog-close mat-icon-button type="button">
+      <mat-icon [icIcon]="icClose"></mat-icon>
+    </button>
+  </div>
+
+  <mat-divider class="-mx-6 text-border"></mat-divider>
+
+  <mat-dialog-content fxLayout="column">
+    <div class="flex flex-col sm:flex-row">
+      <mat-form-field class="flex-auto">
+        <mat-label>Location Name</mat-label>
+        <input cdkFocusInitial formControlName="Name" matInput>
+
+      </mat-form-field>
+
+      <mat-form-field class="sm:ml-6 flex-auto">
+        <mat-label>Short Name</mat-label>
+        <input formControlName="ShortName" matInput>
+
+      </mat-form-field>
+    </div>
+
+    <div class="flex flex-col sm:flex-row">
+      <mat-form-field class="flex-auto">
+        <mat-label>Contact Name</mat-label>
+        <input formControlName="ContactName" matInput>
+
+      </mat-form-field>
+
+      <mat-form-field class="sm:ml-6 flex-auto">
+        <mat-label>Contact Phone</mat-label>
+        <input formControlName="ContactPhone" matInput>
+
+      </mat-form-field>
+    </div>
+
+    <div class="flex flex-col sm:flex-row">
+      <mat-form-field class="flex-auto">
+        <mat-label>Contact Email</mat-label>
+        <input type="email" formControlName="ContactEmail" matInput>
+
+      </mat-form-field>
+    </div>
+
+  </mat-dialog-content>
+
+  <mat-dialog-actions align="end">
+    <button mat-button mat-dialog-close type="button">CANCEL</button>
+    <button color="primary" mat-button type="submit">SEARCH</button>
+  </mat-dialog-actions>
+</form>

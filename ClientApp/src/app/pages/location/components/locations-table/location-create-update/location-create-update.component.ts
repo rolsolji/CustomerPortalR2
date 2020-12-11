@@ -43,6 +43,8 @@ export class LocationCreateUpdateComponent implements OnInit {
   icPhone = icPhone;
 
   checked: boolean = true;
+  approved: number = 1;
+  locationTypeValue: number = 4;
 
   locationTypes: {} = [];
   locationTypeSelected: null;
@@ -83,7 +85,7 @@ export class LocationCreateUpdateComponent implements OnInit {
     }
     const activateDate = this.defaults.ActivateDate ?
         new FormControl(new Date(this.datepipe.transform(this.defaults.ActivateDate?.toString().replace(/(^.*\()|([+-].*$)/g, '')))) : null;
-    const DeactivateDate = this.defaults.DeactivateDate ?
+    const deactivateDate = this.defaults.DeactivateDate ?
         new FormControl(new Date(this.datepipe.transform(this.defaults.DeactivateDate?.toString().replace(/(^.*\()|([+-].*$)/g, '')))) : null;
 
     this.form = this.fb.group({
@@ -92,22 +94,27 @@ export class LocationCreateUpdateComponent implements OnInit {
       ActivateDate: activateDate || '',
       Address1: this.defaults.Address1 || '',
       Address2: this.defaults.Address2 || '',
-      DeactivateDate: DeactivateDate || '',
+      DeactivateDate: deactivateDate || '',
       country: this.getCountryNameById(this.defaults.CountryId || 1) || '',
       ReferenceCode: this.defaults.ReferenceCode || '',
       PostalCode: this.defaults.PostalCode || '',
       InAccountCode: this.defaults.InAccountCode || '',
-      state: this.getStateNameById(this.defaults.StateId || '') || '',
+      state: this.getStateNameById(this.defaults.CityId || '') || '',
       OutAccountCode: this.defaults.OutAccountCode || '',
       city: this.getCityNameById(this.defaults.CityId || '') || '',
-      CreatedBy: new FormControl({value: this.defaults.CreatedBy, disabled: this.isUpdateMode()}) || '',
+      CreatedBy: new FormControl({value: this.defaults.CreatedBy ?? this.user.UserName, disabled: true}) || '',
       ContactName: this.defaults.ContactName || '',
       ContactPhone: this.defaults.ContactPhone || '',
       ContactEmail: this.defaults.ContactEmail || '',
-      Notes: this.defaults.Notes || ''
+      Notes: this.defaults.Notes || '',
+      LocationType: this.defaults.LocationType || 4
     });
     this.checked = this.defaults.Status || true;
-    this.locationTypeSelected = this.defaults.LocationTypeID || null;
+    this.approved = this.defaults.IsApproveLocation || 0;
+
+    if (this.defaults.IsApproveLocation instanceof String) {
+      this.approved = this.defaults.IsApproveLocation === 'YesLoc' ? 1 : 0;
+    }
 
     this.filteredCountriesOptions = this.form.get('country').valueChanges.pipe(
         startWith(''),
@@ -140,10 +147,13 @@ export class LocationCreateUpdateComponent implements OnInit {
 
   save() {
     if (this.mode === 'create') {
-      this.createLocation();
+      this.createLocation().then(locationData => {
+        this.httpService.InsertMasLocation(locationData).then(() => {
+          this.dialogRef.close(locationData);
+        })
+      });
     } else if (this.mode === 'update') {
       this.updateLocation().then(locationData => {
-        console.log(locationData)
         this.httpService.UpdateMasLocation(locationData).then(() => {
           this.dialogRef.close(locationData);
         })
@@ -153,14 +163,11 @@ export class LocationCreateUpdateComponent implements OnInit {
 
   async createLocation() {
     const location = this.form.value;
-
-    await this.mapLocation(location);
-
-    this.dialogRef.close(location);
+    return await this.mapNewLocation(location);
   }
 
   async updateLocation(): Promise<Location> {
-    let location = this.form.value;
+    const location = this.form.value;
     return await this.mapLocation(location);
   }
 
@@ -246,9 +253,9 @@ export class LocationCreateUpdateComponent implements OnInit {
     return undefined;
   }
 
-  getStateNameById(stateId) {
+  getStateNameById(cityId) {
     if (this.statesAndCities && this.statesAndCities.length > 0) {
-      return this.statesAndCities.find(states => states.StateId === stateId)?.StateName
+      return this.statesAndCities.find(states => states.CityID === cityId)?.StateName
     }
     return undefined;
   }
@@ -302,14 +309,6 @@ export class LocationCreateUpdateComponent implements OnInit {
     location.Address1 = locationData.Address1 ?? this.defaults.Address1;
     location.Address2 = locationData.Address2 ?? this.defaults.Address2;
 
-    if (locationData.city instanceof Object) {
-      location.CityId = locationData.city.CityId ?? this.defaults.CityId;
-      location.CityName = locationData.city.CityName ?? this.defaults.CityName;
-    } else {
-      location.CityId = this.defaults.CityId;
-      location.CityName = locationData.city ?? this.defaults.CityName;
-    }
-
     location.ContactEmail = locationData.ContactEmail ?? this.defaults.ContactEmail;
     location.ContactName = locationData.ContactName ?? this.defaults.ContactName;
     location.ContactPhone = locationData.ContactPhone ?? this.defaults.ContactPhone;
@@ -333,6 +332,15 @@ export class LocationCreateUpdateComponent implements OnInit {
       location.PostalCode = locationData.PostalCode ?? this.defaults.PostalCode;
       location.PostalID = locationData.PostalID ?? this.defaults.PostalID;
     }
+
+    if (locationData.city instanceof Object) {
+      location.CityId = locationData.city.CityID ?? this.defaults.CityId;
+      location.CityName = locationData.city.CityName ?? this.defaults.CityName;
+    } else {
+      location.CityId = postalCode[0].CityID ?? this.defaults.CityId;
+      location.CityName = postalCode[0].CityName ?? this.defaults.CityName;
+    }
+
     location.ReferenceCode = locationData.ReferenceCode ?? this.defaults.ReferenceCode;
     location.ShortName = locationData.ShortName ?? this.defaults.ShortName;
 
@@ -345,6 +353,7 @@ export class LocationCreateUpdateComponent implements OnInit {
       location.StateId = postalCode[0].StateId ?? this.defaults.StateId;
       location.StateName = postalCode[0].StateName ?? this.defaults.StateName;
     }
+    location.IsApproveLocation = this.approved === 0 ? 'NoLoc' : 'YesLoc' ;
 
     location.CreatedBy = this.defaults.CreatedBy;
     location.CreatedDate = this.defaults.CreatedDate;
@@ -364,9 +373,73 @@ export class LocationCreateUpdateComponent implements OnInit {
     location.PickupCloseTime = this.defaults.PickupCloseTime;
     location.PickupStartTime = this.defaults.PickupStartTime;
     location.ShipperID = this.defaults.ShipperID;
-    location.Status = this.defaults.Status;
+    location.Status = this.checked ?? this.defaults.Status;
     location.UserID = this.defaults.UserID;
     location.UserToken = this.defaults.UserToken;
+
+    return location;
+  }
+
+  async mapNewLocation(locationData): Promise<Location> {
+    const location = new Location(null);
+    if (locationData.ActivateDate instanceof Object) {
+      location.ActivateDate = String.Format('/Date({0})/', locationData.ActivateDate.getTime());
+    }
+    location.Address1 = locationData.Address1;
+    location.Address2 = locationData.Address2;
+
+    location.ContactEmail = locationData.ContactEmail;
+    location.ContactName = locationData.ContactName;
+    location.ContactPhone = locationData.ContactPhone;
+    location.CountryId = locationData.country.CountryId;
+    location.CountryName = locationData.country.CountryName;
+
+    location.DeactivateDate = locationData.DeactivateDate instanceof Date
+        ? String.Format('/Date({0})/',locationData.DeactivateDate.getTime())
+        : this.defaults.DeactivateDate;
+    location.InAccountCode = locationData.InAccountCode;
+    location.Name = locationData.Name;
+    location.Notes = locationData.Notes;
+    location.OutAccountCode = locationData.OutAccountCode;
+
+    const postalCode = await this.httpService.getPostalDataByPostalCode(locationData.PostalCode, location.CountryId.toString(), this.keyId);
+    if (postalCode.length > 0 && postalCode[0]) {
+      location.PostalCode = locationData.PostalCode;
+      location.PostalID = parseInt(postalCode[0].PostalID);
+    } else {
+      location.PostalCode = locationData.PostalCode;
+      location.PostalID = locationData.PostalID;
+    }
+
+    if (locationData.city instanceof Object) {
+      location.CityId = locationData.city.CityID;
+      location.CityName = locationData.city.CityName;
+    } else {
+      location.CityId = parseInt(postalCode[0].CityID);
+      location.CityName = postalCode[0].CityName;
+    }
+
+    location.ReferenceCode = locationData.ReferenceCode;
+    location.ShortName = locationData.ShortName;
+
+    location.StateCode = postalCode[0].StateCode;
+    location.StateId = parseInt(postalCode[0].StateId);
+    location.StateName = postalCode[0].StateName;
+    location.IsApproveLocation = this.approved === 0 ? 'NoLoc' : 'YesLoc' ;
+
+    const currentTime = new Date();
+    location.CreatedBy = this.user.UserName;
+    location.CreatedDate = String.Format('/Date({0})/', currentTime.getTime());
+    location.ModifiedBy = this.user.UserName;
+    location.ModifiedDate = String.Format('/Date({0})/', currentTime.getTime());
+    location.ClientId = this.user.ClientID;
+
+    // location.LocationGroupID = this.defaults.LocationGroupID;
+    location.LocationTypeID = locationData.LocationType;
+
+    location.Status = this.checked;
+    location.UserID = this.user.UserID;
+    location.UserToken = this.user.TokenString;
 
     return location;
   }

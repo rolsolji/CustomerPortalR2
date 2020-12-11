@@ -101,8 +101,21 @@ export class HttpService{
         const httpHeaders = new HttpHeaders({
             Ticket : ticket
         });
-        console.log(parameters);
+
         return this.http.post<Location[]>(this.baseEndpoint + 'Services/MasLocationService.svc/json/UpdateMasLocation', parameters
+            ,{
+                headers: httpHeaders
+            }
+        ).toPromise();
+    }
+
+    InsertMasLocation(parameters: Location){
+        const ticket = this.token;
+        const httpHeaders = new HttpHeaders({
+            Ticket : ticket
+        });
+
+        return this.http.post<Location[]>(this.baseEndpoint + 'Services/MasLocationService.svc/json/InsertMasLocation', parameters
             ,{
                 headers: httpHeaders
             }

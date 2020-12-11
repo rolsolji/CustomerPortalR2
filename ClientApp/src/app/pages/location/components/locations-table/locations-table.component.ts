@@ -142,15 +142,12 @@ export class LocationsTableComponent implements OnInit, AfterViewInit, OnDestroy
   createLocation() {
     this.dialog.open(LocationCreateUpdateComponent).afterClosed().subscribe((location: Location) => {
       /**
-       * Location is the updated location (if the user pressed Save - otherwise it's null)
+       * Location is the inserted location (if the user pressed Save - otherwise it's null)
        */
       if (location) {
-        /**
-         * Here we are updating our local array.
-         * You would probably make an HTTP request here.
-         */
-        this.locations.unshift(new Location(location));
-        this.subject$.next(this.locations);
+        this.getData().then(locations => {
+          this.subject$.next(locations);
+        });
       }
     });
   }
@@ -162,15 +159,10 @@ export class LocationsTableComponent implements OnInit, AfterViewInit, OnDestroy
       /**
        * Location is the updated location (if the user pressed Save - otherwise it's null)
        */
-      console.log(updatedLocation);
       if (updatedLocation) {
-        /**
-         * Here we are updating our local array.
-         * You would probably make an HTTP request here.
-         */
-        const index = this.locations.findIndex((existingLocation) => existingLocation === updatedLocation);
-        this.locations[index] = new Location(updatedLocation);
-        this.subject$.next(this.locations);
+        this.getData().then(locations => {
+          this.subject$.next(locations);
+        });
       }
     });
   }

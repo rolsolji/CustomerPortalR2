@@ -16,8 +16,8 @@ export class Location {
     CountryId:        number;
     CountryName:      string;
     CreatedBy:        string;
-    CreatedDate:      null;
-    DeactivateDate:   null;
+    CreatedDate:      string;
+    DeactivateDate:   string;
     FaxNumber:        string;
     InAccountCode:    string;
     LocationGroup:    string;
@@ -26,7 +26,7 @@ export class Location {
     LocationType:     string;
     LocationTypeID:   number;
     ModifiedBy:       string;
-    ModifiedDate:     null;
+    ModifiedDate:     string;
     Name:             string;
     Notes:            string;
     OutAccountCode:   string;
@@ -41,8 +41,9 @@ export class Location {
     StateId:          number;
     StateName:        string;
     Status:           boolean;
-    UserID:           null;
-    UserToken:        null;
+    UserID:           number;
+    UserToken:        string;
+    IsApproveLocation: string;
 
     constructor(location: Location | null) {
         if (location) {
@@ -88,6 +89,7 @@ export class Location {
             this.Status = location.Status;
             this.UserID = location.UserID;
             this.UserToken = location.UserToken;
+            this.IsApproveLocation = location.IsApproveLocation;
         }
     }
 }

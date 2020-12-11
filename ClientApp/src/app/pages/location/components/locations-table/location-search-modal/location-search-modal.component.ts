@@ -64,8 +64,6 @@ export class LocationSearchModalComponent implements OnInit {
   }
 
   save() {
-    console.log(this.mode);
-    console.log(this.defaults);
     let location = this.form.value;
     this.initGetLocationsParameter(location);
     this.httpService.getMasLocations(this.getLocationsParameters).then(locations => {

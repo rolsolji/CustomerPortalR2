@@ -38,6 +38,7 @@ import {Location} from "../Entities/Location";
 import { TrackingDetails } from '../Entities/TrackingDetails';
 import {Country} from "../Entities/Country";
 import { Rate } from '../Entities/rate';
+import { HtmlMsgByClient } from '../Entities/HtmlMsgByClient';
 
 @Injectable({
     providedIn: 'root'
@@ -189,8 +190,7 @@ export class HttpService{
           ).toPromise();
     }
 
-    getUserMessage(keyId:string){
-        // return this.http.get(String.Format(this.baseEndpoint + 'Services/MASCityStatePostalService.svc/json/GetCountryList?_={0}',keyId)).toPromise();
+    getUserMessage(keyId:string){        
         return 'It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout.';
     }
 
@@ -562,4 +562,6 @@ export class HttpService{
         }
         ).toPromise();
     }
+
+    
 }

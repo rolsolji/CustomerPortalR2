@@ -64,6 +64,7 @@ import {ConfirmAlertDialogComponent} from '../../../../../app/shared/confirm-ale
 import data from '@iconify/icons-ic/twotone-group';
 import { SendEmailParameters, InvoiceParameter } from '../../../../Entities/SendEmailParameters'; 
 import { SaveQuoteResponse } from '../../../../Entities/SaveQuoteResponse';
+import { HtmlMsgByClient } from 'src/app/Entities/HtmlMsgByClient';
 
 export interface CountryState {
   name: string;
@@ -219,6 +220,7 @@ export class FormQuickQuoteComponent implements OnInit {
   // }
   isShow: boolean;
   topPosToStartShowing = 100;
+  htmlContentByClient: string;
 
   rightPanelImage: any = 'assets/img/demo/R2TestImage.png';
   noRatesFoundText = null;
@@ -286,7 +288,12 @@ export class FormQuickQuoteComponent implements OnInit {
     });
     // --
 
-
+    let htmlMsgByClientObj: HtmlMsgByClient[];
+    htmlMsgByClientObj = this.authenticationService.getClientHtmlMessages();
+    if (htmlMsgByClientObj && htmlMsgByClientObj.length > 0){
+      this.htmlContentByClient = htmlMsgByClientObj[0].HtmlMsg2;
+    }
+    
     const responseData = await this.httpService.getCountryList(this.keyId);
     this.clientDefaultData = await this.httpService.getClientDefaultsByClient(this.ClientID, this.keyId);
 
@@ -321,6 +328,9 @@ export class FormQuickQuoteComponent implements OnInit {
 
   }
 
+  
+
+  
   pcoAutoCompleteFilter(val: string): Observable<any[]> {
     const CountryId = this.originSelectedCountry == null ? '1': this.originSelectedCountry.CountryId.toString();
     return this.httpService.postalCodeAutocomplete(val, CountryId, this.keyId)

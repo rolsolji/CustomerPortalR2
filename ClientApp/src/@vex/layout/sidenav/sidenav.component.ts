@@ -89,13 +89,17 @@ export class SidenavComponent implements OnInit {
     return this.clientsForUser$.asObservable();
   }
 
-  onChange(event) {
+  async onChange(event) {
     const clientName = event.source.value;
     this.clientsForm.get('client').setValue(clientName);
     const _defaultClient = this.authenticationService.clientsForUser$.value.find(
       (client: Client) => client.ClientName === clientName);
     localStorage.setItem('defaultClient', JSON.stringify(_defaultClient));
     this.authenticationService.defaultClient$.next(_defaultClient);
+
+    const clientHtmlMessagesSetup = await this.authenticationService.getClientHtmlMsgByClientID(_defaultClient.ClientID);
+    localStorage.setItem('clientHtmlMessages', JSON.stringify(clientHtmlMessagesSetup));
+    this.authenticationService.clientHtmlMessages$.next(clientHtmlMessagesSetup);
     window.location.reload();
   }
 

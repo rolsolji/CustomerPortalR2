@@ -259,7 +259,7 @@ export class FormAddShipComponent implements OnInit {
 
   Carrier: string;
   carrierData: Carrier[];
-  countryList: Country[];
+  countryList: PostalData[];
 
   addProductFormGroup(): FormGroup{
     return this.fb.group({
@@ -389,7 +389,7 @@ export class FormAddShipComponent implements OnInit {
     // --
 
     const responseData = await this.httpService.getCountryList(this.keyId);
-    this.countryList = (responseData as Country[]);
+    this.countryList = (responseData as PostalData[]);
     this.accessorialArray = await this.httpService.getGetClientMappedAccessorials(this.ClientID, this.keyId);
     this.clientDefaultData = await this.httpService.getClientDefaultsByClient(this.ClientID, this.keyId);
 
@@ -2153,7 +2153,7 @@ export class FormAddShipComponent implements OnInit {
     localShipmentByLadingObject.DestCountryCode = this.destinationSelectedCountry.CountryCode;
 
     if ( this.countryList != null &&  this.countryList.length > 0){
-      const filteredBillCountry = this.countryList.filter(country => country.CountryId === this.clientDefaultData.BillToCountry);
+      const filteredBillCountry = this.countryList.filter(country => country.CountryId === this.clientDefaultData.BillToCountry.toString());
       if (filteredBillCountry != null && filteredBillCountry.length > 0){
         localShipmentByLadingObject.BillToCountryCode = filteredBillCountry[0].CountryCode;
       }

@@ -20,13 +20,13 @@
     <div class="flex flex-col sm:flex-row">
       <mat-form-field class="mt-6 flex-auto">
         <mat-label>Short Name</mat-label>
-        <input cdkFocusInitial formControlName="ShortName" matInput>
+        <input cdkFocusInitial formControlName="ShortName" matInput required>
 
       </mat-form-field>
 
       <mat-form-field class="sm:mt-6 sm:ml-6 flex-auto">
         <mat-label>Location Type</mat-label>
-        <mat-select [(value)]="this.locationTypeSelected">
+        <mat-select [(value)]="this.locationTypeSelected" formControlName="LocationType">
           <mat-option *ngFor="let locationType of this.locationTypes" [value]="locationType.LocationTypeID">
             {{locationType.LocationType}}
           </mat-option>
@@ -38,13 +38,13 @@
     <div class="flex flex-col sm:flex-row">
       <mat-form-field class="flex-auto">
         <mat-label>Location Name</mat-label>
-        <input formControlName="Name" matInput>
+        <input formControlName="Name" matInput required>
 
       </mat-form-field>
 
       <mat-form-field class="sm:ml-6 sm:mr-4" appearance="fill">
         <mat-label>Active Date</mat-label>
-        <input formControlName="ActivateDate" matInput [matDatepicker]="picker">
+        <input formControlName="ActivateDate" matInput [matDatepicker]="picker" required>
         <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
         <mat-datepicker #picker></mat-datepicker>
 
@@ -54,7 +54,7 @@
     <div class="flex flex-col sm:flex-row">
       <mat-form-field class="flex-auto">
         <mat-label>Address 1</mat-label>
-        <input formControlName="Address1" matInput>
+        <input formControlName="Address1" matInput required>
 
       </mat-form-field>
 
@@ -109,7 +109,7 @@
     <div class="flex flex-col sm:flex-row">
       <mat-form-field class="flex-auto">
         <mat-label>Postal</mat-label>
-        <input formControlName="PostalCode" matInput>
+        <input formControlName="PostalCode" matInput required>
 
       </mat-form-field>
 
@@ -124,12 +124,13 @@
       <mat-form-field class="flex-auto">
         <mat-label>State</mat-label>
         <input
-                formControlName="state"
-                type="text"
-                placeholder="State"
-                matInput
-                [matAutocomplete]="stateAutoComplete"
-                required>
+          formControlName="state"
+          type="text"
+          placeholder="State"
+          matInput
+          [matAutocomplete]="stateAutoComplete"
+          required
+        >
         <mat-autocomplete
                 [displayWith]="displayState.bind(this)" #stateAutoComplete="matAutocomplete">
           <mat-option *ngFor="let state of filteredStatesOptions | async"
@@ -151,11 +152,13 @@
       <mat-form-field class="flex-auto">
         <mat-label>City</mat-label>
         <input
-                formControlName="city"
-                type="text"
-                placeholder="Pick one"
-                matInput
-                [matAutocomplete]="cityAutoComplete">
+          formControlName="city"
+          type="text"
+          placeholder="Pick one"
+          matInput
+          [matAutocomplete]="cityAutoComplete"
+          required
+        >
         <mat-autocomplete [displayWith]="displayCity.bind(this)" #cityAutoComplete="matAutocomplete">
           <mat-option *ngFor="let city of filteredCitiesOptions | async"
                       [value]="city">
@@ -182,9 +185,9 @@
       <div class="sm:ml-6 flex-auto">
         <mat-label>Approve</mat-label>
         <br/>
-        <mat-checkbox class="sm:mr-6" color="primary" #c1 [checked]="!c.checked">Yes</mat-checkbox>
-        <mat-checkbox color="primary" #c [checked]="!c1.checked">No</mat-checkbox>
-
+        <div *ngFor="let item of [1,2];  let i = index">
+          <mat-checkbox class="float-left" color="primary" [checked]="approved === i" (change)="approved = i">{{i === 1 ? 'Yes' : 'No'}}</mat-checkbox>
+        </div>
       </div>
     </div>
 
@@ -210,8 +213,8 @@
 
   <mat-dialog-actions align="end">
     <button mat-button mat-dialog-close type="button">CANCEL</button>
-    <button *ngIf="isCreateMode()" color="primary" mat-button type="submit">CREATE LOCATION</button>
-    <button *ngIf="isUpdateMode()" color="primary" mat-button type="submit">UPDATE LOCATION</button>
+    <button *ngIf="isCreateMode()" color="primary" mat-button type="submit" [disabled]="!form.valid">CREATE LOCATION</button>
+    <button *ngIf="isUpdateMode()" color="primary" mat-button type="submit" [disabled]="!form.valid">UPDATE LOCATION</button>
   </mat-dialog-actions>
 </form>
 

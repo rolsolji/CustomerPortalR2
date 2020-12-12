@@ -357,8 +357,8 @@ export class FormQuickQuoteComponent implements OnInit {
 
   addProductFormGroup(): FormGroup{
     return this.fb.group({
-      Pallets: [null, Validators.required],
-      Pieces: [null],
+      Pallets: [0, Validators.required],
+      Pieces: [0],
       PackageTypeID: [3],
       ProductClass: [null, Validators.required],
       NmfcNumber: [null],
@@ -766,8 +766,8 @@ export class FormQuickQuoteComponent implements OnInit {
     arrayProducts.forEach(p => {
       const prod : BOlProductsList = {
         Description: 'NA',
-        Pallets: p.Pallets,
-        Pieces: p.Pieces,
+        Pallets: p.Pallets == null ? 0 : p.Pallets,
+        Pieces: p.Pieces  == null ? 0 : p.Pieces,
         Hazmat: p.HazMat,
         NMFC: p.NmfcNumber,
         Class: p.ProductClass,

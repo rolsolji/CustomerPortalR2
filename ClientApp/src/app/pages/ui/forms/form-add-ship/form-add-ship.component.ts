@@ -263,8 +263,8 @@ export class FormAddShipComponent implements OnInit {
 
   addProductFormGroup(): FormGroup{
     return this.fb.group({
-      Pallets: [null, Validators.required],
-      Pieces: [null],
+      Pallets: [0, Validators.required],
+      Pieces: [0],
       PackageTypeID: [3],
         ProductClass: [null, Validators.required],
         NmfcNumber: [null, Validators.required],
@@ -1697,8 +1697,8 @@ export class FormAddShipComponent implements OnInit {
       const prod : BOlProductsListSQD = {
         BOLProductID: productsCounter,
         Description: p.ProductDescription,
-        Pallets: p.Pallets,
-        Pieces: p.Pieces,
+        Pallets: p.Pallets == null ? 0 : p.Pallets,
+        Pieces: p.Pieces  == null ? 0 : p.Pieces,
         Hazmat: p.HazMat,
         NMFC: p.NmfcNumber,
         Class: p.ProductClass,

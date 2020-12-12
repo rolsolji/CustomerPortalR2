@@ -50,11 +50,15 @@ export class LocationCreateUpdateComponent implements OnInit {
   locationTypeSelected: null;
   originCountries: PostalData[] | Country = [];
   statesAndCities: PostalData[] = [];
+  postalData: PostalData[];
+  postalDataDest: PostalData[];
   filteredCountriesOptions: Observable<PostalData[]>;
   filteredStatesOptions: Observable<PostalData[]>;
   filteredCitiesOptions: Observable<PostalData[]>;
   pcoAutoCompleteOptions: Observable<PostalData[]>;
+  OriginStateName: string;
   OriginPostalCode: string;
+  OriginPostalData: PostalData;
   user: User;
 
   public countries: BehaviorSubject<PostalData[]> = new BehaviorSubject<PostalData[]>(null);
@@ -79,11 +83,6 @@ export class LocationCreateUpdateComponent implements OnInit {
     this.user = this.httpService.getUserFromStorage();
     this.statesAndCities = [];
 
-    if (this.defaults.CountryId) {
-      this.statesAndCities = await this.httpService.getPostalDataByPostalCode('', this.defaults.CountryId.toString(), this.keyId);
-    } else {
-      this.statesAndCities = await this.httpService.getPostalDataByPostalCode('', '1', this.keyId);
-    }
     const activateDate = this.defaults.ActivateDate ?
         new FormControl(new Date(this.datepipe.transform(this.defaults.ActivateDate?.toString().replace(/(^.*\()|([+-].*$)/g, '')))) : null;
     const deactivateDate = this.defaults.DeactivateDate ?
@@ -197,6 +196,7 @@ export class LocationCreateUpdateComponent implements OnInit {
   }
 
   pcoAutoCompleteSelected(event: MatAutocompleteSelectedEvent): void {
+    this.OriginPostalData = event.option.value;
     this.form.get('PostalCode').setValue(event.option.value.StateName.trim());
     this.OriginPostalCode = String.Format('{0}-{1}',event.option.value.PostalCode,event.option.value.CityName.trim());
     this.form.get('PostalCode').setValue(this.OriginPostalCode);
@@ -429,7 +429,7 @@ export class LocationCreateUpdateComponent implements OnInit {
     location.Notes = locationData.Notes;
     location.OutAccountCode = locationData.OutAccountCode;
 
-    const postalCode = await this.httpService.getPostalDataByPostalCode(locationData.PostalCode, location.CountryId.toString(), this.keyId);
+    const postalCode = await this.httpService.getPostalDataByPostalCode(this.OriginPostalData.PostalCode, location.CountryId.toString(), this.keyId);
     if (postalCode.length > 0 && postalCode[0]) {
       location.PostalCode = locationData.PostalCode;
       location.PostalID = parseInt(postalCode[0].PostalID);
@@ -473,5 +473,25 @@ export class LocationCreateUpdateComponent implements OnInit {
     location.UserToken = this.user.TokenString;
 
     return location;
+  }
+
+  async validateOriginPostalCode(event: KeyboardEvent) {
+    const CountryId = this.defaults.CountryId ?? '1';
+    this.OriginPostalCode = this.form.get('PostalCode').value;
+    if (this.OriginPostalCode != null && this.OriginPostalCode.trim().length == 5){
+      const responseData = await this.httpService.getPostalDataByPostalCode(this.OriginPostalCode,CountryId,this.keyId);
+      this.statesAndCities = responseData;
+      if (this.statesAndCities != null && this.statesAndCities.length > 0){
+        this.form.get('PostalCode').setValue(this.postalData[0].StateName.trim());
+        this.OriginPostalCode = String.Format('{0}-{1}',this.postalData[0].PostalCode,this.postalData[0].CityName.trim());
+        this.OriginPostalData = this.postalData[0];
+        this.form.get('PostalCode').setValue(this.OriginPostalCode);
+      }
+      else{
+        this.OriginStateName = String.Empty;
+        this.OriginPostalCode = String.Empty;
+        this.OriginPostalData = null;
+      }
+    }
   }
 }

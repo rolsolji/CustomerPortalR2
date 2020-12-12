@@ -37,17 +37,17 @@
 
     <div class="flex flex-col sm:flex-row">
       <mat-form-field class="flex-auto">
-        <mat-label>Location Name</mat-label>
-        <input formControlName="Name" matInput required>
-
-      </mat-form-field>
-
-      <mat-form-field class="sm:ml-6 sm:mr-4" appearance="fill">
         <mat-label>Active Date</mat-label>
         <input formControlName="ActivateDate" matInput [matDatepicker]="picker" required>
         <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
         <mat-datepicker #picker></mat-datepicker>
+      </mat-form-field>
 
+      <mat-form-field class="sm:ml-6 sm:mr-4" appearance="fill">
+        <mat-label>Deactivation Date</mat-label>
+        <input formControlName="DeactivateDate" matInput [matDatepicker]="picker2">
+        <mat-datepicker-toggle matSuffix [for]="picker2"></mat-datepicker-toggle>
+        <mat-datepicker #picker2></mat-datepicker>
       </mat-form-field>
     </div>
 
@@ -58,24 +58,22 @@
 
       </mat-form-field>
 
-      <div class="sm:ml-6 flex-auto">
-        <mat-checkbox color="primary" [checked]="this.checked"></mat-checkbox>
-        <mat-label class="pl-2">Is Active</mat-label>
-      </div>
-    </div>
-
-    <div class="flex flex-col sm:flex-row">
-      <mat-form-field class="flex-auto">
+      <mat-form-field class="sm:ml-6 flex-auto">
         <mat-label>Address 2</mat-label>
         <input formControlName="Address2" matInput>
 
       </mat-form-field>
+    </div>
 
-      <mat-form-field class="sm:ml-6" appearance="fill">
-        <mat-label>Deactivation Date</mat-label>
-        <input formControlName="DeactivateDate" matInput [matDatepicker]="picker2">
-        <mat-datepicker-toggle matSuffix [for]="picker2"></mat-datepicker-toggle>
-        <mat-datepicker #picker2></mat-datepicker>
+    <div class="flex flex-col sm:flex-row">
+      <mat-form-field class="flex-auto">
+        <mat-label>Location Name</mat-label>
+        <input formControlName="Name" matInput required>
+      </mat-form-field>
+
+      <mat-form-field class="sm:ml-6 flex-auto">
+        <mat-label>Created By</mat-label>
+        <input formControlName="CreatedBy" matInput>
 
       </mat-form-field>
     </div>
@@ -108,8 +106,15 @@
 
     <div class="flex flex-col sm:flex-row">
       <mat-form-field class="flex-auto">
-        <mat-label>Postal</mat-label>
-        <input formControlName="PostalCode" matInput required>
+        <mat-label>Postal Code</mat-label>
+        <input name="PostalCode" formControlName="PostalCode"
+               matInput required
+               [matAutocomplete]="pcoAutoComplete">
+        <mat-autocomplete #pcoAutoComplete="matAutocomplete" (optionSelected)="pcoAutoCompleteSelected($event)">
+          <mat-option *ngFor="let option of pcoAutoCompleteOptions | async" [value]="option">
+            {{option.PostalCode}} - {{option.CityName}}
+          </mat-option>
+        </mat-autocomplete>
 
       </mat-form-field>
 
@@ -169,26 +174,10 @@
       </mat-form-field>
 
       <mat-form-field class="sm:ml-6 flex-auto">
-        <mat-label>Created By</mat-label>
-        <input formControlName="CreatedBy" matInput>
-
-      </mat-form-field>
-    </div>
-
-    <div class="flex flex-col sm:flex-row">
-      <mat-form-field class="flex-auto">
         <mat-label>Contact Name</mat-label>
         <input formControlName="ContactName" matInput>
 
       </mat-form-field>
-
-      <div class="sm:ml-6 flex-auto">
-        <mat-label>Approve</mat-label>
-        <br/>
-        <div *ngFor="let item of [1,2];  let i = index">
-          <mat-checkbox class="float-left" color="primary" [checked]="approved === i" (change)="approved = i">{{i === 1 ? 'Yes' : 'No'}}</mat-checkbox>
-        </div>
-      </div>
     </div>
 
     <div class="flex flex-col sm:flex-row">
@@ -203,6 +192,20 @@
         <input type="email" formControlName="ContactEmail" matInput>
 
       </mat-form-field>
+    </div>
+
+    <div class="flex flex-col sm:flex-row sm:pb-5">
+      <div class="sm:ml-6 flex-auto">
+        <mat-checkbox color="primary" [checked]="this.checked"></mat-checkbox>
+        <mat-label class="pl-2">Is Active</mat-label>
+      </div>
+
+      <div class="sm:ml-6 sm:mr-6 flex-auto">
+        <mat-label class="float-left sm:mr-6">Approve</mat-label>
+          <div *ngFor="let item of [1,2];  let i = index">
+            <mat-checkbox class="{{i === 0 ? 'float-left' : 'float-right'}}" color="primary" [checked]="approved === i" (change)="approved = i">{{i === 1 ? 'Yes' : 'No'}}</mat-checkbox>
+        </div>
+      </div>
     </div>
 
     <mat-form-field class="flex-auto">

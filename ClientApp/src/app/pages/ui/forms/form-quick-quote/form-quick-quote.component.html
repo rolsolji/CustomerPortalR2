@@ -563,8 +563,11 @@
                 
           </div>
           
-          <ng-template [ngIf]="!getQuoteButtonClicked">              
-              <img [src]="rightPanelImage" >
+          <ng-template [ngIf]="!getQuoteButtonClicked"> 
+              <div [innerHtml]=htmlContentByClient>
+                
+              </div>             
+              <!-- <img [src]="rightPanelImage" > -->
           </ng-template>
          
         </div>

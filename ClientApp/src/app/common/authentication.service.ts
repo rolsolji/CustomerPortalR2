@@ -6,6 +6,7 @@ import {environment} from '../../environments/environment';
 import {Router} from '@angular/router';
 import {Client} from '../Entities/client.model';
 import {MasUser} from '../Entities/mas-user.model';
+import { HtmlMsgByClient } from '../Entities/HtmlMsgByClient';
 
 @Injectable({
   providedIn: 'root'
@@ -30,12 +31,14 @@ export class AuthenticationService {
   public defaultClient$: BehaviorSubject<Client> = new BehaviorSubject<Client>(null);
   public loading$: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
   public requestFailed$: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
+  public clientHtmlMessages$: BehaviorSubject<HtmlMsgByClient[]> = new BehaviorSubject<HtmlMsgByClient[]>(null);
 
   public init(): boolean {
     const ticket = this.getTicketFromStorage();
     const user = this.getUserFromStorage();
     const clients = this.getClientsForUserFromStorage();
     const defaultClient = this.getDefaultClientFromStorage();
+    const clientHtmlMessages = this.getClientHtmlMessagesFromStorage();
 
     if (ticket && user) {
       this.ticket$.next(ticket);
@@ -43,6 +46,7 @@ export class AuthenticationService {
       this.authState$.next(true);
       this.clientsForUser$.next(clients);
       this.defaultClient$.next(defaultClient);
+      this.clientHtmlMessages$.next(clientHtmlMessages);
 
       return true;
     }
@@ -84,6 +88,11 @@ export class AuthenticationService {
                 (client: Client) => client.ClientID === user.ClientID);
               localStorage.setItem('defaultClient', JSON.stringify(defaultClient));
               this.defaultClient$.next(defaultClient);
+              
+              const clientHtmlMessagesSetup = await this.getClientHtmlMsgByClientID(defaultClient.ClientID);
+              localStorage.setItem('clientHtmlMessages', JSON.stringify(clientHtmlMessagesSetup));
+              this.clientHtmlMessages$.next(clientHtmlMessagesSetup);
+
             }
 
             resolve({ticket, status: true, user});
@@ -166,6 +175,14 @@ export class AuthenticationService {
     return JSON.parse(localStorage.getItem('masUser'));
   }
 
+  public getClientHtmlMessages(): HtmlMsgByClient[] {
+    return this.clientHtmlMessages$.value;
+  }
+
+  public getClientHtmlMessagesFromStorage(): HtmlMsgByClient[] {
+    return JSON.parse(localStorage.getItem('clientHtmlMessages'));
+  }
+
   public async getMasUser(userId): Promise<MasUser> {
     const ticket = this.ticket$.value;
 
@@ -179,4 +196,16 @@ export class AuthenticationService {
       }
     ).toPromise();
   }
+
+  public async getClientHtmlMsgByClientID(clientID:number){
+    const ticket = this.ticket$.value;
+    const httpHeaders = new HttpHeaders({
+        Ticket : ticket
+    });
+    return this.http.get<HtmlMsgByClient[]>(`${this.baseEndpoint}Services/MasClientHtmlMessageService.svc/json/GetClientHtmlMsgByClientID?ClientID=${clientID}`
+    ,{
+        headers: httpHeaders
+      }
+      ).toPromise();
+}    
 }

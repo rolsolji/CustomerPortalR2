@@ -24,6 +24,8 @@ import {AuthenticationService} from '../../../app/common/authentication.service'
 import {Client} from '../../../app/Entities/client.model';
 import {BehaviorSubject, Observable} from 'rxjs';
 import {PostalData} from '../../../app/Entities/PostalData';
+import { HtmlMsgByClient } from 'src/app/Entities/HtmlMsgByClient';
+import { environment } from 'src/environments/environment';
 
 
 @Component({
@@ -63,7 +65,8 @@ export class ToolbarComponent implements OnInit {
   searchCtrl = new FormControl();
 
   keyId = '1593399730488';
-  toolBarMessage:string;
+  // htmlMsgByClientObj: HtmlMsgByClient[];
+  toolBarMessage: string;
   toolBarTitle: string;
   defaultClient: Client;
   filteredOptions: Observable<Client[]>;
@@ -72,7 +75,7 @@ export class ToolbarComponent implements OnInit {
   public securityToken: string;
   public clientImage: string;
 
-
+  private baseEndpoint: string;
   constructor(
     private layoutService: LayoutService,
     private configService: ConfigService,
@@ -83,14 +86,20 @@ export class ToolbarComponent implements OnInit {
     private fb: FormBuilder,
   ) {
     this.clientsForUser$ = this.authenticationService.clientsForUser$;
+    this.baseEndpoint = environment.baseEndpoint;
   }
 
   async ngOnInit() {
-    this.toolBarMessage = this.httpService.getUserMessage(this.keyId);
+    let htmlMsgByClientObj: HtmlMsgByClient[];
+    // htmlMsgByClientObj = await this.httpService.GetClientHtmlMsgByClientID(this.authenticationService.defaultClient$.value.ClientID);
+    htmlMsgByClientObj = this.authenticationService.getClientHtmlMessages();
+    if (htmlMsgByClientObj && htmlMsgByClientObj.length > 0){
+      this.toolBarMessage = htmlMsgByClientObj[0].HtmlMsg1;
+    }
     this.toolBarTitle = this.authenticationService.getDefaultClient().ClientName;
     this.defaultClient = this.authenticationService.getDefaultClient();
     this.securityToken = this.authenticationService.ticket$.value;
-    this.clientImage = `https://beta-customer.r2logistics.com/Handlers/ClientLogoHandler.ashx?ClientID=${this.defaultClient.ClientID}&id=e(${Math.random().toString().slice(2,11)})/&Ticket=${this.securityToken}`;
+    this.clientImage = this.baseEndpoint + `Handlers/ClientLogoHandler.ashx?ClientID=${this.defaultClient.ClientID}&id=e(${Math.random().toString().slice(2,11)})/&Ticket=${this.securityToken}`;
 
     this.clientsForm = this.fb.group({
       client: [this.authenticationService.defaultClient$.value.ClientName, null],});

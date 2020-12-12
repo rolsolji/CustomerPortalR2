@@ -17,6 +17,7 @@ import {debounceTime, distinctUntilChanged, startWith, switchMap} from "rxjs/ope
 import {PostalData} from "../../../../../Entities/PostalData";
 import {String} from "typescript-string-operations";
 import {User} from "../../../../../Entities/user.model";
+import {MatAutocompleteSelectedEvent} from "@angular/material/autocomplete";
 
 @Component({
   selector: 'vex-location-create-update',
@@ -44,7 +45,6 @@ export class LocationCreateUpdateComponent implements OnInit {
 
   checked: boolean = true;
   approved: number = 1;
-  locationTypeValue: number = 4;
 
   locationTypes: {} = [];
   locationTypeSelected: null;
@@ -53,7 +53,8 @@ export class LocationCreateUpdateComponent implements OnInit {
   filteredCountriesOptions: Observable<PostalData[]>;
   filteredStatesOptions: Observable<PostalData[]>;
   filteredCitiesOptions: Observable<PostalData[]>;
-
+  pcoAutoCompleteOptions: Observable<PostalData[]>;
+  OriginPostalCode: string;
   user: User;
 
   public countries: BehaviorSubject<PostalData[]> = new BehaviorSubject<PostalData[]>(null);
@@ -116,6 +117,16 @@ export class LocationCreateUpdateComponent implements OnInit {
       this.approved = this.defaults.IsApproveLocation === 'YesLoc' ? 1 : 0;
     }
 
+    this.pcoAutoCompleteOptions = this.form.get('PostalCode').valueChanges
+        .pipe(
+            startWith(''),
+            debounceTime(400),
+            distinctUntilChanged(),
+            switchMap(val => {
+              return this.pcoAutoCompleteFilter(val || '')
+            })
+        );
+
     this.filteredCountriesOptions = this.form.get('country').valueChanges.pipe(
         startWith(''),
         debounceTime(400),
@@ -141,7 +152,7 @@ export class LocationCreateUpdateComponent implements OnInit {
         }));
 
     this.form.get('PostalCode').valueChanges.subscribe(value => {
-      this._changeStateAndCity(value)
+      return this._changeStateAndCity(value)
     });
   }
 
@@ -185,15 +196,31 @@ export class LocationCreateUpdateComponent implements OnInit {
     this.statesAndCities = await this.httpService.getPostalDataByPostalCode('', countryId.toString(), this.keyId);
   }
 
+  pcoAutoCompleteSelected(event: MatAutocompleteSelectedEvent): void {
+    this.form.get('PostalCode').setValue(event.option.value.StateName.trim());
+    this.OriginPostalCode = String.Format('{0}-{1}',event.option.value.PostalCode,event.option.value.CityName.trim());
+    this.form.get('PostalCode').setValue(this.OriginPostalCode);
+  }
+
+  pcoAutoCompleteFilter(val: string): Observable<any[]> {
+    const CountryId = this.defaults.CountryId ?? '1';
+    return this.httpService.postalCodeAutocomplete(val, CountryId, this.keyId)
+  }
+
   private _changeStateAndCity(value) {
     if (value) {
-      const filterValue = value;
-      if (filterValue.length >= 4 && (typeof value === 'string')) {
-        const stateAndCity = this.statesAndCities.filter(
-            (option: PostalData) => option.PostalCode.toLowerCase().indexOf(filterValue) === 0);
-        if (stateAndCity && stateAndCity[0]) {
-          this.form.get('state').setValue(stateAndCity[0]);
-          this.form.get('city').setValue(stateAndCity[0]);
+      if (value instanceof Object) {
+        this.form.get('state').setValue(value);
+        this.form.get('city').setValue(value);
+      } else {
+        const filterValue = value;
+        if (filterValue.length >= 4 && (typeof value === 'string')) {
+          const stateAndCity = this.statesAndCities.filter(
+              (option: PostalData) => option.PostalCode.toLowerCase().indexOf(filterValue) === 0);
+          if (stateAndCity && stateAndCity[0]) {
+            this.form.get('state').setValue(stateAndCity[0]);
+            this.form.get('city').setValue(stateAndCity[0]);
+          }
         }
       }
     }
@@ -434,7 +461,11 @@ export class LocationCreateUpdateComponent implements OnInit {
     location.ModifiedDate = String.Format('/Date({0})/', currentTime.getTime());
     location.ClientId = this.user.ClientID;
 
-    // location.LocationGroupID = this.defaults.LocationGroupID;
+    const groupLocations = await this.httpService.GetLocationGroupByClient(this.user.ClientID);
+    const group = groupLocations.find(groupLocation => groupLocation.GroupCode === 'STD');
+
+    location.LocationGroupID = group.LocationGroupID;
+    location.LocationGroup = group.Description;
     location.LocationTypeID = locationData.LocationType;
 
     location.Status = this.checked;

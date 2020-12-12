@@ -22,9 +22,7 @@ import { PaymentTerm } from '../Entities/PaymentTerm';
 import { ShipmentError } from '../Entities/ShipmentError';
 import { ShipmentCost } from '../Entities/ShipmentCost';
 import { Carrier } from '../Entities/Carrier';
-import { ShipmentResponse } from '../Entities/ShipmentResponse';
 import { ShipmentByLading } from '../Entities/ShipmentByLading';
-import {User} from '../Entities/user.model';
 import {environment} from '../../environments/environment';
 import {AuthenticationService} from './authentication.service';
 import { ReferenceByClient } from '../Entities/ReferenceByClient';
@@ -38,6 +36,7 @@ import {Location} from "../Entities/Location";
 import { TrackingDetails } from '../Entities/TrackingDetails';
 import {Country} from "../Entities/Country";
 import { Rate } from '../Entities/rate';
+import {LocationGroup} from "../Entities/LocationGroup";
 
 @Injectable({
     providedIn: 'root'
@@ -128,6 +127,19 @@ export class HttpService{
         });
         return this.http.get(
             this.baseEndpoint + 'Services/MasLocationService.svc/json/GetMasLocationType'
+            ,{
+                headers: httpHeaders
+            }
+        ).toPromise();
+    }
+
+    GetLocationGroupByClient(clientId): Promise<LocationGroup[]> {
+        const ticket = this.token;
+        const httpHeaders = new HttpHeaders({
+            Ticket : ticket
+        });
+        return this.http.get<LocationGroup[]>(
+            `${this.baseEndpoint}Services/MasLocationService.svc/json/GetLocationGroupByClient?ClientID=${clientId}`
             ,{
                 headers: httpHeaders
             }

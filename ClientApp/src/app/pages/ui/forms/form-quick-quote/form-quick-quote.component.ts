@@ -65,6 +65,7 @@ import data from '@iconify/icons-ic/twotone-group';
 import { SendEmailParameters, InvoiceParameter } from '../../../../Entities/SendEmailParameters'; 
 import { SaveQuoteResponse } from '../../../../Entities/SaveQuoteResponse';
 import { HtmlMsgByClient } from 'src/app/Entities/HtmlMsgByClient';
+import { PCFClientDefaults } from '../../../../Entities/PCFClientDefaults';
 
 export interface CountryState {
   name: string;
@@ -122,6 +123,7 @@ export class FormQuickQuoteComponent implements OnInit {
   keyId = '1593399730488';
   ClientID = this.authenticationService.getDefaultClient().ClientID;
   clientDefaultData: ClientDefaultData;
+  clientPCFDefaultData: PCFClientDefaults;
   clientTLWeightLimit: string;
   carrierImageUrl = environment.baseEndpoint +'Handlers/CarrierLogoHandler.ashx?carrierID=';
   UserIDLoggedIn = this.authenticationService.authenticatedUser$.value.UserID;  
@@ -391,6 +393,30 @@ export class FormQuickQuoteComponent implements OnInit {
 
   async getQuote() {
     this.getQuoteButtonClicked = true;
+    
+    // this.showSpinner = true;
+    // this.clientPCFDefaultData = await this.httpService.GetPCFClientDefaultsByClient(this.ClientID.toString());
+    // if (this.clientPCFDefaultData.ShowTLPCFMessage){
+    //   let isMinPCFForQuickQuote = false;
+    //   let tLMinimumPCFLimit = this.clientPCFDefaultData.TLMinimumPCFLimit;
+    //   const arrayProducts = this.formProducts;    
+    //   const filteredArrayPCFs: number[] = [];
+    //   for (let control of arrayProducts.controls) {
+    //     const product = control.value;
+    //     if (product.Status !== 3 && product.PCF != null){         
+    //       filteredArrayPCFs.push(product.PCF);
+    //     }
+    //  }
+
+    //  if (filteredArrayPCFs != null && filteredArrayPCFs.length > 0){
+    //    const foundedLowerPCFList = filteredArrayPCFs.filter(pcf => pcf < tLMinimumPCFLimit);
+    //    if (foundedLowerPCFList != null && foundedLowerPCFList.length > 0){
+    //       this.openDialog(true, 'PCF is below ' + tLMinimumPCFLimit + ', there may be extra charges if you proceed booking this shipment.');
+    //    }
+    //  }
+    // }
+    // this.showSpinner = false;
+
     this.showSpinner = true;
     const test = await this.getShipmentRates();
     this.showSpinner = false;

@@ -38,6 +38,7 @@ import {Country} from "../Entities/Country";
 import { Rate } from '../Entities/rate';
 import {LocationGroup} from "../Entities/LocationGroup";
 import { HtmlMsgByClient } from '../Entities/HtmlMsgByClient';
+import { PCFClientDefaults } from '../Entities/PCFClientDefaults';
 
 @Injectable({
     providedIn: 'root'
@@ -586,6 +587,18 @@ export class HttpService{
             headers: httpHeaders
         }
         ).toPromise();
+    }
+
+    GetPCFClientDefaultsByClient(ClientID:string){
+        const ticket = this.token;
+        const httpHeaders = new HttpHeaders({
+            Ticket : ticket
+        });
+        return this.http.get<PCFClientDefaults>(String.Format(this.baseEndpoint + 'Services/MasClientDefaultsService.svc/json/GetPCFClientDefaultsByClient?ClientID=',ClientID)
+        ,{
+            headers: httpHeaders
+          }
+          ).toPromise();
     }
 
 

@@ -88,7 +88,7 @@ export class AuthenticationService {
                 (client: Client) => client.ClientID === user.ClientID);
               localStorage.setItem('defaultClient', JSON.stringify(defaultClient));
               this.defaultClient$.next(defaultClient);
-              
+
               const clientHtmlMessagesSetup = await this.getClientHtmlMsgByClientID(defaultClient.ClientID);
               localStorage.setItem('clientHtmlMessages', JSON.stringify(clientHtmlMessagesSetup));
               this.clientHtmlMessages$.next(clientHtmlMessagesSetup);
@@ -207,5 +207,5 @@ export class AuthenticationService {
         headers: httpHeaders
       }
       ).toPromise();
-}    
+  }
 }

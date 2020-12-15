@@ -38,6 +38,7 @@ import {Country} from "../Entities/Country";
 import { Rate } from '../Entities/rate';
 import {LocationGroup} from "../Entities/LocationGroup";
 import { HtmlMsgByClient } from '../Entities/HtmlMsgByClient';
+import {Client} from '../Entities/client.model';
 
 @Injectable({
     providedIn: 'root'
@@ -230,6 +231,18 @@ export class HttpService{
           }
           ).toPromise();
     }
+
+  getClientsByClientName(userID:number, clientName:string){
+    const ticket = this.token;
+    const httpHeaders = new HttpHeaders({
+      Ticket : ticket
+    });
+    return this.http.get<Client[]>(this.baseEndpoint + `Services/MASClientService.svc/json/GetClientForUser?userID=${userID}&ClientName=${clientName}`
+      ,{
+        headers: httpHeaders
+      }
+    ).toPromise();
+  }
 
     searchBOLHDRForJason(parameters:GetQuotesParameters){
         const ticket = this.token;

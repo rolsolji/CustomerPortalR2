@@ -358,10 +358,10 @@
             
             <button [disabled]=showSpinner (click)="clearQuoteAndFields()" mat-button type="button">Clear</button>
                 <button [disabled]=showSpinner (click)="getQuote()" color="warn" mat-raised-button type="button" [disabled]="!myForm.valid" >Get Quote</button>
-                <mat-form-field fxFlex=15>
+                <mat-form-field appearance="outline" class="vex-flex-form-field" color="primary" fxFlex=18>
                   <mat-label>Show top Carriers</mat-label>
                   <input matInput type="number" maxlength="2" min="1" max="25" formControlName="showCarriers" required>
-                </mat-form-field>  
+                </mat-form-field>                 
                 <div *ngIf="showSpinner" class="spinnerSection">
                   <div class="center-me">
                     <mat-progress-spinner diameter="20" color="warn" mode="indeterminate"></mat-progress-spinner>

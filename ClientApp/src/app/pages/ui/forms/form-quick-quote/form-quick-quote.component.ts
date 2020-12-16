@@ -393,40 +393,36 @@ export class FormQuickQuoteComponent implements OnInit {
 
   async getQuote() {
     this.getQuoteButtonClicked = true;
-    
-    // this.showSpinner = true;
-    // this.clientPCFDefaultData = await this.httpService.GetPCFClientDefaultsByClient(this.ClientID.toString());
-    // if (this.clientPCFDefaultData.ShowTLPCFMessage){
-    //   let isMinPCFForQuickQuote = false;
-    //   let tLMinimumPCFLimit = this.clientPCFDefaultData.TLMinimumPCFLimit;
-    //   const arrayProducts = this.formProducts;    
-    //   const filteredArrayPCFs: number[] = [];
-    //   for (let control of arrayProducts.controls) {
-    //     const product = control.value;
-    //     if (product.Status !== 3 && product.PCF != null){         
-    //       filteredArrayPCFs.push(product.PCF);
-    //     }
-    //  }
+       
+    let isMinPCFForQuickQuote = false;
+    let tLMinimumPCFLimit = 0;
+    this.clientPCFDefaultData = await this.httpService.GetPCFClientDefaultsByClient(this.ClientID.toString());    
+    if (this.clientPCFDefaultData != null && this.clientPCFDefaultData.ShowTLPCFMessage){     
+      tLMinimumPCFLimit = this.clientPCFDefaultData.TLMinimumPCFLimit;
+      const arrayProducts = this.formProducts;    
+      const filteredArrayPCFs: number[] = [];
+      for (let control of arrayProducts.controls) {
+        const product = control.value;
+        if (product.Status !== 3 && product.PCF != null){         
+          filteredArrayPCFs.push(product.PCF);
+        }
+     }
 
-    //  if (filteredArrayPCFs != null && filteredArrayPCFs.length > 0){
-    //    const foundedLowerPCFList = filteredArrayPCFs.filter(pcf => pcf < tLMinimumPCFLimit);
-    //    if (foundedLowerPCFList != null && foundedLowerPCFList.length > 0){
-    //       this.openDialog(true, 'PCF is below ' + tLMinimumPCFLimit + ', there may be extra charges if you proceed booking this shipment.');
-    //    }
-    //  }
-    // }
-    // this.showSpinner = false;
+     if (filteredArrayPCFs != null && filteredArrayPCFs.length > 0){
+       const foundedLowerPCFList = filteredArrayPCFs.filter(pcf => pcf < tLMinimumPCFLimit);
+       if (foundedLowerPCFList != null && foundedLowerPCFList.length > 0){
+          isMinPCFForQuickQuote = true;          
+       }
+     }
+    }    
 
-    this.showSpinner = true;
-    const test = await this.getShipmentRates();
-    this.showSpinner = false;
-
-    console.log('print at the end.');
-    // window.scroll({
-    //   top: 0,
-    //   left: 0,
-    //   behavior: 'smooth'
-    // });
+    if (isMinPCFForQuickQuote){
+      this.openDialog(true, 'PCF is below ' + tLMinimumPCFLimit + ', there may be extra charges if you proceed booking this shipment.','GetRates');
+    }else{
+      this.showSpinner = true;
+      const test = await this.getShipmentRates();
+      this.showSpinner = false;  
+    }         
   }
 
   clearQuoteAndFields(){
@@ -963,7 +959,7 @@ export class FormQuickQuoteComponent implements OnInit {
           duration: 5000
         });
       }else{
-        this.openDialog(false, 'Quote saved successfully. Quote Number: ' + this.responseData.ClientLadingNo + '. ' + (action === 4 ? 'Email has been sent.' : ''), null, null, true);
+        this.openDialog(false, 'Quote saved successfully. Quote Number: ' + this.responseData.ClientLadingNo + '. ' + (action === 4 ? 'Email has been sent.' : ''), 'QuoteSaved', null, null, true);
       }
     }
     else{
@@ -982,7 +978,7 @@ export class FormQuickQuoteComponent implements OnInit {
       if (this.clientDefaultData.IsCalculateClassByPCF){
         const pcfclass = this.EstimateClassFromPCF(PCF);
         if (product.ProductClass !== pcfclass.toString()) {
-          this.openDialog(true, 'Selected class is ' + product.ProductClass + ' and Estimated class is ' + pcfclass + '. Do you want to change ?', index, pcfclass);          
+          this.openDialog(true, 'Selected class is ' + product.ProductClass + ' and Estimated class is ' + pcfclass + '. Do you want to change ?', 'UpdateProductPCFClass', index, pcfclass);          
         }
       }
 
@@ -1141,7 +1137,7 @@ export class FormQuickQuoteComponent implements OnInit {
     return newClass;
   }
 
-  openDialog(isConfirmDialog, pMessage, productIndex = null, pcfClass = null, clearQuoteAndFields = false){
+  openDialog(isConfirmDialog, pMessage, actionEvent = null, productIndex = null, pcfClass = null, clearQuoteAndFields = false){
     const dialogConfig = new MatDialogConfig();
     dialogConfig.disableClose = true;
     dialogConfig.autoFocus = true;
@@ -1154,16 +1150,30 @@ export class FormQuickQuoteComponent implements OnInit {
 
     const dialogRef = this.dialog.open(ConfirmAlertDialogComponent, dialogConfig);
  
-    dialogRef.afterClosed().subscribe((data: string) => {    
+    dialogRef.afterClosed().subscribe(async (data: string) => {    
       if (data != null && data === 'Accepted') 
       {
-        if (isConfirmDialog && productIndex != null && pcfClass != null){
-          (this.quickQuoteFormGroup.controls.products as FormArray).at(productIndex).get('ProductClass').setValue(pcfClass.toString());
-        }else if (!isConfirmDialog ){
-          if (clearQuoteAndFields){
-            this.clearQuoteAndFields();
-          }
-        }
+        switch (actionEvent) {
+          case 'QuoteSaved':
+            if (!isConfirmDialog ){
+              if (clearQuoteAndFields){
+                this.clearQuoteAndFields();
+              }
+            }
+            break;
+          case 'GetRates':
+            this.showSpinner = true;
+            const test = await this.getShipmentRates();
+            this.showSpinner = false; 
+            break;         
+          case 'UpdateProductPCFClass':
+            if (isConfirmDialog && productIndex != null && pcfClass != null){
+              (this.quickQuoteFormGroup.controls.products as FormArray).at(productIndex).get('ProductClass').setValue(pcfClass.toString());
+            } 
+            break;     
+        } 
+
+        
         
       }
     });

@@ -607,7 +607,7 @@ export class HttpService{
         const httpHeaders = new HttpHeaders({
             Ticket : ticket
         });
-        return this.http.get<PCFClientDefaults>(String.Format(this.baseEndpoint + 'Services/MasClientDefaultsService.svc/json/GetPCFClientDefaultsByClient?ClientID=',ClientID)
+        return this.http.get<PCFClientDefaults>(String.Format(this.baseEndpoint + 'Services/MasClientDefaultsService.svc/json/GetPCFClientDefaultsByClient?ClientID={0}',ClientID)
         ,{
             headers: httpHeaders
           }

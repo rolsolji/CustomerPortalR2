@@ -59,6 +59,7 @@ import { Router, ActivatedRoute } from '@angular/router';
 import {ConfirmAlertDialogComponent} from '../../../../../app/shared/confirm-alert-dialog/confirm-alert-dialog.component';
 import { Country } from 'src/app/Entities/Country';
 import { InvoiceParameter, SendEmailParameters } from 'src/app/Entities/SendEmailParameters';
+import { PCFClientDefaults } from 'src/app/Entities/PCFClientDefaults';
 
 
 @Component({
@@ -150,6 +151,7 @@ export class FormAddShipComponent implements OnInit {
   ratesCounter = 0;
   clientTLWeightLimit: string;
   clientDefaultData: ClientDefaultData;
+  clientPCFDefaultData: PCFClientDefaults;
   accessorialsSelectedQty = 0;
 
   carrierSelected: string;
@@ -823,11 +825,37 @@ export class FormAddShipComponent implements OnInit {
       return;
     }
 
-    this.getQuoteButtonClicked = true;
-    this.showSpinner = true;
-    const test = await this.getShipmentRates();
-    this.confirmFormGroup.get('carrier').setValue('');
-    this.showSpinner = false;
+    let isMinPCFForQuickQuote = false;
+    let tLMinimumPCFLimit = 0;
+    this.clientPCFDefaultData = await this.httpService.GetPCFClientDefaultsByClient(this.ClientID.toString());    
+    if (this.clientPCFDefaultData != null && this.clientPCFDefaultData.ShowTLPCFMessage){     
+      tLMinimumPCFLimit = this.clientPCFDefaultData.TLMinimumPCFLimit;
+      const arrayProducts = this.formProducts;    
+      const filteredArrayPCFs: number[] = [];
+      for (const control of arrayProducts.controls) {
+        const product = control.value;
+        if (product.Status !== 3 && product.PCF != null){         
+          filteredArrayPCFs.push(product.PCF);
+        }
+     }
+
+     if (filteredArrayPCFs != null && filteredArrayPCFs.length > 0){
+       const foundedLowerPCFList = filteredArrayPCFs.filter(pcf => pcf < tLMinimumPCFLimit);
+       if (foundedLowerPCFList != null && foundedLowerPCFList.length > 0){
+          isMinPCFForQuickQuote = true;          
+       }
+     }
+    }    
+
+    if (isMinPCFForQuickQuote){
+      this.openDialog(true, 'PCF is below ' + tLMinimumPCFLimit + ', there may be extra charges if you proceed booking this shipment.',null,'GetRates');
+    }else{
+      this.getQuoteButtonClicked = true;
+      this.showSpinner = true;
+      const test = await this.getShipmentRates();
+      this.confirmFormGroup.get('carrier').setValue('');
+      this.showSpinner = false;
+    }   
   }
 
   async getShipmentRates() {
@@ -1023,7 +1051,7 @@ export class FormAddShipComponent implements OnInit {
     if (PCF != null) {
       if (this.clientDefaultData.IsCalculateClassByPCF){
         const pcfclass = this.EstimateClassFromPCF(PCF);
-        if (product.ProductClass !== pcfclass) {
+        if (product.ProductClass !== pcfclass.toString()) {
           this.openDialog(true, 'Selected class is ' + product.ProductClass + ' and Estimated class is ' + pcfclass + '. Do you want to change ?', false, 'UpdateProductPCFClass', null, index, pcfclass);          
         }
       }
@@ -1325,7 +1353,7 @@ export class FormAddShipComponent implements OnInit {
 
     const dialogRef = this.dialog.open(ConfirmAlertDialogComponent, dialogConfig);
 
-    dialogRef.afterClosed().subscribe((data: string) => {    
+    dialogRef.afterClosed().subscribe(async (data: string) => {    
       if (data != null && data === 'Accepted') {
         switch (actionEvent) {
           case 'UpdateProductPCFClass':
@@ -1342,6 +1370,13 @@ export class FormAddShipComponent implements OnInit {
           case 'QuoteSavedAndRedirectToBoard':           
             this.router.navigate(['../../../shipmentboard/LTLTL/'], { relativeTo: this.route });
             break;
+          case 'GetRates':
+            this.getQuoteButtonClicked = true;
+            this.showSpinner = true;
+            const test = await this.getShipmentRates();
+            this.confirmFormGroup.get('carrier').setValue('');
+            this.showSpinner = false;
+            break;         
         } 
       }else if (data != null && data === 'No') {
         if (actionEvent === 'ReRate'){

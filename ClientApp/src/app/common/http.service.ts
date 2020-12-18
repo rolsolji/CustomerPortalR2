@@ -22,9 +22,7 @@ import { PaymentTerm } from '../Entities/PaymentTerm';
 import { ShipmentError } from '../Entities/ShipmentError';
 import { ShipmentCost } from '../Entities/ShipmentCost';
 import { Carrier } from '../Entities/Carrier';
-import { ShipmentResponse } from '../Entities/ShipmentResponse';
 import { ShipmentByLading } from '../Entities/ShipmentByLading';
-import {User} from '../Entities/user.model';
 import {environment} from '../../environments/environment';
 import {AuthenticationService} from './authentication.service';
 import { ReferenceByClient } from '../Entities/ReferenceByClient';
@@ -39,6 +37,10 @@ import { TrackingDetails } from '../Entities/TrackingDetails';
 import {Country} from "../Entities/Country";
 import { Rate } from '../Entities/rate';
 import { TotalStatusRecords } from '../Entities/TotalStatusRecords'
+import {LocationGroup} from "../Entities/LocationGroup";
+import { HtmlMsgByClient } from '../Entities/HtmlMsgByClient';
+import {Client} from '../Entities/client.model';
+import { PCFClientDefaults } from '../Entities/PCFClientDefaults';
 
 @Injectable({
     providedIn: 'root'
@@ -62,7 +64,7 @@ export class HttpService{
         const httpHeaders = new HttpHeaders({
             Ticket : ticket
         });
-        return this.http.get<Country[] | Country>(
+        return this.http.get<PostalData[] | Country>(
           String.Format(this.baseEndpoint + 'Services/MASCityStatePostalService.svc/json/GetCountryList?_={0}',keyId)
         ,{
             headers: httpHeaders
@@ -89,7 +91,6 @@ export class HttpService{
         const httpHeaders = new HttpHeaders({
             Ticket : ticket
         });
-        console.log(parameters);
         return this.http.post<Location[]>(this.baseEndpoint + 'Services/MasLocationService.svc/json/GetMasLocation', parameters
             ,{
                 headers: httpHeaders
@@ -97,13 +98,26 @@ export class HttpService{
         ).toPromise();
     }
 
-    UpdateMasLocation(parameters: GetLocationsParameters){
+    UpdateMasLocation(parameters: Location){
         const ticket = this.token;
         const httpHeaders = new HttpHeaders({
             Ticket : ticket
         });
-        console.log(parameters);
+
         return this.http.post<Location[]>(this.baseEndpoint + 'Services/MasLocationService.svc/json/UpdateMasLocation', parameters
+            ,{
+                headers: httpHeaders
+            }
+        ).toPromise();
+    }
+
+    InsertMasLocation(parameters: Location){
+        const ticket = this.token;
+        const httpHeaders = new HttpHeaders({
+            Ticket : ticket
+        });
+
+        return this.http.post<Location[]>(this.baseEndpoint + 'Services/MasLocationService.svc/json/InsertMasLocation', parameters
             ,{
                 headers: httpHeaders
             }
@@ -117,6 +131,32 @@ export class HttpService{
         });
         return this.http.get(
             this.baseEndpoint + 'Services/MasLocationService.svc/json/GetMasLocationType'
+            ,{
+                headers: httpHeaders
+            }
+        ).toPromise();
+    }
+
+    GetLocationGroupByClient(clientId): Promise<LocationGroup[]> {
+        const ticket = this.token;
+        const httpHeaders = new HttpHeaders({
+            Ticket : ticket
+        });
+        return this.http.get<LocationGroup[]>(
+            `${this.baseEndpoint}Services/MasLocationService.svc/json/GetLocationGroupByClient?ClientID=${clientId}`
+            ,{
+                headers: httpHeaders
+            }
+        ).toPromise();
+    }
+
+    DeleteMasLocationType(locationId) {
+        const ticket = this.token;
+        const httpHeaders = new HttpHeaders({
+            Ticket : ticket
+        });
+        return this.http.get(
+            this.baseEndpoint + `Services/MasLocationService.svc/json/DeleteMasLocation?LocationID=${locationId}`
             ,{
                 headers: httpHeaders
             }
@@ -179,7 +219,6 @@ export class HttpService{
     }
 
     getUserMessage(keyId:string){
-        // return this.http.get(String.Format(this.baseEndpoint + 'Services/MASCityStatePostalService.svc/json/GetCountryList?_={0}',keyId)).toPromise();
         return 'It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout.';
     }
 
@@ -194,6 +233,18 @@ export class HttpService{
           }
           ).toPromise();
     }
+
+  getClientsByClientName(userID:number, clientName:string){
+    const ticket = this.token;
+    const httpHeaders = new HttpHeaders({
+      Ticket : ticket
+    });
+    return this.http.get<Client[]>(this.baseEndpoint + `Services/MASClientService.svc/json/GetClientForUser?userID=${userID}&ClientName=${clientName}`
+      ,{
+        headers: httpHeaders
+      }
+    ).toPromise();
+  }
 
     searchBOLHDRForJason(parameters:GetQuotesParameters){
         const ticket = this.token;
@@ -220,7 +271,9 @@ export class HttpService{
       ).toPromise();
     }
 
-
+    getUserFromStorage() {
+        return this.authenticationService.getUserFromStorage();
+    }
 
     getMasEquipment(keyId:string){
         const ticket = this.token;
@@ -524,7 +577,7 @@ export class HttpService{
             headers: httpHeaders
         }
         ).toPromise();
-    }   
+    }
 
     ModifiedQuote(parameters:SaveQuoteData){
         const ticket = this.token;
@@ -550,6 +603,18 @@ export class HttpService{
         ).toPromise();
     }
 
+    GetPCFClientDefaultsByClient(ClientID:string){
+        const ticket = this.token;
+        const httpHeaders = new HttpHeaders({
+            Ticket : ticket
+        });
+        return this.http.get<PCFClientDefaults>(String.Format(this.baseEndpoint + 'Services/MasClientDefaultsService.svc/json/GetPCFClientDefaultsByClient?ClientID={0}',ClientID)
+        ,{
+            headers: httpHeaders
+          }
+          ).toPromise();
+    }
+
     GetTotalRowsPerStatus(clientId: number, statusId: number ){
         const ticket = this.token;
         const httpHeaders = new HttpHeaders({
@@ -561,4 +626,5 @@ export class HttpService{
           }
           ).toPromise();
     }
+
 }

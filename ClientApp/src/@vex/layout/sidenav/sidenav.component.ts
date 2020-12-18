@@ -10,6 +10,7 @@ import {AuthenticationService} from '../../../app/common/authentication.service'
 import {Client} from '../../../app/Entities/client.model';
 import {BehaviorSubject, Observable} from 'rxjs';
 import {FormBuilder, FormGroup} from '@angular/forms';
+import {HttpService} from '../../../app/common/http.service';
 
 @Component({
   selector: 'vex-sidenav',
@@ -41,19 +42,11 @@ export class SidenavComponent implements OnInit {
               private configService: ConfigService,
               private authenticationService: AuthenticationService,
               private fb: FormBuilder,
+              private httpService: HttpService
   ) {
   }
 
   async ngOnInit() {
-    let clientsForUserFromStorage = this.authenticationService.getClientsForUserFromStorage();
-    if (clientsForUserFromStorage) {
-      this.clientsForUser$.next(clientsForUserFromStorage);
-    } else {
-      clientsForUserFromStorage = await this.authenticationService.getClientsForUser(
-        this.authenticationService.getUserFromStorage().UserID
-      );
-      this.clientsForUser$.next(clientsForUserFromStorage);
-    }
     this.securityToken = this.authenticationService.ticket$.value;
     this.clientImage = `https://beta-customer.r2logistics.com/Handlers/ClientLogoHandler.ashx?ClientID=${this.authenticationService.getDefaultClient().ClientID}&id=e(${Math.random().toString().slice(2,11)})/&Ticket=${this.securityToken}`;
     this.defaultClient = this.authenticationService.getDefaultClient();
@@ -80,23 +73,36 @@ export class SidenavComponent implements OnInit {
   private _filter(value: string): Observable<Client[]> {
     const filterValue = value.toLowerCase();
     if (filterValue.length >= 3) {
-      this.clientsForUser$.next(this.authenticationService.getClientsForUserFromStorage());
-      this.clientsForUser$.next(this.clientsForUser$.value.filter(
-        (option: Client) => option.ClientName.toLowerCase().indexOf(filterValue) === 0));
+      const user = this.authenticationService.getUserFromStorage();
+      this.httpService.getClientsByClientName(
+        user.UserID, value)
+        .then((clients: Client[]) => {
+          this.clientsForUser$.next(clients)
+        });
       return this.clientsForUser$.asObservable();
     }
     this.clientsForUser$.next([]);
     return this.clientsForUser$.asObservable();
   }
 
-  onChange(event) {
+  async onChange(event) {
     const clientName = event.source.value;
     this.clientsForm.get('client').setValue(clientName);
-    const _defaultClient = this.authenticationService.clientsForUser$.value.find(
-      (client: Client) => client.ClientName === clientName);
-    localStorage.setItem('defaultClient', JSON.stringify(_defaultClient));
-    this.authenticationService.defaultClient$.next(_defaultClient);
-    window.location.reload();
+    const user = this.authenticationService.getUserFromStorage();
+
+    this.httpService.getClientsByClientName(user.UserID, clientName).then(async (clients: Client[]) => {
+        const _defaultClient = clients.find(
+          (client: Client) => client.ClientName === clientName);
+
+        localStorage.setItem('defaultClient', JSON.stringify(_defaultClient));
+        this.authenticationService.defaultClient$.next(_defaultClient);
+
+        const clientHtmlMessagesSetup = await this.authenticationService.getClientHtmlMsgByClientID(_defaultClient.ClientID);
+        localStorage.setItem('clientHtmlMessages', JSON.stringify(clientHtmlMessagesSetup));
+        this.authenticationService.clientHtmlMessages$.next(clientHtmlMessagesSetup);
+
+        window.location.reload();
+      });
   }
 
   onMouseEnter() {

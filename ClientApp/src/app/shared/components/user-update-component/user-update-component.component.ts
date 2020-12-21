@@ -8,11 +8,16 @@ import icDownload from '@iconify/icons-ic/twotone-cloud-download';
 import icDelete from '@iconify/icons-ic/twotone-delete';
 import icPhone from '@iconify/icons-ic/twotone-phone';
 import icPerson from '@iconify/icons-ic/twotone-person';
+import icMyLocation from '@iconify/icons-ic/twotone-my-location';
+import icLocationCity from '@iconify/icons-ic/twotone-location-city';
+import icEditLocation from '@iconify/icons-ic/twotone-edit-location';
 import {MasUser} from '../../../Entities/mas-user.model';
 import {HttpService} from '../../../common/http.service';
 import {PostalData} from '../../../Entities/PostalData';
 import {debounceTime, distinctUntilChanged, map, startWith, switchMap} from 'rxjs/operators';
 import {BehaviorSubject, Observable} from 'rxjs';
+import {Client} from '../../../Entities/client.model';
+import _ from 'lodash';
 
 @Component({
   selector: 'vex-user-update-component',

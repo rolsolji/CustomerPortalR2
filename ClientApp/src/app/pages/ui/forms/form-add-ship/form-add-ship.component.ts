@@ -57,9 +57,6 @@ import { SaveQuoteData,BOlProductsListSQD,BOLAccesorialListSQD,AccountInvoiceCos
 import { StatusReason } from '../../../../Entities/StatusReason';
 import { Router, ActivatedRoute } from '@angular/router';
 import {ConfirmAlertDialogComponent} from '../../../../../app/shared/confirm-alert-dialog/confirm-alert-dialog.component';
-import { Country } from 'src/app/Entities/Country';
-import { InvoiceParameter, SendEmailParameters } from 'src/app/Entities/SendEmailParameters';
-import { PCFClientDefaults } from 'src/app/Entities/PCFClientDefaults';
 
 
 @Component({
@@ -151,7 +148,6 @@ export class FormAddShipComponent implements OnInit {
   ratesCounter = 0;
   clientTLWeightLimit: string;
   clientDefaultData: ClientDefaultData;
-  clientPCFDefaultData: PCFClientDefaults;
   accessorialsSelectedQty = 0;
 
   carrierSelected: string;
@@ -215,7 +211,6 @@ export class FormAddShipComponent implements OnInit {
   equimentDescriptionSelected = '';
   priorityDescriptionSelected = '';
   serviceLevelDescriptionSelected = '';
-  ServiceLevelCodeSelected = '';
   paymentTermDescriptionSelected = '';
   shipmentModeDescriptionSelected = '';
 
@@ -261,12 +256,11 @@ export class FormAddShipComponent implements OnInit {
 
   Carrier: string;
   carrierData: Carrier[];
-  countryList: PostalData[];
 
   addProductFormGroup(): FormGroup{
     return this.fb.group({
-      Pallets: [0, Validators.required],
-      Pieces: [0],
+      Pallets: [null, Validators.required],
+      Pieces: [null],
       PackageTypeID: [3],
         ProductClass: [null, Validators.required],
         NmfcNumber: [null, [Validators.required, Validators.pattern('^([a-zA-Z0-9]{6})-([a-zA-Z0-9]{2})$')]],
@@ -397,7 +391,6 @@ export class FormAddShipComponent implements OnInit {
     // --
 
     const responseData = await this.httpService.getCountryList(this.keyId);
-    this.countryList = (responseData as PostalData[]);
     this.accessorialArray = await this.httpService.getGetClientMappedAccessorials(this.ClientID, this.keyId);
     this.clientDefaultData = await this.httpService.getClientDefaultsByClient(this.ClientID, this.keyId);
 
@@ -493,14 +486,7 @@ export class FormAddShipComponent implements OnInit {
       this.costListFiltered = this.AccountInvoiceCostList;
       
       this.clientTLWeightLimit = (this.clientDefaultData.TLWeightLimit == null ? 0 : this.clientDefaultData.TLWeightLimit) + 'lb';
-
-      // -- Sum all Bill Amounts from SellRates AccountInvoiceCostList
-      const SumBilledAmount = this.AccountInvoiceCostList.filter(item => item.CostStatus !== 3)
-      .reduce((sum, current) => sum + current.BilledCost, 0);
-      // --
-
-      this.TotalShipmentCost = SumBilledAmount + (this.ShipmentByLadingObject.CostWithCustomerPercentage === null ? 0 : this.ShipmentByLadingObject.CostWithCustomerPercentage);      
-      
+      this.TotalShipmentCost = this.ShipmentCostObject.SellRates.TotalBilledAmount;
     }else{
       this.ShowSaveAsQuoteButton = true; // Show SaveAsQuote Button
     }
@@ -731,16 +717,13 @@ export class FormAddShipComponent implements OnInit {
 
   fetchServiceLevel(serviceLevelId) {
     let serviceLevelDescription = '';
-    let ServiceLevelCode = '';
     if (this.ServiceLevelOptions != null && this.ServiceLevelOptions.length > 0){
       const item = this.ServiceLevelOptions.filter(item => item.ServiceLevelID == serviceLevelId);
       if (item != null){
         serviceLevelDescription = item[0].Description;
-        ServiceLevelCode = item[0].ServiceLevelCode;
       }
     }
     this.serviceLevelDescriptionSelected = serviceLevelDescription;
-    this.ServiceLevelCodeSelected = ServiceLevelCode;
     return serviceLevelDescription;
   }
 
@@ -810,8 +793,7 @@ export class FormAddShipComponent implements OnInit {
     selectedAccessorials.forEach(a => {
       const accessorial: AccessorialBase = {
         AccessorialID: a.AccessorialID,
-        AccessorialCode: a.AccesorialCode,
-        Description: a.Description        
+        AccessorialCode: a.AccesorialCode
       }
 
       this.accessorials.push(accessorial);
@@ -837,37 +819,11 @@ export class FormAddShipComponent implements OnInit {
       return;
     }
 
-    let isMinPCFForQuickQuote = false;
-    let tLMinimumPCFLimit = 0;
-    this.clientPCFDefaultData = await this.httpService.GetPCFClientDefaultsByClient(this.ClientID.toString());    
-    if (this.clientPCFDefaultData != null && this.clientPCFDefaultData.ShowTLPCFMessage){     
-      tLMinimumPCFLimit = this.clientPCFDefaultData.TLMinimumPCFLimit;
-      const arrayProducts = this.formProducts;    
-      const filteredArrayPCFs: number[] = [];
-      for (const control of arrayProducts.controls) {
-        const product = control.value;
-        if (product.Status !== 3 && product.PCF != null){         
-          filteredArrayPCFs.push(product.PCF);
-        }
-     }
-
-     if (filteredArrayPCFs != null && filteredArrayPCFs.length > 0){
-       const foundedLowerPCFList = filteredArrayPCFs.filter(pcf => pcf < tLMinimumPCFLimit);
-       if (foundedLowerPCFList != null && foundedLowerPCFList.length > 0){
-          isMinPCFForQuickQuote = true;          
-       }
-     }
-    }    
-
-    if (isMinPCFForQuickQuote){
-      this.openDialog(true, 'PCF is below ' + tLMinimumPCFLimit + ', there may be extra charges if you proceed booking this shipment.',null,'GetRates');
-    }else{
-      this.getQuoteButtonClicked = true;
-      this.showSpinner = true;
-      const test = await this.getShipmentRates();
-      this.confirmFormGroup.get('carrier').setValue('');
-      this.showSpinner = false;
-    }   
+    this.getQuoteButtonClicked = true;
+    this.showSpinner = true;
+    const test = await this.getShipmentRates();
+    this.confirmFormGroup.get('carrier').setValue('');
+    this.showSpinner = false;
   }
 
   async getShipmentRates() {
@@ -905,7 +861,7 @@ export class FormAddShipComponent implements OnInit {
       TopN: this.confirmFormGroup.get('showTopCarriers').value,
       ServiceLevelGrops: [],
       ServiceLevels: [],// this.serviceLevels,
-      ServiceLevelCodes: [this.ServiceLevelCodeSelected],
+      ServiceLevelCodes: [],
       // Ask
       SCAC: this.carrierSelected,
       EquipmentList: [],
@@ -1035,12 +991,7 @@ export class FormAddShipComponent implements OnInit {
         this.costListFiltered.push(accessorialInvoice);                       
       });
 
-      if (selectedRate.ShowTrueCost){
-        this.TotalShipmentCost = selectedRate.TotalCost;
-      }else{
-        this.TotalShipmentCost = selectedRate.TotalCostWithOutTrueCost;
-      }
-      
+      this.TotalShipmentCost = selectedRate.TotalCostWithOutTrueCost;
       this.confirmFormGroup.get('carrier').setValue(selectedRate.CarrierName);      
     }
 
@@ -1048,9 +999,9 @@ export class FormAddShipComponent implements OnInit {
 
   }
 
-  // actions = 1:save / 2:ship / 3:print / 4:email
-  async saveQuote(index: number = null, rateSelectedAction: number = null){
-    this.SaveAsQuote(index, rateSelectedAction);
+  async saveQuote(index: number){
+    // await this.save(index);
+    // this.router.navigate(['../shipmentboard/LTLTL/'], { relativeTo: this.route });
   }
 
   onChangeCalculatePCF(index: number): void{
@@ -1063,7 +1014,7 @@ export class FormAddShipComponent implements OnInit {
     if (PCF != null) {
       if (this.clientDefaultData.IsCalculateClassByPCF){
         const pcfclass = this.EstimateClassFromPCF(PCF);
-        if (product.ProductClass !== pcfclass.toString()) {
+        if (product.ProductClass !== pcfclass) {
           this.openDialog(true, 'Selected class is ' + product.ProductClass + ' and Estimated class is ' + pcfclass + '. Do you want to change ?', false, 'UpdateProductPCFClass', null, index, pcfclass);          
         }
       }
@@ -1318,11 +1269,10 @@ export class FormAddShipComponent implements OnInit {
     if (this.ShipmentByLadingObject.BOLAccesorialList != null && this.ShipmentByLadingObject.BOLAccesorialList.length > 0){
       this.ShipmentByLadingObject.BOLAccesorialList.forEach(BOLAccesorial => {
         this.accessorialArray.forEach(AvailableAccesorial => {
-          if (BOLAccesorial.AccesorialID === AvailableAccesorial.AccessorialID){
+          if (BOLAccesorial.AccesorialID == AvailableAccesorial.AccessorialID){
             const accessorial: AccessorialBase = {
               AccessorialID: AvailableAccesorial.AccessorialID,
-              AccessorialCode: AvailableAccesorial.AccesorialCode,
-              Description: AvailableAccesorial.Description
+              AccessorialCode: AvailableAccesorial.AccesorialCode
             }
 
             this.accessorials.push(accessorial);
@@ -1351,7 +1301,7 @@ export class FormAddShipComponent implements OnInit {
 
   }
 
-  openDialog(isConfirmDialog, pMessage, YesNoActions = false, actionEvent = null, method = null, productIndex = null, keyvalue = null){
+  openDialog(isConfirmDialog, pMessage, YesNoActions = false, actionEvent = null, method = null, productIndex = null, pcfClass = null){
     const dialogConfig = new MatDialogConfig();
     dialogConfig.disableClose = true;
     dialogConfig.autoFocus = true;
@@ -1365,12 +1315,11 @@ export class FormAddShipComponent implements OnInit {
 
     const dialogRef = this.dialog.open(ConfirmAlertDialogComponent, dialogConfig);
 
-    dialogRef.afterClosed().subscribe(async (data: string) => {    
+    dialogRef.afterClosed().subscribe((data: string) => {    
       if (data != null && data === 'Accepted') {
         switch (actionEvent) {
           case 'UpdateProductPCFClass':
-            const pcfclass = keyvalue;
-            (this.productsAndAccessorialsFormGroup.controls.products as FormArray).at(productIndex).get('ProductClass').setValue(keyvalue.toString());
+            (this.productsAndAccessorialsFormGroup.controls.products as FormArray).at(productIndex).get('ProductClass').setValue(pcfClass.toString());
             break;
           case 'ReRate':
             this.confirmFormGroup.get('carrier').setValue(''); // clean current carrier to get all rates
@@ -1700,8 +1649,7 @@ export class FormAddShipComponent implements OnInit {
     return bFieldsHaveChanged;
   }
 
-  // actions = 1:save / 2:ship / 3:print / 4:email
-  SaveAsQuote(rateIndex = null, rateSelectedAction = null) {    
+  SaveAsQuote() {    
     const RequiredFieldsValidationObj = this.CheckAllRequiredFields();
     if (RequiredFieldsValidationObj.showWarningMessage){
        this.openDialog(RequiredFieldsValidationObj.isConfirmDialog, RequiredFieldsValidationObj.message,
@@ -1747,18 +1695,13 @@ export class FormAddShipComponent implements OnInit {
     }  
   }
 
-  async saveNewQuoteAndBookShipment(IsBookShipment = false, ModifiedQuote = false,  objRateSelected = null){
+  async saveNewQuoteAndBookShipment(IsBookShipment = false, ModifiedQuote = false){
 
     this.spinnerMessage = 'Saving quote';
     
     this.showSpinner = true;
     
-    let selectedRate: Rate;
-    if (objRateSelected && objRateSelected.rateIndex != null){
-      selectedRate = this.ratesFiltered[objRateSelected.rateIndex];
-    }else{
-      selectedRate = this.selectedRateFromQuotes; // Selected rate    
-    }        
+    const selectedRate = this.selectedRateFromQuotes; // Selected rate    
 
     const arrayProducts = this.productsAndAccessorialsFormGroup.get('products').value;
     const productList: BOlProductsListSQD[] = [];
@@ -1767,8 +1710,8 @@ export class FormAddShipComponent implements OnInit {
       const prod : BOlProductsListSQD = {
         BOLProductID: productsCounter,
         Description: p.ProductDescription,
-        Pallets: p.Pallets == null ? 0 : p.Pallets,
-        Pieces: p.Pieces  == null ? 0 : p.Pieces,
+        Pallets: p.Pallets,
+        Pieces: p.Pieces,
         Hazmat: p.HazMat,
         NMFC: p.NmfcNumber,
         Class: p.ProductClass,
@@ -1795,8 +1738,8 @@ export class FormAddShipComponent implements OnInit {
     });
 
     const accountInvoiceCostList: AccountInvoiceCostListSQD[] = [];
-    const filteredSelectRateAccessorials = selectedRate.Accessorials.filter(acc => acc.AccessorialCharge > 0);
-    filteredSelectRateAccessorials.forEach(a => {
+
+    selectedRate.Accessorials.forEach(a => {
       const accountInvoiceCost: AccountInvoiceCostListSQD = {
         AccessorialID: a.AccessorialID,
         AccessorialCode: a.AccessorialCode,
@@ -1898,8 +1841,8 @@ export class FormAddShipComponent implements OnInit {
       Ref1ID: this.ReferenceByClientIDField1,
       Ref2ID: this.ReferenceByClientIDField2,
       Ref3ID: this.ReferenceByClientIDField3,
-      Ref1Value: (this.shipmentInfoFormGroup.get('customerref').value != null ? this.shipmentInfoFormGroup.get('customerref').value.trim() : ''),
-      Ref2Value: (this.shipmentInfoFormGroup.get('r2order').value != null ? this.shipmentInfoFormGroup.get('r2order').value.trim() : ''),
+      Ref1Value: this.shipmentInfoFormGroup.get('customerref').value.trim(),
+      Ref2Value: this.shipmentInfoFormGroup.get('r2order').value.trim(),
       Ref3Value: this.shipmentInfoFormGroup.get('r2pronumber').value,
       TransTime: selectedRate.TransitTime,
       ShipCost: selectedRate.TotalCost,
@@ -1919,7 +1862,7 @@ export class FormAddShipComponent implements OnInit {
       ValuePerPound: this.shipmentInfoFormGroup.get('valueperpound').value,
       PriorityID: this.shipmentInfoFormGroup.get('priority').value,
       CarrierType: selectedRate.CarrierType,
-      QuoteNumber: selectedRate.QuoteNumber,
+      QuoteNumber: '',
       OriginTerminalAdd1: selectedRate.OriginTerminalAddress1,
       OriginTerminalCity: selectedRate.OriginTerminalCity,
       OriginTerminalState: selectedRate.OriginTerminalState,
@@ -1991,9 +1934,6 @@ export class FormAddShipComponent implements OnInit {
       Status: (IsBookShipment || ModifiedQuote ? 2 : 10)
     }
 
-    // Set error interceptor variable to false as default
-    this.authenticationService.requestFailed$.next(false);
-
     if (ModifiedQuote){
       try{
         const responseData = await this.httpService.ModifiedQuote(this.saveQuoteData);
@@ -2003,13 +1943,11 @@ export class FormAddShipComponent implements OnInit {
           });
           this.router.navigate(['../../../shipmentboard/LTLTL/'], { relativeTo: this.route });
         }else{
-          this.authenticationService.requestFailed$.next(false);
           this.snackbar.open('Error setting the record as modified.', null, {
             duration: 5000
           });
         }      
       }catch(e){
-        this.authenticationService.requestFailed$.next(false);
         this.snackbar.open('Error setting the record as modified.', null, {
           duration: 5000
         });
@@ -2023,13 +1961,14 @@ export class FormAddShipComponent implements OnInit {
       {
         this.messageService.SendQuoteParameter(responseData.ClientLadingNo);
         this.messageService.SendLadingIDParameter(responseData.LadingID.toString());
-        // this.snackbar.open('Shipment Booked with LoadNo ' + responseData.ClientLadingNo, null, {
-        //   duration: 5000
-        // });
-        this.openDialog(false, 'Shipment Booked with LoadNo: ' + responseData.ClientLadingNo + '. ', null, 'ShipmentBooked');
+        this.snackbar.open('Shipment Booked with LoadNo ' + responseData.ClientLadingNo, null, {
+          duration: 5000
+        });
         const bolPrintURL = String.Format(environment.baseEndpoint + 'Handlers/PrintBOLHandler.ashx?LadingID={0}&ClientID={1}&Ticket={2}',
-        responseData.LadingID.toString(),this.ClientID.toString(), this.securityToken);        
-        window.open(bolPrintURL, '_blank');       
+        responseData.LadingID.toString(),this.ClientID.toString(), this.securityToken);
+        // this.router.([bolPrintURL]);
+        // window.open(bolPrintURL, '_blank');
+        this.router.navigate(['../../../shipmentboard/LTLTL/'], { relativeTo: this.route });
       }
       else{
         this.snackbar.open('Error booking the shipment.', null, {
@@ -2042,44 +1981,10 @@ export class FormAddShipComponent implements OnInit {
       {
         this.messageService.SendQuoteParameter(responseData.ClientLadingNo);
         this.messageService.SendLadingIDParameter(responseData.LadingID.toString());
-        // this.snackbar.open('Quote saved successfully with LoadNo ' + responseData.ClientLadingNo, null, {
-        //   duration: 5000
-        // });
-
-        this.openDialog(false, 'Quote saved successfully. Quote Number: ' + responseData.ClientLadingNo + '. ' + (objRateSelected.rateSelectedAction === 4 ? 'Email has been sent.' : ''), null, 
-        'QuoteSavedAndRedirectToBoard', null, null, null);
-
-        switch (objRateSelected.rateSelectedAction) {
-          case 3: // print quote
-            const ratequotePrintURL = String.Format(environment.baseEndpoint + 'Handlers/PrintQuoteHandler.ashx?LadingID={0}&Ticket={1}',
-                                        responseData.LadingID,this.securityToken);
-            window.open(ratequotePrintURL, '_blank');
-            break;
-          case 4: // email quote
-            let emailBOLParameters: SendEmailParameters;
-
-            const invoiceParameter: InvoiceParameter = {
-              InvoiceDetailIDs: []
-            };
-    
-            emailBOLParameters = {
-              ClientID: this.ClientID,
-              CarrierID : selectedRate.CarrierID,
-              ApplicationID: 56,
-              EventID: 39,
-              EmailAddresses: objRateSelected.keyValue,
-              LadingID: responseData.LadingID,
-              UserRowID: 1,
-              InvoiceParameter: invoiceParameter,
-              LadingIDs: [],
-            }
-    
-            this.httpService.SendEmailManually(emailBOLParameters);
-            break;
-        } 
-        
-
-        // this.router.navigate(['../../../shipmentboard/LTLTL/'], { relativeTo: this.route });
+        this.snackbar.open('Quote saved successfully with LoadNo ' + responseData.ClientLadingNo, null, {
+          duration: 5000
+        });
+        this.router.navigate(['../../../shipmentboard/LTLTL/'], { relativeTo: this.route });
       }
       else{
         this.snackbar.open('Error saving as quote.', null, {
@@ -2092,7 +1997,7 @@ export class FormAddShipComponent implements OnInit {
     this.showSpinner = false;
   }
 
-  async updateQuote(bookShipment = false, ModifiedQuote = false, objRateSelected = null){
+  async updateQuote(bookShipment = false, ModifiedQuote = false){
     this.spinnerMessage = 'Saving quote';
 
     const localShipmentByLadingObject = this.ShipmentByLadingObject;
@@ -2109,13 +2014,7 @@ export class FormAddShipComponent implements OnInit {
 
     this.showSpinner = true;
 
-    let selectedRate: Rate;
-    if (objRateSelected && objRateSelected.rateIndex != null){
-      selectedRate = this.ratesFiltered[objRateSelected.rateIndex];
-    }else{
-      selectedRate = this.selectedRateFromQuotes; // Selected rate    
-    }     
-    
+    const selectedRate = this.selectedRateFromQuotes; // Selected rate
     console.log('Quote has been rerated, selectedRate: ',selectedRate);
 
     const arrayProducts = this.productsAndAccessorialsFormGroup.get('products').value;
@@ -2219,16 +2118,6 @@ export class FormAddShipComponent implements OnInit {
     localShipmentByLadingObject.DestPostalWithCity = this.DestinationPostalData.PostalCode + '-' + this.DestinationPostalData.CityName;
     localShipmentByLadingObject.OrgPostWithCity = this.OriginPostalData.PostalCode + '-' + this.OriginPostalData.CityName;
 
-    localShipmentByLadingObject.OrgCountryCode = this.originSelectedCountry.CountryCode;
-    localShipmentByLadingObject.DestCountryCode = this.destinationSelectedCountry.CountryCode;
-
-    if ( this.countryList != null &&  this.countryList.length > 0){
-      const filteredBillCountry = this.countryList.filter(country => country.CountryId === this.clientDefaultData.BillToCountry.toString());
-      if (filteredBillCountry != null && filteredBillCountry.length > 0){
-        localShipmentByLadingObject.BillToCountryCode = filteredBillCountry[0].CountryCode;
-      }
-    }
-        
     const bolAccesorials: BOLAccesorialListSBL[] = [];
     this.accessorialArray.forEach(a => {
       let isSelectedAccesorial = false;
@@ -2268,7 +2157,7 @@ export class FormAddShipComponent implements OnInit {
       filteredSelectRateAccessorials.forEach(a => {
 
         let tempCostDetailID = 0;
-        const filteredCostList = this.ShipmentCostObject.SellRates.AccountInvoiceCostList.filter(item => item.Description === a.AccessorialDescription);
+        const filteredCostList = this.ShipmentCostObject.BuyRates.AccountInvoiceCostList.filter(item => item.Description === a.AccessorialDescription);
         if (filteredCostList != null && filteredCostList.length > 0){
           tempCostDetailID = filteredCostList[0].CostDetailID;
         }
@@ -2285,7 +2174,7 @@ export class FormAddShipComponent implements OnInit {
         accountInvoiceCostListBuyRates.push(accountInvoiceCost);
 
         let tempCostDetailIDSR = 0;
-        const filteredCostListSR = this.ShipmentCostObject.SellRates.AccountInvoiceCostList.filter(item => item.Description === a.AccessorialDescription);
+        const filteredCostListSR = this.ShipmentCostObject.BuyRates.AccountInvoiceCostList.filter(item => item.Description === a.AccessorialDescription);
         if (filteredCostListSR != null && filteredCostListSR.length > 0){
           tempCostDetailIDSR = filteredCostListSR[0].CostDetailID;
         }
@@ -2304,7 +2193,7 @@ export class FormAddShipComponent implements OnInit {
         
       // Freight
       let FRTCostDetailID = 0;
-      const filteredCostListFRT = this.ShipmentCostObject.SellRates.AccountInvoiceCostList.filter(item => item.AccessorialID === 22 && item.AccessorialCode === 'FRT');
+      const filteredCostListFRT = this.ShipmentCostObject.BuyRates.AccountInvoiceCostList.filter(item => item.AccessorialID === 22 && item.AccessorialCode === 'FRT');
       if (filteredCostListFRT != null && filteredCostListFRT.length > 0){
         FRTCostDetailID = filteredCostListFRT[0].CostDetailID;
       }
@@ -2321,7 +2210,7 @@ export class FormAddShipComponent implements OnInit {
   
       // Fuel
       let FSCCostDetailID = 0;
-      const filteredCostListFSC = this.ShipmentCostObject.SellRates.AccountInvoiceCostList.filter(item => item.AccessorialID === 23 && item.AccessorialCode === 'FSC');
+      const filteredCostListFSC = this.ShipmentCostObject.BuyRates.AccountInvoiceCostList.filter(item => item.AccessorialID === 23 && item.AccessorialCode === 'FSC');
       if (filteredCostListFSC != null && filteredCostListFSC.length > 0){
         FSCCostDetailID = filteredCostListFSC[0].CostDetailID;
       }
@@ -2338,7 +2227,7 @@ export class FormAddShipComponent implements OnInit {
   
       // Discount
       let DISCostDetailID = 0;
-      const filteredCostListDIS = this.ShipmentCostObject.SellRates.AccountInvoiceCostList.filter(item => item.AccessorialID === 24 && item.AccessorialCode === 'DIS');
+      const filteredCostListDIS = this.ShipmentCostObject.BuyRates.AccountInvoiceCostList.filter(item => item.AccessorialID === 24 && item.AccessorialCode === 'DIS');
       if (filteredCostListDIS != null && filteredCostListDIS.length > 0){
         DISCostDetailID = filteredCostListDIS[0].CostDetailID;
       }
@@ -2409,20 +2298,20 @@ export class FormAddShipComponent implements OnInit {
       // -- Sell and Buy rates
       localShipmentByLadingObject.SellRates.SCAC = selectedRate.CarrierID;
       localShipmentByLadingObject.SellRates.CarrierName = selectedRate.CarrierName;
-      localShipmentByLadingObject.BuyRates.AccountInvoiceCostList = accountInvoiceCostListBuyRates;   
-      localShipmentByLadingObject.SellRates.AccountInvoiceCostList = accountInvoiceCostListSellRates;   
+      localShipmentByLadingObject.SellRates.AccountInvoiceCostList = accountInvoiceCostListBuyRates;   
+      localShipmentByLadingObject.BuyRates.AccountInvoiceCostList = accountInvoiceCostListSellRates;   
                    
       localShipmentByLadingObject.SellRates.BolNumber = this.ShipmentCostObject.SellRates.BolNumber;
-      localShipmentByLadingObject.SellRates.CarrierName = selectedRate.CarrierName;
+      localShipmentByLadingObject.SellRates.CarrierName = this.ShipmentCostObject.SellRates.CarrierName;
       localShipmentByLadingObject.SellRates.CrAcID = this.ShipmentCostObject.SellRates.CrAcID;
       localShipmentByLadingObject.SellRates.DrAcID = this.ShipmentCostObject.SellRates.DrAcID;
       localShipmentByLadingObject.SellRates.InvDetailID = this.ShipmentCostObject.SellRates.InvDetailID;
-      localShipmentByLadingObject.SellRates.SCAC = selectedRate.CarrierID;      
+      localShipmentByLadingObject.SellRates.SCAC = this.ShipmentCostObject.SellRates.SCAC;      
       localShipmentByLadingObject.SellRates.SaasRefID = this.ShipmentCostObject.SellRates.SaasRefID;
       localShipmentByLadingObject.SellRates.ShipDate = this.ShipmentCostObject.SellRates.ShipDate;
-      localShipmentByLadingObject.SellRates.TotalBilledAmount = selectedRate.TotalCost; // this.ShipmentCostObject.SellRates.TotalBilledAmount;
+      localShipmentByLadingObject.SellRates.TotalBilledAmount = this.ShipmentCostObject.SellRates.TotalBilledAmount;
       localShipmentByLadingObject.SellRates.TotalPaidAmount = this.ShipmentCostObject.SellRates.TotalPaidAmount;
-      localShipmentByLadingObject.SellRates.TotalRatedCost = selectedRate.TotalCost; // this.ShipmentCostObject.SellRates.TotalRatedCost;
+      localShipmentByLadingObject.SellRates.TotalRatedCost = this.ShipmentCostObject.SellRates.TotalRatedCost;
       localShipmentByLadingObject.SellRates.UserId = this.ShipmentCostObject.SellRates.UserId;
       localShipmentByLadingObject.SellRates.VoucherTypeID = this.ShipmentCostObject.SellRates.VoucherTypeID;
       localShipmentByLadingObject.SellRates.QuoteAmt = this.ShipmentCostObject.SellRates.QuoteAmt;
@@ -2431,16 +2320,16 @@ export class FormAddShipComponent implements OnInit {
       localShipmentByLadingObject.SellRates.IsSynchronized = this.ShipmentCostObject.SellRates.IsSynchronized;
       
       localShipmentByLadingObject.BuyRates.BolNumber = this.ShipmentCostObject.BuyRates.BolNumber;
-      localShipmentByLadingObject.BuyRates.CarrierName = selectedRate.CarrierName;
+      localShipmentByLadingObject.BuyRates.CarrierName = this.ShipmentCostObject.BuyRates.CarrierName;
       localShipmentByLadingObject.BuyRates.CrAcID = this.ShipmentCostObject.BuyRates.CrAcID;
       localShipmentByLadingObject.BuyRates.DrAcID = this.ShipmentCostObject.BuyRates.DrAcID;
       localShipmentByLadingObject.BuyRates.InvDetailID = this.ShipmentCostObject.BuyRates.InvDetailID;
-      localShipmentByLadingObject.BuyRates.SCAC = selectedRate.CarrierID;
+      localShipmentByLadingObject.BuyRates.SCAC = this.ShipmentCostObject.BuyRates.SCAC;
       localShipmentByLadingObject.BuyRates.SaasRefID = this.ShipmentCostObject.BuyRates.SaasRefID;
       localShipmentByLadingObject.BuyRates.ShipDate = this.ShipmentCostObject.BuyRates.ShipDate;
-      localShipmentByLadingObject.BuyRates.TotalBilledAmount = selectedRate.TotalCost; // this.ShipmentCostObject.BuyRates.TotalBilledAmount;
+      localShipmentByLadingObject.BuyRates.TotalBilledAmount = this.ShipmentCostObject.BuyRates.TotalBilledAmount;
       localShipmentByLadingObject.BuyRates.TotalPaidAmount = this.ShipmentCostObject.BuyRates.TotalPaidAmount;
-      localShipmentByLadingObject.BuyRates.TotalRatedCost = selectedRate.TotalCost; // this.ShipmentCostObject.BuyRates.TotalRatedCost;
+      localShipmentByLadingObject.BuyRates.TotalRatedCost = this.ShipmentCostObject.BuyRates.TotalRatedCost;
       localShipmentByLadingObject.BuyRates.UserId = this.ShipmentCostObject.BuyRates.UserId;
       localShipmentByLadingObject.BuyRates.VoucherTypeID = this.ShipmentCostObject.BuyRates.VoucherTypeID;
       localShipmentByLadingObject.BuyRates.QuoteAmt = this.ShipmentCostObject.BuyRates.QuoteAmt;
@@ -2484,7 +2373,6 @@ export class FormAddShipComponent implements OnInit {
       localShipmentByLadingObject.ServiceLevelName = selectedRate.ServiceLevel;
       localShipmentByLadingObject.ServiceLevelCode = selectedRate.SaasServiceLevelCode;
       localShipmentByLadingObject.RatingResultId = selectedRate.RatingResultId;
-      localShipmentByLadingObject.QuoteNumber = selectedRate.QuoteNumber;
       localShipmentByLadingObject.Miles = selectedRate.LaneWiseMiles;
       localShipmentByLadingObject.RefNo = selectedRate.ReferenceNo;
       localShipmentByLadingObject.SellProfileID = selectedRate.ProfileID;
@@ -2532,16 +2420,7 @@ export class FormAddShipComponent implements OnInit {
       localShipmentByLadingObject.BuyRates.IsSynchronized = this.ShipmentCostObject.BuyRates.IsSynchronized;
 
     }
-
-    // -- Validate if no buy rates are set up so put same rates from sell rates
-    if (localShipmentByLadingObject.BuyRates.AccountInvoiceCostList === null || localShipmentByLadingObject.BuyRates.AccountInvoiceCostList.length === 0){
-      localShipmentByLadingObject.BuyRates.AccountInvoiceCostList = localShipmentByLadingObject.SellRates.AccountInvoiceCostList;
-    }
-    // --
     
-    // Set error interceptor variable to false as default
-    this.authenticationService.requestFailed$.next(false);
-
     if (ModifiedQuote){
       try{
         const responseData = await this.httpService.ModifiedQuoteWithLadingData(localShipmentByLadingObject);
@@ -2553,13 +2432,11 @@ export class FormAddShipComponent implements OnInit {
           });
           this.router.navigate(['../../../shipmentboard/LTLTL/'], { relativeTo: this.route });
         }else{
-          this.authenticationService.requestFailed$.next(false);
           this.snackbar.open('Error setting the record as modified.', null, {
             duration: 5000
           });
         }      
       }catch(e){
-        this.authenticationService.requestFailed$.next(false);
         this.snackbar.open('Error setting the record as modified.', null, {
           duration: 5000
         });
@@ -2573,56 +2450,16 @@ export class FormAddShipComponent implements OnInit {
       if (!this.authenticationService.requestFailed$.value){
         this.messageService.SendQuoteParameter(localShipmentByLadingObject.ClientLadingNo);
         this.messageService.SendLadingIDParameter(localShipmentByLadingObject.LadingID.toString());
-        if (!bookShipment){
-          // this.snackbar.open('Quote saved successfully', null, {
-          //   duration: 5000
-          // });
-          this.openDialog(false, 'Quote saved successfully. Quote Number: ' + localShipmentByLadingObject.ClientLadingNo + '. ' + (objRateSelected.rateSelectedAction === 4 ? 'Email has been sent.' : ''), null, 
-          'QuoteSavedAndRedirectToBoard', null, null, null);
-  
-          switch (objRateSelected.rateSelectedAction) {
-            case 3: // print quote
-              const ratequotePrintURL = String.Format(environment.baseEndpoint + 'Handlers/PrintQuoteHandler.ashx?LadingID={0}&Ticket={1}',
-              localShipmentByLadingObject.LadingID,this.securityToken);
-              window.open(ratequotePrintURL, '_blank');
-              break;
-            case 4: // email quote
-              let emailBOLParameters: SendEmailParameters;
-  
-              const invoiceParameter: InvoiceParameter = {
-                InvoiceDetailIDs: []
-              };
-      
-              emailBOLParameters = {
-                ClientID: this.ClientID,
-                CarrierID : selectedRate.CarrierID,
-                ApplicationID: 56,
-                EventID: 39,
-                EmailAddresses: objRateSelected.keyValue,
-                LadingID: localShipmentByLadingObject.LadingID,
-                UserRowID: 1,
-                InvoiceParameter: invoiceParameter,
-                LadingIDs: [],
-              }
-      
-              this.httpService.SendEmailManually(emailBOLParameters);
-              break;
-          } 
-
-        }else{
-          this.openDialog(false, 'Shipment Booked with LoadNo: ' + localShipmentByLadingObject.LadingID.toString() + '. ', null, 'ShipmentBooked');
-          const bolPrintURL = String.Format(environment.baseEndpoint + 'Handlers/PrintBOLHandler.ashx?LadingID={0}&ClientID={1}&Ticket={2}',
-          localShipmentByLadingObject.LadingID.toString(),this.ClientID.toString(), this.securityToken);        
-          window.open(bolPrintURL, '_blank');  
-        }
+        this.snackbar.open(bookShipment ? 'Shipment booked' : 'Quote saved successfully', null, {
+          duration: 5000
+        });
+        this.router.navigate(['../../../shipmentboard/LTLTL/'], { relativeTo: this.route });
       }else{
-        this.authenticationService.requestFailed$.next(false);
         this.snackbar.open('Error updating the record.', null, {
           duration: 5000
         });
       }      
     }catch(e){
-      this.authenticationService.requestFailed$.next(false);
       this.snackbar.open('Error updating the record.', null, {
         duration: 5000
       });
@@ -2654,7 +2491,7 @@ export class FormAddShipComponent implements OnInit {
       RequiredFieldsValidationObj.showWarningMessage = true;
       RequiredFieldsValidationObj.message = 'Please complete all required fields.';
       RequiredFieldsValidationObj.isConfirmDialog = false;     
-    }else if(this.costListFiltered == null || this.costListFiltered.length === 0){
+    }else if(this.costListFiltered.length === 0){
       RequiredFieldsValidationObj.showWarningMessage = true;
       RequiredFieldsValidationObj.message = 'Please rate the shipment first.';
       RequiredFieldsValidationObj.isConfirmDialog = false;     

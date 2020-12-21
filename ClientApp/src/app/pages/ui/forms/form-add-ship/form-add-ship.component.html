@@ -1019,11 +1019,11 @@
                               </div>                      
                               <div class="inner-rates-options-container">
                                   <div class="inner-rate-options-column" [ngClass]="{'inner-rate-options-column_with_email_input': sendEmailClicked}">
-                                    <button mat-icon-button matTooltip="Save Quote" (click)="saveQuote(j, 1)">
+                                    <button mat-icon-button matTooltip="Save Quote" (click)="saveQuote(j)">
                                       <mat-icon [icIcon]="outlineSave"></mat-icon>
                                     </button>
                                     <button mat-icon-button matTooltip="Print">
-                                      <mat-icon [icIcon]="outlinePrint" (click)="saveQuote(j,3)"></mat-icon>
+                                      <mat-icon [icIcon]="outlinePrint"></mat-icon>
                                     </button>
                                     <button mat-icon-button matTooltip="Send Email" (click)="sendEmailClicked = true">
                                       <mat-icon [icIcon]="outlineEmail"></mat-icon>
@@ -1039,7 +1039,7 @@
                                         </mat-form-field>
                                        
                                         <div>
-                                          <button color="primary" class="mr-1 mat-stroked-sent-email-button" mat-stroked-button type="button"  [disabled]="emailFormGroup.invalid" (click)="sendEmailClicked = false" (click)="saveQuote(j, 4)">Send</button>
+                                          <button color="primary" class="mr-1 mat-stroked-sent-email-button" mat-stroked-button type="button"  [disabled]="emailFormGroup.invalid" (click)="sendEmailClicked = false">Send</button>
                                           <button color="primary"  class="mat-stroked-sent-email-button" mat-stroked-button type="button" (click)="sendEmailClicked = false">Cancel</button>                                   
                                         </div>
                                       </div>                                                            

@@ -31,7 +31,6 @@ export interface UsedRatingFuel {
 export interface AccessorialBase {
     AccessorialCode: string;
     AccessorialID: number;
-    Description?: string;
 }
 
 export interface Accessorial {

@@ -64,8 +64,6 @@ import {ConfirmAlertDialogComponent} from '../../../../../app/shared/confirm-ale
 import data from '@iconify/icons-ic/twotone-group';
 import { SendEmailParameters, InvoiceParameter } from '../../../../Entities/SendEmailParameters'; 
 import { SaveQuoteResponse } from '../../../../Entities/SaveQuoteResponse';
-import { HtmlMsgByClient } from 'src/app/Entities/HtmlMsgByClient';
-import { PCFClientDefaults } from '../../../../Entities/PCFClientDefaults';
 
 export interface CountryState {
   name: string;
@@ -123,7 +121,6 @@ export class FormQuickQuoteComponent implements OnInit {
   keyId = '1593399730488';
   ClientID = this.authenticationService.getDefaultClient().ClientID;
   clientDefaultData: ClientDefaultData;
-  clientPCFDefaultData: PCFClientDefaults;
   clientTLWeightLimit: string;
   carrierImageUrl = environment.baseEndpoint +'Handlers/CarrierLogoHandler.ashx?carrierID=';
   UserIDLoggedIn = this.authenticationService.authenticatedUser$.value.UserID;  
@@ -222,7 +219,6 @@ export class FormQuickQuoteComponent implements OnInit {
   // }
   isShow: boolean;
   topPosToStartShowing = 100;
-  htmlContentByClient: string;
 
   rightPanelImage: any = 'assets/img/demo/R2TestImage.png';
   noRatesFoundText = null;
@@ -290,12 +286,7 @@ export class FormQuickQuoteComponent implements OnInit {
     });
     // --
 
-    let htmlMsgByClientObj: HtmlMsgByClient[];
-    htmlMsgByClientObj = this.authenticationService.getClientHtmlMessages();
-    if (htmlMsgByClientObj && htmlMsgByClientObj.length > 0){
-      this.htmlContentByClient = htmlMsgByClientObj[0].HtmlMsg2;
-    }
-    
+
     const responseData = await this.httpService.getCountryList(this.keyId);
     this.clientDefaultData = await this.httpService.getClientDefaultsByClient(this.ClientID, this.keyId);
 
@@ -330,9 +321,6 @@ export class FormQuickQuoteComponent implements OnInit {
 
   }
 
-  
-
-  
   pcoAutoCompleteFilter(val: string): Observable<any[]> {
     const CountryId = this.originSelectedCountry == null ? '1': this.originSelectedCountry.CountryId.toString();
     return this.httpService.postalCodeAutocomplete(val, CountryId, this.keyId)
@@ -359,8 +347,8 @@ export class FormQuickQuoteComponent implements OnInit {
 
   addProductFormGroup(): FormGroup{
     return this.fb.group({
-      Pallets: [0, Validators.required],
-      Pieces: [0],
+      Pallets: [null, Validators.required],
+      Pieces: [null],
       PackageTypeID: [3],
       ProductClass: [null, Validators.required],
       NmfcNumber: [null],
@@ -391,37 +379,18 @@ export class FormQuickQuoteComponent implements OnInit {
     }
   }
 
-  async getQuote() {           
-    let isMinPCFForQuickQuote = false;
-    let tLMinimumPCFLimit = 0;
-    this.clientPCFDefaultData = await this.httpService.GetPCFClientDefaultsByClient(this.ClientID.toString());    
-    if (this.clientPCFDefaultData != null && this.clientPCFDefaultData.ShowTLPCFMessage){     
-      tLMinimumPCFLimit = this.clientPCFDefaultData.TLMinimumPCFLimit;
-      const arrayProducts = this.formProducts;    
-      const filteredArrayPCFs: number[] = [];
-      for (const control of arrayProducts.controls) {
-        const product = control.value;
-        if (product.Status !== 3 && product.PCF != null){         
-          filteredArrayPCFs.push(product.PCF);
-        }
-     }
+  async getQuote() {
+    this.getQuoteButtonClicked = true;
+    this.showSpinner = true;
+    const test = await this.getShipmentRates();
+    this.showSpinner = false;
 
-     if (filteredArrayPCFs != null && filteredArrayPCFs.length > 0){
-       const foundedLowerPCFList = filteredArrayPCFs.filter(pcf => pcf < tLMinimumPCFLimit);
-       if (foundedLowerPCFList != null && foundedLowerPCFList.length > 0){
-          isMinPCFForQuickQuote = true;          
-       }
-     }
-    }    
-
-    if (isMinPCFForQuickQuote){
-      this.openDialog(true, 'PCF is below ' + tLMinimumPCFLimit + ', there may be extra charges if you proceed booking this shipment.','GetRates');
-    }else{
-      this.getQuoteButtonClicked = true;
-      this.showSpinner = true;
-      const test = await this.getShipmentRates();
-      this.showSpinner = false;  
-    }         
+    console.log('print at the end.');
+    // window.scroll({
+    //   top: 0,
+    //   left: 0,
+    //   behavior: 'smooth'
+    // });
   }
 
   clearQuoteAndFields(){
@@ -787,8 +756,8 @@ export class FormQuickQuoteComponent implements OnInit {
     arrayProducts.forEach(p => {
       const prod : BOlProductsList = {
         Description: 'NA',
-        Pallets: p.Pallets == null ? 0 : p.Pallets,
-        Pieces: p.Pieces  == null ? 0 : p.Pieces,
+        Pallets: p.Pallets,
+        Pieces: p.Pieces,
         Hazmat: p.HazMat,
         NMFC: p.NmfcNumber,
         Class: p.ProductClass,
@@ -958,7 +927,7 @@ export class FormQuickQuoteComponent implements OnInit {
           duration: 5000
         });
       }else{
-        this.openDialog(false, 'Quote saved successfully. Quote Number: ' + this.responseData.ClientLadingNo + '. ' + (action === 4 ? 'Email has been sent.' : ''), 'QuoteSaved', null, null, true);
+        this.openDialog(false, 'Quote saved successfully. Quote Number: ' + this.responseData.ClientLadingNo + '. ' + (action === 4 ? 'Email has been sent.' : ''), null, null, true);
       }
     }
     else{
@@ -977,7 +946,7 @@ export class FormQuickQuoteComponent implements OnInit {
       if (this.clientDefaultData.IsCalculateClassByPCF){
         const pcfclass = this.EstimateClassFromPCF(PCF);
         if (product.ProductClass !== pcfclass.toString()) {
-          this.openDialog(true, 'Selected class is ' + product.ProductClass + ' and Estimated class is ' + pcfclass + '. Do you want to change ?', 'UpdateProductPCFClass', index, pcfclass);          
+          this.openDialog(true, 'Selected class is ' + product.ProductClass + ' and Estimated class is ' + pcfclass + '. Do you want to change ?', index, pcfclass);          
         }
       }
 
@@ -1136,7 +1105,7 @@ export class FormQuickQuoteComponent implements OnInit {
     return newClass;
   }
 
-  openDialog(isConfirmDialog, pMessage, actionEvent = null, productIndex = null, pcfClass = null, clearQuoteAndFields = false){
+  openDialog(isConfirmDialog, pMessage, productIndex = null, pcfClass = null, clearQuoteAndFields = false){
     const dialogConfig = new MatDialogConfig();
     dialogConfig.disableClose = true;
     dialogConfig.autoFocus = true;
@@ -1149,31 +1118,16 @@ export class FormQuickQuoteComponent implements OnInit {
 
     const dialogRef = this.dialog.open(ConfirmAlertDialogComponent, dialogConfig);
  
-    dialogRef.afterClosed().subscribe(async (data: string) => {    
+    dialogRef.afterClosed().subscribe((data: string) => {    
       if (data != null && data === 'Accepted') 
       {
-        switch (actionEvent) {
-          case 'QuoteSaved':
-            if (!isConfirmDialog ){
-              if (clearQuoteAndFields){
-                this.clearQuoteAndFields();
-              }
-            }
-            break;
-          case 'GetRates':
-            this.getQuoteButtonClicked = true;
-            this.showSpinner = true;
-            const test = await this.getShipmentRates();
-            this.showSpinner = false; 
-            break;         
-          case 'UpdateProductPCFClass':
-            if (isConfirmDialog && productIndex != null && pcfClass != null){
-              (this.quickQuoteFormGroup.controls.products as FormArray).at(productIndex).get('ProductClass').setValue(pcfClass.toString());
-            } 
-            break;     
-        } 
-
-        
+        if (isConfirmDialog && productIndex != null && pcfClass != null){
+          (this.quickQuoteFormGroup.controls.products as FormArray).at(productIndex).get('ProductClass').setValue(pcfClass.toString());
+        }else if (!isConfirmDialog ){
+          if (clearQuoteAndFields){
+            this.clearQuoteAndFields();
+          }
+        }
         
       }
     });

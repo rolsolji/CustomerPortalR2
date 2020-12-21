@@ -1,10 +1,4 @@
-<mat-progress-spinner
-        [diameter]="50"
-        *ngIf="!form || originCountries == null || statesAndCities == null"
-        mode="indeterminate"
-        color="accent">
-</mat-progress-spinner>
-<form (ngSubmit)="save()" [formGroup]="form" *ngIf="form && originCountries !== null && statesAndCities !== null">
+<form (ngSubmit)="save()" [formGroup]="form" *ngIf="form">
   <div fxLayout="row" fxLayoutAlign="start center" mat-dialog-title>
     <h2 *ngIf="isCreateMode()" class="headline m-0" fxFlex="auto">New Location</h2>
     <h2 *ngIf="isUpdateMode()" class="headline m-0" fxFlex="auto">Update Location</h2>
@@ -20,13 +14,13 @@
     <div class="flex flex-col sm:flex-row">
       <mat-form-field class="mt-6 flex-auto">
         <mat-label>Short Name</mat-label>
-        <input cdkFocusInitial formControlName="ShortName" matInput required>
+        <input cdkFocusInitial formControlName="ShortName" matInput>
 
       </mat-form-field>
 
       <mat-form-field class="sm:mt-6 sm:ml-6 flex-auto">
         <mat-label>Location Type</mat-label>
-        <mat-select [(value)]="this.locationTypeSelected" formControlName="LocationType">
+        <mat-select [(value)]="this.locationTypeSelected">
           <mat-option *ngFor="let locationType of this.locationTypes" [value]="locationType.LocationTypeID">
             {{locationType.LocationType}}
           </mat-option>
@@ -37,43 +31,45 @@
 
     <div class="flex flex-col sm:flex-row">
       <mat-form-field class="flex-auto">
-        <mat-label>Active Date</mat-label>
-        <input formControlName="ActivateDate" matInput [matDatepicker]="picker" required>
-        <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
-        <mat-datepicker #picker></mat-datepicker>
+        <mat-label>Location Name</mat-label>
+        <input formControlName="Name" matInput>
+
       </mat-form-field>
 
       <mat-form-field class="sm:ml-6 sm:mr-4" appearance="fill">
-        <mat-label>Deactivation Date</mat-label>
-        <input formControlName="DeactivateDate" matInput [matDatepicker]="picker2">
-        <mat-datepicker-toggle matSuffix [for]="picker2"></mat-datepicker-toggle>
-        <mat-datepicker #picker2></mat-datepicker>
+        <mat-label>Active Date</mat-label>
+        <input formControlName="ActivateDate" matInput [matDatepicker]="picker">
+        <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+        <mat-datepicker #picker></mat-datepicker>
+
       </mat-form-field>
     </div>
 
     <div class="flex flex-col sm:flex-row">
       <mat-form-field class="flex-auto">
         <mat-label>Address 1</mat-label>
-        <input formControlName="Address1" matInput required>
+        <input formControlName="Address1" matInput>
 
       </mat-form-field>
 
-      <mat-form-field class="sm:ml-6 flex-auto">
-        <mat-label>Address 2</mat-label>
-        <input formControlName="Address2" matInput>
-
-      </mat-form-field>
+      <div class="sm:ml-6 flex-auto">
+        <mat-checkbox color="primary" [checked]="this.checked"></mat-checkbox>
+        <mat-label class="pl-2">Is Active</mat-label>
+      </div>
     </div>
 
     <div class="flex flex-col sm:flex-row">
       <mat-form-field class="flex-auto">
-        <mat-label>Location Name</mat-label>
-        <input formControlName="Name" matInput required>
+        <mat-label>Address 2</mat-label>
+        <input formControlName="Address2" matInput>
+
       </mat-form-field>
 
-      <mat-form-field class="sm:ml-6 flex-auto">
-        <mat-label>Created By</mat-label>
-        <input formControlName="CreatedBy" matInput>
+      <mat-form-field class="sm:ml-6" appearance="fill">
+        <mat-label>Deactivation Date</mat-label>
+        <input formControlName="DeactivateDate" matInput [matDatepicker]="picker2">
+        <mat-datepicker-toggle matSuffix [for]="picker2"></mat-datepicker-toggle>
+        <mat-datepicker #picker2></mat-datepicker>
 
       </mat-form-field>
     </div>
@@ -81,17 +77,14 @@
     <div class="flex flex-col sm:flex-row">
       <mat-form-field class="flex-auto">
         <mat-label>Country</mat-label>
-        <input
-          formControlName="country"
-          type="text"
-          placeholder="Country"
-          matInput
-          [matAutocomplete]="countryAutoComplete"
-          required>
-        <mat-autocomplete
-                [displayWith]="displayCountry.bind(this)" #countryAutoComplete="matAutocomplete" (optionSelected)="setCountryStatesCities($event)">
-          <mat-option *ngFor="let country of filteredCountriesOptions | async"
-                      [value]="country">
+        <input type="text"
+               placeholder="Pick one"
+               aria-label="Number"
+               matInput
+               [formControl]="countryControl"
+               [matAutocomplete]="auto">
+        <mat-autocomplete #auto="matAutocomplete" (optionSelected)="onCountryChange($event)">
+          <mat-option *ngFor="let country of filteredOptions | async" [value]="country.CountryName">
             {{country.CountryName}}
           </mat-option>
         </mat-autocomplete>
@@ -106,16 +99,8 @@
 
     <div class="flex flex-col sm:flex-row">
       <mat-form-field class="flex-auto">
-        <mat-label>Postal Code</mat-label>
-        <input name="PostalCode" formControlName="PostalCode"
-               matInput required
-               [matAutocomplete]="pcoAutoComplete"
-               (keydown.tab)="validateOriginPostalCode($event)">
-        <mat-autocomplete #pcoAutoComplete="matAutocomplete" (optionSelected)="pcoAutoCompleteSelected($event)">
-          <mat-option *ngFor="let option of pcoAutoCompleteOptions | async" [value]="option">
-            {{option.PostalCode}} - {{option.CityName}}
-          </mat-option>
-        </mat-autocomplete>
+        <mat-label>Postal</mat-label>
+        <input formControlName="PostalCode" matInput>
 
       </mat-form-field>
 
@@ -129,21 +114,7 @@
     <div class="flex flex-col sm:flex-row">
       <mat-form-field class="flex-auto">
         <mat-label>State</mat-label>
-        <input
-          formControlName="state"
-          type="text"
-          placeholder="State"
-          matInput
-          [matAutocomplete]="stateAutoComplete"
-          required
-        >
-        <mat-autocomplete
-                [displayWith]="displayState.bind(this)" #stateAutoComplete="matAutocomplete">
-          <mat-option *ngFor="let state of filteredStatesOptions | async"
-                      [value]="state">
-            {{state.StateName}}
-          </mat-option>
-        </mat-autocomplete>
+        <input formControlName="StateCode" matInput>
 
       </mat-form-field>
 
@@ -157,28 +128,31 @@
     <div class="flex flex-col sm:flex-row">
       <mat-form-field class="flex-auto">
         <mat-label>City</mat-label>
-        <input
-          formControlName="city"
-          type="text"
-          placeholder="Pick one"
-          matInput
-          [matAutocomplete]="cityAutoComplete"
-          required
-        >
-        <mat-autocomplete [displayWith]="displayCity.bind(this)" #cityAutoComplete="matAutocomplete">
-          <mat-option *ngFor="let city of filteredCitiesOptions | async"
-                      [value]="city">
-            {{city.CityName}}
-          </mat-option>
-        </mat-autocomplete>
+        <input formControlName="CityName" matInput>
 
       </mat-form-field>
 
       <mat-form-field class="sm:ml-6 flex-auto">
+        <mat-label>Created By</mat-label>
+        <input formControlName="CreatedBy" matInput>
+
+      </mat-form-field>
+    </div>
+
+    <div class="flex flex-col sm:flex-row">
+      <mat-form-field class="flex-auto">
         <mat-label>Contact Name</mat-label>
         <input formControlName="ContactName" matInput>
 
       </mat-form-field>
+
+      <div class="sm:ml-6 flex-auto">
+        <mat-label>Approve</mat-label>
+        <br/>
+        <mat-checkbox class="sm:mr-6" color="primary" #c1 [checked]="!c.checked">Yes</mat-checkbox>
+        <mat-checkbox color="primary" #c [checked]="!c1.checked">No</mat-checkbox>
+
+      </div>
     </div>
 
     <div class="flex flex-col sm:flex-row">
@@ -195,20 +169,6 @@
       </mat-form-field>
     </div>
 
-    <div class="flex flex-col sm:flex-row sm:pb-5">
-      <div class="sm:ml-6 flex-auto">
-        <mat-checkbox color="primary" [checked]="this.checked"></mat-checkbox>
-        <mat-label class="pl-2">Is Active</mat-label>
-      </div>
-
-      <div class="sm:ml-6 sm:mr-6 flex-auto">
-        <mat-label class="float-left sm:mr-6">Approve</mat-label>
-          <div *ngFor="let item of [1,2];  let i = index">
-            <mat-checkbox class="{{i === 0 ? 'float-left' : 'float-right'}}" color="primary" [checked]="approved === i" (change)="approved = i">{{i === 1 ? 'Yes' : 'No'}}</mat-checkbox>
-        </div>
-      </div>
-    </div>
-
     <mat-form-field class="flex-auto">
       <mat-label>Notes</mat-label>
       <textarea formControlName="Notes" matInput></textarea>
@@ -217,8 +177,8 @@
 
   <mat-dialog-actions align="end">
     <button mat-button mat-dialog-close type="button">CANCEL</button>
-    <button *ngIf="isCreateMode()" color="primary" mat-button type="submit" [disabled]="!form.valid">CREATE LOCATION</button>
-    <button *ngIf="isUpdateMode()" color="primary" mat-button type="submit" [disabled]="!form.valid">UPDATE LOCATION</button>
+    <button *ngIf="isCreateMode()" color="primary" mat-button type="submit">CREATE LOCATION</button>
+    <button *ngIf="isUpdateMode()" color="primary" mat-button type="submit">UPDATE LOCATION</button>
   </mat-dialog-actions>
 </form>
 

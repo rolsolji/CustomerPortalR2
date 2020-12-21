@@ -45,11 +45,11 @@
                     <mat-icon [icIcon]="icSearch"></mat-icon>
                 </button>
 
-                <button [matMenuTriggerFor]="columnFilterMenu"
+                <button (click)="searchLocationModal()"
                         class="ml-4"
                         fxFlex="none"
                         mat-icon-button
-                        matTooltip="Filter Columns"
+                        matTooltip="Search"
                         type="button">
                     <mat-icon [icIcon]="icFilterList"></mat-icon>
                 </button>

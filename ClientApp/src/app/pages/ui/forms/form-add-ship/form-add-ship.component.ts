@@ -269,7 +269,7 @@ export class FormAddShipComponent implements OnInit {
       Pieces: [0],
       PackageTypeID: [3],
         ProductClass: [null, Validators.required],
-        NmfcNumber: [null, Validators.required],
+        NmfcNumber: [null, [Validators.required, Validators.pattern('^([a-zA-Z0-9]{6})-([a-zA-Z0-9]{2})$')]],
         ProductDescription: [null, Validators.required],
         Length: [null, Validators.required],
         Width: [null, Validators.required],
@@ -306,6 +306,12 @@ export class FormAddShipComponent implements OnInit {
   // Shipment Mode change event
   selectChangeShipmentMode (event: any) {
     this.fetchShipmentMode(event.value);
+  }
+
+  getProductsFormGroup(index): FormGroup {
+    const productsList = this.productsAndAccessorialsFormGroup.get('products') as FormArray;
+    const formGroup = productsList.controls[index] as FormGroup;
+    return formGroup;
   }
 
   async ngOnInit() {
@@ -644,11 +650,17 @@ export class FormAddShipComponent implements OnInit {
       this.openDialog(RequiredFieldsValidationObj.isConfirmDialog, RequiredFieldsValidationObj.message,
         RequiredFieldsValidationObj.yesNoActions, RequiredFieldsValidationObj.actionEvent, 'BookShipmentSubmit');
     }else {
-      if (this.ShipmentByLadingObject == null){
-        this.saveNewQuoteAndBookShipment(true);
+      //const pickupTimesWarningMessage = this.PickupTwoHoursAndAfterOnePMValidations(); //TESTRS
+      const pickupTimesWarningMessage = '';
+      if (pickupTimesWarningMessage !== ''){
+        this.openDialog(true, pickupTimesWarningMessage, true, 'pickupTimesValidations', 'BookShipmentSubmit');    
       }else{
-        this.updateQuote(true);
-      }
+        if (this.ShipmentByLadingObject == null){
+          this.saveNewQuoteAndBookShipment(true);
+        }else{
+          this.updateQuote(true);
+        }
+      }      
     }
   }
 
@@ -1376,7 +1388,23 @@ export class FormAddShipComponent implements OnInit {
             const test = await this.getShipmentRates();
             this.confirmFormGroup.get('carrier').setValue('');
             this.showSpinner = false;
-            break;         
+            break;
+          case 'pickupTimesValidations':
+            let bookShipment;
+            if (method === 'SaveAsQuote'){
+              bookShipment = false;
+            }else if (method === 'BookShipmentSubmit'){
+              bookShipment = true;
+            }
+  
+            if (this.ShipmentByLadingObject == null){
+              // Insert as new quote
+              this.saveNewQuoteAndBookShipment(bookShipment, true);
+            }else{
+              // Update quote
+              this.updateQuote(bookShipment, true);
+            }
+            break;
         } 
       }else if (data != null && data === 'No') {
         if (actionEvent === 'ReRate'){
@@ -1702,13 +1730,20 @@ export class FormAddShipComponent implements OnInit {
         }        
       }
 
-      if (this.ShipmentByLadingObject == null){
-        // Insert as new quote
-        this.saveNewQuoteAndBookShipment(IsBookShipment, ModifiedQuote, objRateSelected);
-      }else{
-        // Update quote
-        this.updateQuote(IsBookShipment, ModifiedQuote, objRateSelected);
+      // const pickupTimesWarningMessage = this.PickupTwoHoursAndAfterOnePMValidations(); // TESTRS
+      const pickupTimesWarningMessage = '';
+      if (pickupTimesWarningMessage !== ''){
+        this.openDialog(true, pickupTimesWarningMessage, true, 'pickupTimesValidations', 'SaveAsQuote');    
+      }else {
+        if (this.ShipmentByLadingObject == null){
+          // Insert as new quote
+          this.saveNewQuoteAndBookShipment(IsBookShipment, ModifiedQuote, objRateSelected);
+        }else{
+          // Update quote
+          this.updateQuote(IsBookShipment, ModifiedQuote, objRateSelected);
+        }
       }
+      
     }  
   }
 
@@ -2743,6 +2778,49 @@ export class FormAddShipComponent implements OnInit {
         newClass = 50;
 
     return newClass;
+  } 
+
+  ConvertTime12HoursTo24Hours(InputTime) {
+    let NewTime = 0;
+
+    const Time = parseInt(InputTime.substr(0, 2));
+    const meridiem = InputTime.slice(-2);
+
+
+    if (meridiem === "AM" && Time === 12) {
+        NewTime = 0;
+    }
+    else {
+        NewTime = Time;
+    }
+    if (meridiem === "PM") {
+        NewTime = Time + 12;
+    }
+
+    return NewTime;
+  }
+
+  PickupTwoHoursAndAfterOnePMValidations() {
+    let warningMessage = '';
+      
+    const fromTime = this.ConvertTime12HoursTo24Hours(this.originAndDestinationFormGroup.get('originpickupopen').value);
+    const ToTime = this.ConvertTime12HoursTo24Hours(this.originAndDestinationFormGroup.get('originpickupclose').value);
+                 
+        if (fromTime < ToTime) {
+          const diffTime = ToTime - fromTime;
+            if (diffTime < 2) {    
+              warningMessage = 'Scheduled Pickups Require a Minimum 2-Hour Window Between Pickup Open Time & Pickup Close Time';                
+            }
+            else if (fromTime > 13) {
+                warningMessage = 'Same day pickup requests scheduled after 1:00 PM relevant to the pickup location could miss pickup and be rescheduled for the following business day. To Confirm Equipment Availability please contact your account representative.';                            
+            }           
+        }
+        else if (fromTime > 13) {
+            warningMessage = 'Same day pickup requests scheduled after 1:00 PM relevant to the pickup location could miss pickup and be rescheduled for the following business day. To Confirm Equipment Availability please contact your account representative.';          
+        }  
+        
+    return warningMessage;
+    
   }  
 
 }

@@ -321,28 +321,28 @@ export class FormShipmentBoardComponent implements OnInit {
 
     // Get total per status
     let totalPerStatus: TotalStatusRecords; 
-    totalPerStatus = await this.httpService.GetTotalRowsPerStatus(this.user.ClientID, 10);
+    totalPerStatus = await this.httpService.GetTotalRowsPerStatus(this.authenticationService.getDefaultClient().ClientID, 10);
     this.totalQuotedStatus = totalPerStatus != null ? totalPerStatus.RecordCount : 0;
 
-    totalPerStatus = await this.httpService.GetTotalRowsPerStatus(this.user.ClientID, 13);
+    totalPerStatus = await this.httpService.GetTotalRowsPerStatus(this.authenticationService.getDefaultClient().ClientID, 13);
     this.totalQuotedStatus += totalPerStatus != null ? totalPerStatus.RecordCount : 0;
 
-    totalPerStatus = await this.httpService.GetTotalRowsPerStatus(this.user.ClientID, 14);
+    totalPerStatus = await this.httpService.GetTotalRowsPerStatus(this.authenticationService.getDefaultClient().ClientID, 14);
     this.totalQuotedStatus += totalPerStatus != null ? totalPerStatus.RecordCount : 0;
 
-    totalPerStatus = await this.httpService.GetTotalRowsPerStatus(this.user.ClientID, 2);
+    totalPerStatus = await this.httpService.GetTotalRowsPerStatus(this.authenticationService.getDefaultClient().ClientID, 2);
     this.totalBookedStatus = totalPerStatus != null ? totalPerStatus.RecordCount : 0;
 
-    totalPerStatus = await this.httpService.GetTotalRowsPerStatus(this.user.ClientID, 15);
+    totalPerStatus = await this.httpService.GetTotalRowsPerStatus(this.authenticationService.getDefaultClient().ClientID, 15);
     this.totalPickupRequestedStatus = totalPerStatus != null ? totalPerStatus.RecordCount : 0;
 
-    totalPerStatus = await this.httpService.GetTotalRowsPerStatus(this.user.ClientID, 1);
+    totalPerStatus = await this.httpService.GetTotalRowsPerStatus(this.authenticationService.getDefaultClient().ClientID, 1);
     this.totalInTransitStatus = totalPerStatus != null ? totalPerStatus.RecordCount : 0;
 
-    totalPerStatus = await this.httpService.GetTotalRowsPerStatus(this.user.ClientID, 9);
+    totalPerStatus = await this.httpService.GetTotalRowsPerStatus(this.authenticationService.getDefaultClient().ClientID, 9);
     this.totalOutForDeliveryStatus = totalPerStatus != null ? totalPerStatus.RecordCount : 0;
 
-    totalPerStatus = await this.httpService.GetTotalRowsPerStatus(this.user.ClientID, 6);
+    totalPerStatus = await this.httpService.GetTotalRowsPerStatus(this.authenticationService.getDefaultClient().ClientID, 6);
     this.totalDeliveredStatus = totalPerStatus != null ? totalPerStatus.RecordCount : 0;
 
     this.EquipmentOptions = await this.httpService.getMasEquipment(this.keyId);

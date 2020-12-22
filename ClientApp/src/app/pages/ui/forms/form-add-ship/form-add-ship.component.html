@@ -47,7 +47,14 @@
                     <div fxFlex="100%">
                       <mat-form-field>
                         <mat-label>Name</mat-label>
-                        <input name="originname" formControlName="originname" matInput maxlength="150" required >
+                        <input name="originname" formControlName="originname" matInput maxlength="150" required 
+                                [matAutocomplete]="pcoAutoComplete"
+                                (keydown.tab)="validateOriginPostalCode($event)">
+                                <mat-autocomplete #pcoAutoComplete="matAutocomplete" (optionSelected)="pcoAutoCompleteSelected($event)">
+                                  <mat-option *ngFor="let option of pcoAutoCompleteOptions | async" [value]="option">
+                                    {{option.PostalCode}} - {{option.CityName}}
+                                  </mat-option>
+                                </mat-autocomplete>
                       </mat-form-field>
                     </div>                                 
                   </div>

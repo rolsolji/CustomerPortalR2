@@ -570,11 +570,13 @@ export class FormAddShipComponent implements OnInit {
   } 
 
   pcoAutoCompleteFilter(val: string): Observable<any[]> {
+    console.log('Autocomplete origin filter:', val);
     const CountryId = this.originSelectedCountry == null ? '1': this.originSelectedCountry.CountryId.toString();
     return this.httpService.postalCodeAutocomplete(val, CountryId, this.keyId)
   }
 
   pcoAutoCompleteSelected(event: MatAutocompleteSelectedEvent): void {
+    console.log('Autocomplete origin selected');
     this.originAndDestinationFormGroup.get('originstatename').setValue(event.option.value.StateName.trim());
     this.OriginPostalCode = String.Format('{0}-{1}',event.option.value.PostalCode,event.option.value.CityName.trim());
     this.OriginPostalData = event.option.value;
@@ -582,11 +584,13 @@ export class FormAddShipComponent implements OnInit {
   }
 
   pcdAutoCompletefilter(val: string): Observable<any[]> {
+    console.log('Autocomplete dest filter:', val);
     const CountryId = this.destinationSelectedCountry == null ? '1': this.destinationSelectedCountry.CountryId.toString();
     return this.httpService.postalCodeAutocomplete(val, CountryId, this.keyId)
   }
 
   pcdAutoCompleteSelected(event: MatAutocompleteSelectedEvent): void {
+    console.log('Autocomplete dest selected');
     this.originAndDestinationFormGroup.get('deststatename').setValue(event.option.value.StateName.trim());
     this.DestinationPostalCode = String.Format('{0}-{1}',event.option.value.PostalCode,event.option.value.CityName.trim());
     this.DestinationPostalData = event.option.value;

@@ -73,7 +73,9 @@ import { ReferenceByClient } from '../../../../Entities/ReferenceByClient';
 import {environment} from '../../../../../environments/environment';
 import { SendEmailParameters, InvoiceParameter } from '../../../../Entities/SendEmailParameters';
 import { SendEmailResponse } from '../../../../Entities/SendEmailResponse';
-import { TrackingDetails } from '../../../../Entities/TrackingDetails'
+import { TrackingDetails } from '../../../../Entities/TrackingDetails';
+import { importType } from '@angular/compiler/src/output/output_ast';
+import { TotalStatusRecords }  from '../../../../Entities/TotalStatusRecords';
 
 @Component({
   selector: 'vex-form-shipment-board',
@@ -176,16 +178,24 @@ export class FormShipmentBoardComponent implements OnInit {
   StatusOptions: Status[] = [];
   StatusOptionsString: string[] = [];
   StatusSelectec: string[];
+
+  QuotedId = 10 //Quoted
+  BookedId = 2 //Booked
+  PickupRequestedId = 15 //Pickup Requested
+  InTransitId = 1 //In Transit
+  OutForDeliveryId = 9 //Out For Delivery
+  DeliveredId = 6 //Delivered
   SpotQuotedId = 13; //Spot Quoted
   QuotedModifiedId = 14; //Quote Modified
+
   EquipmentOptions: object;
   quoteIdParameter: string;
-  totalQuotedStatus: string = '--';
-  totalBookedStatus: string = '--';
-  totalPickupRequestedStatus: string = '--';
-  totalInTransitStatus: string = '--';
-  totalOutForDeliveryStatus: string = '--';
-  totalDeliveredStatus: string = '--';
+  totalQuotedStatus: number = 0;
+  totalBookedStatus: number = 0;
+  totalPickupRequestedStatus: number = 0;
+  totalInTransitStatus: number = 0;
+  totalOutForDeliveryStatus: number = 0;
+  totalDeliveredStatus: number = 0;
 
   shipmentInformation: ShipmentByLading;
   ReferenceByClientOptions: ReferenceByClient[];
@@ -240,6 +250,16 @@ export class FormShipmentBoardComponent implements OnInit {
   auditLogIsEnabled: boolean = false;
 
   quoteSelected: Quote;
+
+  quotedStatusSelected: boolean;
+  bookedStatusSelected: boolean;
+  pickupRequestedStatusSelected: boolean;
+  inTransitStatusSelected: boolean;
+  outForDeliveryStatusSelected: boolean;
+  deliveredStatusSelected: boolean;
+  panelCollectionServiceState = false;
+  totalStatusSelected: 0;
+  statusSelectedDescription = '6 status selected';
   //#endregion
 
   @ViewChild('statusInput') statusInput: ElementRef<HTMLInputElement>;
@@ -300,12 +320,30 @@ export class FormShipmentBoardComponent implements OnInit {
     );
 
     // Get total per status
-    this.totalQuotedStatus = '22';
-    this.totalBookedStatus = '22';
-    this.totalPickupRequestedStatus = '11';
-    this.totalInTransitStatus = '33';
-    this.totalOutForDeliveryStatus = '44';
-    this.totalDeliveredStatus = '22';
+    let totalPerStatus: TotalStatusRecords; 
+    totalPerStatus = await this.httpService.GetTotalRowsPerStatus(this.user.ClientID, 10);
+    this.totalQuotedStatus = totalPerStatus != null ? totalPerStatus.RecordCount : 0;
+
+    totalPerStatus = await this.httpService.GetTotalRowsPerStatus(this.user.ClientID, 13);
+    this.totalQuotedStatus += totalPerStatus != null ? totalPerStatus.RecordCount : 0;
+
+    totalPerStatus = await this.httpService.GetTotalRowsPerStatus(this.user.ClientID, 14);
+    this.totalQuotedStatus += totalPerStatus != null ? totalPerStatus.RecordCount : 0;
+
+    totalPerStatus = await this.httpService.GetTotalRowsPerStatus(this.user.ClientID, 2);
+    this.totalBookedStatus = totalPerStatus != null ? totalPerStatus.RecordCount : 0;
+
+    totalPerStatus = await this.httpService.GetTotalRowsPerStatus(this.user.ClientID, 15);
+    this.totalPickupRequestedStatus = totalPerStatus != null ? totalPerStatus.RecordCount : 0;
+
+    totalPerStatus = await this.httpService.GetTotalRowsPerStatus(this.user.ClientID, 1);
+    this.totalInTransitStatus = totalPerStatus != null ? totalPerStatus.RecordCount : 0;
+
+    totalPerStatus = await this.httpService.GetTotalRowsPerStatus(this.user.ClientID, 9);
+    this.totalOutForDeliveryStatus = totalPerStatus != null ? totalPerStatus.RecordCount : 0;
+
+    totalPerStatus = await this.httpService.GetTotalRowsPerStatus(this.user.ClientID, 6);
+    this.totalDeliveredStatus = totalPerStatus != null ? totalPerStatus.RecordCount : 0;
 
     this.EquipmentOptions = await this.httpService.getMasEquipment(this.keyId);
     this.StatusOptions.forEach(s => this.StatusOptionsString.push(s.Status));
@@ -330,7 +368,7 @@ export class FormShipmentBoardComponent implements OnInit {
       ClientName: null,
       OrderBy: 'LadingID',
       IsAccending: false,
-      UserRowID: 0,
+      UserRowID: 1,
       LadingIDList: [],
       LoadNo: null,
       IsExpired: false,
@@ -373,6 +411,14 @@ export class FormShipmentBoardComponent implements OnInit {
     );
 
     this.defaultFilterText = 'Select Mode: All / Status Selected: All';
+
+    this.quotedStatusSelected = true;
+    this.bookedStatusSelected = true;
+    this.pickupRequestedStatusSelected = true;
+    this.inTransitStatusSelected = true;
+    this.outForDeliveryStatusSelected = true;
+    this.deliveredStatusSelected = true;
+    this.statusSelectedDescription= '6 status selected';
   }
 
   // SearchModal Open/Close
@@ -409,6 +455,7 @@ export class FormShipmentBoardComponent implements OnInit {
     let additionalFilters = false;
     // SearchModal
     this.close('close');
+    this.panelCollectionServiceState = false;
 
     //Clean filters
     if (parameter === 'clearfilters'){
@@ -447,6 +494,33 @@ export class FormShipmentBoardComponent implements OnInit {
       this.getQuotesParameters.BOlStatusIDList.push(parameter);
       if (this.statusSelected !== null && this.statusSelected.length > 0)
         this.defaultFilterText = String.Format('Status Selected: {0}', this.statusSelected[0].Status);
+
+        this.quotedStatusSelected = false;
+      this.bookedStatusSelected = false;
+      this.pickupRequestedStatusSelected = false;
+      this.inTransitStatusSelected = false;
+      this.outForDeliveryStatusSelected = false;
+      this.deliveredStatusSelected = false;
+
+      if (parameter === '10')
+        this.quotedStatusSelected = true;
+
+      if (parameter === '2')
+        this.bookedStatusSelected = true;
+
+      if (parameter === '15')
+        this.pickupRequestedStatusSelected = true;
+
+      if (parameter === '1')
+        this.inTransitStatusSelected = true;
+
+      if (parameter === '9')
+        this.outForDeliveryStatusSelected = true;
+
+      if (parameter === '6')
+        this.deliveredStatusSelected = true;
+
+      this.statusSelectedDescription = String.Format('{0} status selected', this.statusSelected.length);
     }
     else{
       this.getQuotesParameters.BOlStatusIDList = [];
@@ -468,7 +542,8 @@ export class FormShipmentBoardComponent implements OnInit {
       }
     }
 
-    if (this.getQuotesParameters.BOlStatusIDList.findIndex(s => s === 10) !== -1){
+    if (this.getQuotesParameters.BOlStatusIDList.findIndex(s => s === 10) !== -1
+          || this.getQuotesParameters.BOlStatusIDList.findIndex(s => s === '10') !== -1 ){
       this.getQuotesParameters.BOlStatusIDList.push(this.SpotQuotedId);
       this.getQuotesParameters.BOlStatusIDList.push(this.QuotedModifiedId);
     }
@@ -817,5 +892,19 @@ export class FormShipmentBoardComponent implements OnInit {
     }
 
     return fontWeight;
+  }
+
+  validateCollectionStatus(event,code: number){
+
+    if(event.checked){
+      this.statusSelected.push(this.StatusOptions.find(s => s.BOLStatusID === code));
+    }
+    /* unselected */
+    else{
+      const index = this.statusSelected.findIndex(s => s.BOLStatusID === code);
+      this.statusSelected.splice(index,1);
+    }
+
+    this.statusSelectedDescription = String.Format('{0} status selected', this.statusSelected.length);
   }
 }

@@ -650,8 +650,8 @@ export class FormAddShipComponent implements OnInit {
       this.openDialog(RequiredFieldsValidationObj.isConfirmDialog, RequiredFieldsValidationObj.message,
         RequiredFieldsValidationObj.yesNoActions, RequiredFieldsValidationObj.actionEvent, 'BookShipmentSubmit');
     }else {
-      //const pickupTimesWarningMessage = this.PickupTwoHoursAndAfterOnePMValidations(); //TESTRS
-      const pickupTimesWarningMessage = '';
+      const pickupTimesWarningMessage = this.PickupTwoHoursAndAfterOnePMValidations(); //TESTRS
+      // const pickupTimesWarningMessage = '';
       if (pickupTimesWarningMessage !== ''){
         this.openDialog(true, pickupTimesWarningMessage, true, 'pickupTimesValidations', 'BookShipmentSubmit');    
       }else{
@@ -1399,10 +1399,10 @@ export class FormAddShipComponent implements OnInit {
   
             if (this.ShipmentByLadingObject == null){
               // Insert as new quote
-              this.saveNewQuoteAndBookShipment(bookShipment, true);
+              this.saveNewQuoteAndBookShipment(bookShipment);
             }else{
               // Update quote
-              this.updateQuote(bookShipment, true);
+              this.updateQuote(bookShipment);
             }
             break;
         } 
@@ -1730,8 +1730,8 @@ export class FormAddShipComponent implements OnInit {
         }        
       }
 
-      // const pickupTimesWarningMessage = this.PickupTwoHoursAndAfterOnePMValidations(); // TESTRS
-      const pickupTimesWarningMessage = '';
+      const pickupTimesWarningMessage = this.PickupTwoHoursAndAfterOnePMValidations(); // TESTRS
+      // const pickupTimesWarningMessage = '';
       if (pickupTimesWarningMessage !== ''){
         this.openDialog(true, pickupTimesWarningMessage, true, 'pickupTimesValidations', 'SaveAsQuote');    
       }else {
@@ -2577,37 +2577,40 @@ export class FormAddShipComponent implements OnInit {
           // this.snackbar.open('Quote saved successfully', null, {
           //   duration: 5000
           // });
-          this.openDialog(false, 'Quote saved successfully. Quote Number: ' + localShipmentByLadingObject.ClientLadingNo + '. ' + (objRateSelected.rateSelectedAction === 4 ? 'Email has been sent.' : ''), null, 
+          this.openDialog(false, 'Quote saved successfully. Quote Number: ' + localShipmentByLadingObject.ClientLadingNo + '. ' + (objRateSelected != null && objRateSelected.rateSelectedAction === 4 ? 'Email has been sent.' : ''), null, 
           'QuoteSavedAndRedirectToBoard', null, null, null);
-  
-          switch (objRateSelected.rateSelectedAction) {
-            case 3: // print quote
-              const ratequotePrintURL = String.Format(environment.baseEndpoint + 'Handlers/PrintQuoteHandler.ashx?LadingID={0}&Ticket={1}',
-              localShipmentByLadingObject.LadingID,this.securityToken);
-              window.open(ratequotePrintURL, '_blank');
-              break;
-            case 4: // email quote
-              let emailBOLParameters: SendEmailParameters;
-  
-              const invoiceParameter: InvoiceParameter = {
-                InvoiceDetailIDs: []
-              };
-      
-              emailBOLParameters = {
-                ClientID: this.ClientID,
-                CarrierID : selectedRate.CarrierID,
-                ApplicationID: 56,
-                EventID: 39,
-                EmailAddresses: objRateSelected.keyValue,
-                LadingID: localShipmentByLadingObject.LadingID,
-                UserRowID: 1,
-                InvoiceParameter: invoiceParameter,
-                LadingIDs: [],
-              }
-      
-              this.httpService.SendEmailManually(emailBOLParameters);
-              break;
-          } 
+          
+          if (objRateSelected != null){
+            switch (objRateSelected.rateSelectedAction) {
+              case 3: // print quote
+                const ratequotePrintURL = String.Format(environment.baseEndpoint + 'Handlers/PrintQuoteHandler.ashx?LadingID={0}&Ticket={1}',
+                localShipmentByLadingObject.LadingID,this.securityToken);
+                window.open(ratequotePrintURL, '_blank');
+                break;
+              case 4: // email quote
+                let emailBOLParameters: SendEmailParameters;
+    
+                const invoiceParameter: InvoiceParameter = {
+                  InvoiceDetailIDs: []
+                };
+        
+                emailBOLParameters = {
+                  ClientID: this.ClientID,
+                  CarrierID : selectedRate.CarrierID,
+                  ApplicationID: 56,
+                  EventID: 39,
+                  EmailAddresses: objRateSelected.keyValue,
+                  LadingID: localShipmentByLadingObject.LadingID,
+                  UserRowID: 1,
+                  InvoiceParameter: invoiceParameter,
+                  LadingIDs: [],
+                }
+        
+                this.httpService.SendEmailManually(emailBOLParameters);
+                break;
+            } 
+          }
+          
 
         }else{
           this.openDialog(false, 'Shipment Booked with LoadNo: ' + localShipmentByLadingObject.LadingID.toString() + '. ', null, 'ShipmentBooked');
@@ -2802,23 +2805,30 @@ export class FormAddShipComponent implements OnInit {
 
   PickupTwoHoursAndAfterOnePMValidations() {
     let warningMessage = '';
+    
+    if (this.originAndDestinationFormGroup.get('originpickupopen').value != null && this.originAndDestinationFormGroup.get('originpickupopen').value !== '' && 
+    this.originAndDestinationFormGroup.get('originpickupclose').value != null && this.originAndDestinationFormGroup.get('originpickupclose').value !== ''){
+      const fromTime = this.ConvertTime12HoursTo24Hours(this.originAndDestinationFormGroup.get('originpickupopen').value);
+      const ToTime = this.ConvertTime12HoursTo24Hours(this.originAndDestinationFormGroup.get('originpickupclose').value);
+                   
+          if (fromTime < ToTime) {
+            const diffTime = ToTime - fromTime;
+              if (diffTime < 2) {    
+                warningMessage = 'Scheduled Pickups Require a Minimum 2-Hour Window Between Pickup Open Time & Pickup Close Time. ';                
+              }
+              else if (fromTime > 13) {
+                  warningMessage += 'Same day pickup requests scheduled after 1:00 PM relevant to the pickup location could miss pickup and be rescheduled for the following business day. To Confirm Equipment Availability please contact your account representative. ';                            
+              }           
+          }
+          else if (fromTime > 13) {
+              warningMessage = 'Same day pickup requests scheduled after 1:00 PM relevant to the pickup location could miss pickup and be rescheduled for the following business day. To Confirm Equipment Availability please contact your account representative. ';          
+          }  
       
-    const fromTime = this.ConvertTime12HoursTo24Hours(this.originAndDestinationFormGroup.get('originpickupopen').value);
-    const ToTime = this.ConvertTime12HoursTo24Hours(this.originAndDestinationFormGroup.get('originpickupclose').value);
-                 
-        if (fromTime < ToTime) {
-          const diffTime = ToTime - fromTime;
-            if (diffTime < 2) {    
-              warningMessage = 'Scheduled Pickups Require a Minimum 2-Hour Window Between Pickup Open Time & Pickup Close Time';                
-            }
-            else if (fromTime > 13) {
-                warningMessage = 'Same day pickup requests scheduled after 1:00 PM relevant to the pickup location could miss pickup and be rescheduled for the following business day. To Confirm Equipment Availability please contact your account representative.';                            
-            }           
-        }
-        else if (fromTime > 13) {
-            warningMessage = 'Same day pickup requests scheduled after 1:00 PM relevant to the pickup location could miss pickup and be rescheduled for the following business day. To Confirm Equipment Availability please contact your account representative.';          
-        }  
-        
+      if (warningMessage !== ''){
+        warningMessage += 'Continue?'
+      }
+    }
+            
     return warningMessage;
     
   }  

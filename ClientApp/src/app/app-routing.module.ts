@@ -4,6 +4,7 @@ import { VexRoutes } from '../@vex/interfaces/vex-route.interface';
 import { CustomLayoutComponent } from './custom-layout/custom-layout.component';
 import {AuthGuardService as AuthGuard} from './common/auth-guard.service';
 import { LocationListComponent } from './pages/location/location-list.component'
+import { ProductListComponent } from './pages/product/product-list.component'
 
 const childrenRoutes: VexRoutes = [
   {
@@ -55,7 +56,17 @@ const childrenRoutes: VexRoutes = [
         },
       ],
       canActivate: [AuthGuard]
-    },
+  },
+  {
+    path:'products',
+    children:[
+      {
+        path: 'list',
+        component: ProductListComponent
+      },
+    ],
+    canActivate: [AuthGuard]
+  },
   {
     path: 'apps',
     children: [

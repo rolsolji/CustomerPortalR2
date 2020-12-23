@@ -41,13 +41,17 @@ export class ProductService {
         }
 
         filteredProducts = [...filteredProducts].sort((a, b) => {
-            const propA = a[request.sort.property]
-            const propB = b[request.sort.property]
+            const propA = a[request.sort?.property]
+            const propB = b[request.sort?.property]
             let result
-            if (typeof propA === 'string') {
-                result = propA.toLowerCase().localeCompare(propB.toString().toLowerCase())
+            if (propA && propB) {
+                if (typeof propA === 'string') {
+                    result = propA.toLowerCase().localeCompare(propB.toString().toLowerCase())
+                } else {
+                    result = propA as any - (propB as any)
+                }
             } else {
-                result = propA as any - (propB as any)
+                result = -1;
             }
             const factor = request.sort.order == 'asc' ? 1 : -1
             return result * factor

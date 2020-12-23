@@ -140,6 +140,14 @@ export class ProductTableComponent implements OnInit, AfterViewInit, OnDestroy {
 
   ngAfterViewInit() {}
 
+  sortData(event) {
+    console.log(event);
+    const { active, direction } = event;
+    console.log(active);
+    console.log(direction);
+    this.dataSource.sortBy({property: active, order: direction})
+  }
+
   createCustomer() {
     this.dialog.open(CustomerCreateUpdateComponent).afterClosed().subscribe((product: Product) => {
       /**

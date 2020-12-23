@@ -391,9 +391,7 @@ export class FormQuickQuoteComponent implements OnInit {
     }
   }
 
-  async getQuote() {
-    this.getQuoteButtonClicked = true;
-       
+  async getQuote() {           
     let isMinPCFForQuickQuote = false;
     let tLMinimumPCFLimit = 0;
     this.clientPCFDefaultData = await this.httpService.GetPCFClientDefaultsByClient(this.ClientID.toString());    
@@ -401,7 +399,7 @@ export class FormQuickQuoteComponent implements OnInit {
       tLMinimumPCFLimit = this.clientPCFDefaultData.TLMinimumPCFLimit;
       const arrayProducts = this.formProducts;    
       const filteredArrayPCFs: number[] = [];
-      for (let control of arrayProducts.controls) {
+      for (const control of arrayProducts.controls) {
         const product = control.value;
         if (product.Status !== 3 && product.PCF != null){         
           filteredArrayPCFs.push(product.PCF);
@@ -419,6 +417,7 @@ export class FormQuickQuoteComponent implements OnInit {
     if (isMinPCFForQuickQuote){
       this.openDialog(true, 'PCF is below ' + tLMinimumPCFLimit + ', there may be extra charges if you proceed booking this shipment.','GetRates');
     }else{
+      this.getQuoteButtonClicked = true;
       this.showSpinner = true;
       const test = await this.getShipmentRates();
       this.showSpinner = false;  
@@ -1162,6 +1161,7 @@ export class FormQuickQuoteComponent implements OnInit {
             }
             break;
           case 'GetRates':
+            this.getQuoteButtonClicked = true;
             this.showSpinner = true;
             const test = await this.getShipmentRates();
             this.showSpinner = false; 

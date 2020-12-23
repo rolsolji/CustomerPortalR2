@@ -59,6 +59,7 @@ import { Router, ActivatedRoute } from '@angular/router';
 import {ConfirmAlertDialogComponent} from '../../../../../app/shared/confirm-alert-dialog/confirm-alert-dialog.component';
 import { Country } from 'src/app/Entities/Country';
 import { InvoiceParameter, SendEmailParameters } from 'src/app/Entities/SendEmailParameters';
+import { PCFClientDefaults } from 'src/app/Entities/PCFClientDefaults';
 
 
 @Component({
@@ -150,6 +151,7 @@ export class FormAddShipComponent implements OnInit {
   ratesCounter = 0;
   clientTLWeightLimit: string;
   clientDefaultData: ClientDefaultData;
+  clientPCFDefaultData: PCFClientDefaults;
   accessorialsSelectedQty = 0;
 
   carrierSelected: string;
@@ -267,7 +269,7 @@ export class FormAddShipComponent implements OnInit {
       Pieces: [0],
       PackageTypeID: [3],
         ProductClass: [null, Validators.required],
-        NmfcNumber: [null, Validators.required],
+        NmfcNumber: [null, [Validators.required, Validators.pattern('^([a-zA-Z0-9]{6})-([a-zA-Z0-9]{2})$')]],
         ProductDescription: [null, Validators.required],
         Length: [null, Validators.required],
         Width: [null, Validators.required],
@@ -304,6 +306,12 @@ export class FormAddShipComponent implements OnInit {
   // Shipment Mode change event
   selectChangeShipmentMode (event: any) {
     this.fetchShipmentMode(event.value);
+  }
+
+  getProductsFormGroup(index): FormGroup {
+    const productsList = this.productsAndAccessorialsFormGroup.get('products') as FormArray;
+    const formGroup = productsList.controls[index] as FormGroup;
+    return formGroup;
   }
 
   async ngOnInit() {
@@ -642,11 +650,17 @@ export class FormAddShipComponent implements OnInit {
       this.openDialog(RequiredFieldsValidationObj.isConfirmDialog, RequiredFieldsValidationObj.message,
         RequiredFieldsValidationObj.yesNoActions, RequiredFieldsValidationObj.actionEvent, 'BookShipmentSubmit');
     }else {
-      if (this.ShipmentByLadingObject == null){
-        this.saveNewQuoteAndBookShipment(true);
+      const pickupTimesWarningMessage = this.PickupTwoHoursAndAfterOnePMValidations(); //TESTRS
+      // const pickupTimesWarningMessage = '';
+      if (pickupTimesWarningMessage !== ''){
+        this.openDialog(true, pickupTimesWarningMessage, true, 'pickupTimesValidations', 'BookShipmentSubmit');    
       }else{
-        this.updateQuote(true);
-      }
+        if (this.ShipmentByLadingObject == null){
+          this.saveNewQuoteAndBookShipment(true);
+        }else{
+          this.updateQuote(true);
+        }
+      }      
     }
   }
 
@@ -823,11 +837,37 @@ export class FormAddShipComponent implements OnInit {
       return;
     }
 
-    this.getQuoteButtonClicked = true;
-    this.showSpinner = true;
-    const test = await this.getShipmentRates();
-    this.confirmFormGroup.get('carrier').setValue('');
-    this.showSpinner = false;
+    let isMinPCFForQuickQuote = false;
+    let tLMinimumPCFLimit = 0;
+    this.clientPCFDefaultData = await this.httpService.GetPCFClientDefaultsByClient(this.ClientID.toString());    
+    if (this.clientPCFDefaultData != null && this.clientPCFDefaultData.ShowTLPCFMessage){     
+      tLMinimumPCFLimit = this.clientPCFDefaultData.TLMinimumPCFLimit;
+      const arrayProducts = this.formProducts;    
+      const filteredArrayPCFs: number[] = [];
+      for (const control of arrayProducts.controls) {
+        const product = control.value;
+        if (product.Status !== 3 && product.PCF != null){         
+          filteredArrayPCFs.push(product.PCF);
+        }
+     }
+
+     if (filteredArrayPCFs != null && filteredArrayPCFs.length > 0){
+       const foundedLowerPCFList = filteredArrayPCFs.filter(pcf => pcf < tLMinimumPCFLimit);
+       if (foundedLowerPCFList != null && foundedLowerPCFList.length > 0){
+          isMinPCFForQuickQuote = true;          
+       }
+     }
+    }    
+
+    if (isMinPCFForQuickQuote){
+      this.openDialog(true, 'PCF is below ' + tLMinimumPCFLimit + ', there may be extra charges if you proceed booking this shipment.',null,'GetRates');
+    }else{
+      this.getQuoteButtonClicked = true;
+      this.showSpinner = true;
+      const test = await this.getShipmentRates();
+      this.confirmFormGroup.get('carrier').setValue('');
+      this.showSpinner = false;
+    }   
   }
 
   async getShipmentRates() {
@@ -1023,7 +1063,7 @@ export class FormAddShipComponent implements OnInit {
     if (PCF != null) {
       if (this.clientDefaultData.IsCalculateClassByPCF){
         const pcfclass = this.EstimateClassFromPCF(PCF);
-        if (product.ProductClass !== pcfclass) {
+        if (product.ProductClass !== pcfclass.toString()) {
           this.openDialog(true, 'Selected class is ' + product.ProductClass + ' and Estimated class is ' + pcfclass + '. Do you want to change ?', false, 'UpdateProductPCFClass', null, index, pcfclass);          
         }
       }
@@ -1325,7 +1365,7 @@ export class FormAddShipComponent implements OnInit {
 
     const dialogRef = this.dialog.open(ConfirmAlertDialogComponent, dialogConfig);
 
-    dialogRef.afterClosed().subscribe((data: string) => {    
+    dialogRef.afterClosed().subscribe(async (data: string) => {    
       if (data != null && data === 'Accepted') {
         switch (actionEvent) {
           case 'UpdateProductPCFClass':
@@ -1341,6 +1381,29 @@ export class FormAddShipComponent implements OnInit {
             break;
           case 'QuoteSavedAndRedirectToBoard':           
             this.router.navigate(['../../../shipmentboard/LTLTL/'], { relativeTo: this.route });
+            break;
+          case 'GetRates':
+            this.getQuoteButtonClicked = true;
+            this.showSpinner = true;
+            const test = await this.getShipmentRates();
+            this.confirmFormGroup.get('carrier').setValue('');
+            this.showSpinner = false;
+            break;
+          case 'pickupTimesValidations':
+            let bookShipment;
+            if (method === 'SaveAsQuote'){
+              bookShipment = false;
+            }else if (method === 'BookShipmentSubmit'){
+              bookShipment = true;
+            }
+  
+            if (this.ShipmentByLadingObject == null){
+              // Insert as new quote
+              this.saveNewQuoteAndBookShipment(bookShipment);
+            }else{
+              // Update quote
+              this.updateQuote(bookShipment);
+            }
             break;
         } 
       }else if (data != null && data === 'No') {
@@ -1667,13 +1730,20 @@ export class FormAddShipComponent implements OnInit {
         }        
       }
 
-      if (this.ShipmentByLadingObject == null){
-        // Insert as new quote
-        this.saveNewQuoteAndBookShipment(IsBookShipment, ModifiedQuote, objRateSelected);
-      }else{
-        // Update quote
-        this.updateQuote(IsBookShipment, ModifiedQuote, objRateSelected);
+      const pickupTimesWarningMessage = this.PickupTwoHoursAndAfterOnePMValidations(); // TESTRS
+      // const pickupTimesWarningMessage = '';
+      if (pickupTimesWarningMessage !== ''){
+        this.openDialog(true, pickupTimesWarningMessage, true, 'pickupTimesValidations', 'SaveAsQuote');    
+      }else {
+        if (this.ShipmentByLadingObject == null){
+          // Insert as new quote
+          this.saveNewQuoteAndBookShipment(IsBookShipment, ModifiedQuote, objRateSelected);
+        }else{
+          // Update quote
+          this.updateQuote(IsBookShipment, ModifiedQuote, objRateSelected);
+        }
       }
+      
     }  
   }
 
@@ -2507,37 +2577,40 @@ export class FormAddShipComponent implements OnInit {
           // this.snackbar.open('Quote saved successfully', null, {
           //   duration: 5000
           // });
-          this.openDialog(false, 'Quote saved successfully. Quote Number: ' + localShipmentByLadingObject.ClientLadingNo + '. ' + (objRateSelected.rateSelectedAction === 4 ? 'Email has been sent.' : ''), null, 
+          this.openDialog(false, 'Quote saved successfully. Quote Number: ' + localShipmentByLadingObject.ClientLadingNo + '. ' + (objRateSelected != null && objRateSelected.rateSelectedAction === 4 ? 'Email has been sent.' : ''), null, 
           'QuoteSavedAndRedirectToBoard', null, null, null);
-  
-          switch (objRateSelected.rateSelectedAction) {
-            case 3: // print quote
-              const ratequotePrintURL = String.Format(environment.baseEndpoint + 'Handlers/PrintQuoteHandler.ashx?LadingID={0}&Ticket={1}',
-              localShipmentByLadingObject.LadingID,this.securityToken);
-              window.open(ratequotePrintURL, '_blank');
-              break;
-            case 4: // email quote
-              let emailBOLParameters: SendEmailParameters;
-  
-              const invoiceParameter: InvoiceParameter = {
-                InvoiceDetailIDs: []
-              };
-      
-              emailBOLParameters = {
-                ClientID: this.ClientID,
-                CarrierID : selectedRate.CarrierID,
-                ApplicationID: 56,
-                EventID: 39,
-                EmailAddresses: objRateSelected.keyValue,
-                LadingID: localShipmentByLadingObject.LadingID,
-                UserRowID: 1,
-                InvoiceParameter: invoiceParameter,
-                LadingIDs: [],
-              }
-      
-              this.httpService.SendEmailManually(emailBOLParameters);
-              break;
-          } 
+          
+          if (objRateSelected != null){
+            switch (objRateSelected.rateSelectedAction) {
+              case 3: // print quote
+                const ratequotePrintURL = String.Format(environment.baseEndpoint + 'Handlers/PrintQuoteHandler.ashx?LadingID={0}&Ticket={1}',
+                localShipmentByLadingObject.LadingID,this.securityToken);
+                window.open(ratequotePrintURL, '_blank');
+                break;
+              case 4: // email quote
+                let emailBOLParameters: SendEmailParameters;
+    
+                const invoiceParameter: InvoiceParameter = {
+                  InvoiceDetailIDs: []
+                };
+        
+                emailBOLParameters = {
+                  ClientID: this.ClientID,
+                  CarrierID : selectedRate.CarrierID,
+                  ApplicationID: 56,
+                  EventID: 39,
+                  EmailAddresses: objRateSelected.keyValue,
+                  LadingID: localShipmentByLadingObject.LadingID,
+                  UserRowID: 1,
+                  InvoiceParameter: invoiceParameter,
+                  LadingIDs: [],
+                }
+        
+                this.httpService.SendEmailManually(emailBOLParameters);
+                break;
+            } 
+          }
+          
 
         }else{
           this.openDialog(false, 'Shipment Booked with LoadNo: ' + localShipmentByLadingObject.LadingID.toString() + '. ', null, 'ShipmentBooked');
@@ -2708,6 +2781,56 @@ export class FormAddShipComponent implements OnInit {
         newClass = 50;
 
     return newClass;
+  } 
+
+  ConvertTime12HoursTo24Hours(InputTime) {
+    let NewTime = 0;
+
+    const Time = parseInt(InputTime.substr(0, 2));
+    const meridiem = InputTime.slice(-2);
+
+
+    if (meridiem === "AM" && Time === 12) {
+        NewTime = 0;
+    }
+    else {
+        NewTime = Time;
+    }
+    if (meridiem === "PM") {
+        NewTime = Time + 12;
+    }
+
+    return NewTime;
+  }
+
+  PickupTwoHoursAndAfterOnePMValidations() {
+    let warningMessage = '';
+    
+    if (this.originAndDestinationFormGroup.get('originpickupopen').value != null && this.originAndDestinationFormGroup.get('originpickupopen').value !== '' && 
+    this.originAndDestinationFormGroup.get('originpickupclose').value != null && this.originAndDestinationFormGroup.get('originpickupclose').value !== ''){
+      const fromTime = this.ConvertTime12HoursTo24Hours(this.originAndDestinationFormGroup.get('originpickupopen').value);
+      const ToTime = this.ConvertTime12HoursTo24Hours(this.originAndDestinationFormGroup.get('originpickupclose').value);
+                   
+          if (fromTime < ToTime) {
+            const diffTime = ToTime - fromTime;
+              if (diffTime < 2) {    
+                warningMessage = 'Scheduled Pickups Require a Minimum 2-Hour Window Between Pickup Open Time & Pickup Close Time. ';                
+              }
+              else if (fromTime > 13) {
+                  warningMessage += 'Same day pickup requests scheduled after 1:00 PM relevant to the pickup location could miss pickup and be rescheduled for the following business day. To Confirm Equipment Availability please contact your account representative. ';                            
+              }           
+          }
+          else if (fromTime > 13) {
+              warningMessage = 'Same day pickup requests scheduled after 1:00 PM relevant to the pickup location could miss pickup and be rescheduled for the following business day. To Confirm Equipment Availability please contact your account representative. ';          
+          }  
+      
+      if (warningMessage !== ''){
+        warningMessage += 'Continue?'
+      }
+    }
+            
+    return warningMessage;
+    
   }  
 
 }

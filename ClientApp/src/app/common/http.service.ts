@@ -42,6 +42,7 @@ import {Client} from '../Entities/client.model';
 import { PCFClientDefaults } from '../Entities/PCFClientDefaults';
 import {ProductGroup} from "../Entities/ProductGroup";
 import {Product} from "../Entities/Product";
+import { TotalStatusRecords } from '../Entities/TotalStatusRecords';
 
 @Injectable({
     providedIn: 'root'
@@ -670,5 +671,15 @@ export class HttpService{
           ).toPromise();
     }
 
-
+    GetTotalRowsPerStatus(clientId: number, statusId: number ){
+        const ticket = this.token;
+        const httpHeaders = new HttpHeaders({
+            Ticket : ticket
+        });
+        return this.http.get<TotalStatusRecords>(String.Format(this.baseEndpoint + 'Services/BOLHDRService.svc/json/GetCountByClientAndStatus?ClientId={0}&StatusId={1}',clientId, statusId)
+        ,{
+            headers: httpHeaders
+          }
+          ).toPromise();
+    }
 }

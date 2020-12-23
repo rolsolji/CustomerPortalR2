@@ -372,25 +372,28 @@
                       </div>
         
                       <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="5px">   
-                        <div fxFlex="15%">
+                        <div fxFlex="18%">
                           <mat-form-field>
                             <mat-label>NMFC</mat-label>
-                            <input matInput maxlength="50" formControlName="NmfcNumber" required>                            
+                            <input matInput maxlength="50" formControlName="NmfcNumber"  required>                                                      
+                            <div class="emailNotValid" *ngIf="getProductsFormGroup(i).controls['NmfcNumber'].touched && getProductsFormGroup(i).controls['NmfcNumber'].hasError('pattern')">
+                              NMFC Number should be in XXXXXX-XX format
+                            </div>                            
                           </mat-form-field>
                         </div>           
-                        <div fxFlex="15%">
+                        <div fxFlex="14%">
                           <mat-form-field>
                             <mat-label>L</mat-label>
                             <input matInput type="number" maxlength="4" min="0" formControlName="Length" (change)="onChangeCalculatePCF(i)" required class="removeArrowsNumberInput">
                           </mat-form-field>
                         </div>  
-                        <div fxFlex="15%">
+                        <div fxFlex="14%">
                           <mat-form-field>
                             <mat-label>W</mat-label>
                             <input matInput type="number" maxlength="4" min="0" formControlName="Width" (change)="onChangeCalculatePCF(i)" required class="removeArrowsNumberInput">
                           </mat-form-field>
                         </div>  
-                        <div fxFlex="15%">
+                        <div fxFlex="14%">
                           <mat-form-field>
                             <mat-label>H</mat-label>
                             <input matInput type="number" maxlength="4" min="0" formControlName="Height" (change)="onChangeCalculatePCF(i)" required class="removeArrowsNumberInput">
@@ -409,7 +412,7 @@
                           </mat-form-field>
                         </div>
                         
-                      </div>
+                      </div>                      
                       <div fxLayout="row" fxLayout.lt-md="column">  
                         <div fxFlex="27%" class="addToProductMaster">
                           <mat-checkbox [checked]="false" formControlName="addToProductMaster" color="primary">Add to my saved products</mat-checkbox>

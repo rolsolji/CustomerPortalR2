@@ -213,12 +213,47 @@
                                     </mat-form-field>
                                 </div>
                                 <div class="ml-2 mr-2">
-                                    <mat-form-field appearance="outline">
+                                    <!-- <mat-form-field appearance="outline">
                                         <mat-label>Select Status</mat-label>
                                         <mat-select multiple [(value)]="statusSelected">
                                             <mat-option *ngFor="let status of StatusOptions" [value]="status">{{status.Status}}</mat-option>
                                         </mat-select>
-                                    </mat-form-field>
+                                    </mat-form-field> -->
+
+                                    <mat-accordion>
+                                        <mat-expansion-panel [expanded]="panelCollectionServiceState" class="origin-services-expansion-panel"  
+                                            (opened)="panelCollectionServiceState = true"
+                                            (closed)="panelCollectionServiceState = false">
+                                            <mat-expansion-panel-header [collapsedHeight]="'32px'" [expandedHeight]="'32px'" class="expansion-panel-header-style">
+                                                <mat-panel-title>
+                                                    Select Status
+                                                </mat-panel-title>
+                                                <mat-panel-description>
+                                                    {{statusSelectedDescription}}
+                                                </mat-panel-description>
+                                            </mat-expansion-panel-header>
+                                            <div class="expansion-panel-body-style">
+                                                <div class="pt-1" fxLayout.lt-xs="column" fxLayout.gt-xs="row">
+                                                    <mat-checkbox [checked]="false" [(ngModel)]="quotedStatusSelected" color="warn" (change)="validateCollectionStatus($event,10)" value=10>Quoted</mat-checkbox>
+                                                </div>
+                                                <div class="pt-1" fxLayout.lt-xs="column" fxLayout.gt-xs="row">
+                                                    <mat-checkbox [checked]="false" [(ngModel)]="bookedStatusSelected" color="warn" (change)="validateCollectionStatus($event,2)" value=2>Booked</mat-checkbox>    
+                                                </div>
+                                                <div class="pt-1" fxLayout.lt-xs="column" fxLayout.gt-xs="row">
+                                                    <mat-checkbox [checked]="false" [(ngModel)]="pickupRequestedStatusSelected" color="warn" (change)="validateCollectionStatus($event,15)" value=15>Pickup Requested</mat-checkbox>    
+                                                </div>
+                                                <div class="pt-1" fxLayout.lt-xs="column" fxLayout.gt-xs="row">
+                                                    <mat-checkbox [checked]="false" [(ngModel)]="inTransitStatusSelected" color="warn" (change)="validateCollectionStatus($event,1)" value=1>In Transit</mat-checkbox>    
+                                                </div>
+                                                <div class="pt-1" fxLayout.lt-xs="column" fxLayout.gt-xs="row">
+                                                    <mat-checkbox [checked]="false" [(ngModel)]="outForDeliveryStatusSelected" color="warn" (change)="validateCollectionStatus($event,9)" value=9>Out For Delivery</mat-checkbox>    
+                                                </div>
+                                                <div class="pt-1" fxLayout.lt-xs="column" fxLayout.gt-xs="row">
+                                                    <mat-checkbox [checked]="false" [(ngModel)]="deliveredStatusSelected" color="warn" (change)="validateCollectionStatus($event,6)" value=6>Delivered</mat-checkbox>    
+                                                </div>
+                                            </div>
+                                        </mat-expansion-panel>
+                                    </mat-accordion>
                                 </div>
     
                                 <div fxLayout="row" fxLayoutAlign="end center" fxLayoutGap="8px" class="py-5 pr-2">

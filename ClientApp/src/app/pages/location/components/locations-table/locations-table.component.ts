@@ -28,6 +28,7 @@ import {GetLocationsParameters} from '../../../../Entities/GetLocationsParameter
 import {Location} from '../../../../Entities/Location';
 import {LocationCreateUpdateComponent} from "./location-create-update/location-create-update.component";
 import {LocationSearchModalComponent} from "./location-search-modal/location-search-modal.component";
+import {User} from "../../../../Entities/user.model";
 
 @Component({
   selector: 'vex-locations-table',
@@ -49,7 +50,7 @@ import {LocationSearchModalComponent} from "./location-search-modal/location-sea
 export class LocationsTableComponent implements OnInit, AfterViewInit, OnDestroy {
 
   layoutCtrl = 'fullwidth';
-
+  user: User;
   /**
    * Simulating a service with HTTP that returns Observables
    * You probably want to remove this and do all requests in a service with HTTP
@@ -95,6 +96,7 @@ export class LocationsTableComponent implements OnInit, AfterViewInit, OnDestroy
   @ViewChild(MatSort, { static: true }) sort: MatSort;
 
   constructor(private dialog: MatDialog, private httpService : HttpService) {
+    this.user = this.httpService.getUserFromStorage();
     this.initGetLocationsParameter();
   }
 
@@ -231,7 +233,7 @@ export class LocationsTableComponent implements OnInit, AfterViewInit, OnDestroy
 
   initGetLocationsParameter() {
     this.getLocationsParameters = {
-      ClientId: 1,
+      ClientId: this.user.ClientID,
       IsAccending: false,
       LocationID: null,
       Name: null,
@@ -241,7 +243,7 @@ export class LocationsTableComponent implements OnInit, AfterViewInit, OnDestroy
       ContactPhone: null,
       OrderBy: "",
       PageNumber: 1,
-      PageSize: 200,
+      PageSize: 100000,
       Status: null,
     }
   }

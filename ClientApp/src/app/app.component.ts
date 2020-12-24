@@ -162,11 +162,6 @@ export class AppComponent {
             label: 'Products',
             route: '/products/list',
             icon: icBaselineDvr,
-            badge: {
-              value: '16',
-              bgClass: 'bg-cyan',
-              textClass: 'text-cyan-contrast',
-            },
           },
           {
             type: 'dropdown',

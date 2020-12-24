@@ -375,7 +375,7 @@
                         <div fxFlex="18%">
                           <mat-form-field>
                             <mat-label>NMFC</mat-label>
-                            <input matInput maxlength="50" formControlName="NmfcNumber"  required>                                                      
+                            <input matInput maxlength="50" formControlName="NmfcNumber">                                                      
                             <div class="emailNotValid" *ngIf="getProductsFormGroup(i).controls['NmfcNumber'].touched && getProductsFormGroup(i).controls['NmfcNumber'].hasError('pattern')">
                               NMFC Number should be in XXXXXX-XX format
                             </div>                            

@@ -269,7 +269,8 @@ export class FormAddShipComponent implements OnInit {
       Pieces: [0],
       PackageTypeID: [3],
         ProductClass: [null, Validators.required],
-        NmfcNumber: [null, [Validators.required, Validators.pattern('^([a-zA-Z0-9]{6})-([a-zA-Z0-9]{2})$')]],
+        // NmfcNumber: [null, [Validators.required, Validators.pattern('^([a-zA-Z0-9]{6})-([a-zA-Z0-9]{2})$')]],
+        NmfcNumber: [null, [Validators.pattern('^([a-zA-Z0-9]{6})-([a-zA-Z0-9]{2})$')]],
         ProductDescription: [null, Validators.required],
         Length: [null, Validators.required],
         Width: [null, Validators.required],
@@ -899,7 +900,8 @@ export class FormAddShipComponent implements OnInit {
       DestCountry: this.DestinationPostalData.CountryCode,
       DestStateCode: this.DestinationPostalData.StateCode,
       DestCityName: this.DestinationPostalData.CityName,
-      ShipmentDate: String.Format('/Date({0})/',this.originAndDestinationFormGroup.get('originpickupdate').value.getTime()),
+      // ShipmentDate: String.Format('/Date({0})/',this.originAndDestinationFormGroup.get('originpickupdate').value.getTime()),
+      ShipmentDate: this.utilitiesService.ConvertDateToJsonFormate(this.originAndDestinationFormGroup.get('originpickupdate').value),
       Accessorials: this.accessorials,
       AccessorialCodes: [],
       TopN: this.confirmFormGroup.get('showTopCarriers').value,
@@ -1167,6 +1169,7 @@ export class FormAddShipComponent implements OnInit {
     let defaultdestpostalcode = null;
     let defaultdeststatename = null;
     let defaultDestExpDelDate = null;
+    let defaultRequestedDeliveryDate = null;
 
     if (this.ShipmentByLadingObject == null){      
       return;
@@ -1190,7 +1193,10 @@ export class FormAddShipComponent implements OnInit {
     
 
     // -- Calculate Expected Develiry Date
-    this.ExpectedDeliveryDateCalculated = await this.httpService.CalculateExpectedDeliveryDate(this.keyId, this.ShipmentByLadingObject.TransTime, strTempPickupDate);    
+    //this.ExpectedDeliveryDateCalculated = await this.httpService.CalculateExpectedDeliveryDate(this.keyId, this.ShipmentByLadingObject.TransTime, strTempPickupDate);    
+
+    const strTempReqDelDate = this.ConverteJsonDateToLocalTimeZone(this.ShipmentByLadingObject.RequestedDeliveryDate);
+    defaultRequestedDeliveryDate = new Date(strTempReqDelDate);
 
     defaultdestpostalcode = this.ShipmentByLadingObject.DestZipCode.trim() + '-' + this.ShipmentByLadingObject.DestCityName.trim();
     defaultdeststatename = this.ShipmentByLadingObject.DestStateName.trim();
@@ -1261,10 +1267,10 @@ export class FormAddShipComponent implements OnInit {
     this.originAndDestinationFormGroup.controls.destphone.setValue(this.ShipmentByLadingObject.DestContactPhone === 'NA' ? '' : this.ShipmentByLadingObject.DestContactPhone, {onlySelf: false});
     this.originAndDestinationFormGroup.controls.destemail.setValue(this.ShipmentByLadingObject.DestEmail === 'NA' ? '' : this.ShipmentByLadingObject.DestEmail, {onlySelf: false});
      
-     defaultDestExpDelDate = new Date(this.ConverteJsonDateToLocalTimeZone(this.ExpectedDeliveryDateCalculated));
+    // defaultDestExpDelDate = new Date(this.ConverteJsonDateToLocalTimeZone(this.ExpectedDeliveryDateCalculated));
     // const tempDestExpDelDate = moment.utc(this.ExpectedDeliveryDateCalculated);
     // defaultDestExpDelDate = new Date(this.datepipe.transform(tempDestExpDelDate.toString().replace(/(^.*\()|([+-].*$)/g, ''),'MM/dd/yyyy'));    
-    this.originAndDestinationFormGroup.controls.destexpdeldate.setValue(defaultDestExpDelDate, {onlySelf: false});
+    this.originAndDestinationFormGroup.controls.destexpdeldate.setValue(defaultRequestedDeliveryDate, {onlySelf: false});
     
     this.originAndDestinationFormGroup.controls.destdelapptfrom.setValue(this.ShipmentByLadingObject.DeliveryAppointmentTimeFrom, {onlySelf: false});
     this.originAndDestinationFormGroup.controls.destdelapptto.setValue(this.ShipmentByLadingObject.DeliveryAppointmentTimeTo, {onlySelf: false});
@@ -1868,7 +1874,8 @@ export class FormAddShipComponent implements OnInit {
 
     this.saveQuoteData = {
       ClientId: this.ClientID,
-      PickupDate: String.Format('/Date({0})/',this.originAndDestinationFormGroup.get('originpickupdate').value.getTime()),
+      // PickupDate: String.Format('/Date({0})/',this.originAndDestinationFormGroup.get('originpickupdate').value.getTime()),
+      PickupDate: this.utilitiesService.ConvertDateToJsonFormate(this.originAndDestinationFormGroup.get('originpickupdate').value),
       DeliveryDate: null,
       OrgName: this.originAndDestinationFormGroup.get('originname').value,
       OrgAdr1: this.originAndDestinationFormGroup.get('originadddress1').value,
@@ -1934,12 +1941,14 @@ export class FormAddShipComponent implements OnInit {
       DestTerminalPhone: selectedRate.DestTerminalPhoneNo,
       OriginTerminalFax:  selectedRate.OriginTerminalFaxNo,
       DestTerminalFax: selectedRate.DestTerminalFaxNo,
-      RequestedPickupDateFrom: this.originAndDestinationFormGroup.get('originpickupdate').value != null ? String.Format('/Date({0})/',this.originAndDestinationFormGroup.get('originpickupdate').value.getTime()) : null,
+      // RequestedPickupDateFrom: this.originAndDestinationFormGroup.get('originpickupdate').value != null ? String.Format('/Date({0})/',this.originAndDestinationFormGroup.get('originpickupdate').value.getTime()) : null,
+      RequestedPickupDateFrom: this.originAndDestinationFormGroup.get('originpickupdate').value != null ? this.utilitiesService.ConvertDateToJsonFormate(this.originAndDestinationFormGroup.get('originpickupdate').value) : null,
       RequestedPickupTimeFrom: this.originAndDestinationFormGroup.get('originpickupopen').value,
       RequestedPickupTimeTo: this.originAndDestinationFormGroup.get('originpickupclose').value,
       OrgFaxNo: null,
       DestFaxNo: null,
-      RequestedDeliveryDate: this.originAndDestinationFormGroup.get('destexpdeldate').value != null ? String.Format('/Date({0})/',this.originAndDestinationFormGroup.get('destexpdeldate').value.getTime()) : null,
+      // RequestedDeliveryDate: this.originAndDestinationFormGroup.get('destexpdeldate').value != null ? String.Format('/Date({0})/',this.originAndDestinationFormGroup.get('destexpdeldate').value.getTime()) : null,
+      RequestedDeliveryDate: this.originAndDestinationFormGroup.get('destexpdeldate').value != null ? this.utilitiesService.ConvertDateToJsonFormate(this.originAndDestinationFormGroup.get('destexpdeldate').value) : null,
       ServiceLevelID: this.shipmentInfoFormGroup.get('servicelevel').value,
       Miles: selectedRate.LaneWiseMiles,
       BrokerCarrierCode: null,
@@ -2188,11 +2197,13 @@ export class FormAddShipComponent implements OnInit {
     localShipmentByLadingObject.DestContactPhone = this.originAndDestinationFormGroup.get('destphone').value;
     localShipmentByLadingObject.DestEmail = this.originAndDestinationFormGroup.get('destemail').value;
 
-    localShipmentByLadingObject.PickupDate = String.Format('/Date({0})/',this.originAndDestinationFormGroup.get('originpickupdate').value.getTime());
+    // localShipmentByLadingObject.PickupDate = String.Format('/Date({0})/',this.originAndDestinationFormGroup.get('originpickupdate').value.getTime());
+    localShipmentByLadingObject.PickupDate = this.utilitiesService.ConvertDateToJsonFormate(this.originAndDestinationFormGroup.get('originpickupdate').value);
     localShipmentByLadingObject.RequestedPickupTimeFrom = this.originAndDestinationFormGroup.get('originpickupopen').value;
     localShipmentByLadingObject.RequestedPickupTimeTo = this.originAndDestinationFormGroup.get('originpickupclose').value;   
 
-    localShipmentByLadingObject.ExpectedDeliveryDate = String.Format('/Date({0})/',this.originAndDestinationFormGroup.get('destexpdeldate').value.getTime());
+    // localShipmentByLadingObject.ExpectedDeliveryDate = String.Format('/Date({0})/',this.originAndDestinationFormGroup.get('destexpdeldate').value.getTime());
+    localShipmentByLadingObject.ExpectedDeliveryDate = this.utilitiesService.ConvertDateToJsonFormate(this.originAndDestinationFormGroup.get('destexpdeldate').value);
     localShipmentByLadingObject.DeliveryAppointmentTimeFrom = this.originAndDestinationFormGroup.get('destdelapptfrom').value;
     localShipmentByLadingObject.DeliveryAppointmentTimeTo = this.originAndDestinationFormGroup.get('destdelapptto').value;   
     // --

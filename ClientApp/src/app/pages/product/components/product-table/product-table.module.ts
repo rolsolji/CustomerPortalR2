@@ -19,34 +19,39 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { ContainerModule } from '../../../../../@vex/directives/container/container.module';
 import { MatSelectModule } from '@angular/material/select';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
-
+import { MatSidenavModule } from "@angular/material/sidenav";
+import { MatInputModule } from "@angular/material/input";
+import { MatRadioModule } from "@angular/material/radio";
 
 @NgModule({
   declarations: [ProductTableComponent],
   exports: [
     ProductTableComponent
   ],
-  imports: [
-    CommonModule,
-    PageLayoutModule,
-    FlexLayoutModule,
-    BreadcrumbsModule,
-    // CustomerCreateUpdateModule,
-    MatPaginatorModule,
-    MatTableModule,
-    MatSortModule,
-    MatCheckboxModule,
-    MatIconModule,
-    MatButtonModule,
-    MatMenuModule,
-    IconModule,
-    FormsModule,
-    MatTooltipModule,
-    ReactiveFormsModule,
-    ContainerModule,
-    MatSelectModule,
-    MatButtonToggleModule
-  ]
+    imports: [
+        CommonModule,
+        PageLayoutModule,
+        FlexLayoutModule,
+        BreadcrumbsModule,
+        // CustomerCreateUpdateModule,
+        MatPaginatorModule,
+        MatTableModule,
+        MatSortModule,
+        MatCheckboxModule,
+        MatIconModule,
+        MatButtonModule,
+        MatMenuModule,
+        IconModule,
+        FormsModule,
+        MatTooltipModule,
+        ReactiveFormsModule,
+        ContainerModule,
+        MatSelectModule,
+        MatButtonToggleModule,
+        MatSidenavModule,
+        MatInputModule,
+        MatRadioModule,
+    ]
 })
 export class ProductTableModule {
 }

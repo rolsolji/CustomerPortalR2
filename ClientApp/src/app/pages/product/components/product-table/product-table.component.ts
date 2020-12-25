@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import {AfterViewInit, Component, EventEmitter, Input, OnDestroy, OnInit, Output, ViewChild} from '@angular/core';
 import { ReplaySubject } from 'rxjs';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
@@ -15,7 +15,7 @@ import icMoreHoriz from '@iconify/icons-ic/twotone-more-horiz';
 import { fadeInUp400ms } from '../../../../../@vex/animations/fade-in-up.animation';
 import { MAT_FORM_FIELD_DEFAULT_OPTIONS, MatFormFieldDefaultOptions } from '@angular/material/form-field';
 import { stagger40ms } from '../../../../../@vex/animations/stagger.animation';
-import { FormControl } from '@angular/forms';
+import { FormBuilder, FormControl, FormGroup } from '@angular/forms';
 import { untilDestroyed } from 'ngx-take-until-destroy';
 import { MatSelectChange } from '@angular/material/select';
 import icPhone from '@iconify/icons-ic/twotone-phone';
@@ -26,7 +26,8 @@ import { User } from "../../../../Entities/user.model";
 import { Product } from "../../../../Entities/Product";
 import { PaginatedDataSource } from "../../../../shared/components/datasource/PaginatedDataSource";
 import { ProductService, ProductQuery } from "../../../../common/product.service";
-import {Delete, Sort} from "../../../../shared/components/datasource/Page";
+import { Delete, Sort } from "../../../../shared/components/datasource/Page";
+import { MatSidenav } from "@angular/material/sidenav";
 
 @Component({
   selector: 'vex-product-table',
@@ -48,6 +49,7 @@ import {Delete, Sort} from "../../../../shared/components/datasource/Page";
 export class ProductTableComponent implements OnInit, AfterViewInit, OnDestroy {
 
   layoutCtrl = new FormControl('fullwidth');
+  formGroup: FormGroup;
   user: User;
   getProductParameter;
   getProductDetailsCountParameter;
@@ -75,11 +77,13 @@ export class ProductTableComponent implements OnInit, AfterViewInit, OnDestroy {
   pageNumber = 1;
   orderBy = "Description";
   isAscending = true;
+  productDisplay: ProductDisplay;
   dataSource: PaginatedDataSource<Product, ProductQuery> | null;
   selection = new SelectionModel<Product>(true, []);
   searchCtrl = new FormControl();
 
   labels = [];
+  productClasses = [50, 55, 60, 65, 70, 77.5, 85, 92.5, 100, 110, 125, 150, 175, 200, 250, 300, 400, 500, '']
 
   icPhone = icPhone;
   icMail = icMail;
@@ -96,8 +100,14 @@ export class ProductTableComponent implements OnInit, AfterViewInit, OnDestroy {
 
   @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
   @ViewChild(MatSort, {static: true}) sort: MatSort;
+  @ViewChild('searchModal') sidenav: MatSidenav;
 
-  constructor(private dialog: MatDialog, private httpService: HttpService, private productsService: ProductService) {
+  constructor(
+      private dialog: MatDialog,
+      private httpService: HttpService,
+      private productsService: ProductService,
+      private fb: FormBuilder
+  ) {
     this.user = this.httpService.getUserFromStorage();
   }
 
@@ -109,17 +119,24 @@ export class ProductTableComponent implements OnInit, AfterViewInit, OnDestroy {
    * Example on how to get data and pass it to the table - usually you would want a dedicated service with a HTTP request for this
    * We are simulating this request here.
    */
-  async getData() {
-    return await this.httpService.GetAndSearchPagedProductDetails(this.getProductParameter);
-  }
-
-  async ngOnInit() {
+  async getData(
+      Description = null,
+      Hazmat = null,
+      NMFC = null,
+      Class = null,
+      Commodity = null,
+      Status = null
+  ) {
+    this.productDisplay = this.initProductDisplay(Description, Hazmat, NMFC, Class, Commodity, Status);
     this.initGetProductDetailsCountParameter();
     const productDetailsCountResponse = await this.httpService.GetAndSearchPagedProductDetailsCount(this.getProductDetailsCountParameter);
     this.productDetailsCount = productDetailsCountResponse.GetAndSearchPagedProductDetailsCountResult;
 
     this.initGetProductsParameter();
+    return await this.httpService.GetAndSearchPagedProductDetails(this.getProductParameter);
+  }
 
+  async ngOnInit() {
     const { GetAndSearchPagedProductDetailsResult } = await this.getData();
     this.dataSource = new PaginatedDataSource<Product, ProductQuery>(
         (request, query, hasDelete) =>
@@ -131,6 +148,13 @@ export class ProductTableComponent implements OnInit, AfterViewInit, OnDestroy {
         this.initialDelete
     )
 
+    this.formGroup = this.fb.group({
+      commodity: '',
+      description: '',
+      hazMatSearchSelected: ['null'],
+      statusSearchSelected: ['null'],
+      productClass: ''
+    });
     this.searchCtrl.valueChanges.pipe(
         untilDestroyed(this)
     ).subscribe(value => this.onFilterChange(value));
@@ -138,13 +162,31 @@ export class ProductTableComponent implements OnInit, AfterViewInit, OnDestroy {
     const productGroupType = await this.httpService.GetProductGroupType(this.user.ClientID);
   }
 
+  async search() {
+    const commodityValue = this.formGroup.get('commodity').value;
+    const descriptionValue = this.formGroup.get('description').value;
+    const hazMatSearchSelected = this.formGroup.get('hazMatSearchSelected').value;
+    const statusSearchSelected = this.formGroup.get('statusSearchSelected').value;
+    const productClassSelected = this.formGroup.get('productClass').value;
+    const { GetAndSearchPagedProductDetailsResult } = await this.getData(
+        descriptionValue === '' ? null : descriptionValue,
+        hazMatSearchSelected === 'null' ? null : hazMatSearchSelected === 'true',
+        null,
+        productClassSelected === '' ? null : productClassSelected,
+        commodityValue === '' ? null : commodityValue,
+        statusSearchSelected === 'null' ? null : statusSearchSelected === 'true'
+    );
+    this.dataSource.queryBy({
+      search: GetAndSearchPagedProductDetailsResult,
+      registration: undefined
+    });
+    this.close('close');
+  }
+
   ngAfterViewInit() {}
 
   sortData(event) {
-    console.log(event);
     const { active, direction } = event;
-    console.log(active);
-    console.log(direction);
     this.dataSource.sortBy({property: active, order: direction})
   }
 
@@ -239,6 +281,21 @@ export class ProductTableComponent implements OnInit, AfterViewInit, OnDestroy {
     this.subject$.next(this.products);
   }
 
+  close(reason: string) {
+    if (reason === 'open' || reason === 'search')
+    {
+      this.sidenav.open();
+      event.stopPropagation();
+      event.stopImmediatePropagation();
+    }
+    else
+    {
+      this.sidenav.close();
+      event.stopPropagation();
+      event.stopImmediatePropagation();
+    }
+  }
+
   ngOnDestroy() {}
 
   initGetProductDetailsCountParameter() {
@@ -263,14 +320,34 @@ export class ProductTableComponent implements OnInit, AfterViewInit, OnDestroy {
       PageSize: this.pageSize * this.productDetailsCount,
       OrderBy: this.orderBy,
       IsAccending: this.isAscending,
-      productDisplay: {
-        Description: null,
-        Hazmat: null,
-        NMFC: null,
-        Class: null,
-        Commodity: null,
-        Status: null
-      }
+      productDisplay: this.productDisplay,
     }
   }
+
+  initProductDisplay(
+      Description = null,
+      Hazmat = null,
+      NMFC = null,
+      Class = null,
+      Commodity = null,
+      Status = null
+  ): ProductDisplay {
+    return {
+      Description: Description,
+      Hazmat: Hazmat,
+      NMFC: NMFC,
+      Class: Class,
+      Commodity: Commodity,
+      Status: Status
+    };
+  }
+}
+
+interface ProductDisplay {
+  Description: string | null,
+  Hazmat: boolean | null,
+  NMFC: string | null,
+  Class: number | null,
+  Commodity: number | null,
+  Status: boolean | null
 }

@@ -26,6 +26,7 @@ import {BehaviorSubject, Observable} from 'rxjs';
 import {PostalData} from '../../../app/Entities/PostalData';
 import { HtmlMsgByClient } from 'src/app/Entities/HtmlMsgByClient';
 import { environment } from 'src/environments/environment';
+import { Brand } from 'src/app/Entities/Brand';
 
 
 @Component({
@@ -93,9 +94,15 @@ export class ToolbarComponent implements OnInit {
     let htmlMsgByClientObj: HtmlMsgByClient[];
     // htmlMsgByClientObj = await this.httpService.GetClientHtmlMsgByClientID(this.authenticationService.defaultClient$.value.ClientID);
     htmlMsgByClientObj = this.authenticationService.getClientHtmlMessages();
-    if (htmlMsgByClientObj && htmlMsgByClientObj.length > 0){
-      this.toolBarMessage = htmlMsgByClientObj[0].HtmlMsg1;
+    // if (htmlMsgByClientObj && htmlMsgByClientObj.length > 0){
+    //   this.toolBarMessage = htmlMsgByClientObj[0].HtmlMsg1;
+    // }
+    let masBrandByClientObj: Brand[];
+    masBrandByClientObj = this.authenticationService.getMasBrands();
+    if(masBrandByClientObj && masBrandByClientObj.length > 0){
+      this.toolBarMessage = masBrandByClientObj[0].BannerText;
     }
+    
     this.toolBarTitle = this.authenticationService.getDefaultClient().ClientName;
     this.defaultClient = this.authenticationService.getDefaultClient();
     this.securityToken = this.authenticationService.ticket$.value;

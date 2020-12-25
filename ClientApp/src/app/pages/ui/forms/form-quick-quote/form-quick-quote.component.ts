@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit, ViewChild, ElementRef, Input,
-          Output, EventEmitter, HostListener, Pipe, PipeTransform } from '@angular/core';
+          Output, EventEmitter, HostListener, Pipe, PipeTransform, Sanitizer } from '@angular/core';
 import { DatePipe } from '@angular/common';
 
 import icVisibility from '@iconify/icons-ic/twotone-visibility';
@@ -66,8 +66,7 @@ import { SendEmailParameters, InvoiceParameter } from '../../../../Entities/Send
 import { SaveQuoteResponse } from '../../../../Entities/SaveQuoteResponse';
 import { HtmlMsgByClient } from 'src/app/Entities/HtmlMsgByClient';
 import { PCFClientDefaults } from '../../../../Entities/PCFClientDefaults';
-
-
+import { Brand } from 'src/app/Entities/Brand';
 
 export interface CountryState {
   name: string;
@@ -227,6 +226,10 @@ export class FormQuickQuoteComponent implements OnInit {
   htmlContentByClient: string;
 
   rightPanelImage: any = 'assets/img/demo/R2TestImage.png';
+
+  promotionImageByClient: any;
+  promotionImageTitle: string;
+
   noRatesFoundText = null;
 
   //#region Origin Fields
@@ -294,10 +297,13 @@ export class FormQuickQuoteComponent implements OnInit {
 
     let htmlMsgByClientObj: HtmlMsgByClient[];
     htmlMsgByClientObj = this.authenticationService.getClientHtmlMessages();
-    if (htmlMsgByClientObj && htmlMsgByClientObj.length > 0){
-      this.htmlContentByClient = htmlMsgByClientObj[0].HtmlMsg2;
-    }
+    // if (htmlMsgByClientObj && htmlMsgByClientObj.length > 0){
+    //   this.htmlContentByClient = htmlMsgByClientObj[0].HtmlMsg2;
+    // }
     
+    this.promotionImageByClient = environment.baseEndpoint + `Handlers/PromotionImageHandler.ashx?ClientID=${this.authenticationService.getDefaultClient().ClientID}&id=e(${Math.random().toString().slice(2,11)})/&Ticket=${this.securityToken}`;    
+    
+    this.promotionImageTitle = this.authenticationService.getDefaultClient().ClientName;
     const responseData = await this.httpService.getCountryList(this.keyId);
     this.clientDefaultData = await this.httpService.getClientDefaultsByClient(this.ClientID, this.keyId);
 

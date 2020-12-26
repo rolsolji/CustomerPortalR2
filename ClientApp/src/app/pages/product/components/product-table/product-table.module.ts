@@ -1,11 +1,9 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-
 import { ProductTableComponent } from './product-table.component';
 import { PageLayoutModule } from '../../../../../@vex/components/page-layout/page-layout.module';
 import { FlexLayoutModule } from '@angular/flex-layout';
 import { BreadcrumbsModule } from '../../../../../@vex/components/breadcrumbs/breadcrumbs.module';
-// import { CustomerCreateUpdateModule } from './customer-create-update/customer-create-update.module';
 import { MatPaginatorModule } from '@angular/material/paginator';
 import { MatTableModule } from '@angular/material/table';
 import { MatSortModule } from '@angular/material/sort';
@@ -22,6 +20,7 @@ import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { MatSidenavModule } from "@angular/material/sidenav";
 import { MatInputModule } from "@angular/material/input";
 import { MatRadioModule } from "@angular/material/radio";
+import { ProductCreateUpdateModule } from "../product-create-update/product-create-update.module";
 
 @NgModule({
   declarations: [ProductTableComponent],
@@ -33,7 +32,7 @@ import { MatRadioModule } from "@angular/material/radio";
         PageLayoutModule,
         FlexLayoutModule,
         BreadcrumbsModule,
-        // CustomerCreateUpdateModule,
+        ProductCreateUpdateModule,
         MatPaginatorModule,
         MatTableModule,
         MatSortModule,

@@ -4,7 +4,6 @@ import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { MatDialog } from '@angular/material/dialog';
 import { TableColumn } from '../../../../../@vex/interfaces/table-column.interface';
-import { CustomerCreateUpdateComponent } from '../../../apps/aio-table/customer-create-update/customer-create-update.component';
 import icEdit from '@iconify/icons-ic/twotone-edit';
 import icDelete from '@iconify/icons-ic/twotone-delete';
 import icSearch from '@iconify/icons-ic/twotone-search';
@@ -28,6 +27,7 @@ import { PaginatedDataSource } from "../../../../shared/components/datasource/Pa
 import { ProductService, ProductQuery } from "../../../../common/product.service";
 import { Delete, Sort } from "../../../../shared/components/datasource/Page";
 import { MatSidenav } from "@angular/material/sidenav";
+import { ProductCreateUpdateComponent } from "../product-create-update/product-create-update.component";
 
 @Component({
   selector: 'vex-product-table',
@@ -158,8 +158,6 @@ export class ProductTableComponent implements OnInit, AfterViewInit, OnDestroy {
     this.searchCtrl.valueChanges.pipe(
         untilDestroyed(this)
     ).subscribe(value => this.onFilterChange(value));
-
-    const productGroupType = await this.httpService.GetProductGroupType(this.user.ClientID);
   }
 
   async search() {
@@ -191,7 +189,7 @@ export class ProductTableComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   createCustomer() {
-    this.dialog.open(CustomerCreateUpdateComponent).afterClosed().subscribe((product: Product) => {
+    this.dialog.open(ProductCreateUpdateComponent).afterClosed().subscribe((product: Product) => {
       /**
        * Customer is the updated customer (if the user pressed Save - otherwise it's null)
        */
@@ -200,14 +198,14 @@ export class ProductTableComponent implements OnInit, AfterViewInit, OnDestroy {
          * Here we are updating our local array.
          * You would probably make an HTTP request here.
          */
-        this.products.unshift(new Product(product));
-        this.subject$.next(this.products);
+        this.dataSource.data.unshift(new Product(product));
+        this.dataSource.fetch(0);
       }
     });
   }
 
   updateCustomer(product: Product) {
-    this.dialog.open(CustomerCreateUpdateComponent, {
+    this.dialog.open(ProductCreateUpdateComponent, {
       data: product
     }).afterClosed().subscribe(updatedProduct => {
       /**
@@ -218,9 +216,9 @@ export class ProductTableComponent implements OnInit, AfterViewInit, OnDestroy {
          * Here we are updating our local array.
          * You would probably make an HTTP request here.
          */
-        const index = this.products.findIndex((existingCustomer) => existingCustomer.ProductID === updatedProduct.ProductID);
-        this.products[index] = new Product(updatedProduct);
-        this.subject$.next(this.products);
+        const index = this.dataSource.data.findIndex((existingCustomer) => existingCustomer.ProductID === updatedProduct.ProductID);
+        this.dataSource.data[index] = new Product(updatedProduct);
+        this.dataSource.fetch(0);
       }
     });
   }

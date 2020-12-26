@@ -197,14 +197,14 @@
 
     <div class="flex flex-col sm:flex-row sm:pb-5">
       <div class="sm:ml-6 flex-auto">
-        <mat-checkbox color="primary" [checked]="this.checked"></mat-checkbox>
+        <mat-checkbox color="primary" [checked]="this.checked" (change)="this.checked = $event.checked"></mat-checkbox>
         <mat-label class="pl-2">Is Active</mat-label>
       </div>
 
       <div class="sm:ml-6 sm:mr-6 flex-auto">
         <mat-label class="float-left sm:mr-6">Approve</mat-label>
-          <div *ngFor="let item of [1,2];  let i = index">
-            <mat-checkbox class="{{i === 0 ? 'float-left' : 'float-right'}}" color="primary" [checked]="approved === i" (change)="approved = i">{{i === 1 ? 'Yes' : 'No'}}</mat-checkbox>
+        <div *ngFor="let item of [1,2];  let i = index">
+          <mat-checkbox class="{{i === 0 ? 'float-left' : 'float-right'}}" color="primary" [checked]="this.approved === i" (change)="this.approved = i">{{i === 1 ? 'Yes' : 'No'}}</mat-checkbox>
         </div>
       </div>
     </div>

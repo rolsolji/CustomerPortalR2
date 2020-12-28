@@ -190,6 +190,29 @@ const childrenRoutes: VexRoutes = [
     path: 'documentation',
     loadChildren: () => import('./pages/documentation/documentation.module').then(m => m.DocumentationModule),
   },
+  {      
+    path:'reports',
+    children:[
+      {
+        path: 'KPI',        
+        loadChildren: () => import('./pages/ui/Reports/KPI/KPI-routing.module').then(m => m.KeyPerformanceIndicatorRoutingModule),
+        //loadChildren: () => import('./pages/ui/Reports/MasterReport/MasterReport-routing.module').then(m => m.MasterReportRoutingModule),
+      },
+      {
+        path: 'CarrierPerformance',        
+        loadChildren: () => import('./pages/ui/Reports/CarrierPerformance/CarrierPerformance-routing.module').then(m => m.CarrierPerformanceRoutingModule),        
+      },
+      {
+        path: 'ShipmentHistory',        
+        loadChildren: () => import('./pages/ui/Reports/ShipmentHistory/ShipmentHistory-routing.module').then(m => m.ShipmentHistoryRoutingModule),        
+      },
+      {
+        path: 'DailyActivity',        
+        loadChildren: () => import('./pages/ui/Reports/DailyActivity/DailyActivity-routing.module').then(m => m.DailyActivityRoutingModule),        
+      }
+    ],
+    canActivate: [AuthGuard] 
+  },
   {
     path: '**',
     loadChildren: () => import('./pages/pages/errors/error-404/error-404.module').then(m => m.Error404Module)

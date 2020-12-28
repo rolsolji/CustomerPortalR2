@@ -38,7 +38,7 @@ import {Country} from "../Entities/Country";
 import { Rate } from '../Entities/rate';
 import {LocationGroup} from "../Entities/LocationGroup";
 import { HtmlMsgByClient } from '../Entities/HtmlMsgByClient';
-import {Client} from '../Entities/client.model';
+import { Client } from '../Entities/client.model';
 import { PCFClientDefaults } from '../Entities/PCFClientDefaults';
 import { TotalStatusRecords } from '../Entities/TotalStatusRecords';
 
@@ -626,4 +626,32 @@ export class HttpService{
           }
           ).toPromise();
     }
+
+    /* Start http Services for Reports */
+    GetShipmentModeForReport() {
+        const ticket = this.token;
+        const httpHeaders = new HttpHeaders({
+            Ticket : ticket
+        });
+        return this.http.get<ShipmentMode[]>(
+            this.baseEndpoint + 'Services/BOLHDRService.svc/json/GetShipmentMode'
+            ,{
+                headers: httpHeaders
+            }
+        ).toPromise();
+    }
+
+    public GetClientsForReportByUserAndClientName(userID:number, val:string) {
+        const ticket = this.token;
+        const httpHeaders = new HttpHeaders({
+            Ticket : ticket
+        });
+        return this.http.get<Client[]>(
+            this.baseEndpoint + 'Services/MASClientService.svc/json/GetClientForUser?userID=' + userID + '&ClientName=' + val
+            ,{
+                headers: httpHeaders
+            }
+        ).toPromise();
+    }
+    /* END */
 }

@@ -594,7 +594,7 @@
                       </mat-form-field>
                     </div>                                           
                 </div>                       
-                  <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="5px">
+                  <!-- <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="5px">
                     <div fxFlex="75%">
                       <mat-form-field>
                         <mat-label>Internal Note</mat-label>
@@ -621,7 +621,7 @@
                         </div>                                            
                       </mat-list>
                     </div>                     
-                  </div>
+                  </div> -->
                 </div>
               </div>
             </div>
@@ -649,7 +649,7 @@
               <div>
                 <div fxLayout="column" class="expansion-panel-cont-style">
                   <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="5px" >
-                    <div fxFlex="50%">
+                    <div fxFlex="48%">
                       <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="5px">
                         <div fxFlex="100%">
                           <h3 class="OriginDestinationSubTitle">Origin</h3>
@@ -657,26 +657,49 @@
                       </div>
                       <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="5px">
                         <div fxFlex="100%">
-                          <mat-label>Name: </mat-label><mat-label class="InfoLabel">{{originAndDestinationFormGroup.get('originname').value}}</mat-label>
+                          <mat-label class="SummaryFieldLabelTitle">Name: </mat-label><mat-label class="InfoLabel">{{originAndDestinationFormGroup.get('originname').value}}</mat-label>
                         </div>                                                        
                       </div> 
                       <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="5px">
                         <div fxFlex="100%">
-                          <mat-label>Postal Code: </mat-label><mat-label class="InfoLabel">{{originAndDestinationFormGroup.get('originpostalcode').value}}</mat-label>
+                          <mat-label class="SummaryFieldLabelTitle">Address 1: </mat-label><mat-label class="InfoLabel">{{originAndDestinationFormGroup.get('originadddress1').value}}</mat-label>
+                        </div>                                                        
+                      </div>                                          
+                      <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="5px">
+                        <div fxFlex="100%">
+                          <mat-label class="SummaryFieldLabelTitle">Postal Code: </mat-label><mat-label class="InfoLabel">{{originAndDestinationFormGroup.get('originpostalcode').value}}</mat-label>
                         </div>                                                        
                       </div>
                       <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="5px">
                         <div fxFlex="100%">
-                          <mat-label>State: </mat-label><mat-label class="InfoLabel">{{originAndDestinationFormGroup.get('originstatename').value}}</mat-label>
+                          <mat-label class="SummaryFieldLabelTitle">State: </mat-label><mat-label class="InfoLabel">{{originAndDestinationFormGroup.get('originstatename').value}}</mat-label>
                         </div>                                                        
                       </div>
                       <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="5px">
                         <div fxFlex="100%">
-                          <mat-label>Exp Pickup Date: </mat-label><mat-label class="InfoLabel">{{originPckupDate}}</mat-label>
+                          <mat-label class="SummaryFieldLabelTitle">Phone: </mat-label><mat-label class="InfoLabel">{{originAndDestinationFormGroup.get('originphone').value}}</mat-label>
                         </div>                                                        
-                      </div>                                            
+                      </div>  
+                      <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="5px">
+                        <div fxFlex="100%">
+                          <mat-label class="SummaryFieldLabelTitle">Exp Pickup Date: </mat-label><mat-label class="InfoLabel">{{originPckupDate}}</mat-label>
+                        </div>                                                        
+                      </div>
+                      <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="5px">
+                        <div fxFlex="100%">
+                          <mat-label class="SummaryFieldLabelTitle">Pickup Open: </mat-label><mat-label class="InfoLabel">{{originAndDestinationFormGroup.get('originpickupopen').value}}</mat-label>
+                        </div>                                                        
+                      </div>  
+                      <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="5px">
+                        <div fxFlex="100%">
+                          <mat-label class="SummaryFieldLabelTitle">Pickup Close: </mat-label><mat-label class="InfoLabel">{{originAndDestinationFormGroup.get('originpickupclose').value}}</mat-label>
+                        </div>                                                        
+                      </div>                                              
                     </div>
-                    <div fxFlex="50%">
+                    <div fxFlex="2%" class="SummarySplitter">
+
+                    </div>
+                    <div fxFlex="48%">
                       <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="5px">
                         <div fxFlex="100%">
                           <h3 class="OriginDestinationSubTitle">Destination</h3>
@@ -684,22 +707,32 @@
                       </div>
                       <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="5px">
                         <div fxFlex="100%">
-                          <mat-label>Name: </mat-label><mat-label class="InfoLabel">{{originAndDestinationFormGroup.get('destname').value}}</mat-label>
+                          <mat-label class="SummaryFieldLabelTitle">Name: </mat-label><mat-label class="InfoLabel">{{originAndDestinationFormGroup.get('destname').value}}</mat-label>
                         </div>                                                        
                       </div>
                       <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="5px">
                         <div fxFlex="100%">
-                          <mat-label>Postal Code: </mat-label><mat-label class="InfoLabel">{{originAndDestinationFormGroup.get('destpostalcode').value}}</mat-label>
+                          <mat-label class="SummaryFieldLabelTitle">Address 1: </mat-label><mat-label class="InfoLabel">{{originAndDestinationFormGroup.get('destadddress1').value}}</mat-label>
+                        </div>                                                        
+                      </div>
+                      <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="5px">
+                        <div fxFlex="100%">
+                          <mat-label class="SummaryFieldLabelTitle">Postal Code: </mat-label><mat-label class="InfoLabel">{{originAndDestinationFormGroup.get('destpostalcode').value}}</mat-label>
                         </div>                                                        
                       </div> 
                       <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="5px">
                         <div fxFlex="100%">
-                          <mat-label>State: </mat-label><mat-label class="InfoLabel">{{originAndDestinationFormGroup.get('deststatename').value}}</mat-label>
+                          <mat-label class="SummaryFieldLabelTitle">State: </mat-label><mat-label class="InfoLabel">{{originAndDestinationFormGroup.get('deststatename').value}}</mat-label>
                         </div>                                                        
                       </div> 
                       <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="5px">
                         <div fxFlex="100%">
-                          <mat-label>Exp Del Date: </mat-label><mat-label class="InfoLabel">{{destExpDelDate}}</mat-label>
+                          <mat-label class="SummaryFieldLabelTitle">Phone: </mat-label><mat-label class="InfoLabel">{{originAndDestinationFormGroup.get('destphone').value}}</mat-label>
+                        </div>                                                        
+                      </div> 
+                      <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="5px">
+                        <div fxFlex="100%">
+                          <mat-label class="SummaryFieldLabelTitle">Exp Del Date: </mat-label><mat-label class="InfoLabel">{{destExpDelDate}}</mat-label>
                         </div>                                                        
                       </div>
                     </div>                                 
@@ -727,21 +760,21 @@
                           <div fxFlex="33.33%">
                             <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="5px">
                               <div fxFlex="100%">
-                                <mat-label>Pallet: </mat-label><mat-label class="InfoLabel">{{prod.Pallets}}</mat-label>
+                                <mat-label class="SummaryFieldLabelTitle">Pallet: </mat-label><mat-label class="InfoLabel">{{prod.Pallets}}</mat-label>
                               </div>                                                        
                             </div>                         
                           </div>
                           <div fxFlex="33.33%">
                             <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="5px">
                               <div fxFlex="100%">
-                                <mat-label>Pieces: </mat-label><mat-label class="InfoLabel">{{prod.Pieces}}</mat-label>
+                                <mat-label class="SummaryFieldLabelTitle">Pieces: </mat-label><mat-label class="InfoLabel">{{prod.Pieces}}</mat-label>
                               </div>                                                        
                             </div>                        
                           </div>  
                           <div fxFlex="33.33%">
                             <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="5px">
                               <div fxFlex="100%">
-                                <mat-label>Packages: </mat-label><mat-label class="InfoLabel">{{prod.PackageTypeDescription}}</mat-label>
+                                <mat-label class="SummaryFieldLabelTitle">Packages: </mat-label><mat-label class="InfoLabel">{{prod.PackageTypeDescription}}</mat-label>
                               </div>                                                        
                             </div>                          
                           </div>
@@ -750,21 +783,21 @@
                           <div fxFlex="33.33%">
                             <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="5px">
                               <div fxFlex="100%">
-                                <mat-label>Class: </mat-label><mat-label class="InfoLabel">{{prod.ProductClass}}</mat-label>
+                                <mat-label class="SummaryFieldLabelTitle">Class: </mat-label><mat-label class="InfoLabel">{{prod.ProductClass}}</mat-label>
                               </div>                                                        
                             </div>                         
                           </div>
                           <div fxFlex="33.33%">
                             <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="5px">
                               <div fxFlex="100%">
-                                <mat-label>NMFC: </mat-label><mat-label class="InfoLabel">{{prod.NmfcNumber}}</mat-label>                                
+                                <mat-label class="SummaryFieldLabelTitle">NMFC: </mat-label><mat-label class="InfoLabel">{{prod.NmfcNumber}}</mat-label>                                
                               </div>                                                        
                             </div>                         
                           </div>  
                           <div fxFlex="33.33%">
                             <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="5px">
                               <div fxFlex="100%">                                
-                                <mat-label>PCF: </mat-label><mat-label class="InfoLabel">{{prod.PCF}}</mat-label>
+                                <mat-label class="SummaryFieldLabelTitle">PCF: </mat-label><mat-label class="InfoLabel">{{prod.PCF}}</mat-label>
                               </div>                                                        
                             </div>                         
                           </div>                            
@@ -773,21 +806,21 @@
                           <div fxFlex="33.33%">
                             <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="5px">
                               <div fxFlex="100%">
-                                <mat-label>Length: </mat-label><mat-label class="InfoLabel">{{prod.Length}}</mat-label>
+                                <mat-label class="SummaryFieldLabelTitle">Length: </mat-label><mat-label class="InfoLabel">{{prod.Length}}</mat-label>
                               </div>                                                        
                             </div>                        
                           </div>  
                           <div fxFlex="33.33%">
                             <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="5px">
                               <div fxFlex="100%">
-                                <mat-label>Width: </mat-label><mat-label class="InfoLabel">{{prod.Width}}</mat-label>
+                                <mat-label class="SummaryFieldLabelTitle">Width: </mat-label><mat-label class="InfoLabel">{{prod.Width}}</mat-label>
                               </div>                                                        
                             </div>                          
                           </div>
                           <div fxFlex="33.33%">
                             <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="5px">
                               <div fxFlex="100%">
-                                <mat-label>Height: </mat-label><mat-label class="InfoLabel">{{prod.Height}}</mat-label>
+                                <mat-label class="SummaryFieldLabelTitle">Height: </mat-label><mat-label class="InfoLabel">{{prod.Height}}</mat-label>
                               </div>                                                        
                             </div>                          
                           </div>
@@ -796,14 +829,14 @@
                           <div fxFlex="66.66%">
                             <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="5px">
                               <div fxFlex="100%">
-                                <mat-label>Description: </mat-label><mat-label class="InfoLabel">{{prod.ProductDescription}}</mat-label>
+                                <mat-label class="SummaryFieldLabelTitle">Description: </mat-label><mat-label class="InfoLabel">{{prod.ProductDescription}}</mat-label>
                               </div>                                                        
                             </div>                        
                           </div>  
                           <div fxFlex="32.5%">
                             <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="5px">
                               <div fxFlex="100%">
-                                <mat-label>Total Weight: </mat-label><mat-label class="InfoLabel">{{prod.Weight}}</mat-label>
+                                <mat-label class="SummaryFieldLabelTitle">Total Weight: </mat-label><mat-label class="InfoLabel">{{prod.Weight}}</mat-label>
                               </div>                                                        
                             </div>                          
                           </div>                          
@@ -830,34 +863,34 @@
                   </div>
                   <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="5px">
                     <div fxFlex="50%">
-                      <mat-label>Equipment: </mat-label><mat-label class="InfoLabel">{{equimentDescriptionSelected}}</mat-label>
+                      <mat-label class="SummaryFieldLabelTitle">Equipment: </mat-label><mat-label class="InfoLabel">{{equimentDescriptionSelected}}</mat-label>
                     </div>
                     <div fxFlex="50%">
-                      <mat-label>Priority: </mat-label><mat-label class="InfoLabel">{{priorityDescriptionSelected}}</mat-label>
+                      <mat-label class="SummaryFieldLabelTitle">Priority: </mat-label><mat-label class="InfoLabel">{{priorityDescriptionSelected}}</mat-label>
                     </div>                                 
                   </div>
                   <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="5px">
                     <div fxFlex="50%">
-                      <mat-label>{{ReferenceByClientField1}}</mat-label><mat-label class="InfoLabel">{{shipmentInfoFormGroup.get('customerref').value}}</mat-label>
+                      <mat-label class="SummaryFieldLabelTitle">{{ReferenceByClientField1}}</mat-label><mat-label class="InfoLabel">{{shipmentInfoFormGroup.get('customerref').value}}</mat-label>
                     </div>
                     <div fxFlex="50%">
-                      <mat-label>{{ReferenceByClientField2}}</mat-label><mat-label class="InfoLabel">{{shipmentInfoFormGroup.get('r2order').value}}</mat-label>
+                      <mat-label class="SummaryFieldLabelTitle">{{ReferenceByClientField2}}</mat-label><mat-label class="InfoLabel">{{shipmentInfoFormGroup.get('r2order').value}}</mat-label>
                     </div>                                 
                   </div>
                   <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="5px">
                     <div fxFlex="50%">
-                      <mat-label>Service Level: </mat-label><mat-label class="InfoLabel">{{serviceLevelDescriptionSelected}}</mat-label>
+                      <mat-label class="SummaryFieldLabelTitle">Service Level: </mat-label><mat-label class="InfoLabel">{{serviceLevelDescriptionSelected}}</mat-label>
                     </div>
                     <div fxFlex="50%">
-                      <mat-label>Payment Terms: </mat-label><mat-label class="InfoLabel">{{paymentTermDescriptionSelected}}</mat-label>
+                      <mat-label class="SummaryFieldLabelTitle">Payment Terms: </mat-label><mat-label class="InfoLabel">{{paymentTermDescriptionSelected}}</mat-label>
                     </div>                                 
                   </div>
                   <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="5px">
                     <div fxFlex="50%">
-                      <mat-label>Pro Number: </mat-label><mat-label class="InfoLabel">{{shipmentInfoFormGroup.get('pronumber').value}}</mat-label>
+                      <mat-label class="SummaryFieldLabelTitle">Pro Number: </mat-label><mat-label class="InfoLabel">{{shipmentInfoFormGroup.get('pronumber').value}}</mat-label>
                     </div>
                     <div fxFlex="50%">
-                      <mat-label>Mode: </mat-label><mat-label class="InfoLabel">{{shipmentModeDescriptionSelected}}</mat-label>
+                      <mat-label class="SummaryFieldLabelTitle">Mode: </mat-label><mat-label class="InfoLabel">{{shipmentModeDescriptionSelected}}</mat-label>
                     </div>                                 
                   </div>
                   <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="5px">

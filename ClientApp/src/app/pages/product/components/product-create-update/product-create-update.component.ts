@@ -13,6 +13,7 @@ import { User } from "../../../../Entities/user.model";
 import { HttpService } from "../../../../common/http.service";
 import { ProductGroup } from "../../../../Entities/ProductGroup";
 import { String } from "typescript-string-operations";
+import { MatSnackBar } from "@angular/material/snack-bar";
 
 @Component({
   selector: 'vex-product-create-update',
@@ -42,11 +43,13 @@ export class ProductCreateUpdateComponent implements OnInit {
   icPerson = icPerson;
   icPhone = icPhone;
 
-  constructor(@Inject(MAT_DIALOG_DATA) public defaults: any,
-              private dialogRef: MatDialogRef<ProductCreateUpdateComponent>,
-              private fb: FormBuilder,
-              private httpService: HttpService) {
-  }
+  constructor(
+      @Inject(MAT_DIALOG_DATA) public defaults: any,
+      private dialogRef: MatDialogRef<ProductCreateUpdateComponent>,
+      private fb: FormBuilder,
+      private httpService: HttpService,
+      private snackBar: MatSnackBar
+  ) {}
 
   async ngOnInit() {
     if (this.defaults) {
@@ -65,7 +68,7 @@ export class ProductCreateUpdateComponent implements OnInit {
       Pieces: this.defaults?.Pieces,
       NMFC: this.defaults?.NMFC,
       Lenght: this.defaults?.Lenght,
-      Class: this.defaults?.Class ?? '',
+      Class: this.defaults?.Class ?? '50',
       Height: this.defaults?.Height,
       Commodity: this.defaults?.Commodity,
       Width: this.defaults?.Width,
@@ -78,20 +81,30 @@ export class ProductCreateUpdateComponent implements OnInit {
 
   save() {
     if (this.mode === 'create') {
-      this.createCustomer();
+      this.createProduct();
     } else if (this.mode === 'update') {
-      this.updateCustomer();
+      this.updateProduct();
     }
   }
 
-  createCustomer() {
+  createProduct() {
     const product = this.parseCreateProduct();
-    this.httpService.InsertProductDetails(product).then(() => this.dialogRef.close(product));
+    this.httpService.InsertProductDetails(product).then(() => {
+      this.snackBar.open('Product added', null, {
+        duration: 5000
+      });
+      this.dialogRef.close(product);
+    });
   }
 
-  updateCustomer() {
+  updateProduct() {
     const product = this.parseUpdateProduct();
-    this.httpService.UpdateProductDetails(product).then(() => this.dialogRef.close(product));
+    this.httpService.UpdateProductDetails(product).then(() => {
+      this.snackBar.open('Product modified', null, {
+        duration: 5000
+      });
+      this.dialogRef.close(product);
+    });
   }
 
   isCreateMode() {
@@ -138,7 +151,7 @@ export class ProductCreateUpdateComponent implements OnInit {
     product.ProductGroup = this.defaults.ProductGroup ?? 'STANDARD';
 
     const productGroupType = this.productGroupType.find((item) => item.Description === product.ProductGroup);
-    product.ProductGroupID = productGroupType.ProductGroupID;
+    product.ProductGroupID = productGroupType?.ProductGroupID;
 
     return product
   }

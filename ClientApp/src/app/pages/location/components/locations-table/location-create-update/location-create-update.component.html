@@ -217,8 +217,8 @@
 
   <mat-dialog-actions align="end">
     <button mat-button mat-dialog-close type="button">CANCEL</button>
-    <button *ngIf="isCreateMode()" color="primary" mat-button type="submit" [disabled]="!form.valid">CREATE LOCATION</button>
-    <button *ngIf="isUpdateMode()" color="primary" mat-button type="submit" [disabled]="!form.valid">UPDATE LOCATION</button>
+    <button *ngIf="isCreateMode()" color="primary" mat-button type="submit" [disabled]="!form.valid && this.OriginPostalData == null">CREATE LOCATION</button>
+    <button *ngIf="isUpdateMode()" color="primary" mat-button type="submit" [disabled]="!form.valid && this.OriginPostalData == null">UPDATE LOCATION</button>
   </mat-dialog-actions>
 </form>
 

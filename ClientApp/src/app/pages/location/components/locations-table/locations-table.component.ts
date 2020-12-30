@@ -29,6 +29,8 @@ import {Location} from '../../../../Entities/Location';
 import {LocationCreateUpdateComponent} from "./location-create-update/location-create-update.component";
 import {LocationSearchModalComponent} from "./location-search-modal/location-search-modal.component";
 import {User} from "../../../../Entities/user.model";
+import {AuthenticationService} from "../../../../common/authentication.service";
+import {MatSnackBar} from "@angular/material/snack-bar";
 
 @Component({
   selector: 'vex-locations-table',
@@ -51,6 +53,7 @@ export class LocationsTableComponent implements OnInit, AfterViewInit, OnDestroy
 
   layoutCtrl = 'fullwidth';
   user: User;
+  clientID: number;
   /**
    * Simulating a service with HTTP that returns Observables
    * You probably want to remove this and do all requests in a service with HTTP
@@ -95,8 +98,14 @@ export class LocationsTableComponent implements OnInit, AfterViewInit, OnDestroy
   @ViewChild(MatPaginator, { static: true }) paginator: MatPaginator;
   @ViewChild(MatSort, { static: true }) sort: MatSort;
 
-  constructor(private dialog: MatDialog, private httpService : HttpService) {
+  constructor(
+      private dialog: MatDialog,
+      private httpService : HttpService,
+      private au: AuthenticationService,
+      private snackBar: MatSnackBar
+  ) {
     this.user = this.httpService.getUserFromStorage();
+    this.clientID = this.au.getDefaultClient().ClientID;
     this.initGetLocationsParameter();
   }
 
@@ -178,7 +187,10 @@ export class LocationsTableComponent implements OnInit, AfterViewInit, OnDestroy
     this.selection.deselect(location);
     this.subject$.next(this.locations);
 
-    this.httpService.DeleteMasLocationType(location.LocationID);
+    this.httpService.DeleteMasLocationType(location.LocationID).then(() => this.snackBar.open('Location deleted', null, {
+        duration: 5000
+      })
+    );
   }
 
   deleteLocations(locations: Location[]) {
@@ -233,7 +245,7 @@ export class LocationsTableComponent implements OnInit, AfterViewInit, OnDestroy
 
   initGetLocationsParameter() {
     this.getLocationsParameters = {
-      ClientId: this.user.ClientID,
+      ClientId: this.clientID,
       IsAccending: false,
       LocationID: null,
       Name: null,

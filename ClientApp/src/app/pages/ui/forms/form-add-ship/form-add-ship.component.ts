@@ -2046,40 +2046,40 @@ export class FormAddShipComponent implements OnInit {
         //   duration: 5000
         // });
 
-        this.openDialog(false, 'Quote saved successfully. Quote Number: ' + responseData.ClientLadingNo + '. ' + (objRateSelected.rateSelectedAction === 4 ? 'Email has been sent.' : ''), null, 
+        this.openDialog(false, 'Quote saved successfully. Quote Number: ' + responseData.ClientLadingNo + '. ' + (objRateSelected != null && objRateSelected.rateSelectedAction === 4 ? 'Email has been sent.' : ''), null, 
         'QuoteSavedAndRedirectToBoard', null, null, null);
 
-        switch (objRateSelected.rateSelectedAction) {
-          case 3: // print quote
-            const ratequotePrintURL = String.Format(environment.baseEndpoint + 'Handlers/PrintQuoteHandler.ashx?LadingID={0}&Ticket={1}',
-                                        responseData.LadingID,this.securityToken);
-            window.open(ratequotePrintURL, '_blank');
-            break;
-          case 4: // email quote
-            let emailBOLParameters: SendEmailParameters;
-
-            const invoiceParameter: InvoiceParameter = {
-              InvoiceDetailIDs: []
-            };
-    
-            emailBOLParameters = {
-              ClientID: this.ClientID,
-              CarrierID : selectedRate.CarrierID,
-              ApplicationID: 56,
-              EventID: 39,
-              EmailAddresses: objRateSelected.keyValue,
-              LadingID: responseData.LadingID,
-              UserRowID: 1,
-              InvoiceParameter: invoiceParameter,
-              LadingIDs: [],
-            }
-    
-            this.httpService.SendEmailManually(emailBOLParameters);
-            break;
-        } 
+        if (objRateSelected != null){
+          switch (objRateSelected.rateSelectedAction) {
+            case 3: // print quote
+              const ratequotePrintURL = String.Format(environment.baseEndpoint + 'Handlers/PrintQuoteHandler.ashx?LadingID={0}&Ticket={1}',
+                                          responseData.LadingID,this.securityToken);
+              window.open(ratequotePrintURL, '_blank');
+              break;
+            case 4: // email quote
+              let emailBOLParameters: SendEmailParameters;
+  
+              const invoiceParameter: InvoiceParameter = {
+                InvoiceDetailIDs: []
+              };
+      
+              emailBOLParameters = {
+                ClientID: this.ClientID,
+                CarrierID : selectedRate.CarrierID,
+                ApplicationID: 56,
+                EventID: 39,
+                EmailAddresses: objRateSelected.keyValue,
+                LadingID: responseData.LadingID,
+                UserRowID: 1,
+                InvoiceParameter: invoiceParameter,
+                LadingIDs: [],
+              }
+      
+              this.httpService.SendEmailManually(emailBOLParameters);
+              break;
+          } 
+        }                
         
-
-        // this.router.navigate(['../../../shipmentboard/LTLTL/'], { relativeTo: this.route });
       }
       else{
         this.snackbar.open('Error saving as quote.', null, {

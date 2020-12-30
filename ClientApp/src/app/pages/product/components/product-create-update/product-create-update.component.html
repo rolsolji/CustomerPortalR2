@@ -1,0 +1,130 @@
+<mat-progress-spinner
+        [diameter]="50"
+        *ngIf="!form || productGroupType == null"
+        mode="indeterminate"
+        color="accent">
+</mat-progress-spinner>
+<form (ngSubmit)="save()" [formGroup]="form" *ngIf="form && productGroupType !== null">
+  <div fxLayout="row" fxLayoutAlign="start center" mat-dialog-title>
+    <h2 class="headline m-0" fxFlex="auto">New Product</h2>
+
+    <button class="text-secondary" mat-dialog-close mat-icon-button type="button">
+      <mat-icon [icIcon]="icClose"></mat-icon>
+    </button>
+  </div>
+
+  <mat-divider class="-mx-6 text-border"></mat-divider>
+
+  <mat-dialog-content fxLayout="column">
+    <div class="flex flex-col sm:flex-row">
+      <mat-form-field class="mt-6 flex-auto">
+        <mat-label>Description</mat-label>
+        <input cdkFocusInitial formControlName="Description" matInput required>
+      </mat-form-field>
+
+      <mat-form-field class="sm:mt-6 sm:ml-6 flex-auto">
+        <mat-label>Product Weight</mat-label>
+        <input appOnlyNumber formControlName="Weight" matInput>
+      </mat-form-field>
+    </div>
+
+    <div class="flex flex-col sm:flex-row">
+      <mat-form-field class="flex-auto">
+        <mat-label>Pallets</mat-label>
+        <input appOnlyNumber formControlName="Pallets" matInput>
+      </mat-form-field>
+
+      <mat-form-field class="sm:ml-6 flex-auto">
+        <mat-label>Pieces</mat-label>
+        <input appOnlyNumber formControlName="Pieces" matInput>
+      </mat-form-field>
+    </div>
+
+    <div class="flex flex-col sm:flex-row">
+      <mat-form-field class="flex-auto">
+        <mat-label>NMFC</mat-label>
+        <input formControlName="NMFC" matInput placeholder="123456-00">
+      </mat-form-field>
+
+      <mat-form-field class="sm:ml-6 flex-auto">
+        <mat-label>Product Length</mat-label>
+        <input appOnlyNumber formControlName="Lenght" matInput>
+      </mat-form-field>
+    </div>
+
+    <div class="flex flex-col sm:flex-row">
+      <mat-form-field class="flex-auto">
+        <mat-label>Product Class</mat-label>
+        <mat-select formControlName="Class">
+          <mat-option *ngFor="let class of productClasses" value="{{class}}">{{class}}</mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <mat-form-field class="sm:ml-6 flex-auto">
+        <mat-label>Product Height</mat-label>
+        <input appOnlyNumber formControlName="Height" matInput>
+      </mat-form-field>
+    </div>
+
+    <div class="flex flex-col sm:flex-row">
+      <mat-form-field class="flex-auto">
+        <mat-label>Commodity</mat-label>
+        <input formControlName="Commodity" matInput>
+      </mat-form-field>
+
+      <mat-form-field class="sm:ml-6 flex-auto">
+        <mat-label>Product Width</mat-label>
+        <input appOnlyNumber formControlName="Width" matInput>
+      </mat-form-field>
+    </div>
+
+    <div class="flex flex-col sm:flex-row sm:pb-5">
+      <div class="sm:ml-6 flex-auto">
+        <mat-checkbox color="primary" [checked]="this.hazmat" (change)="this.hazmat = $event.checked"></mat-checkbox>
+        <mat-label class="pl-2">Hazmat</mat-label>
+      </div>
+      <div class="sm:ml-6 flex-auto">
+        <mat-checkbox color="primary" [checked]="this.active" (change)="this.active = $event.checked"></mat-checkbox>
+        <mat-label class="pl-2">Is Active</mat-label>
+      </div>
+    </div>
+    <div class="flex flex-col sm:flex-row sm:pb-5">
+      <div class="sm:mr-6 flex-auto">
+        <mat-form-field>
+          <mat-label>Hazmat Contact</mat-label>
+          <input formControlName="HazmatContact" matInput>
+        </mat-form-field>
+      </div>
+
+      <div class="sm:ml-6 sm:mr-6 flex-auto">
+        <mat-label class="float-left sm:mr-6">Approve</mat-label>
+        <div *ngFor="let item of [1,2];  let i = index">
+          <mat-checkbox class="{{i === 0 ? 'float-left' : 'float-right'}}" color="primary" [checked]="this.approved === i" (change)="this.approved = i">{{i === 1 ? 'Yes' : 'No'}}</mat-checkbox>
+        </div>
+      </div>
+    </div>
+  </mat-dialog-content>
+
+  <mat-dialog-actions align="end">
+    <button mat-button mat-dialog-close type="button">CANCEL</button>
+    <button *ngIf="isCreateMode()" color="primary" mat-button type="submit" [disabled]="!form.valid">CREATE PRODUCT</button>
+    <button *ngIf="isUpdateMode()" color="primary" mat-button type="submit" [disabled]="!form.valid">UPDATE PRODUCT</button>
+  </mat-dialog-actions>
+</form>
+
+<mat-menu #settingsMenu="matMenu" xPosition="before" yPosition="below">
+  <button mat-menu-item>
+    <mat-icon [icIcon]="icPrint"></mat-icon>
+    <span>Print</span>
+  </button>
+
+  <button mat-menu-item>
+    <mat-icon [icIcon]="icDownload"></mat-icon>
+    <span>Export</span>
+  </button>
+
+  <button mat-menu-item>
+    <mat-icon [icIcon]="icDelete"></mat-icon>
+    <span>Delete</span>
+  </button>
+</mat-menu>

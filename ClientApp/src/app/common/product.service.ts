@@ -6,7 +6,7 @@ import { Product} from "../Entities/Product";
 import { HttpService } from "./http.service";
 
 export interface ProductQuery {
-    search: string;
+    search;
     registration: Date;
 }
 
@@ -22,16 +22,18 @@ export class ProductService {
         // fake pagination, do your server request here instead
         let filteredProducts = products;
         let { search } = query;
-        if (search) {
+        if (typeof search === 'string') {
             search = search.toLowerCase();
             filteredProducts = filteredProducts.filter(
-                ({ Description, Commodity, NMFC, ProductGroup, Weight }) =>
+                ({Description, Commodity, NMFC, ProductGroup, Weight}) =>
                     Description?.toLowerCase().includes(search) ||
                     Commodity?.toLowerCase().includes(search) ||
                     NMFC?.toLowerCase().includes(search) ||
                     Weight?.toString().includes(search) ||
                     ProductGroup?.toLowerCase().includes(search)
             );
+        } else if (search instanceof Object) {
+            filteredProducts = search;
         }
 
         const { item } = hasDelete;

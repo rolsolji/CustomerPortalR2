@@ -9,20 +9,21 @@ import { HTTP_INTERCEPTORS, HttpClientModule } from '@angular/common/http';
 import { CustomLayoutModule } from './custom-layout/custom-layout.module';
 import { FormsModule } from '@angular/forms';
 import { DatePipe } from '@angular/common';
-import {HttpErrorInterceptor} from './common/http-error-interceptor';
-import {AuthenticationService} from './common/authentication.service';
-import {MatSnackBar} from '@angular/material/snack-bar';
-import {MatSelectModule} from '@angular/material/select';
-import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
-import {MatInputModule} from '@angular/material/input';
-import {MatFormFieldModule} from '@angular/material/form-field';
-import {MatTableModule} from "@angular/material/table";
-import {MatDatepickerModule} from "@angular/material/datepicker";
-import {MatNativeDateModule} from "@angular/material/core";
-import {MatAutocompleteModule} from "@angular/material/autocomplete";
+import { HttpErrorInterceptor } from './common/http-error-interceptor';
+import { AuthenticationService } from './common/authentication.service';
+import { MatSnackBar } from '@angular/material/snack-bar';
+import { MatSelectModule } from '@angular/material/select';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatInputModule } from '@angular/material/input';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatTableModule } from "@angular/material/table";
+import { MatDatepickerModule } from "@angular/material/datepicker";
+import { MatNativeDateModule } from "@angular/material/core";
+import { MatAutocompleteModule } from "@angular/material/autocomplete";
+import { OnlyNumberDirective } from "./shared/directives/OnlyNumber.directive";
 
 @NgModule({
-  declarations: [AppComponent],
+  declarations: [AppComponent, OnlyNumberDirective],
   imports: [
     BrowserModule,
     AppRoutingModule,
@@ -52,6 +53,9 @@ import {MatAutocompleteModule} from "@angular/material/autocomplete";
       multi: true,
       deps: [AuthenticationService, MatSnackBar]
     }
+  ],
+  exports: [
+    OnlyNumberDirective
   ],
   // entryComponents: [
   //   ConfirmAlertDialogComponent

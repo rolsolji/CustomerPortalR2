@@ -206,6 +206,32 @@ export class HttpService{
         ).toPromise();
     }
 
+    UpdateProductDetails(parameters): Promise<any> {
+        const ticket = this.token;
+        const httpHeaders = new HttpHeaders({
+            Ticket : ticket
+        });
+        return this.http.post<any>(`${this.baseEndpoint}Services/MasProductService.svc/json/UpdateProductDetails`,
+            parameters,
+            {
+                headers: httpHeaders
+            }
+        ).toPromise();
+    }
+
+    InsertProductDetails(parameters): Promise<any> {
+        const ticket = this.token;
+        const httpHeaders = new HttpHeaders({
+            Ticket : ticket
+        });
+        return this.http.post<any>(`${this.baseEndpoint}Services/MasProductService.svc/json/InsertProductDetails`,
+            parameters,
+            {
+                headers: httpHeaders
+            }
+        ).toPromise();
+    }
+
     DeleteProductDetails(productId, key = null): Promise<ProductGroup[]> {
         const ticket = this.token;
         const httpHeaders = new HttpHeaders({

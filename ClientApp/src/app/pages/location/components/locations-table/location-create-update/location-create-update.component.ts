@@ -18,6 +18,7 @@ import {PostalData} from "../../../../../Entities/PostalData";
 import {String} from "typescript-string-operations";
 import {User} from "../../../../../Entities/user.model";
 import {MatAutocompleteSelectedEvent} from "@angular/material/autocomplete";
+import {MatSnackBar} from "@angular/material/snack-bar";
 
 @Component({
   selector: 'vex-location-create-update',
@@ -51,7 +52,6 @@ export class LocationCreateUpdateComponent implements OnInit {
   originCountries: PostalData[] | Country = [];
   statesAndCities: PostalData[] = [];
   postalData: PostalData[];
-  postalDataDest: PostalData[];
   filteredCountriesOptions: Observable<PostalData[]>;
   filteredStatesOptions: Observable<PostalData[]>;
   filteredCitiesOptions: Observable<PostalData[]>;
@@ -65,11 +65,13 @@ export class LocationCreateUpdateComponent implements OnInit {
   public states: BehaviorSubject<PostalData[]> = new BehaviorSubject<PostalData[]>(null);
   public cities: BehaviorSubject<PostalData[]> = new BehaviorSubject<PostalData[]>(null);
 
-  constructor(private httpService : HttpService, @Inject(MAT_DIALOG_DATA) public defaults: any,
-              private dialogRef: MatDialogRef<LocationCreateUpdateComponent>,
-              private fb: FormBuilder,
-              public datepipe: DatePipe) {
-  }
+  constructor(
+      private httpService : HttpService, @Inject(MAT_DIALOG_DATA) public defaults: any,
+      private dialogRef: MatDialogRef<LocationCreateUpdateComponent>,
+      private fb: FormBuilder,
+      private snackBar: MatSnackBar,
+      public datepipe: DatePipe
+  ) {}
 
   async ngOnInit() {
     if (this.defaults) {
@@ -173,12 +175,20 @@ export class LocationCreateUpdateComponent implements OnInit {
 
   async createLocation() {
     const location = this.form.value;
-    return await this.mapNewLocation(location);
+    const newLocation = await this.mapNewLocation(location);
+    this.snackBar.open('Location added', null, {
+      duration: 5000
+    });
+    return newLocation;
   }
 
   async updateLocation(): Promise<Location> {
     const location = this.form.value;
-    return await this.mapLocation(location);
+    const locationUpdated = await this.mapLocation(location);
+    this.snackBar.open('Location modified', null, {
+      duration: 5000
+    });
+    return locationUpdated;
   }
 
   isCreateMode() {

@@ -28,6 +28,8 @@ import { ProductService, ProductQuery } from "../../../../common/product.service
 import { Delete, Sort } from "../../../../shared/components/datasource/Page";
 import { MatSidenav } from "@angular/material/sidenav";
 import { ProductCreateUpdateComponent } from "../product-create-update/product-create-update.component";
+import {AuthenticationService} from "../../../../common/authentication.service";
+import {MatSnackBar} from "@angular/material/snack-bar";
 
 @Component({
   selector: 'vex-product-table',
@@ -51,6 +53,7 @@ export class ProductTableComponent implements OnInit, AfterViewInit, OnDestroy {
   layoutCtrl = new FormControl('fullwidth');
   formGroup: FormGroup;
   user: User;
+  clientID: number;
   getProductParameter;
   getProductDetailsCountParameter;
   /**
@@ -106,9 +109,12 @@ export class ProductTableComponent implements OnInit, AfterViewInit, OnDestroy {
       private dialog: MatDialog,
       private httpService: HttpService,
       private productsService: ProductService,
-      private fb: FormBuilder
+      private fb: FormBuilder,
+      private au: AuthenticationService,
+      private snackBar: MatSnackBar
   ) {
     this.user = this.httpService.getUserFromStorage();
+    this.clientID = this.au.getDefaultClient().ClientID;
   }
 
   get visibleColumns() {
@@ -153,7 +159,7 @@ export class ProductTableComponent implements OnInit, AfterViewInit, OnDestroy {
       description: '',
       hazMatSearchSelected: ['null'],
       statusSearchSelected: ['null'],
-      productClass: ''
+      productClass: '50'
     });
     this.searchCtrl.valueChanges.pipe(
         untilDestroyed(this)
@@ -188,10 +194,10 @@ export class ProductTableComponent implements OnInit, AfterViewInit, OnDestroy {
     this.dataSource.sortBy({property: active, order: direction})
   }
 
-  createCustomer() {
+  createProduct() {
     this.dialog.open(ProductCreateUpdateComponent).afterClosed().subscribe((product: Product) => {
       /**
-       * Customer is the updated customer (if the user pressed Save - otherwise it's null)
+       * Product is the updated product (if the user pressed Save - otherwise it's null)
        */
       if (product) {
         /**
@@ -204,40 +210,43 @@ export class ProductTableComponent implements OnInit, AfterViewInit, OnDestroy {
     });
   }
 
-  updateCustomer(product: Product) {
+  updateProduct(product: Product) {
     this.dialog.open(ProductCreateUpdateComponent, {
       data: product
     }).afterClosed().subscribe(updatedProduct => {
       /**
-       * Customer is the updated customer (if the user pressed Save - otherwise it's null)
+       * Product is the updated product (if the user pressed Save - otherwise it's null)
        */
       if (updatedProduct) {
         /**
          * Here we are updating our local array.
          * You would probably make an HTTP request here.
          */
-        const index = this.dataSource.data.findIndex((existingCustomer) => existingCustomer.ProductID === updatedProduct.ProductID);
+        const index = this.dataSource.data.findIndex((existingProduct) => existingProduct.ProductID === updatedProduct.ProductID);
         this.dataSource.data[index] = new Product(updatedProduct);
         this.dataSource.fetch(0);
       }
     });
   }
 
-  deleteCustomer(product: Product) {
+  deleteProduct(product: Product) {
     /**
      * Here we are updating our local array.
      * You would probably make an HTTP request here.
      */
     this.selection.deselect(product);
     this.dataSource.delete({item: product});
+    this.snackBar.open('Product deleted', null, {
+      duration: 5000
+    });
   }
 
-  deleteCustomers(products: Product[]) {
+  deleteProducts(products: Product[]) {
     /**
      * Here we are updating our local array.
      * You would probably make an HTTP request here.
      */
-    products.forEach(p => this.deleteCustomer(p));
+    products.forEach(p => this.deleteProduct(p));
   }
 
   onFilterChange(value: string) {
@@ -298,7 +307,7 @@ export class ProductTableComponent implements OnInit, AfterViewInit, OnDestroy {
 
   initGetProductDetailsCountParameter() {
     this.getProductDetailsCountParameter = {
-      ClientID: this.user.ClientID,
+      ClientID: this.clientID,
       pageSize: this.pageSize,
       productDisplay: {
         Description: null,
@@ -313,7 +322,7 @@ export class ProductTableComponent implements OnInit, AfterViewInit, OnDestroy {
 
   initGetProductsParameter() {
     this.getProductParameter = {
-      ClientID: this.user.ClientID,
+      ClientID: this.clientID,
       PageNumber: this.pageNumber,
       PageSize: this.pageSize * this.productDetailsCount,
       OrderBy: this.orderBy,

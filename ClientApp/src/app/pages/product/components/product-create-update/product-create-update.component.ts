@@ -14,6 +14,7 @@ import { HttpService } from "../../../../common/http.service";
 import { ProductGroup } from "../../../../Entities/ProductGroup";
 import { String } from "typescript-string-operations";
 import { MatSnackBar } from "@angular/material/snack-bar";
+import {AuthenticationService} from "../../../../common/authentication.service";
 
 @Component({
   selector: 'vex-product-create-update',
@@ -30,6 +31,7 @@ export class ProductCreateUpdateComponent implements OnInit {
   active: boolean = false;
   approved: number = 1;
   user: User;
+  clientID: number;
   productGroupType: ProductGroup[];
   productClasses = [50, 55, 60, 65, 70, 77.5, 85, 92.5, 100, 110, 125, 150, 175, 200, 250, 300, 400, 500, '']
 
@@ -48,7 +50,8 @@ export class ProductCreateUpdateComponent implements OnInit {
       private dialogRef: MatDialogRef<ProductCreateUpdateComponent>,
       private fb: FormBuilder,
       private httpService: HttpService,
-      private snackBar: MatSnackBar
+      private snackBar: MatSnackBar,
+      private au: AuthenticationService
   ) {}
 
   async ngOnInit() {
@@ -59,7 +62,8 @@ export class ProductCreateUpdateComponent implements OnInit {
     }
 
     this.user = this.httpService.getUserFromStorage();
-    this.productGroupType = await this.httpService.GetProductGroupType(this.user.ClientID);
+    this.clientID = this.au.getDefaultClient().ClientID;
+    this.productGroupType = await this.httpService.GetProductGroupType(this.clientID);
 
     this.form = this.fb.group({
       Description: this.defaults?.Description,
@@ -132,7 +136,7 @@ export class ProductCreateUpdateComponent implements OnInit {
     const product = this.parseProduct();
     const currentTime = new Date();
 
-    product.ClientID = this.user.ClientID;
+    product.ClientID = this.clientID;
     product.CreatedBy = this.user.UserName;
     product.CreatedDate = String.Format('/Date({0})/', currentTime.getTime());
 

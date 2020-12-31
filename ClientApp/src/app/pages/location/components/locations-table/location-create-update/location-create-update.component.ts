@@ -19,6 +19,7 @@ import {String} from "typescript-string-operations";
 import {User} from "../../../../../Entities/user.model";
 import {MatAutocompleteSelectedEvent} from "@angular/material/autocomplete";
 import {MatSnackBar} from "@angular/material/snack-bar";
+import {AuthenticationService} from "../../../../../common/authentication.service";
 
 @Component({
   selector: 'vex-location-create-update',
@@ -46,6 +47,7 @@ export class LocationCreateUpdateComponent implements OnInit {
 
   checked: boolean = true;
   approved: number = 1;
+  clientID: number;
 
   locationTypes: {} = [];
   locationTypeSelected: null;
@@ -70,8 +72,11 @@ export class LocationCreateUpdateComponent implements OnInit {
       private dialogRef: MatDialogRef<LocationCreateUpdateComponent>,
       private fb: FormBuilder,
       private snackBar: MatSnackBar,
+      private au: AuthenticationService,
       public datepipe: DatePipe
-  ) {}
+  ) {
+    this.clientID = this.au.getDefaultClient().ClientID;
+  }
 
   async ngOnInit() {
     if (this.defaults) {
@@ -469,9 +474,9 @@ export class LocationCreateUpdateComponent implements OnInit {
     location.CreatedDate = String.Format('/Date({0})/', currentTime.getTime());
     location.ModifiedBy = this.user.UserName;
     location.ModifiedDate = String.Format('/Date({0})/', currentTime.getTime());
-    location.ClientId = this.user.ClientID;
+    location.ClientId = this.clientID;
 
-    const groupLocations = await this.httpService.GetLocationGroupByClient(this.user.ClientID);
+    const groupLocations = await this.httpService.GetLocationGroupByClient(this.clientID);
     const group = groupLocations.find(groupLocation => groupLocation.GroupCode === 'STD');
 
     location.LocationGroupID = group.LocationGroupID;

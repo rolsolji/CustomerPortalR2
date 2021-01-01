@@ -19,7 +19,7 @@ import { BreadcrumbsModule } from '../../../../@vex/components/breadcrumbs/bread
 import { MatButtonModule } from '@angular/material/button';
 import { PageLayoutModule } from '../../../../@vex/components/page-layout/page-layout.module';
 import { ContainerModule } from '../../../../@vex/directives/container/container.module';
-
+import { WidgetBarChartModule } from '../../../../@vex/components/widgets/widget-bar-chart/widget-bar-chart.module';
 
 @NgModule({
   declarations: [DashboardAnalyticsComponent],
@@ -41,7 +41,8 @@ import { ContainerModule } from '../../../../@vex/directives/container/container
     BreadcrumbsModule,
     MatButtonModule,
     PageLayoutModule,
-    ContainerModule
+    ContainerModule,
+    WidgetBarChartModule
   ]
 })
 export class DashboardAnalyticsModule {

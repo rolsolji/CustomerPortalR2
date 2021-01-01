@@ -21,6 +21,7 @@ import {MatDatepickerModule} from "@angular/material/datepicker";
 import {MatNativeDateModule} from "@angular/material/core";
 import {MatAutocompleteModule} from "@angular/material/autocomplete";
 
+
 @NgModule({
   declarations: [AppComponent],
   imports: [
@@ -44,7 +45,7 @@ import {MatAutocompleteModule} from "@angular/material/autocomplete";
     // MatDialogModule
   ],
   providers: [
-    DatePipe,
+    DatePipe,    
     MatSnackBar,
     {
       provide: HTTP_INTERCEPTORS,

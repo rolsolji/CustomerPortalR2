@@ -13,6 +13,7 @@ import { createDateArray } from '../../../utils/create-date-array';
 export class WidgetLargeChartComponent implements OnInit {
 
   @Input() series: ApexNonAxisChartSeries | ApexAxisChartSeries;
+  @Input() titleName: string;
   @Input() options: ApexOptions = defaultChartOptions({
     grid: {
       show: true,
@@ -29,7 +30,7 @@ export class WidgetLargeChartComponent implements OnInit {
       },
       zoom: {
         enabled: false
-      }
+      },
     },
     fill: {
       type: 'gradient',

@@ -9,10 +9,10 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { IconModule } from '@visurel/iconify-angular';
-
+import { PowerPipe } from "./widget-pipe";
 
 @NgModule({
-  declarations: [WidgetTableComponent],
+  declarations: [WidgetTableComponent,PowerPipe],
   imports: [
     CommonModule,
     MatTableModule,
@@ -22,9 +22,10 @@ import { IconModule } from '@visurel/iconify-angular';
     MatTooltipModule,
     MatButtonModule,
     MatIconModule,
-    IconModule
+    IconModule    
   ],
-  exports: [WidgetTableComponent]
+  exports: [WidgetTableComponent],
+  providers:[PowerPipe]
 })
 export class WidgetTableModule {
 }

@@ -7,6 +7,7 @@ import {Router} from '@angular/router';
 import {Client} from '../Entities/client.model';
 import {MasUser} from '../Entities/mas-user.model';
 import { HtmlMsgByClient } from '../Entities/HtmlMsgByClient';
+import { Brand } from '../Entities/Brand';
 
 @Injectable({
   providedIn: 'root'
@@ -32,6 +33,7 @@ export class AuthenticationService {
   public loading$: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
   public requestFailed$: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
   public clientHtmlMessages$: BehaviorSubject<HtmlMsgByClient[]> = new BehaviorSubject<HtmlMsgByClient[]>(null);
+  public MasBrandForClient$: BehaviorSubject<Brand[]> = new BehaviorSubject<Brand[]>(null);
 
   public init(): boolean {
     const ticket = this.getTicketFromStorage();
@@ -39,6 +41,7 @@ export class AuthenticationService {
     const clients = this.getClientsForUserFromStorage();
     const defaultClient = this.getDefaultClientFromStorage();
     const clientHtmlMessages = this.getClientHtmlMessagesFromStorage();
+    const masBrands = this.getMasBrandFromStorage();
 
     if (ticket && user) {
       this.ticket$.next(ticket);
@@ -47,6 +50,7 @@ export class AuthenticationService {
       this.clientsForUser$.next(clients);
       this.defaultClient$.next(defaultClient);
       this.clientHtmlMessages$.next(clientHtmlMessages);
+      this.MasBrandForClient$.next(masBrands);
 
       return true;
     }
@@ -93,6 +97,9 @@ export class AuthenticationService {
               localStorage.setItem('clientHtmlMessages', JSON.stringify(clientHtmlMessagesSetup));
               this.clientHtmlMessages$.next(clientHtmlMessagesSetup);
 
+              const masBrandsSetup = await this.getMasBrandsByClientID(defaultClient.ClientID);
+              localStorage.setItem('masBrands', JSON.stringify(masBrandsSetup));
+              this.MasBrandForClient$.next(masBrandsSetup);
             }
 
             resolve({ticket, status: true, user});
@@ -183,6 +190,14 @@ export class AuthenticationService {
     return JSON.parse(localStorage.getItem('clientHtmlMessages'));
   }
 
+  public getMasBrands(): Brand[] {
+    return this.MasBrandForClient$.value;
+  }
+
+  public getMasBrandFromStorage(): Brand[] {
+    return JSON.parse(localStorage.getItem('masBrands'));
+  }
+
   public async getMasUser(userId): Promise<MasUser> {
     const ticket = this.ticket$.value;
 
@@ -203,6 +218,18 @@ export class AuthenticationService {
         Ticket : ticket
     });
     return this.http.get<HtmlMsgByClient[]>(`${this.baseEndpoint}Services/MasClientHtmlMessageService.svc/json/GetClientHtmlMsgByClientID?ClientID=${clientID}`
+    ,{
+        headers: httpHeaders
+      }
+      ).toPromise();
+  }
+
+  public async getMasBrandsByClientID(clientID:number){
+    const ticket = this.ticket$.value;
+    const httpHeaders = new HttpHeaders({
+        Ticket : ticket
+    });
+    return this.http.get<Brand[]>(`${this.baseEndpoint}Services/MasBrandsService.svc/json/GetMasBrandsDataByClientID?ClientID=${clientID}`
     ,{
         headers: httpHeaders
       }

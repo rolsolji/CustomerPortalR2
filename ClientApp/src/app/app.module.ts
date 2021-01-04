@@ -22,6 +22,7 @@ import { MatNativeDateModule } from "@angular/material/core";
 import { MatAutocompleteModule } from "@angular/material/autocomplete";
 import { OnlyNumberDirective } from "./shared/directives/OnlyNumber.directive";
 
+
 @NgModule({
   declarations: [AppComponent, OnlyNumberDirective],
   imports: [
@@ -45,7 +46,7 @@ import { OnlyNumberDirective } from "./shared/directives/OnlyNumber.directive";
     // MatDialogModule
   ],
   providers: [
-    DatePipe,
+    DatePipe,    
     MatSnackBar,
     {
       provide: HTTP_INTERCEPTORS,

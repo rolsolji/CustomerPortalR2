@@ -16,4 +16,13 @@ export class UtilitiesService {
         }
         return currentDate;
     }
+
+    ConvertDateToJsonFormate (txtDate: Date){
+        var time = txtDate.getTime();
+        var timezone = txtDate.getTimezoneOffset();
+        var totaltime = parseInt(timezone.toString()) * 60000 * (-1) + parseInt(time.toString());
+        var Jsondate = "\/Date(" + totaltime.toString() + ")\/";    
+        return Jsondate;
+      }
+
 }

@@ -14,7 +14,7 @@ export class WidgetTableComponent<T> implements OnInit, OnChanges, AfterViewInit
 
   @Input() data: T[];
   @Input() columns: TableColumn<T>[];
-  @Input() pageSize = 6;
+  @Input() pageSize = 8;
 
   visibleColumns: Array<keyof T | string>;
   dataSource = new MatTableDataSource<T>();

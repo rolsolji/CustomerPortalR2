@@ -1,0 +1,182 @@
+<form (ngSubmit)="showReport()" [formGroup]="KPIFormGroup" #reportForm="ngForm">
+
+    <div @stagger class="qcForms p-gutter" vexContainer>
+        <div @fadeInUp class="card overflow-hidden">
+            <div fxLayout="row" fxLayout.lt-md="column" fxLayoutAlign="center center">
+                <p class="title">{{reportTitle}}</p>
+            </div>
+
+            <div fxLayout="row" fxLayout.lt-md="column" fxLayoutAlign="center center" fxLayoutGap="5px">
+                <div @fadeInUp class="card" fxFlex="90%">
+
+                    <div fxLayout="row" fxLayoutGap="3px" style="margin-bottom: 10px;" class="ml-5" *ngIf="isShowReportOption">
+                        <div fxFlex="15%">
+
+                        </div>
+                        <div fxFlex="40%" >
+                            <mat-radio-group formControlName="ReportType" color="primary">
+                                <mat-radio-button value="pdf">PDF</mat-radio-button>
+                                <mat-radio-button value="xls" style="margin-left: 10px;">EXCEL</mat-radio-button>
+                            </mat-radio-group>
+                        </div>
+                    </div>
+
+                    <div fxLayout="row" fxLayoutGap="3px" style="margin-bottom: 10px;" class="ml-5" *ngIf="isShipmentOrQuote">
+                        <div fxFlex="15%">
+
+                        </div>
+                        <div fxFlex="40%" >
+                            <mat-radio-group formControlName="isShipmentOrQuote" color="primary">
+                                <mat-radio-button value="Shipments">Shipments</mat-radio-button>
+                                <mat-radio-button value="Quote" style="margin-left: 10px;">Quotes</mat-radio-button>
+                            </mat-radio-group>
+                        </div>
+                    </div>
+
+                    <div fxLayout="row" fxLayoutGap="3px" class="ml-5" *ngIf="isShowClientName">
+                        <div fxFlex="11%">
+                            <div class="actionspan">
+                                <span class="stepTitleStyle">Client Name</span>
+                            </div>
+                        </div>
+                        <div fxFlex="40%">
+                            <mat-form-field class="matFormField" appearance="outline">
+                                <input name="client" formControlName="client" type="text" matInput
+                                    placeholder="Client Name" style="color: #a1a2b6;"
+                                    [matAutocomplete]="clientAutoComplete">
+                                <mat-autocomplete #clientAutoComplete="matAutocomplete">
+                                    <mat-option *ngFor="let client of filteredOptions | async" (onSelectionChange)="clientAutoCompleteSelected(client)"
+                                        [value]="client.ClientName" style="font-size: 12px">
+                                        {{client.ClientName}}
+                                    </mat-option>
+                                </mat-autocomplete>
+                            </mat-form-field>
+                        </div>
+                    </div>
+
+                    <div fxLayout="row" fxLayoutGap="3px" class="ml-5" *ngIf="isShowMode">
+                        <div fxFlex="11%">
+                            <div class="actionspan">
+                                <span class="stepTitleStyle">Mode</span>
+                            </div>
+                        </div>
+                        <div fxFlex="40%">
+                            <mat-form-field appearance="fill" class="matFormField">
+                                <!-- <mat-label>Select Mode</mat-label> -->
+                                <mat-select [(value)]="this.shipmentModeSelected" formControlName="ModeCode">
+                                    <mat-option *ngFor="let mode of this.shipmentModes" [value]="mode.ModeCode">
+                                        {{mode.Mode}}
+                                    </mat-option>
+                                </mat-select>
+                            </mat-form-field>
+                        </div>
+                    </div>
+
+                    <div fxLayout="row" fxLayoutGap="3px" class="ml-5" *ngIf="isShowPickupDate">
+                        <div fxFlex="11%">
+                            <div class="actionspan">
+                                <span class="stepTitleStyle">Pickup Date From</span>
+                            </div>
+                        </div>
+                        <div fxFlex="20%">
+                            <mat-form-field style="width: 100%;" appearance="outline">
+                                <mat-label>Pickup From Date</mat-label>
+                                <input (click)="formDatepickerRef.open()" (focus)="formDatepickerRef.open()"
+                                    name="pickupDateFrom" [matDatepicker]="formDatepickerRef" matInput readonly
+                                    formControlName="pickupDateFrom" (dateChange)="pickupDatevalueChange()" (dateInput)="pickupDatevalueChange()">
+                                <mat-datepicker-toggle [for]="formDatepickerRef" matSuffix></mat-datepicker-toggle>
+                                <mat-datepicker #formDatepickerRef></mat-datepicker>
+                            </mat-form-field>
+                        </div>
+                        <div fxFlex="3%">
+                            <div class="actionspan" style="margin-left: 10%;">
+                                <span class="stepTitleStyle">To</span>
+                            </div>
+                        </div>
+                        <div fxFlex="20%">
+                            <mat-form-field style="width: 100%;" appearance="outline">
+                                <mat-label>Pickup To Date</mat-label>
+                                <input (click)="toDatepickerRef.open()" (focus)="toDatepickerRef.open()"
+                                    name="pickupDateTo" [matDatepicker]="toDatepickerRef" matInput readonly
+                                    formControlName="pickupDateTo">
+                                <mat-datepicker-toggle [for]="toDatepickerRef" matSuffix></mat-datepicker-toggle>
+                                <mat-datepicker #toDatepickerRef></mat-datepicker>
+                            </mat-form-field>
+                        </div>
+                    </div>
+
+                    <div fxLayout="row" fxLayoutGap="3px" class="ml-5" *ngIf="isShowInvoiceDate">
+                        <div fxFlex="11%">
+                            <div class="actionspan">
+                                <span class="stepTitleStyle">Invoice Date From</span>
+                            </div>
+                        </div>
+                        <div fxFlex="20%">
+                            <mat-form-field style="width: 100%;" appearance="outline">
+                                <mat-label>Invoice From Date</mat-label>
+                                <input (click)="formInvoiceDatepickerRef.open()" (focus)="formInvoiceDatepickerRef.open()"
+                                    name="invoiceDateFrom" [matDatepicker]="formInvoiceDatepickerRef" matInput readonly
+                                    formControlName="invoiceDateFrom" (dateChange)="invoiceDatevalueChange()" (dateInput)="invoiceDatevalueChange()">
+                                <mat-datepicker-toggle [for]="formInvoiceDatepickerRef" matSuffix></mat-datepicker-toggle>
+                                <mat-datepicker #formInvoiceDatepickerRef></mat-datepicker>
+                            </mat-form-field>
+                        </div>
+                        <div fxFlex="3%">
+                            <div class="actionspan" style="margin-left: 10%;">
+                                <span class="stepTitleStyle">To</span>
+                            </div>
+                        </div>
+                        <div fxFlex="20%">
+                            <mat-form-field style="width: 100%;" appearance="outline">
+                                <mat-label>Invoice To Date</mat-label>
+                                <input (click)="toInvoiceDatepickerRef.open()" (focus)="toInvoiceDatepickerRef.open()"
+                                    name="invoiceDateTo" [matDatepicker]="toInvoiceDatepickerRef" matInput readonly
+                                    formControlName="invoiceDateTo">
+                                <mat-datepicker-toggle [for]="toInvoiceDatepickerRef" matSuffix></mat-datepicker-toggle>
+                                <mat-datepicker #toInvoiceDatepickerRef></mat-datepicker>
+                            </mat-form-field>
+                        </div>
+                    </div>
+
+                    <div fxLayout="row" fxLayoutGap="3px" class="ml-5" *ngIf="isShowOnlyInvoiced">
+                        <div fxFlex="11%">
+
+                        </div>
+                        <div fxFlex="40%" class="matCheckandRadio">
+                            <mat-checkbox [checked]="false" formControlName="isOnlyInvoiced" color="primary">Only Invoiced</mat-checkbox>
+                        </div>
+                    </div>
+
+                    <div fxLayout="row" fxLayoutGap="3px" class="ml-5" *ngIf="isShowAVGCostPerMile">
+                        <div fxFlex="11%">
+
+                        </div>
+                        <div fxFlex="40%" class="matCheckandRadio">
+                            <mat-checkbox [checked]="false" formControlName="isAVGCostPerMile" color="primary">Avg. Cost per Mile</mat-checkbox>
+                        </div>
+                    </div>
+
+                    <div fxLayout="row" fxLayoutGap="3px" class="ml-5" *ngIf="isShowIncludeSubClient">
+                        <div fxFlex="11%">
+
+                        </div>
+                        <div fxFlex="40%" class="matCheckandRadio">
+                            <mat-checkbox [checked]="false" formControlName="isIncludeSubClient" color="primary">Include Sub Client</mat-checkbox>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <div fxLayout="row" fxLayoutGap="3px" class="ml-5">
+                <div fxFlex="15%">
+                </div>
+                <div fxFlex="40%" class="matCheckandRadio">
+                    <div class="action">
+                        <button color="primary" mat-raised-button [disabled]="!reportForm.valid">SHOW REPORT</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>

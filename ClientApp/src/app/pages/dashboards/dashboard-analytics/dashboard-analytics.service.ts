@@ -27,4 +27,19 @@ export class DashBoardService {
         const data = await this.httpService.DashBoard_GetTopCarriers(clientID, dateFrom, dateTo, isIncludeSubClient);
         return data;
     }
+
+    public async DashBoard_GetTopLaneForZip(clientID: number, dateFrom: string, dateTo: string, isIncludeSubClient: boolean) {
+        const data = await this.httpService.DashBoard_GetTopLaneForZip(clientID, dateFrom, dateTo, isIncludeSubClient);
+        return data;
+    }
+
+    public async DashBoard_GetTopLaneForZipCity(clientID: number, dateFrom: string, dateTo: string, isIncludeSubClient: boolean) {
+        const data = await this.httpService.DashBoard_GetTopLaneForZipCity(clientID, dateFrom, dateTo, isIncludeSubClient);
+        return data;
+    }
+
+    public async DashBoard_GetTopLaneForState(clientID: number, dateFrom: string, dateTo: string, isIncludeSubClient: boolean) {
+        const data = await this.httpService.DashBoard_GetTopLaneForState(clientID, dateFrom, dateTo, isIncludeSubClient);
+        return data;
+    }
 }

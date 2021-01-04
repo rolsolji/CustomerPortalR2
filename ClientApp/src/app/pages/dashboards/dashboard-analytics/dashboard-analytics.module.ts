@@ -12,7 +12,7 @@ import { WidgetQuickValueStartModule } from '../../../../@vex/components/widgets
 import { WidgetLargeGoalChartModule } from '../../../../@vex/components/widgets/widget-large-goal-chart/widget-large-goal-chart.module';
 import { IconModule } from '@visurel/iconify-angular';
 import { WidgetAssistantModule } from '../../../../@vex/components/widgets/widget-assistant/widget-assistant.module';
-import { WidgetLargeChartModule } from '../../../../@vex/components/widgets/widget-large-chart/widget-large-chart.module';
+import { WidgetLargeChartModule } from '../../../../@vex/components/widgets/widget-pie-chart/widget-large-chart.module';
 import { WidgetTableModule } from '../../../../@vex/components/widgets/widget-table/widget-table.module';
 import { SecondaryToolbarModule } from '../../../../@vex/components/secondary-toolbar/secondary-toolbar.module';
 import { BreadcrumbsModule } from '../../../../@vex/components/breadcrumbs/breadcrumbs.module';

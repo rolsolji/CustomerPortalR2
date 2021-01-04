@@ -44,6 +44,7 @@ import { TotalStatusRecords } from '../Entities/TotalStatusRecords';
 import { weightcostCompareModel } from '../Entities/WeightCostCompareModel';
 import { AccessorialPerformance } from '../Entities/AccessorialPerformance';
 import { CarrierPerformanceModel } from '../Entities/CarrierPerformanceModel';
+import { TopLanes } from '../Entities/TopLanes';
 
 @Injectable({
     providedIn: 'root'
@@ -692,6 +693,45 @@ export class HttpService{
         });
         return this.http.get<CarrierPerformanceModel[]>(
             this.baseEndpoint + 'Services/DashBoardService.svc/json/DashBoard_GetTopCarriers?clientID=' + clientID + '&shipFromdate=' + dateFrom + '&shipTodate=' + dateTo + '&ByVolume=true&IsIncludeSubClient=' + isIncludeSubClient
+            ,{
+                headers: httpHeaders
+            }
+        ).toPromise();
+    }
+
+    public DashBoard_GetTopLaneForZip(clientID: number, dateFrom: string, dateTo: string, isIncludeSubClient: boolean) {
+        const ticket = this.token;
+        const httpHeaders = new HttpHeaders({
+            Ticket : ticket
+        });
+        return this.http.get<TopLanes[]>(
+            this.baseEndpoint + 'Services/DashBoardService.svc/json/DashBoard_GetTopLaneForZip?clientID=' + clientID + '&shipFromdate=' + dateFrom + '&shipTodate=' + dateTo + '&TopValue=10&OrderBy=1&IsIncludeSubClient=' + isIncludeSubClient
+            ,{
+                headers: httpHeaders
+            }
+        ).toPromise();
+    }
+
+    public DashBoard_GetTopLaneForZipCity(clientID: number, dateFrom: string, dateTo: string, isIncludeSubClient: boolean) {
+        const ticket = this.token;
+        const httpHeaders = new HttpHeaders({
+            Ticket : ticket
+        });
+        return this.http.get<TopLanes[]>(
+            this.baseEndpoint + 'Services/DashBoardService.svc/json/DashBoard_GetTopLaneForZipCity?clientID=' + clientID + '&shipFromdate=' + dateFrom + '&shipTodate=' + dateTo + '&TopValue=10&OrderBy=1&IsIncludeSubClient=' + isIncludeSubClient
+            ,{
+                headers: httpHeaders
+            }
+        ).toPromise();
+    }
+
+    public DashBoard_GetTopLaneForState(clientID: number, dateFrom: string, dateTo: string, isIncludeSubClient: boolean) {
+        const ticket = this.token;
+        const httpHeaders = new HttpHeaders({
+            Ticket : ticket
+        });
+        return this.http.get<TopLanes[]>(
+            this.baseEndpoint + 'Services/DashBoardService.svc/json/DashBoard_GetTopLaneForState?clientID=' + clientID + '&shipFromdate=' + dateFrom + '&shipTodate=' + dateTo + '&TopValue=10&OrderBy=1&IsIncludeSubClient=' + isIncludeSubClient
             ,{
                 headers: httpHeaders
             }

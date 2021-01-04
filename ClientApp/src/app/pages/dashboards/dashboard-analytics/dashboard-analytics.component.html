@@ -7,7 +7,7 @@
 </vex-secondary-toolbar>
 
 <div class="p-gutter" gdColumns="1fr 1fr 1fr 1fr" gdColumns.lt-md="1fr 1fr" gdColumns.lt-sm="1fr" gdGap="16px"
-  vexContainer>  
+  vexContainer>
 
   <vex-widget-large-chart [options]="TotalShipmentsOptions" [titleName]="chart1Name" gdColumn="1 / 1"
     gdColumn.lt-md="1 / -1" gdColumn.lt-sm="1"></vex-widget-large-chart>
@@ -21,9 +21,17 @@
   <vex-widget-large-chart [options]="TopAccessorials" [titleName]="chart3Name" gdColumn="-1 / 2" gdColumn.lt-md="1 / -1"
     gdColumn.lt-sm="1"></vex-widget-large-chart>
 
-  <vex-widget-bar-chart [options]="TopCarriers" [titleName]="chart4Name" gdColumn="1 / 1" gdColumn.lt-md="1 / -1"
-    gdColumn.lt-sm="1"></vex-widget-bar-chart>
+  <!-- <vex-widget-bar-chart [options]="TopCarriers" [titleName]="chart4Name" gdColumn="1 / 1" gdColumn.lt-md="1 / -1"
+    gdColumn.lt-sm="1"></vex-widget-bar-chart> -->
 
+  <vex-widget-large-chart [options]="TopLanesByZip" [titleName]="chart5Name" gdColumn="1 / 1" gdColumn.lt-md="1 / -1"
+    gdColumn.lt-sm="1"></vex-widget-large-chart>
+
+  <vex-widget-large-chart [options]="TopLanesByZipAndCity" [titleName]="chart6Name" gdColumn="-1 / 2" gdColumn.lt-md="1 / -1"
+    gdColumn.lt-sm="1"></vex-widget-large-chart>
+
+  <vex-widget-large-chart [options]="TopLanesByState" [titleName]="chart7Name" gdColumn="1 / 1" gdColumn.lt-md="1 / -1"
+    gdColumn.lt-sm="1"></vex-widget-large-chart>
 
   <!-- <vex-widget-quick-line-chart [icon]="icPageView"
                                  [series]="pageViewsSeries"

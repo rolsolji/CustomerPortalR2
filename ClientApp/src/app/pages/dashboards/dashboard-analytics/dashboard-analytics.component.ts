@@ -13,6 +13,8 @@ import { AuthenticationService } from 'src/app/common/authentication.service';
 import { BehaviorSubject, Subject } from 'rxjs';
 import { AccessorialPerformance } from 'src/app/Entities/AccessorialPerformance';
 import { CarrierPerformanceModel } from 'src/app/Entities/CarrierPerformanceModel';
+import { TopLanes } from 'src/app/Entities/TopLanes';
+import { formatCurrency } from '@angular/common';
 
 
 @Component({
@@ -29,6 +31,9 @@ export class DashboardAnalyticsComponent implements OnInit {
   chart2Name: string = "Cost By Firgation";
   chart3Name: string = "Top Accessorials";
   chart4Name: string = "Top Carriers";
+  chart5Name: string = "Top 10 lanes By Zip Code";
+  chart6Name: string = "Top 10 lanes By Zip Code - City";
+  chart7Name: string = "Top 10 lanes By State";
 
   tableColumns: TableColumn<Order>[] = [
     {
@@ -63,6 +68,10 @@ export class DashboardAnalyticsComponent implements OnInit {
   topAccessorialDetails: AccessorialPerformance[] = [];
 
   topCarriersDetails: CarrierPerformanceModel[] = [];
+
+  topLanesByZip: TopLanes[] = [];
+  topLanesByZipAndCity: TopLanes[] = [];
+  topLanesByState: TopLanes[] = [];
 
   // series: ApexAxisChartSeries = [{
   //   name: 'Subscribers',
@@ -143,6 +152,30 @@ export class DashboardAnalyticsComponent implements OnInit {
     labels: []
   });
 
+  TopLanesByZip = defaultChartOptions({
+    chart: {
+      type: 'donut'
+    },
+    series: [],
+    labels: []
+  });
+
+  TopLanesByZipAndCity = defaultChartOptions({
+    chart: {
+      type: 'donut'
+    },
+    series: [],
+    labels: []
+  });
+
+  TopLanesByState = defaultChartOptions({
+    chart: {
+      type: 'donut'
+    },
+    series: [],
+    labels: []
+  });
+
   constructor(private cd: ChangeDetectorRef, private dashBoardService: DashBoardService,
     private authenticationService: AuthenticationService) { }
 
@@ -172,6 +205,10 @@ export class DashboardAnalyticsComponent implements OnInit {
     /* Start Details of Top Carriers chart. */
     this.GetDetailsForTopCarriersChart();
     /* END */
+
+    /* Start Details of Top Lanes Chart. */
+    this.GetDetailsForTopLanesChart();
+    /* END */
   }
 
   calculationOfDateFromAndTo() {
@@ -200,15 +237,15 @@ export class DashboardAnalyticsComponent implements OnInit {
     this.TotalShipmentsOptions = defaultChartOptions({
       chart: {
         type: 'pie',
-        height: 300,
+        height: 450,
         width: 550,
       },
       legend: {
         show: true,
-        position: 'right',
+        position: 'bottom',
         horizontalAlign: 'center',
         floating: false,
-        fontSize: '8px',
+        fontSize: '10px',
         itemMargin: {
           horizontal: 5,
           vertical: 5
@@ -317,7 +354,7 @@ export class DashboardAnalyticsComponent implements OnInit {
         position: 'right',
         horizontalAlign: 'center',
         floating: false,
-        fontSize: '8px',
+        fontSize: '10px',
         itemMargin: {
           horizontal: 5,
           vertical: 5
@@ -375,7 +412,7 @@ export class DashboardAnalyticsComponent implements OnInit {
         position: 'right',
         horizontalAlign: 'center',
         floating: false,
-        fontSize: '8px',
+        fontSize: '10px',
         itemMargin: {
           horizontal: 5,
           vertical: 5
@@ -406,7 +443,8 @@ export class DashboardAnalyticsComponent implements OnInit {
       ],
       chart: {
         type: "bar",
-        height: 430
+        height: "300",
+        width: "550"
       },
       plotOptions: {
         bar: {
@@ -434,5 +472,152 @@ export class DashboardAnalyticsComponent implements OnInit {
       }
     });
 
+  }
+
+  GetDetailsForTopLanesChart() {
+    this.GetDataForTopLanesByZipChart();
+    this.GetDataForTopLanesByZipAndCityChart();
+    this.GetDataForTopLanesByStateChart();
+  }
+
+  async GetDataForTopLanesByZipChart() {
+    this.topLanesByZip = await this.dashBoardService.DashBoard_GetTopLaneForZip(this.authenticationService.getDefaultClientFromStorage().ClientID, this.dateFrom, this.dateTo, this.isIncludeSubClient);
+    this.PrepareDetailsForTopLanesByZipChart();
+  }
+
+  PrepareDetailsForTopLanesByZipChart() {
+    var label: string[] = [];
+    var series: ApexNonAxisChartSeries = [];
+
+    for (let i = 0; i < this.topLanesByZip.length; i++) {
+      var DestAndOrgZipLabel = 'Org Zip:' + this.topLanesByZip[i].OrgPostalCode + ' - Dest Zip:' + this.topLanesByZip[i].DestPostalCode;
+      label.push(DestAndOrgZipLabel);
+      series.push(this.topLanesByZip[i].SellCost);
+    }
+
+    this.TopLanesByZip = defaultChartOptions({
+      chart: {
+        type: 'donut',
+        height: 300,
+        width: 550,
+      },
+      responsive: [
+        {
+          breakpoint: 480,
+          options: {
+            chart: {
+              width: 200
+            },
+          }
+        }
+      ],
+      legend: {
+        show: true,
+        position: 'right',
+        horizontalAlign: 'center',
+        floating: false,
+        fontSize: '10px',
+        itemMargin: {
+          horizontal: 5,
+          vertical: 5
+        },
+      },
+      series: series,
+      labels: label
+    });
+  }
+
+  async GetDataForTopLanesByZipAndCityChart() {
+    this.topLanesByZipAndCity = await this.dashBoardService.DashBoard_GetTopLaneForZipCity(this.authenticationService.getDefaultClientFromStorage().ClientID, this.dateFrom, this.dateTo, this.isIncludeSubClient);
+    this.PrepareDetailsForTopLanesByZipAndCityChart();
+  }
+
+  PrepareDetailsForTopLanesByZipAndCityChart() {
+    var label: string[] = [];
+    var series: ApexNonAxisChartSeries = [];
+
+    for (let i = 0; i < this.topLanesByZipAndCity.length; i++) {
+      var DestAndOrgZipCityLabel = this.topLanesByZipAndCity[i].OrgPostalCode + '/' + this.topLanesByZipAndCity[i].OrgCityName.trim() + ' - ' + this.topLanesByZipAndCity[i].DestPostalCode + '/' + this.topLanesByZipAndCity[i].DestCityName.trim();
+      label.push(DestAndOrgZipCityLabel);
+      series.push(this.topLanesByZipAndCity[i].SellCost);
+    }
+
+    this.TopLanesByZipAndCity = defaultChartOptions({
+      chart: {
+        type: 'donut',
+        height: 300,
+        width: 620,
+      },
+      responsive: [
+        {
+          breakpoint: 480,
+          options: {
+            chart: {
+              width: 200
+            },
+          }
+        }
+      ],
+      legend: {
+        show: true,
+        position: 'right',
+        horizontalAlign: 'center',
+        floating: false,
+        fontSize: '9px',
+        itemMargin: {
+          horizontal: 5,
+          vertical: 5
+        }
+      },
+      series: series,
+      labels: label
+    });
+  }
+
+  async GetDataForTopLanesByStateChart() {
+    this.topLanesByState = await this.dashBoardService.DashBoard_GetTopLaneForState(this.authenticationService.getDefaultClientFromStorage().ClientID, this.dateFrom, this.dateTo, this.isIncludeSubClient);
+    this.PrepareDetailsForTopLanesByStateChart();
+  }
+
+  PrepareDetailsForTopLanesByStateChart() {
+    var label: string[] = [];
+    var series: ApexNonAxisChartSeries = [];
+
+    for (let i = 0; i < this.topLanesByState.length; i++) {
+      var DestAndOrgStateLabel = this.topLanesByState[i].OrgStateName.trim() + ' - ' + this.topLanesByState[i].DestStateName.trim();
+      label.push(DestAndOrgStateLabel);
+      series.push(this.topLanesByState[i].SellCost);
+    }
+
+    this.TopLanesByState = defaultChartOptions({
+      chart: {
+        type: 'donut',
+        height: 300,
+        width: 550,
+      },
+      responsive: [
+        {
+          breakpoint: 480,
+          options: {
+            chart: {
+              width: 200
+            },
+          }
+        }
+      ],
+      legend: {
+        show: true,
+        position: 'right',
+        horizontalAlign: 'center',
+        floating: false,
+        fontSize: '10px',
+        itemMargin: {
+          horizontal: 5,
+          vertical: 5
+        },
+      },
+      series: series,
+      labels: label      
+    });
   }
 }

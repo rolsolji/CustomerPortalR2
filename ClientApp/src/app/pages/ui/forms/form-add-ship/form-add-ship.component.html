@@ -449,6 +449,7 @@
                           <mat-form-field>
                             <mat-label>Description</mat-label>
                             <input matInput type="text" maxlength="50" formControlName="ProductDescription" required
+                                    (keypress)="onKeypressProdDesc($event, i)"
                                     [matAutocomplete]="pAutoComplete" 
                                     (keydown.tab)="validateProductByClient($event)">
                                     <mat-autocomplete #pAutoComplete="matAutocomplete" (optionSelected)="pAutoCompleteSelected($event, i)">

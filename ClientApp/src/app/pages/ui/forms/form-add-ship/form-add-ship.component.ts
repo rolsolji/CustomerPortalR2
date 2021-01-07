@@ -840,6 +840,26 @@ private productsByClientFilter(value = ''): ProductByClient[]{
     return  index;
   }
 
+  onKeypressProdDesc(event: any, index: number){
+    console.log('key press evento', event, 'index', index);
+
+    const productsList = this.productsAndAccessorialsFormGroup.get('products') as FormArray;
+
+    if (productsList.length - 1 !== index){
+      const productsList = this.productsAndAccessorialsFormGroup.get('products') as FormArray;
+      const formGroup = productsList.controls[index] as FormGroup;
+
+      console.log('press key - formGroup', formGroup);
+      console.log('press key -- productsList.length', productsList.length);
+
+      this.pAutoCompleteOptions = formGroup.get('ProductDescription').valueChanges
+        .pipe(
+          startWith(''),
+          map(val => this.productsByClientFilter((val)))
+        ); 
+    }
+  }
+
   addNewProdField(): void {
     (this.productsAndAccessorialsFormGroup.get('products') as FormArray).push(this.addProductFormGroup());
 

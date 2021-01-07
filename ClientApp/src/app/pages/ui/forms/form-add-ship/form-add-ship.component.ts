@@ -19,7 +19,7 @@ import { InternalNote } from '../../../../Entities/InternalNote';
 import { ShipmentCost, AccountInvoiceCostList } from '../../../../Entities/ShipmentCost';
 import { MessageService } from '../../../../common/message.service';
 import { Observable, of } from 'rxjs';
-import { startWith, debounceTime, distinctUntilChanged, switchMap, pairwise } from 'rxjs/operators';
+import { startWith, debounceTime, distinctUntilChanged, switchMap, pairwise, map } from 'rxjs/operators';
 import {MatAutocompleteSelectedEvent, MatAutocomplete} from '@angular/material/autocomplete';
 import { EquipmentType } from '../../../../Entities/EquipmentType';
 import { ShipmentPriority } from '../../../../Entities/ShipmentPriority';
@@ -60,7 +60,7 @@ import {ConfirmAlertDialogComponent} from '../../../../../app/shared/confirm-ale
 import { Country } from 'src/app/Entities/Country';
 import { InvoiceParameter, SendEmailParameters } from 'src/app/Entities/SendEmailParameters';
 import { PCFClientDefaults } from 'src/app/Entities/PCFClientDefaults';
-
+import { ProductByClient } from  '../../../../Entities/ProductByClient'
 
 @Component({
   selector: 'vex-form-add-ship',
@@ -225,6 +225,7 @@ export class FormAddShipComponent implements OnInit {
   ReferenceByClientIDField1 = 0;
   ReferenceByClientIDField2 = 0;
   ReferenceByClientIDField3 = 0;
+  IsAutoCompleteProductSelected = false;
 
   ForceToReRate = false;
   accessorialsUsedToRate: AccessorialBase[] = [];
@@ -241,6 +242,9 @@ export class FormAddShipComponent implements OnInit {
 
   pcoAutoCompleteOptions: Observable<PostalData[]>;
   pcdAutoCompleteOptions: Observable<PostalData[]>;
+  loAutoCompleteOptions: Observable<Location[]>;
+  ldAutoCompleteOptions: Observable<Location[]>;
+  pAutoCompleteOptions: Observable<ProductByClient[]>;
 
   carrierAutoCompleteOptions: Observable<Object[]>;
 
@@ -262,6 +266,7 @@ export class FormAddShipComponent implements OnInit {
   Carrier: string;
   carrierData: Carrier[];
   countryList: PostalData[];
+  productList: ProductByClient[];
 
   addProductFormGroup(): FormGroup{
     return this.fb.group({
@@ -403,6 +408,8 @@ export class FormAddShipComponent implements OnInit {
 
     this.packageTypes = await this.httpService.getProductPackageType(this.keyId);
 
+    this.productList = await this.httpService.GetProductByClient(this.ClientID, this.keyId);
+
     this.originCountries = responseData;
     this.destinationCountries = responseData;
     this.originSelectedCountry = responseData[0]; // US as default
@@ -420,16 +427,36 @@ export class FormAddShipComponent implements OnInit {
         distinctUntilChanged(),
         switchMap(val => {
             return this.pcoAutoCompleteFilter(val || '')
-       })
+        })
       );
 
-      this.pcdAutoCompleteOptions = this.originAndDestinationFormGroup.get('destpostalcode').valueChanges
+    this.pcdAutoCompleteOptions = this.originAndDestinationFormGroup.get('destpostalcode').valueChanges
       .pipe(
         startWith(''),
         debounceTime(400),
         distinctUntilChanged(),
         switchMap(val => {
           return this.pcdAutoCompletefilter(val || '')
+        })
+      );
+
+    this.loAutoCompleteOptions = this.originAndDestinationFormGroup.get('originname').valueChanges
+      .pipe(
+        startWith(''),
+        debounceTime(400),
+        distinctUntilChanged(),
+        switchMap(val => {
+            return this.loAutoCompleteFilter(val || '')
+        })
+      );
+
+    this.ldAutoCompleteOptions = this.originAndDestinationFormGroup.get('destname').valueChanges
+      .pipe(
+        startWith(''),
+        debounceTime(400),
+        distinctUntilChanged(),
+        switchMap(val => {
+          return this.ldAutoCompletefilter(val || '')
         })
       );
 
@@ -506,8 +533,6 @@ export class FormAddShipComponent implements OnInit {
     }
     // --
 
-
-
     this.carrierAutoCompleteOptions = this.confirmFormGroup.get('carrier').valueChanges
       .pipe(
         startWith(''),
@@ -559,6 +584,34 @@ export class FormAddShipComponent implements OnInit {
           this.ForceToReRate = true;
         }
       });     
+
+    const productsList = this.productsAndAccessorialsFormGroup.get('products') as FormArray;
+    
+    for (let i = 0; i <  productsList.length; i++){
+      const formGroup = productsList.controls[i] as FormGroup;
+
+      console.log('formGroup', formGroup);
+  
+  
+      this.pAutoCompleteOptions = formGroup.get('ProductDescription').valueChanges
+        .pipe(
+          startWith(''),
+          map(val => this.productsByClientFilter((val)))
+        ); 
+    }
+    
+
+    // for (let i = 0; i <  productsList.length; i++){
+
+    //   console.log('prod', productsList.at(i), 'i', i);
+
+    //   this.pAutoCompleteOptions = productsList.at(i).get('ProductDescription').valueChanges
+    //   .pipe(
+    //     startWith(''),
+    //     map(val => this.productsByClientFilter((val)))
+    //   ); 
+    // } 
+
   }
 
   get originEmail() {
@@ -569,18 +622,52 @@ export class FormAddShipComponent implements OnInit {
     return this.originAndDestinationFormGroup.get('destemail');
   } 
 
+private productsByClientFilter(value = ''): ProductByClient[]{
+
+  console.log('IsAutoCompleteProductSelected', this.IsAutoCompleteProductSelected);
+
+  console.log('prodfilter', value);
+
+  console.log('productList', this.productList);
+  
+  if (!this.IsAutoCompleteProductSelected && value !== null && value !== '' )
+    return this.productList.filter(p => p.Description.toLowerCase().includes(value.toLocaleLowerCase()))  
+  
+  this.IsAutoCompleteProductSelected = false;
+  const prodBase: ProductByClient[] = [];
+  return prodBase; 
+}
+
   pcoAutoCompleteFilter(val: string): Observable<any[]> {
-    console.log('Autocomplete origin filter:', val);
+    console.log('pcoAutoCompleteFilter', val);
     const CountryId = this.originSelectedCountry == null ? '1': this.originSelectedCountry.CountryId.toString();
     return this.httpService.postalCodeAutocomplete(val, CountryId, this.keyId)
   }
 
   pcoAutoCompleteSelected(event: MatAutocompleteSelectedEvent): void {
-    console.log('Autocomplete origin selected');
+    console.log('pcoAutoCompleteSelected', event.option.value);
     this.originAndDestinationFormGroup.get('originstatename').setValue(event.option.value.StateName.trim());
     this.OriginPostalCode = String.Format('{0}-{1}',event.option.value.PostalCode,event.option.value.CityName.trim());
     this.OriginPostalData = event.option.value;
     this.originAndDestinationFormGroup.get('originpostalcode').setValue(this.OriginPostalCode);
+  }
+
+  loAutoCompleteFilter(val: string): Observable<any[]> {
+    console.log('Autocomplete origin filter:', val);
+    return this.httpService.GetLocationByType(this.authenticationService.getDefaultClient().ClientID,1,val, this.keyId);
+  }
+
+  loAutoCompleteSelected(event: MatAutocompleteSelectedEvent): void {
+    console.log('Autocomplete origin selected', event.option.value);
+    this.originAndDestinationFormGroup.get('originname').setValue(event.option.value.Name.trim());
+    this.originAndDestinationFormGroup.get('originadddress1').setValue(event.option.value.Address1.trim());
+    this.originAndDestinationFormGroup.get('originadddress2').setValue(event.option.value.Address2.trim());
+    this.originAndDestinationFormGroup.get('originstatename').setValue(event.option.value.StateName.trim());
+    this.OriginPostalCode = String.Format('{0}-{1}',event.option.value.PostalCode,event.option.value.CityName.trim());
+    this.OriginPostalData = event.option.value;
+    this.originAndDestinationFormGroup.get('originpostalcode').setValue(this.OriginPostalCode);
+    this.originAndDestinationFormGroup.get('origincontact').setValue(event.option.value.ContactName.trim());
+    this.originAndDestinationFormGroup.get('originemail').setValue(event.option.value.ContactEmail.trim());
   }
 
   pcdAutoCompletefilter(val: string): Observable<any[]> {
@@ -597,7 +684,45 @@ export class FormAddShipComponent implements OnInit {
     this.originAndDestinationFormGroup.get('destpostalcode').setValue(this.DestinationPostalCode);
   }
 
+  ldAutoCompletefilter(val: string): Observable<any[]> {
+    console.log('Autocomplete dest filter:', val);
+    return this.httpService.GetLocationByType(this.authenticationService.getDefaultClient().ClientID,2,val, this.keyId);
+  }
+
+  ldAutoCompleteSelected(event: MatAutocompleteSelectedEvent): void {
+    console.log('Autocomplete dest selected', event.option.value);
+    this.originAndDestinationFormGroup.get('destname').setValue(event.option.value.Name.trim());
+    this.originAndDestinationFormGroup.get('destadddress1').setValue(event.option.value.Address1.trim());
+    this.originAndDestinationFormGroup.get('destadddress2').setValue(event.option.value.Address2.trim());
+    this.originAndDestinationFormGroup.get('deststatename').setValue(event.option.value.StateName.trim());
+    this.DestinationPostalCode = String.Format('{0}-{1}',event.option.value.PostalCode,event.option.value.CityName.trim());
+    this.DestinationPostalData = event.option.value;
+    this.originAndDestinationFormGroup.get('destpostalcode').setValue(this.DestinationPostalCode);
+    this.originAndDestinationFormGroup.get('destcontact').setValue(event.option.value.ContactName.trim());
+    this.originAndDestinationFormGroup.get('destemail').setValue(event.option.value.ContactEmail.trim());
+  }
+
   async validateOriginPostalCode(event: KeyboardEvent){
+    const CountryId = this.originSelectedCountry == null ? '1': this.originSelectedCountry.CountryId.toString();
+    this.OriginPostalCode = this.originAndDestinationFormGroup.get('originpostalcode').value;
+    if (this.OriginPostalCode != null && this.OriginPostalCode.trim().length == 5){
+      const responseData = await this.httpService.getPostalDataByPostalCode(this.OriginPostalCode,CountryId,this.keyId);
+      this.postalData = responseData;
+      if (this.postalData != null && this.postalData.length > 0){
+        this.originAndDestinationFormGroup.get('originstatename').setValue(this.postalData[0].StateName.trim());
+        this.OriginPostalCode = String.Format('{0}-{1}',this.postalData[0].PostalCode,this.postalData[0].CityName.trim());
+        this.OriginPostalData = this.postalData[0];
+        this.originAndDestinationFormGroup.get('originpostalcode').setValue(this.OriginPostalCode);
+      }
+      else{
+        this.OriginStateName = String.Empty;
+        this.OriginPostalCode = String.Empty;
+        this.OriginPostalData = null;
+      }
+    }
+  }
+
+  async validateOriginLocation(event: KeyboardEvent){
     const CountryId = this.originSelectedCountry == null ? '1': this.originSelectedCountry.CountryId.toString();
     this.OriginPostalCode = this.originAndDestinationFormGroup.get('originpostalcode').value;
     if (this.OriginPostalCode != null && this.OriginPostalCode.trim().length == 5){
@@ -638,10 +763,97 @@ export class FormAddShipComponent implements OnInit {
       }
     }
   }
+
+  async validateDestinationLocation(event: KeyboardEvent){
+    const CountryId = this.originSelectedCountry == null ? '1': this.originSelectedCountry.CountryId.toString();
+    this.OriginPostalCode = this.originAndDestinationFormGroup.get('originpostalcode').value;
+    if (this.OriginPostalCode != null && this.OriginPostalCode.trim().length == 5){
+      const responseData = await this.httpService.getPostalDataByPostalCode(this.OriginPostalCode,CountryId,this.keyId);
+      this.postalData = responseData;
+      if (this.postalData != null && this.postalData.length > 0){
+        this.originAndDestinationFormGroup.get('originstatename').setValue(this.postalData[0].StateName.trim());
+        this.OriginPostalCode = String.Format('{0}-{1}',this.postalData[0].PostalCode,this.postalData[0].CityName.trim());
+        this.OriginPostalData = this.postalData[0];
+        this.originAndDestinationFormGroup.get('originpostalcode').setValue(this.OriginPostalCode);
+      }
+      else{
+        this.OriginStateName = String.Empty;
+        this.OriginPostalCode = String.Empty;
+        this.OriginPostalData = null;
+      }
+    }
+  }
+
+  async validateProductByClient(event: KeyboardEvent){
+
+    console.log('validateProductByClient', event);
+
+    const CountryId = this.originSelectedCountry == null ? '1': this.originSelectedCountry.CountryId.toString();
+    this.OriginPostalCode = this.originAndDestinationFormGroup.get('originpostalcode').value;
+    if (this.OriginPostalCode != null && this.OriginPostalCode.trim().length == 5){
+      const responseData = await this.httpService.getPostalDataByPostalCode(this.OriginPostalCode,CountryId,this.keyId);
+      this.postalData = responseData;
+      if (this.postalData != null && this.postalData.length > 0){
+        this.originAndDestinationFormGroup.get('originstatename').setValue(this.postalData[0].StateName.trim());
+        this.OriginPostalCode = String.Format('{0}-{1}',this.postalData[0].PostalCode,this.postalData[0].CityName.trim());
+        this.OriginPostalData = this.postalData[0];
+        this.originAndDestinationFormGroup.get('originpostalcode').setValue(this.OriginPostalCode);
+      }
+      else{
+        this.OriginStateName = String.Empty;
+        this.OriginPostalCode = String.Empty;
+        this.OriginPostalData = null;
+      }
+    }
+  }
+
+  pAutoCompleteSelected(event: MatAutocompleteSelectedEvent, index: number): void {
+    console.log('Autocomplete Prod selected', event.option.value, index);
+
+    this.IsAutoCompleteProductSelected = true;
+
+    const productSelected = this.productList.find(p => p.Description === event.option.value);
+
+    console.log('productSelected', productSelected, productSelected !== null);
+
+    if (productSelected !== null){
+      const productsList = this.productsAndAccessorialsFormGroup.get('products') as FormArray;
+      const formGroup = productsList.controls[index] as FormGroup;
+  
+      formGroup.get('Pallets').setValue(productSelected.Pallets);
+      formGroup.get('Pieces').setValue(productSelected.Pieces);
+      formGroup.get('PackageTypeID').setValue(productSelected.PackageTypeID);
+      formGroup.get('ProductClass').setValue(productSelected.Class.trim());
+      formGroup.get('ProductDescription').setValue(productSelected.Description.trim());
+      formGroup.get('NmfcNumber').setValue(productSelected.NMFC.trim());
+      formGroup.get('Length').setValue(productSelected.Lenght);
+      formGroup.get('Width').setValue(productSelected.Width);
+      formGroup.get('Height').setValue(productSelected.Height);
+      formGroup.get('Weight').setValue(productSelected.Weight);
+      formGroup.get('Hazmat').setValue(productSelected.Hazmat);
+      this.onChangeCalculatePCF(index);
+    }    
+  }
   //#endregion
+
+  customTrackBy(index: number, obj: any): any {
+    return  index;
+  }
 
   addNewProdField(): void {
     (this.productsAndAccessorialsFormGroup.get('products') as FormArray).push(this.addProductFormGroup());
+
+    const productsList = this.productsAndAccessorialsFormGroup.get('products') as FormArray;
+    const formGroup = productsList.controls[productsList.length - 1] as FormGroup;
+
+    console.log('formGroup', formGroup);
+    console.log('productsList.length', productsList.length);
+
+    this.pAutoCompleteOptions = formGroup.get('ProductDescription').valueChanges
+      .pipe(
+        startWith(''),
+        map(val => this.productsByClientFilter((val)))
+      ); 
   }
 
   removeNewProdField(index: number): void {

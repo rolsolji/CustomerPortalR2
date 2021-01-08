@@ -4,7 +4,7 @@ import { CommonModule } from '@angular/common';
 import { DashboardAnalyticsRoutingModule } from './dashboard-analytics-routing.module';
 import { DashboardAnalyticsComponent } from './dashboard-analytics.component';
 import { FlexLayoutModule } from '@angular/flex-layout';
-import { ChartModule } from '../../../../@vex/components/chart/chart.module';
+
 import { MatIconModule } from '@angular/material/icon';
 import { WidgetQuickLineChartModule } from '../../../../@vex/components/widgets/widget-quick-line-chart/widget-quick-line-chart.module';
 import { WidgetQuickValueCenterModule } from '../../../../@vex/components/widgets/widget-quick-value-center/widget-quick-value-center.module';
@@ -20,6 +20,14 @@ import { MatButtonModule } from '@angular/material/button';
 import { PageLayoutModule } from '../../../../@vex/components/page-layout/page-layout.module';
 import { ContainerModule } from '../../../../@vex/directives/container/container.module';
 import { WidgetBarChartModule } from '../../../../@vex/components/widgets/widget-bar-chart/widget-bar-chart.module';
+import { MatRadioModule } from '@angular/material/radio';
+import { FormsModule } from '@angular/forms';
+import { MatSelectModule } from '@angular/material/select';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatInputModule } from '@angular/material/input';
+import { MatCheckboxModule } from '@angular/material/checkbox';
 
 @NgModule({
   declarations: [DashboardAnalyticsComponent],
@@ -27,7 +35,6 @@ import { WidgetBarChartModule } from '../../../../@vex/components/widgets/widget
     CommonModule,
     DashboardAnalyticsRoutingModule,
     FlexLayoutModule,
-    ChartModule,
     MatIconModule,
     WidgetQuickLineChartModule,
     WidgetQuickValueCenterModule,
@@ -42,7 +49,15 @@ import { WidgetBarChartModule } from '../../../../@vex/components/widgets/widget
     MatButtonModule,
     PageLayoutModule,
     ContainerModule,
-    WidgetBarChartModule
+    WidgetBarChartModule,
+    MatRadioModule,
+    FormsModule,
+    MatSelectModule,
+    MatFormFieldModule,
+    MatProgressSpinnerModule,
+    MatDatepickerModule,
+    MatCheckboxModule,
+    MatInputModule
   ]
 })
 export class DashboardAnalyticsModule {

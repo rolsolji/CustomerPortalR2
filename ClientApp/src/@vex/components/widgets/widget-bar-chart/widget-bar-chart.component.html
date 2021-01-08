@@ -1,13 +1,11 @@
 <div class="card">
     <div class="border-b py-4 px-6" fxLayout="row" fxLayoutAlign="start center">
-        <h2 class="m-0 title" fxFlex="auto">{{titleName}}</h2>
-    </div>
+        <h2 class="m-0 title" fxFlex="auto" style="text-align: center;">{{titleName}}</h2>
+    </div>    
 
-    <!-- <div class="pt-3 pb-1 pr-6" style="margin-left: 60px; margin-bottom: 20px; padding-left: 0px; padding-bottom: 0px;">
-        <vex-chart [options]="options" [series]="series"></vex-chart>
-    </div>     -->
-
-    <div style="height: auto; width: auto;">
-        <vex-chart [options]="options" [series]="series"></vex-chart>
+    <div id="chart" style="margin-top:0px;">
+        <apx-chart [series]="chartOptions.series" [chart]="chartOptions.chart" [dataLabels]="chartOptions.dataLabels"
+            [plotOptions]="chartOptions.plotOptions" [xaxis]="chartOptions.xaxis" [stroke]="chartOptions.stroke">
+        </apx-chart>
     </div>
 </div>

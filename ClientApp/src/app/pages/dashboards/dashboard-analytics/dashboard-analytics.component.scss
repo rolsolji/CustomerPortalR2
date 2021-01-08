@@ -1,0 +1,27 @@
+.stepTitleStyle{
+    font-size: 15px;    
+}
+
+.spinnerSection{
+    display: flex;
+    justify-content: center;
+}
+
+.center-me{
+    margin-top: 50%;
+    margin-bottom: 50%;
+}
+
+.center-me-for-spinner{
+    margin-top: 5%;
+    margin-left: 42%;
+}
+
+.spinnerSection mat-progress-spinner{
+    flex: 6;
+}
+
+.matCheckandRadio {
+    margin-top: 5px;
+    margin-bottom: 5px;
+}

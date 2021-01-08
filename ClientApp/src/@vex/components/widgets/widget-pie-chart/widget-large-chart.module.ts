@@ -5,7 +5,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { IconModule } from '@visurel/iconify-angular';
 import { FlexLayoutModule } from '@angular/flex-layout';
-import { ChartModule } from '../../chart/chart.module';
+import { NgApexchartsModule } from "ng-apexcharts";
 
 
 @NgModule({
@@ -16,7 +16,7 @@ import { ChartModule } from '../../chart/chart.module';
     MatButtonModule,
     IconModule,
     FlexLayoutModule,
-    ChartModule
+    NgApexchartsModule  
   ],
   exports: [WidgetLargeChartComponent]
 })

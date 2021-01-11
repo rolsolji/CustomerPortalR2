@@ -1188,15 +1188,21 @@ export class FormAddShipComponent implements OnInit {
     // const tempPickupDate = moment.utc(this.ShipmentByLadingObject.PickupDate);
     // const strTempPickupDate = this.datepipe.transform(tempPickupDate.toString().replace(/(^.*\()|([+-].*$)/g, ''),'MM/dd/yyyy')
     // defaultpickupdate = new Date(strTempPickupDate);
-    const strTempPickupDate = this.ConverteJsonDateToLocalTimeZone(this.ShipmentByLadingObject.PickupDate);
-    defaultpickupdate = new Date(strTempPickupDate);
+    if (this.ShipmentByLadingObject.PickupDate != null) {
+      const strTempPickupDate = this.ConverteJsonDateToLocalTimeZone(this.ShipmentByLadingObject.PickupDate);
+      defaultpickupdate = new Date(strTempPickupDate);
+    }
+    
     
 
     // -- Calculate Expected Develiry Date
     //this.ExpectedDeliveryDateCalculated = await this.httpService.CalculateExpectedDeliveryDate(this.keyId, this.ShipmentByLadingObject.TransTime, strTempPickupDate);    
 
-    const strTempReqDelDate = this.ConverteJsonDateToLocalTimeZone(this.ShipmentByLadingObject.RequestedDeliveryDate);
-    defaultRequestedDeliveryDate = new Date(strTempReqDelDate);
+    if (this.ShipmentByLadingObject.RequestedDeliveryDate != null) {
+      const strTempReqDelDate = this.ConverteJsonDateToLocalTimeZone(this.ShipmentByLadingObject.RequestedDeliveryDate);
+      defaultRequestedDeliveryDate = new Date(strTempReqDelDate);
+    }
+    
 
     defaultdestpostalcode = this.ShipmentByLadingObject.DestZipCode.trim() + '-' + this.ShipmentByLadingObject.DestCityName.trim();
     defaultdeststatename = this.ShipmentByLadingObject.DestStateName.trim();

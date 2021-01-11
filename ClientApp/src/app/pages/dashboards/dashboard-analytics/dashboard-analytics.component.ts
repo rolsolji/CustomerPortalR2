@@ -15,7 +15,9 @@ import { AccessorialPerformance } from 'src/app/Entities/AccessorialPerformance'
 import { CarrierPerformanceModel } from 'src/app/Entities/CarrierPerformanceModel';
 import { TopLanes } from 'src/app/Entities/TopLanes';
 import { formatCurrency } from '@angular/common';
-
+import { ChartType } from 'ng-apexcharts';
+import { DashBoardMissedPickupModel } from 'src/app/Entities/DashBoardMissedPickupModel';
+import { DatePipe } from '@angular/common'
 
 @Component({
   selector: 'vex-dashboard-analytics',
@@ -27,13 +29,80 @@ export class DashboardAnalyticsComponent implements OnInit {
   dateFrom: string = null;
   dateTo: string = null;
   isIncludeSubClient: boolean = true;
+  isDateRangeVisible: boolean = false;
+  dateFromForDatePicker: Date = null;
+  dateToForDatePicker: Date = null;
+  showSpinnerOnDateChanges: boolean = false;
+
   chart1Name: string = "Total Shipments By MTD";
+  SeriesOfTotalShipmentsChart: ApexNonAxisChartSeries = [];
+  labelsOfTotalShipmentsChart: any;
+  heightOfTopShipmentsChart: number = 450;
+  widthOfTopShipmentsChart: number = 550;
+
   chart2Name: string = "Cost By Firgation";
+  chart2Type: ChartType = 'donut';
+  SeriesOfCostByFirgationChart: ApexNonAxisChartSeries = [];
+  labelsOfCostByFirgationChart: any;
+  heightOfCostByFirgationChart: number = 450;
+  widthOfCostByFirgationChart: number = 550;
+
   chart3Name: string = "Top Accessorials";
+  SeriesOfTopAccessorialsChart: ApexNonAxisChartSeries = [];
+  labelsOfTopAccessorialsChart: any;
+  heightOfTopAccessorialsChart: number = 450;
+  widthOfTopAccessorialsChart: number = 550;
+
   chart4Name: string = "Top Carriers";
-  chart5Name: string = "Top 10 lanes By Zip Code";
-  chart6Name: string = "Top 10 lanes By Zip Code - City";
-  chart7Name: string = "Top 10 lanes By State";
+  SeriesOfTopCarriersChart: ApexAxisChartSeries = [];
+  labelsOfTopCarriersChart: any;
+  barHeightOfTopCarriersChart: string = "50";
+
+  chart5Name: string = "Top 10 Lanes - Cost";
+  SeriesOfTopLanesChart: ApexNonAxisChartSeries = [];
+  labelsOfTopLanesChart: any;
+  heightOfTopLanesChart: number = 450;
+  widthOfTopLanesChart: number = 550;
+  selectedOption: string = 'cost';
+  lanetypesOfChart: any = [{ text: "By ZipCode", value: 1 }, { text: "By ZipCode-City", value: 2 }, { text: "By State", value: 3 }];
+  selectedLaneType: number = 1;
+  showSpinner: boolean;
+
+  chart6Name: string = "Top Vendors By Volume YTD";
+  SeriesOfTopVendorsByVolumeChart: ApexAxisChartSeries = [];
+  labelsOfTopVendorsByVolumeChart: any;
+  barHeightOfTopVendorsByVolumeChart: string = "50";
+
+  chart7Name: string = "Missed Deliveries";
+  SeriesOfMissedDeliveriesChart: ApexAxisChartSeries = [];
+  labelsOfMissedDeliveriesChart: any;
+  barHeightOfMissedDeliveriesChart: string = "50";
+
+  chart8Name: string = "Missed Pickups";
+  SeriesOfMissedPickupsChart: ApexAxisChartSeries = [];
+  labelsOfMissedPickupsChart: any;
+  barHeightOfMissedPickupsChart: string = "50";
+
+  chart9Name: string = "On Time Performance By Carrier";
+  SeriesOfCarrierPerformanceChart: ApexAxisChartSeries = [];
+  labelsOfCarrierPerformanceChart: any;
+  barHeightOfCarrierPerformanceChart: string = "50";
+
+  dateRanges: any = [
+    { text: "This Year", value: "YTD" },
+    { text: "This Quarter", value: "QUARTER" },
+    { text: "This Month", value: "MTD" },
+    { text: "Custom Dates", value: "Custom" }
+  ];
+  selectedDateRange: string = "MTD";
+
+  chartType: any = [
+    { text: "This Year", value: "YTD" },
+    { text: "This Quarter", value: "QUARTER" },
+    { text: "This Month", value: "MTD" },
+    { text: "Custom Dates", value: "Custom" }
+  ];
+  //selectedDateRange: string = "MTD";
 
   tableColumns: TableColumn<Order>[] = [
     {
@@ -62,57 +131,16 @@ export class DashboardAnalyticsComponent implements OnInit {
   tableData = tableSalesData;
 
   tableColumnsShipments: TableColumn<Order>[] = [];
-
   tableDataShipments: weightcostCompareModel[] = [];
-
   topAccessorialDetails: AccessorialPerformance[] = [];
-
   topCarriersDetails: CarrierPerformanceModel[] = [];
-
   topLanesByZip: TopLanes[] = [];
   topLanesByZipAndCity: TopLanes[] = [];
   topLanesByState: TopLanes[] = [];
-
-  // series: ApexAxisChartSeries = [{
-  //   name: 'Subscribers',
-  //   data: [28, 40, 36, 0, 52, 38, 60, 55, 67, 33, 89, 44]
-  // }];
-
-  // uniqueUsersOptionsTotalShipmentChart = defaultChartOptions({
-  //   chart: {
-  //     type: 'pie'
-  //   },
-  //   series: [1281, 326, 0, 0, 0, 0, 0],
-  //   labels: ['TL', 'LTL', 'OCEAN', 'Small Package', 'AIR FREIGHT', 'INTERMODAL', 'TL Spot Quote']
-  //   //,
-  //   //legend: {
-  //   //    show: true,
-  //   //    position: 'bottom'
-  //   //} 
-  // });
-
-  // salesSeries: ApexAxisChartSeries = [{
-  //   name: 'Sales',
-  //   data: [28, 40, 36, 0, 52, 38, 60, 55, 99, 54, 38, 87]
-  // }];
-
-  // pageViewsSeries: ApexAxisChartSeries = [{
-  //   name: 'Page Views',
-  //   data: [405, 800, 200, 600, 105, 788, 600, 204]
-  // }];
-
-  // uniqueUsersSeries: ApexAxisChartSeries = [{
-  //   name: 'Unique Users',
-  //   data: [356, 806, 600, 754, 432, 854, 555, 1004]
-  // }];
-
-  // uniqueUsersOptions = defaultChartOptions({
-  //   chart: {
-  //     type: 'area',
-  //     height: 100
-  //   },
-  //   colors: ['#ff9800']
-  // });
+  topVendorsByVolume: weightcostCompareModel[] = [];
+  missedDeliveryDetails: CarrierPerformanceModel[] = [];
+  missedPickupDetails: DashBoardMissedPickupModel[] = [];
+  carrierPerformanceDetails: CarrierPerformanceModel[] = [];
 
   icGroup = icGroup;
   icPageView = icPageView;
@@ -120,63 +148,7 @@ export class DashboardAnalyticsComponent implements OnInit {
   icTimer = icTimer;
   icMoreVert = icMoreVert;
 
-  TotalShipmentsOptions = defaultChartOptions({
-    chart: {
-      type: 'pie'
-    },
-    series: [],
-    labels: []
-  });
-
-  CostByFirgation = defaultChartOptions({
-    chart: {
-      type: 'donut'
-    },
-    series: [],
-    labels: []
-  });
-
-  TopAccessorials = defaultChartOptions({
-    chart: {
-      type: 'donut'
-    },
-    series: [],
-    labels: []
-  });
-
-  TopCarriers = defaultChartOptions({
-    chart: {
-      type: 'bar'
-    },
-    series: [],
-    labels: []
-  });
-
-  TopLanesByZip = defaultChartOptions({
-    chart: {
-      type: 'donut'
-    },
-    series: [],
-    labels: []
-  });
-
-  TopLanesByZipAndCity = defaultChartOptions({
-    chart: {
-      type: 'donut'
-    },
-    series: [],
-    labels: []
-  });
-
-  TopLanesByState = defaultChartOptions({
-    chart: {
-      type: 'donut'
-    },
-    series: [],
-    labels: []
-  });
-
-  constructor(private cd: ChangeDetectorRef, private dashBoardService: DashBoardService,
+  constructor(private cd: ChangeDetectorRef, private dashBoardService: DashBoardService, public datepipe: DatePipe,
     private authenticationService: AuthenticationService) { }
 
   async ngOnInit() {
@@ -192,8 +164,15 @@ export class DashboardAnalyticsComponent implements OnInit {
       ];
     }, 3000);
 
-    this.calculationOfDateFromAndTo();
+    // this.calculationOfDateFromAndTo();
 
+    // this.prepareDetailsOfAllCharts();
+    
+    this.SetDateRangeForMTD();    
+  }
+
+  prepareDetailsOfAllCharts() {
+    
     /* Start Details of Total shipments by MTD chart and Shipments table. */
     this.GetDetailsForTotalShipmentsChartAndTable();
     /* END */
@@ -209,20 +188,29 @@ export class DashboardAnalyticsComponent implements OnInit {
     /* Start Details of Top Lanes Chart. */
     this.GetDetailsForTopLanesChart();
     /* END */
-  }
 
-  calculationOfDateFromAndTo() {
-    var currentTime = new Date();
-    this.dateTo = (currentTime.getMonth() + 1) + '/' + currentTime.getDate() + '/' + currentTime.getFullYear();
-    var fdm = new Date(currentTime.getFullYear(), currentTime.getMonth(), 1);
-    //this.dateFrom = (fdm.getMonth() + 1) + '/' + fdm.getDate() + '/' + fdm.getFullYear();
-    this.dateFrom = "01/01/2020";
+    /* Start Details of Top Vendors By Volume Chart. */
+    this.GetDetailsForTopVendorsByVolumeChart();
+    /* END */
+
+    /* Start Details of Missed Delivery Chart. */
+    this.GetDetailsForMissedDeliveryChart();
+    /* END */
+
+    /* Start Details of Missed Pickup Chart. */
+    this.GetDetailsForMissedPickupChart();
+    /* END */
+
+    /* Start Details of On Time Carrier Performance Chart. */
+    this.GetDetailsForOnTimeCarrierPerformanceChart();
+    /* END */    
   }
 
   async GetDetailsForTotalShipmentsChartAndTable() {
+    this.showSpinnerOnDateChanges = true;
     this.tableDataShipments = await this.dashBoardService.DashBoard_GetTotalShipmentByMTDByDate(this.authenticationService.getDefaultClientFromStorage().ClientID, this.dateFrom, this.dateTo, this.isIncludeSubClient);
     this.calculateTotal();
-    this.PrepareDetailsForChart();
+    this.PrepareDetailsForChart();    
   }
 
   PrepareDetailsForChart() {
@@ -234,26 +222,10 @@ export class DashboardAnalyticsComponent implements OnInit {
     var intermodelshipment = Number(this.tableDataShipments.filter(a => a.Mode.trim() == "INTERMODAL").map(a => a.ShipmentCount));
     var tlSpotquoteshipment = Number(this.tableDataShipments.filter(a => a.Mode.trim() == "TL Spot Quote").map(a => a.ShipmentCount));
 
-    this.TotalShipmentsOptions = defaultChartOptions({
-      chart: {
-        type: 'pie',
-        height: 450,
-        width: 550,
-      },
-      legend: {
-        show: true,
-        position: 'bottom',
-        horizontalAlign: 'center',
-        floating: false,
-        fontSize: '10px',
-        itemMargin: {
-          horizontal: 5,
-          vertical: 5
-        },
-      },
-      series: [tlshipment, ltlshipment, oceanshipment, smallPackageshipment, airFreightshipment, intermodelshipment, tlSpotquoteshipment],
-      labels: ['TL', 'LTL', 'OCEAN', 'Small Package', 'AIR FREIGHT', 'INTERMODAL', 'TL Spot Quote']
-    });
+    this.SeriesOfTotalShipmentsChart = [tlshipment, ltlshipment, oceanshipment, smallPackageshipment, airFreightshipment, intermodelshipment, tlSpotquoteshipment];
+    this.labelsOfTotalShipmentsChart = ['TL', 'LTL', 'OCEAN', 'Small Package', 'AIR FREIGHT', 'INTERMODAL', 'TL Spot Quote'];
+    this.heightOfTopShipmentsChart = 470;
+    this.widthOfTopShipmentsChart = 590;
   }
 
   calculateTotal() {
@@ -261,8 +233,22 @@ export class DashboardAnalyticsComponent implements OnInit {
     var totalQtyShipment = this.tableDataShipments.reduce((a, b) => a + b.ShipmentCount, 0);
     var totalWeight = this.tableDataShipments.reduce((a, b) => a + b.TotalWeight, 0);
     var totalSpend = this.tableDataShipments.reduce((a, b) => a + b.TotalSpend, 0);
-    var totalAvgCost = (totalSpend / totalQtyShipment);
-    var totalCostPerPound = (totalSpend / totalWeight);
+
+    var totalAvgCost = 0;
+    if (totalQtyShipment && totalQtyShipment !== 0) {
+      totalAvgCost = (totalSpend / totalQtyShipment);
+    }
+    else {
+      totalAvgCost = 0;
+    }
+
+    var totalCostPerPound = 0;
+    if (totalWeight && totalWeight !== 0) {
+      totalCostPerPound = (totalSpend / totalWeight);
+    }
+    else {
+      totalCostPerPound = 0;
+    }
 
     this.TableHeaderAndFooterSetData(totalQtyShipment.toString(), totalAvgCost.toFixed(2).toString(), totalWeight.toString(), totalCostPerPound.toFixed(2).toString(), totalSpend.toFixed(2).toString());
   }
@@ -333,36 +319,10 @@ export class DashboardAnalyticsComponent implements OnInit {
       }
     }
 
-    this.TopAccessorials = defaultChartOptions({
-      chart: {
-        type: 'donut',
-        height: 300,
-        width: 550,
-      },
-      responsive: [
-        {
-          breakpoint: 480,
-          options: {
-            chart: {
-              width: 200
-            },
-          }
-        }
-      ],
-      legend: {
-        show: true,
-        position: 'right',
-        horizontalAlign: 'center',
-        floating: false,
-        fontSize: '10px',
-        itemMargin: {
-          horizontal: 5,
-          vertical: 5
-        },
-      },
-      series: accCost,
-      labels: accDesc
-    });
+    this.SeriesOfTopAccessorialsChart = accCost;
+    this.labelsOfTopAccessorialsChart = accDesc;
+    this.heightOfTopAccessorialsChart = 450;
+    this.widthOfTopAccessorialsChart = 600;
   }
 
   PrepareDetailsForByFirgationChart() {
@@ -391,36 +351,10 @@ export class DashboardAnalyticsComponent implements OnInit {
       accCost.push(totalAccessorialChrg);
     }
 
-    this.CostByFirgation = defaultChartOptions({
-      chart: {
-        type: 'donut',
-        height: 300,
-        width: 550,
-      },
-      responsive: [
-        {
-          breakpoint: 480,
-          options: {
-            chart: {
-              width: 200
-            },
-          }
-        }
-      ],
-      legend: {
-        show: true,
-        position: 'right',
-        horizontalAlign: 'center',
-        floating: false,
-        fontSize: '10px',
-        itemMargin: {
-          horizontal: 5,
-          vertical: 5
-        },
-      },
-      series: accCost,
-      labels: accDesc
-    });
+    this.SeriesOfCostByFirgationChart = accCost;
+    this.labelsOfCostByFirgationChart = accDesc;
+    this.heightOfCostByFirgationChart = 450;
+    this.widthOfCostByFirgationChart = 550;
   }
 
   async GetDetailsForTopCarriersChart() {
@@ -430,58 +364,55 @@ export class DashboardAnalyticsComponent implements OnInit {
 
   PrepareDetailsForTopCarriersChart() {
 
-    this.TopCarriers = defaultChartOptions({
-      series: [
-        {
-          name: "serie1",
-          data: [44, 55, 41, 64, 22, 43, 21]
-        },
-        {
-          name: "serie2",
-          data: [53, 32, 33, 52, 13, 44, 32]
-        }
-      ],
-      chart: {
-        type: "bar",
-        height: "300",
-        width: "550"
-      },
-      plotOptions: {
-        bar: {
-          horizontal: true,
-          dataLabels: {
-            position: "top"
-          }
-        }
-      },
-      dataLabels: {
-        enabled: true,
-        offsetX: -6,
-        style: {
-          fontSize: "12px",
-          colors: ["#fff"]
-        }
-      },
-      stroke: {
-        show: true,
-        width: 1,
-        colors: ["#fff"]
-      },
-      xaxis: {
-        categories: [2001, 2002, 2003, 2004, 2005, 2006, 2007]
-      }
-    });
+    var costOfSeries1: number[] = [];
+    var costOfSeries2: number[] = [];
+    var labelOfCarriers: string[] = [];
 
+    for (let i = 0; i < this.topCarriersDetails.length; i++) {
+      costOfSeries1.push(this.topCarriersDetails[i].TotalBilledAmount);
+      costOfSeries2.push(this.topCarriersDetails[i].ShipmentCount);
+      labelOfCarriers.push(this.topCarriersDetails[i].SCAC);
+    }
+
+    this.SeriesOfTopCarriersChart = [
+      {
+        name: "TotalBilledAmount",
+        data: costOfSeries1
+      },
+      {
+        name: "ShipCountData",
+        data: costOfSeries2
+      }
+    ];
+    this.labelsOfTopCarriersChart = labelOfCarriers;
+    this.barHeightOfTopCarriersChart = "100";
   }
 
   GetDetailsForTopLanesChart() {
     this.GetDataForTopLanesByZipChart();
-    this.GetDataForTopLanesByZipAndCityChart();
-    this.GetDataForTopLanesByStateChart();
+  }
+
+  onLaneTypeselectionChange() {
+
+    this.selectedOption = 'cost';
+    this.chart5Name = "Top 10 Lanes - Cost";
+
+    if (this.selectedLaneType === 2) {
+      this.GetDataForTopLanesByZipAndCityChart();
+    }
+    else if (this.selectedLaneType === 3) {
+      this.GetDataForTopLanesByStateChart();
+    }
+    else {
+      this.GetDataForTopLanesByZipChart();
+    }
+
   }
 
   async GetDataForTopLanesByZipChart() {
+    this.showSpinner = true;
     this.topLanesByZip = await this.dashBoardService.DashBoard_GetTopLaneForZip(this.authenticationService.getDefaultClientFromStorage().ClientID, this.dateFrom, this.dateTo, this.isIncludeSubClient);
+    this.showSpinner = false;
     this.PrepareDetailsForTopLanesByZipChart();
   }
 
@@ -495,40 +426,16 @@ export class DashboardAnalyticsComponent implements OnInit {
       series.push(this.topLanesByZip[i].SellCost);
     }
 
-    this.TopLanesByZip = defaultChartOptions({
-      chart: {
-        type: 'donut',
-        height: 300,
-        width: 550,
-      },
-      responsive: [
-        {
-          breakpoint: 480,
-          options: {
-            chart: {
-              width: 200
-            },
-          }
-        }
-      ],
-      legend: {
-        show: true,
-        position: 'right',
-        horizontalAlign: 'center',
-        floating: false,
-        fontSize: '10px',
-        itemMargin: {
-          horizontal: 5,
-          vertical: 5
-        },
-      },
-      series: series,
-      labels: label
-    });
+    this.SeriesOfTopLanesChart = series;
+    this.labelsOfTopLanesChart = label;
+    this.heightOfTopLanesChart = 450;
+    this.widthOfTopLanesChart = 550;
   }
 
   async GetDataForTopLanesByZipAndCityChart() {
+    this.showSpinner = true;
     this.topLanesByZipAndCity = await this.dashBoardService.DashBoard_GetTopLaneForZipCity(this.authenticationService.getDefaultClientFromStorage().ClientID, this.dateFrom, this.dateTo, this.isIncludeSubClient);
+    this.showSpinner = false;
     this.PrepareDetailsForTopLanesByZipAndCityChart();
   }
 
@@ -542,40 +449,16 @@ export class DashboardAnalyticsComponent implements OnInit {
       series.push(this.topLanesByZipAndCity[i].SellCost);
     }
 
-    this.TopLanesByZipAndCity = defaultChartOptions({
-      chart: {
-        type: 'donut',
-        height: 300,
-        width: 620,
-      },
-      responsive: [
-        {
-          breakpoint: 480,
-          options: {
-            chart: {
-              width: 200
-            },
-          }
-        }
-      ],
-      legend: {
-        show: true,
-        position: 'right',
-        horizontalAlign: 'center',
-        floating: false,
-        fontSize: '9px',
-        itemMargin: {
-          horizontal: 5,
-          vertical: 5
-        }
-      },
-      series: series,
-      labels: label
-    });
+    this.SeriesOfTopLanesChart = series;
+    this.labelsOfTopLanesChart = label;
+    this.heightOfTopLanesChart = 530;
+    this.widthOfTopLanesChart = 680;
   }
 
   async GetDataForTopLanesByStateChart() {
+    this.showSpinner = true;
     this.topLanesByState = await this.dashBoardService.DashBoard_GetTopLaneForState(this.authenticationService.getDefaultClientFromStorage().ClientID, this.dateFrom, this.dateTo, this.isIncludeSubClient);
+    this.showSpinner = false;
     this.PrepareDetailsForTopLanesByStateChart();
   }
 
@@ -589,35 +472,310 @@ export class DashboardAnalyticsComponent implements OnInit {
       series.push(this.topLanesByState[i].SellCost);
     }
 
-    this.TopLanesByState = defaultChartOptions({
-      chart: {
-        type: 'donut',
-        height: 300,
-        width: 550,
-      },
-      responsive: [
-        {
-          breakpoint: 480,
-          options: {
-            chart: {
-              width: 200
-            },
+    this.SeriesOfTopLanesChart = series;
+    this.labelsOfTopLanesChart = label;
+    this.heightOfTopLanesChart = 450;
+    this.widthOfTopLanesChart = 550;
+  }
+
+  onSelectionChange(value: string) {
+    var series: ApexNonAxisChartSeries = [];
+
+    if (this.selectedLaneType === 2) {
+      if (this.topLanesByZipAndCity && this.topLanesByZipAndCity.length > 0) {
+        for (let i = 0; i < this.topLanesByZipAndCity.length; i++) {
+          if (value === 'cost') {
+            series.push(this.topLanesByZipAndCity[i].SellCost);
+          }
+          else {
+            series.push(this.topLanesByZipAndCity[i].Volume);
           }
         }
-      ],
-      legend: {
-        show: true,
-        position: 'right',
-        horizontalAlign: 'center',
-        floating: false,
-        fontSize: '10px',
-        itemMargin: {
-          horizontal: 5,
-          vertical: 5
+      }
+    }
+    else if (this.selectedLaneType === 3) {
+      if (this.topLanesByState && this.topLanesByState.length > 0) {
+        for (let i = 0; i < this.topLanesByState.length; i++) {
+          if (value === 'cost') {
+            series.push(this.topLanesByState[i].SellCost);
+          }
+          else {
+            series.push(this.topLanesByState[i].Volume);
+          }
+        }
+      }
+    }
+    else {
+      if (this.topLanesByZip && this.topLanesByZip.length > 0) {
+        for (let i = 0; i < this.topLanesByZip.length; i++) {
+          if (value === 'cost') {
+            series.push(this.topLanesByZip[i].SellCost);
+          }
+          else {
+            series.push(this.topLanesByZip[i].Volume);
+          }
+        }
+      }
+    }
+
+    if (value === 'cost') {
+      this.chart5Name = "Top 10 Lanes - Cost";
+    }
+    else {
+      this.chart5Name = "Top 10 Lanes - Volume";
+    }
+
+    this.SeriesOfTopLanesChart = series;
+  }
+
+  async GetDetailsForTopVendorsByVolumeChart() {
+    this.topVendorsByVolume = await this.dashBoardService.DashBoard_GetTopVendorForPPS(this.authenticationService.getDefaultClientFromStorage().ClientID, this.dateFrom, this.dateTo, this.isIncludeSubClient);
+    this.PrepareDetailsForTopVendorsByVolumeChart();
+  }
+
+  PrepareDetailsForTopVendorsByVolumeChart() {
+
+    var costOfSeries1: number[] = [];
+    var labelOfVendors: string[] = [];
+
+    for (let i = 0; i < this.topVendorsByVolume.length; i++) {
+      costOfSeries1.push(this.topVendorsByVolume[i].ShipmentCount);
+      labelOfVendors.push(this.topVendorsByVolume[i].ClientName);
+    }
+
+    this.SeriesOfTopVendorsByVolumeChart = [
+      {
+        name: "ShipmentCount",
+        data: costOfSeries1
+      }
+    ];
+    this.labelsOfTopVendorsByVolumeChart = labelOfVendors;
+    this.barHeightOfTopVendorsByVolumeChart = "60";
+  }
+
+  async GetDetailsForMissedDeliveryChart() {
+    this.missedDeliveryDetails = await this.dashBoardService.DashBoard_GetCarrierPerformanceByDate(this.authenticationService.getDefaultClientFromStorage().ClientID, this.dateFrom, this.dateTo, this.isIncludeSubClient);
+    this.PrepareDetailsForMissedDeliveryChart();
+  }
+
+  PrepareDetailsForMissedDeliveryChart() {
+
+    var costOfSeries1: number[] = [];
+    var labelOfMissedDel: string[] = [];
+
+    if (this.missedDeliveryDetails && this.missedDeliveryDetails.length > 0) {
+      this.missedDeliveryDetails = this.missedDeliveryDetails.sort(
+        function (a, b) {
+          return b.ShipmentCount - a.ShipmentCount;
+        }
+      ).filter(a => a.DeliveryStatus == 'Late').slice(0, 10);
+
+      for (let i = 0; i < this.missedDeliveryDetails.length; i++) {
+        costOfSeries1.push(this.missedDeliveryDetails[i].ShipmentCount);
+        labelOfMissedDel.push(this.missedDeliveryDetails[i].CarrierName);
+      }
+
+      this.SeriesOfMissedDeliveriesChart = [
+        {
+          name: "Late",
+          data: costOfSeries1
+        }
+      ];
+      this.labelsOfMissedDeliveriesChart = labelOfMissedDel;
+      this.barHeightOfMissedDeliveriesChart = "60";
+    }
+  }
+
+  async GetDetailsForMissedPickupChart() {
+    this.missedPickupDetails = await this.dashBoardService.DashBoard_GetMissedPickup(this.authenticationService.getDefaultClientFromStorage().ClientID, this.dateFrom, this.dateTo, this.isIncludeSubClient);
+    this.PrepareDetailsForMissedPickupChart();
+  }
+
+  PrepareDetailsForMissedPickupChart() {
+
+    var costOfSeries1: number[] = [];
+    var costOfSeries2: number[] = [];
+    var labelOfMissedPickup: string[] = [];
+
+    if (this.missedPickupDetails && this.missedPickupDetails.length > 0) {
+
+      const calculated = this.missedPickupDetails.reduce((acc, item) => {
+        let accItem = acc.find(ai => ai.CarrierName === item.CarrierName)
+        if (accItem) {
+          accItem.ClientName = item.ClientName,
+            accItem.LatePickupTime += item.LatePickupTime,
+            accItem.OnTimePickup += item.OnTimePickup
+        } else {
+          acc.push(item)
+        }
+        return acc;
+      }, [])
+
+      this.missedPickupDetails = calculated;
+
+      this.missedPickupDetails = this.missedPickupDetails.sort(
+        function (a, b) {
+          return b.LatePickupTime - a.LatePickupTime;
+        }
+      ).slice(0, 10);
+
+      for (let i = 0; i < this.missedPickupDetails.length; i++) {
+        costOfSeries1.push(this.missedPickupDetails[i].LatePickupTime);
+        costOfSeries2.push(this.missedPickupDetails[i].OnTimePickup);
+        labelOfMissedPickup.push(this.missedPickupDetails[i].CarrierName);
+      }
+
+      this.SeriesOfMissedPickupsChart = [
+        {
+          name: "Late",
+          data: costOfSeries1
         },
-      },
-      series: series,
-      labels: label      
-    });
+        {
+          name: "OnTime",
+          data: costOfSeries2
+        }
+      ];
+      this.labelsOfMissedPickupsChart = labelOfMissedPickup;
+      this.barHeightOfMissedPickupsChart = "100";
+    }
+  }
+
+  async GetDetailsForOnTimeCarrierPerformanceChart() {
+    this.carrierPerformanceDetails = await this.dashBoardService.DashBoard_GetCarrierPerformance(this.authenticationService.getDefaultClientFromStorage().ClientID, this.dateFrom, this.dateTo, this.isIncludeSubClient);
+    this.PrepareDetailsForOnTimeCarrierPerformanceChart();
+    this.showSpinnerOnDateChanges = false;
+  }
+
+  PrepareDetailsForOnTimeCarrierPerformanceChart() {
+
+    var costOfSeries1: number[] = [];
+    var costOfSeries2: number[] = [];
+    var labelOfCarrierPerformance: string[] = [];
+    var finalData: DashBoardMissedPickupModel[] = [];
+
+    if (this.carrierPerformanceDetails && this.carrierPerformanceDetails.length > 0) {
+
+      for (let i = 0; i < this.carrierPerformanceDetails.length; i++) {
+        let temp = <DashBoardMissedPickupModel>{};
+        let oldItem = finalData.find(ai => ai.CarrierName === this.carrierPerformanceDetails[i].CarrierName.trim())
+        if (oldItem) { }
+        else {
+          temp.CarrierName = this.carrierPerformanceDetails[i].CarrierName.trim();
+          finalData.push(temp);
+        }
+      }
+
+      for (let i = 0; i < this.carrierPerformanceDetails.length; i++) {
+        let oldItem = finalData.find(ai => ai.CarrierName === this.carrierPerformanceDetails[i].CarrierName.trim())
+        if (this.carrierPerformanceDetails[i].DeliveryStatus === 'Late') {
+          oldItem.LatePickupTime = this.carrierPerformanceDetails[i].ShipmentCount;
+        }
+        else {
+          oldItem.OnTimePickup = this.carrierPerformanceDetails[i].ShipmentCount;
+        }
+      }
+
+      for (let i = 0; i < finalData.length; i++) {
+        if (finalData[i].LatePickupTime) {
+          costOfSeries1.push(finalData[i].LatePickupTime);
+        }
+        else {
+          costOfSeries1.push(0);
+        }
+        if (finalData[i].OnTimePickup) {
+          costOfSeries2.push(finalData[i].OnTimePickup);
+        }
+        else {
+          costOfSeries2.push(0);
+        }
+
+        labelOfCarrierPerformance.push(finalData[i].CarrierName);
+      }
+
+      this.SeriesOfCarrierPerformanceChart = [
+        {
+          name: "Late",
+          data: costOfSeries1
+        },
+        {
+          name: "On Time",
+          data: costOfSeries2
+        }
+      ];
+      this.labelsOfCarrierPerformanceChart = labelOfCarrierPerformance;
+      this.barHeightOfCarrierPerformanceChart = "100";
+    }
+  }
+
+  onDateRangeselectionChange() {
+    if (this.selectedDateRange === "YTD") {
+      this.SetDateRangeForYTD();
+    }
+    else if (this.selectedDateRange === "QUARTER") {
+      this.SetDateRangeForQUARTER();
+    }
+    else if (this.selectedDateRange === "Custom") {
+      this.SetDateRangeForCustom();
+    }
+    else {
+      this.SetDateRangeForMTD();
+    }
+  }
+
+  SetDateRangeForYTD() {
+    this.isDateRangeVisible = false;
+
+    var currentTime = new Date();
+    this.dateTo = (currentTime.getMonth() + 1) + '/' + currentTime.getDate() + '/' + currentTime.getFullYear();
+    var d = new Date(new Date().getFullYear(), 0, 1);
+    this.dateFrom = (d.getMonth() + 1) + '/' + d.getDate() + '/' + d.getFullYear();
+
+    this.prepareDetailsOfAllCharts();
+  }
+
+  SetDateRangeForQUARTER() {
+    this.isDateRangeVisible = false;
+
+    var currentTime = new Date();
+    this.dateTo = (currentTime.getMonth() + 1) + '/' + currentTime.getDate() + '/' + currentTime.getFullYear();
+    var fq = this.getQuarterFirstDay();
+    this.dateFrom = (fq.getMonth() + 1) + '/' + fq.getDate() + '/' + fq.getFullYear();
+
+    this.prepareDetailsOfAllCharts();
+  }
+
+  getQuarterFirstDay() {
+    var now = new Date();
+    var quarter = Math.floor((now.getMonth() / 3));
+    var firstDate = new Date(now.getFullYear(), quarter * 3, 1);
+    return firstDate;
+  }
+
+  SetDateRangeForMTD() {
+    this.isDateRangeVisible = false;
+
+    var currentTime = new Date();
+    this.dateTo = (currentTime.getMonth() + 1) + '/' + currentTime.getDate() + '/' + currentTime.getFullYear();
+    var fdm = new Date(currentTime.getFullYear(), currentTime.getMonth(), 1);
+    this.dateFrom = (fdm.getMonth() + 1) + '/' + fdm.getDate() + '/' + fdm.getFullYear();
+    //this.dateFrom = "01/01/2020";
+
+    this.prepareDetailsOfAllCharts();
+  }
+
+  SetDateRangeForCustom() {
+    this.dateFromForDatePicker = new Date();
+    this.dateToForDatePicker = new Date();
+    this.isDateRangeVisible = true;
+  }
+
+  refreshChartsUsingSelectedDate() {
+    this.dateFrom = this.datepipe.transform(this.dateFromForDatePicker, 'MM/dd/yyyy');
+    this.dateTo = this.datepipe.transform(this.dateToForDatePicker, 'MM/dd/yyyy');
+    this.prepareDetailsOfAllCharts();
+  }
+
+  changedValueOfIsIncludeSubClient() {
+    this.prepareDetailsOfAllCharts();
   }
 }

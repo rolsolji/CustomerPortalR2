@@ -42,4 +42,24 @@ export class DashBoardService {
         const data = await this.httpService.DashBoard_GetTopLaneForState(clientID, dateFrom, dateTo, isIncludeSubClient);
         return data;
     }
+
+    public async DashBoard_GetTopVendorForPPS(clientID: number, dateFrom: string, dateTo: string, isIncludeSubClient: boolean) {
+        const data = await this.httpService.DashBoard_GetTopVendorForPPS(clientID, dateFrom, dateTo, isIncludeSubClient);
+        return data;
+    }
+
+    public async DashBoard_GetCarrierPerformanceByDate(clientID: number, dateFrom: string, dateTo: string, isIncludeSubClient: boolean) {
+        const data = await this.httpService.DashBoard_GetCarrierPerformanceByDate(clientID, dateFrom, dateTo, isIncludeSubClient);
+        return data;
+    }
+
+    public async DashBoard_GetMissedPickup(clientID: number, dateFrom: string, dateTo: string, isIncludeSubClient: boolean) {
+        const data = await this.httpService.DashBoard_GetMissedPickup(clientID, dateFrom, dateTo, isIncludeSubClient);
+        return data;
+    }
+
+    public async DashBoard_GetCarrierPerformance(clientID: number, dateFrom: string, dateTo: string, isIncludeSubClient: boolean) {
+        const data = await this.httpService.DashBoard_GetCarrierPerformance(clientID, dateFrom, dateTo, isIncludeSubClient);
+        return data;
+    }
 }

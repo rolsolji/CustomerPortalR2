@@ -396,9 +396,15 @@
                 <div><h2 class="OriginDestinationTitle">Product(s) <label class="QuantityLabel">{{productCounter}}</label></h2></div>
               </div>
               <div  [ngClass]="{'ProductsSection': formProducts.length >= 3}">
+<<<<<<< HEAD
                <div formArrayName='products' *ngFor="let prod of formProducts.controls; let i = index;" > 
+                  <hr *ngIf="i > 0" >
+                  <div [formGroupName]="i">
+=======
+               <div formArrayName='products' *ngFor="let prod of formProducts.controls; let i = index" > 
                   <hr *ngIf="i > 0 && prod.value.Status !== 3">
                   <div [formGroupName]="i" *ngIf="prod.value.Status !== 3">
+>>>>>>> R2-Development-20210104
                     <div fxLayout="column" class="pt-5" class="expansion-panel-cont-style">
                       <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="5px">
                         <div fxFlex="12%">

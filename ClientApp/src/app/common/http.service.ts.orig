@@ -47,8 +47,11 @@ import { weightcostCompareModel } from '../Entities/WeightCostCompareModel';
 import { AccessorialPerformance } from '../Entities/AccessorialPerformance';
 import { CarrierPerformanceModel } from '../Entities/CarrierPerformanceModel';
 import { TopLanes } from '../Entities/TopLanes';
+<<<<<<< HEAD
 import { ProductByClient } from  '../Entities/ProductByClient';
+=======
 import { DashBoardMissedPickupModel } from '../Entities/DashBoardMissedPickupModel';
+>>>>>>> R2-Development-20210104
 
 @Injectable({
     providedIn: 'root'

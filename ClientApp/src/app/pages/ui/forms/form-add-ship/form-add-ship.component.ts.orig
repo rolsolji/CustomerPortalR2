@@ -840,6 +840,7 @@ export class FormAddShipComponent implements OnInit {
 
   addNewProdField(): void {
     (this.productsAndAccessorialsFormGroup.get('products') as FormArray).push(this.addProductFormGroup());
+<<<<<<< HEAD
     const productsList = this.productsAndAccessorialsFormGroup.get('products') as FormArray;
     const formGroup = productsList.controls[productsList.length - 1] as FormGroup;
     this.pAutoCompleteOptions = formGroup.get('ProductDescription').valueChanges
@@ -847,6 +848,7 @@ export class FormAddShipComponent implements OnInit {
         startWith(''),
         map(val => this.productsByClientFilter((val)))
       ); 
+=======
 
     /* Start counter of products */
     const arrayProducts = (this.productsAndAccessorialsFormGroup.get('products') as FormArray); 
@@ -858,6 +860,7 @@ export class FormAddShipComponent implements OnInit {
       }
    }
     /* End */
+>>>>>>> R2-Development-20210104
   }
 
   removeNewProdField(index: number): void {

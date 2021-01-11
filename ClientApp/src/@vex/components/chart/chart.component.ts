@@ -51,7 +51,7 @@ export class ChartComponent implements OnInit, OnChanges {
   @Input() series: ApexAxisChartSeries | ApexNonAxisChartSeries;
   @Input() autoUpdateSeries = true;
   public chart: ApexCharts;
-  @ViewChild('chart', { static: true }) private chartElement: ElementRef;
+  @ViewChild('chart', { static: true }) private chartElement: ElementRef;   
 
   constructor(private cd: ChangeDetectorRef,
               private ngZone: NgZone) {}
@@ -80,8 +80,8 @@ export class ChartComponent implements OnInit, OnChanges {
 
   private _createElement() {
     if (this.series) {
-      this.options.series = this.series;
-    }
+      this.options.series = this.series;      
+    }    
 
     if (this.chart) {
       this.chart.destroy();

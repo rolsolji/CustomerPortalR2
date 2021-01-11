@@ -274,7 +274,8 @@ export class FormAddShipComponent implements OnInit {
       Pieces: [0],
       PackageTypeID: [3],
         ProductClass: [null, Validators.required],
-        NmfcNumber: [null, [Validators.required, Validators.pattern('^([a-zA-Z0-9]{6})-([a-zA-Z0-9]{2})$')]],
+        // NmfcNumber: [null, [Validators.required, Validators.pattern('^([a-zA-Z0-9]{6})-([a-zA-Z0-9]{2})$')]],
+        NmfcNumber: [null, [Validators.pattern('^([a-zA-Z0-9]{6})-([a-zA-Z0-9]{2})$')]],
         ProductDescription: [null, Validators.required],
         Length: [null, Validators.required],
         Width: [null, Validators.required],
@@ -852,8 +853,8 @@ export class FormAddShipComponent implements OnInit {
       this.openDialog(RequiredFieldsValidationObj.isConfirmDialog, RequiredFieldsValidationObj.message,
         RequiredFieldsValidationObj.yesNoActions, RequiredFieldsValidationObj.actionEvent, 'BookShipmentSubmit');
     }else {
-      //const pickupTimesWarningMessage = this.PickupTwoHoursAndAfterOnePMValidations(); //TESTRS
-      const pickupTimesWarningMessage = '';
+      const pickupTimesWarningMessage = this.PickupTwoHoursAndAfterOnePMValidations(); //TESTRS
+      // const pickupTimesWarningMessage = '';
       if (pickupTimesWarningMessage !== ''){
         this.openDialog(true, pickupTimesWarningMessage, true, 'pickupTimesValidations', 'BookShipmentSubmit');    
       }else{
@@ -1101,7 +1102,8 @@ export class FormAddShipComponent implements OnInit {
       DestCountry: this.DestinationPostalData.CountryCode,
       DestStateCode: this.DestinationPostalData.StateCode,
       DestCityName: this.DestinationPostalData.CityName,
-      ShipmentDate: String.Format('/Date({0})/',this.originAndDestinationFormGroup.get('originpickupdate').value.getTime()),
+      // ShipmentDate: String.Format('/Date({0})/',this.originAndDestinationFormGroup.get('originpickupdate').value.getTime()),
+      ShipmentDate: this.utilitiesService.ConvertDateToJsonFormate(this.originAndDestinationFormGroup.get('originpickupdate').value),
       Accessorials: this.accessorials,
       AccessorialCodes: [],
       TopN: this.confirmFormGroup.get('showTopCarriers').value,
@@ -1369,6 +1371,7 @@ export class FormAddShipComponent implements OnInit {
     let defaultdestpostalcode = null;
     let defaultdeststatename = null;
     let defaultDestExpDelDate = null;
+    let defaultRequestedDeliveryDate = null;
 
     if (this.ShipmentByLadingObject == null){      
       return;
@@ -1392,7 +1395,10 @@ export class FormAddShipComponent implements OnInit {
     
 
     // -- Calculate Expected Develiry Date
-    this.ExpectedDeliveryDateCalculated = await this.httpService.CalculateExpectedDeliveryDate(this.keyId, this.ShipmentByLadingObject.TransTime, strTempPickupDate);    
+    //this.ExpectedDeliveryDateCalculated = await this.httpService.CalculateExpectedDeliveryDate(this.keyId, this.ShipmentByLadingObject.TransTime, strTempPickupDate);    
+
+    const strTempReqDelDate = this.ConverteJsonDateToLocalTimeZone(this.ShipmentByLadingObject.RequestedDeliveryDate);
+    defaultRequestedDeliveryDate = new Date(strTempReqDelDate);
 
     defaultdestpostalcode = this.ShipmentByLadingObject.DestZipCode.trim() + '-' + this.ShipmentByLadingObject.DestCityName.trim();
     defaultdeststatename = this.ShipmentByLadingObject.DestStateName.trim();
@@ -1463,10 +1469,10 @@ export class FormAddShipComponent implements OnInit {
     this.originAndDestinationFormGroup.controls.destphone.setValue(this.ShipmentByLadingObject.DestContactPhone === 'NA' ? '' : this.ShipmentByLadingObject.DestContactPhone, {onlySelf: false});
     this.originAndDestinationFormGroup.controls.destemail.setValue(this.ShipmentByLadingObject.DestEmail === 'NA' ? '' : this.ShipmentByLadingObject.DestEmail, {onlySelf: false});
      
-     defaultDestExpDelDate = new Date(this.ConverteJsonDateToLocalTimeZone(this.ExpectedDeliveryDateCalculated));
+    // defaultDestExpDelDate = new Date(this.ConverteJsonDateToLocalTimeZone(this.ExpectedDeliveryDateCalculated));
     // const tempDestExpDelDate = moment.utc(this.ExpectedDeliveryDateCalculated);
     // defaultDestExpDelDate = new Date(this.datepipe.transform(tempDestExpDelDate.toString().replace(/(^.*\()|([+-].*$)/g, ''),'MM/dd/yyyy'));    
-    this.originAndDestinationFormGroup.controls.destexpdeldate.setValue(defaultDestExpDelDate, {onlySelf: false});
+    this.originAndDestinationFormGroup.controls.destexpdeldate.setValue(defaultRequestedDeliveryDate, {onlySelf: false});
     
     this.originAndDestinationFormGroup.controls.destdelapptfrom.setValue(this.ShipmentByLadingObject.DeliveryAppointmentTimeFrom, {onlySelf: false});
     this.originAndDestinationFormGroup.controls.destdelapptto.setValue(this.ShipmentByLadingObject.DeliveryAppointmentTimeTo, {onlySelf: false});
@@ -1601,10 +1607,10 @@ export class FormAddShipComponent implements OnInit {
   
             if (this.ShipmentByLadingObject == null){
               // Insert as new quote
-              this.saveNewQuoteAndBookShipment(bookShipment, true);
+              this.saveNewQuoteAndBookShipment(bookShipment);
             }else{
               // Update quote
-              this.updateQuote(bookShipment, true);
+              this.updateQuote(bookShipment);
             }
             break;
         } 
@@ -1932,8 +1938,8 @@ export class FormAddShipComponent implements OnInit {
         }        
       }
 
-      // const pickupTimesWarningMessage = this.PickupTwoHoursAndAfterOnePMValidations(); // TESTRS
-      const pickupTimesWarningMessage = '';
+      const pickupTimesWarningMessage = this.PickupTwoHoursAndAfterOnePMValidations(); // TESTRS
+      // const pickupTimesWarningMessage = '';
       if (pickupTimesWarningMessage !== ''){
         this.openDialog(true, pickupTimesWarningMessage, true, 'pickupTimesValidations', 'SaveAsQuote');    
       }else {
@@ -2070,7 +2076,8 @@ export class FormAddShipComponent implements OnInit {
 
     this.saveQuoteData = {
       ClientId: this.ClientID,
-      PickupDate: String.Format('/Date({0})/',this.originAndDestinationFormGroup.get('originpickupdate').value.getTime()),
+      // PickupDate: String.Format('/Date({0})/',this.originAndDestinationFormGroup.get('originpickupdate').value.getTime()),
+      PickupDate: this.utilitiesService.ConvertDateToJsonFormate(this.originAndDestinationFormGroup.get('originpickupdate').value),
       DeliveryDate: null,
       OrgName: this.originAndDestinationFormGroup.get('originname').value,
       OrgAdr1: this.originAndDestinationFormGroup.get('originadddress1').value,
@@ -2136,12 +2143,14 @@ export class FormAddShipComponent implements OnInit {
       DestTerminalPhone: selectedRate.DestTerminalPhoneNo,
       OriginTerminalFax:  selectedRate.OriginTerminalFaxNo,
       DestTerminalFax: selectedRate.DestTerminalFaxNo,
-      RequestedPickupDateFrom: this.originAndDestinationFormGroup.get('originpickupdate').value != null ? String.Format('/Date({0})/',this.originAndDestinationFormGroup.get('originpickupdate').value.getTime()) : null,
+      // RequestedPickupDateFrom: this.originAndDestinationFormGroup.get('originpickupdate').value != null ? String.Format('/Date({0})/',this.originAndDestinationFormGroup.get('originpickupdate').value.getTime()) : null,
+      RequestedPickupDateFrom: this.originAndDestinationFormGroup.get('originpickupdate').value != null ? this.utilitiesService.ConvertDateToJsonFormate(this.originAndDestinationFormGroup.get('originpickupdate').value) : null,
       RequestedPickupTimeFrom: this.originAndDestinationFormGroup.get('originpickupopen').value,
       RequestedPickupTimeTo: this.originAndDestinationFormGroup.get('originpickupclose').value,
       OrgFaxNo: null,
       DestFaxNo: null,
-      RequestedDeliveryDate: this.originAndDestinationFormGroup.get('destexpdeldate').value != null ? String.Format('/Date({0})/',this.originAndDestinationFormGroup.get('destexpdeldate').value.getTime()) : null,
+      // RequestedDeliveryDate: this.originAndDestinationFormGroup.get('destexpdeldate').value != null ? String.Format('/Date({0})/',this.originAndDestinationFormGroup.get('destexpdeldate').value.getTime()) : null,
+      RequestedDeliveryDate: this.originAndDestinationFormGroup.get('destexpdeldate').value != null ? this.utilitiesService.ConvertDateToJsonFormate(this.originAndDestinationFormGroup.get('destexpdeldate').value) : null,
       ServiceLevelID: this.shipmentInfoFormGroup.get('servicelevel').value,
       Miles: selectedRate.LaneWiseMiles,
       BrokerCarrierCode: null,
@@ -2248,40 +2257,40 @@ export class FormAddShipComponent implements OnInit {
         //   duration: 5000
         // });
 
-        this.openDialog(false, 'Quote saved successfully. Quote Number: ' + responseData.ClientLadingNo + '. ' + (objRateSelected.rateSelectedAction === 4 ? 'Email has been sent.' : ''), null, 
+        this.openDialog(false, 'Quote saved successfully. Quote Number: ' + responseData.ClientLadingNo + '. ' + (objRateSelected != null && objRateSelected.rateSelectedAction === 4 ? 'Email has been sent.' : ''), null, 
         'QuoteSavedAndRedirectToBoard', null, null, null);
 
-        switch (objRateSelected.rateSelectedAction) {
-          case 3: // print quote
-            const ratequotePrintURL = String.Format(environment.baseEndpoint + 'Handlers/PrintQuoteHandler.ashx?LadingID={0}&Ticket={1}',
-                                        responseData.LadingID,this.securityToken);
-            window.open(ratequotePrintURL, '_blank');
-            break;
-          case 4: // email quote
-            let emailBOLParameters: SendEmailParameters;
-
-            const invoiceParameter: InvoiceParameter = {
-              InvoiceDetailIDs: []
-            };
-    
-            emailBOLParameters = {
-              ClientID: this.ClientID,
-              CarrierID : selectedRate.CarrierID,
-              ApplicationID: 56,
-              EventID: 39,
-              EmailAddresses: objRateSelected.keyValue,
-              LadingID: responseData.LadingID,
-              UserRowID: 1,
-              InvoiceParameter: invoiceParameter,
-              LadingIDs: [],
-            }
-    
-            this.httpService.SendEmailManually(emailBOLParameters);
-            break;
-        } 
+        if (objRateSelected != null){
+          switch (objRateSelected.rateSelectedAction) {
+            case 3: // print quote
+              const ratequotePrintURL = String.Format(environment.baseEndpoint + 'Handlers/PrintQuoteHandler.ashx?LadingID={0}&Ticket={1}',
+                                          responseData.LadingID,this.securityToken);
+              window.open(ratequotePrintURL, '_blank');
+              break;
+            case 4: // email quote
+              let emailBOLParameters: SendEmailParameters;
+  
+              const invoiceParameter: InvoiceParameter = {
+                InvoiceDetailIDs: []
+              };
+      
+              emailBOLParameters = {
+                ClientID: this.ClientID,
+                CarrierID : selectedRate.CarrierID,
+                ApplicationID: 56,
+                EventID: 39,
+                EmailAddresses: objRateSelected.keyValue,
+                LadingID: responseData.LadingID,
+                UserRowID: 1,
+                InvoiceParameter: invoiceParameter,
+                LadingIDs: [],
+              }
+      
+              this.httpService.SendEmailManually(emailBOLParameters);
+              break;
+          } 
+        }                
         
-
-        // this.router.navigate(['../../../shipmentboard/LTLTL/'], { relativeTo: this.route });
       }
       else{
         this.snackbar.open('Error saving as quote.', null, {
@@ -2390,11 +2399,13 @@ export class FormAddShipComponent implements OnInit {
     localShipmentByLadingObject.DestContactPhone = this.originAndDestinationFormGroup.get('destphone').value;
     localShipmentByLadingObject.DestEmail = this.originAndDestinationFormGroup.get('destemail').value;
 
-    localShipmentByLadingObject.PickupDate = String.Format('/Date({0})/',this.originAndDestinationFormGroup.get('originpickupdate').value.getTime());
+    // localShipmentByLadingObject.PickupDate = String.Format('/Date({0})/',this.originAndDestinationFormGroup.get('originpickupdate').value.getTime());
+    localShipmentByLadingObject.PickupDate = this.utilitiesService.ConvertDateToJsonFormate(this.originAndDestinationFormGroup.get('originpickupdate').value);
     localShipmentByLadingObject.RequestedPickupTimeFrom = this.originAndDestinationFormGroup.get('originpickupopen').value;
     localShipmentByLadingObject.RequestedPickupTimeTo = this.originAndDestinationFormGroup.get('originpickupclose').value;   
 
-    localShipmentByLadingObject.ExpectedDeliveryDate = String.Format('/Date({0})/',this.originAndDestinationFormGroup.get('destexpdeldate').value.getTime());
+    // localShipmentByLadingObject.ExpectedDeliveryDate = String.Format('/Date({0})/',this.originAndDestinationFormGroup.get('destexpdeldate').value.getTime());
+    localShipmentByLadingObject.ExpectedDeliveryDate = this.utilitiesService.ConvertDateToJsonFormate(this.originAndDestinationFormGroup.get('destexpdeldate').value);
     localShipmentByLadingObject.DeliveryAppointmentTimeFrom = this.originAndDestinationFormGroup.get('destdelapptfrom').value;
     localShipmentByLadingObject.DeliveryAppointmentTimeTo = this.originAndDestinationFormGroup.get('destdelapptto').value;   
     // --
@@ -2779,37 +2790,40 @@ export class FormAddShipComponent implements OnInit {
           // this.snackbar.open('Quote saved successfully', null, {
           //   duration: 5000
           // });
-          this.openDialog(false, 'Quote saved successfully. Quote Number: ' + localShipmentByLadingObject.ClientLadingNo + '. ' + (objRateSelected.rateSelectedAction === 4 ? 'Email has been sent.' : ''), null, 
+          this.openDialog(false, 'Quote saved successfully. Quote Number: ' + localShipmentByLadingObject.ClientLadingNo + '. ' + (objRateSelected != null && objRateSelected.rateSelectedAction === 4 ? 'Email has been sent.' : ''), null, 
           'QuoteSavedAndRedirectToBoard', null, null, null);
-  
-          switch (objRateSelected.rateSelectedAction) {
-            case 3: // print quote
-              const ratequotePrintURL = String.Format(environment.baseEndpoint + 'Handlers/PrintQuoteHandler.ashx?LadingID={0}&Ticket={1}',
-              localShipmentByLadingObject.LadingID,this.securityToken);
-              window.open(ratequotePrintURL, '_blank');
-              break;
-            case 4: // email quote
-              let emailBOLParameters: SendEmailParameters;
-  
-              const invoiceParameter: InvoiceParameter = {
-                InvoiceDetailIDs: []
-              };
-      
-              emailBOLParameters = {
-                ClientID: this.ClientID,
-                CarrierID : selectedRate.CarrierID,
-                ApplicationID: 56,
-                EventID: 39,
-                EmailAddresses: objRateSelected.keyValue,
-                LadingID: localShipmentByLadingObject.LadingID,
-                UserRowID: 1,
-                InvoiceParameter: invoiceParameter,
-                LadingIDs: [],
-              }
-      
-              this.httpService.SendEmailManually(emailBOLParameters);
-              break;
-          } 
+          
+          if (objRateSelected != null){
+            switch (objRateSelected.rateSelectedAction) {
+              case 3: // print quote
+                const ratequotePrintURL = String.Format(environment.baseEndpoint + 'Handlers/PrintQuoteHandler.ashx?LadingID={0}&Ticket={1}',
+                localShipmentByLadingObject.LadingID,this.securityToken);
+                window.open(ratequotePrintURL, '_blank');
+                break;
+              case 4: // email quote
+                let emailBOLParameters: SendEmailParameters;
+    
+                const invoiceParameter: InvoiceParameter = {
+                  InvoiceDetailIDs: []
+                };
+        
+                emailBOLParameters = {
+                  ClientID: this.ClientID,
+                  CarrierID : selectedRate.CarrierID,
+                  ApplicationID: 56,
+                  EventID: 39,
+                  EmailAddresses: objRateSelected.keyValue,
+                  LadingID: localShipmentByLadingObject.LadingID,
+                  UserRowID: 1,
+                  InvoiceParameter: invoiceParameter,
+                  LadingIDs: [],
+                }
+        
+                this.httpService.SendEmailManually(emailBOLParameters);
+                break;
+            } 
+          }
+          
 
         }else{
           this.openDialog(false, 'Shipment Booked with LoadNo: ' + localShipmentByLadingObject.LadingID.toString() + '. ', null, 'ShipmentBooked');
@@ -3004,23 +3018,30 @@ export class FormAddShipComponent implements OnInit {
 
   PickupTwoHoursAndAfterOnePMValidations() {
     let warningMessage = '';
+    
+    if (this.originAndDestinationFormGroup.get('originpickupopen').value != null && this.originAndDestinationFormGroup.get('originpickupopen').value !== '' && 
+    this.originAndDestinationFormGroup.get('originpickupclose').value != null && this.originAndDestinationFormGroup.get('originpickupclose').value !== ''){
+      const fromTime = this.ConvertTime12HoursTo24Hours(this.originAndDestinationFormGroup.get('originpickupopen').value);
+      const ToTime = this.ConvertTime12HoursTo24Hours(this.originAndDestinationFormGroup.get('originpickupclose').value);
+                   
+          if (fromTime < ToTime) {
+            const diffTime = ToTime - fromTime;
+              if (diffTime < 2) {    
+                warningMessage = 'Scheduled Pickups Require a Minimum 2-Hour Window Between Pickup Open Time & Pickup Close Time. ';                
+              }
+              else if (fromTime > 13) {
+                  warningMessage += 'Same day pickup requests scheduled after 1:00 PM relevant to the pickup location could miss pickup and be rescheduled for the following business day. To Confirm Equipment Availability please contact your account representative. ';                            
+              }           
+          }
+          else if (fromTime > 13) {
+              warningMessage = 'Same day pickup requests scheduled after 1:00 PM relevant to the pickup location could miss pickup and be rescheduled for the following business day. To Confirm Equipment Availability please contact your account representative. ';          
+          }  
       
-    const fromTime = this.ConvertTime12HoursTo24Hours(this.originAndDestinationFormGroup.get('originpickupopen').value);
-    const ToTime = this.ConvertTime12HoursTo24Hours(this.originAndDestinationFormGroup.get('originpickupclose').value);
-                 
-        if (fromTime < ToTime) {
-          const diffTime = ToTime - fromTime;
-            if (diffTime < 2) {    
-              warningMessage = 'Scheduled Pickups Require a Minimum 2-Hour Window Between Pickup Open Time & Pickup Close Time';                
-            }
-            else if (fromTime > 13) {
-                warningMessage = 'Same day pickup requests scheduled after 1:00 PM relevant to the pickup location could miss pickup and be rescheduled for the following business day. To Confirm Equipment Availability please contact your account representative.';                            
-            }           
-        }
-        else if (fromTime > 13) {
-            warningMessage = 'Same day pickup requests scheduled after 1:00 PM relevant to the pickup location could miss pickup and be rescheduled for the following business day. To Confirm Equipment Availability please contact your account representative.';          
-        }  
-        
+      if (warningMessage !== ''){
+        warningMessage += 'Continue?'
+      }
+    }
+            
     return warningMessage;
     
   }  

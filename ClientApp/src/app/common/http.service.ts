@@ -38,10 +38,16 @@ import {Country} from "../Entities/Country";
 import { Rate } from '../Entities/rate';
 import {LocationGroup} from "../Entities/LocationGroup";
 import { HtmlMsgByClient } from '../Entities/HtmlMsgByClient';
-import {Client} from '../Entities/client.model';
+import { Client } from '../Entities/client.model';
 import { PCFClientDefaults } from '../Entities/PCFClientDefaults';
+import {ProductGroup} from "../Entities/ProductGroup";
+import {Product} from "../Entities/Product";
 import { TotalStatusRecords } from '../Entities/TotalStatusRecords';
-import { ProductByClient } from  '../Entities/ProductByClient'
+import { weightcostCompareModel } from '../Entities/WeightCostCompareModel';
+import { AccessorialPerformance } from '../Entities/AccessorialPerformance';
+import { CarrierPerformanceModel } from '../Entities/CarrierPerformanceModel';
+import { TopLanes } from '../Entities/TopLanes';
+import { ProductByClient } from  '../Entities/ProductByClient';
 
 @Injectable({
     providedIn: 'root'
@@ -164,6 +170,86 @@ export class HttpService{
         ).toPromise();
     }
 
+    // Product methods
+    GetProductGroupType(clientId): Promise<ProductGroup[]> {
+        const ticket = this.token;
+        const httpHeaders = new HttpHeaders({
+            Ticket : ticket
+        });
+        return this.http.get<ProductGroup[]>(
+            `${this.baseEndpoint}Services/MasProductService.svc/json/GetProductGroupType?ClientID=${clientId}&_=1608171142226`
+            ,{
+                headers: httpHeaders
+            }
+        ).toPromise();
+    }
+
+    GetAndSearchPagedProductDetailsCount(parameters): Promise<any> {
+        const ticket = this.token;
+        const httpHeaders = new HttpHeaders({
+            Ticket : ticket
+        });
+        return this.http.post<any>(
+            `${this.baseEndpoint}Services/MasProductService.svc/json/GetAndSearchPagedProductDetailsCount`,
+            parameters,
+            {
+                headers: httpHeaders
+            }
+        ).toPromise();
+    }
+
+    GetAndSearchPagedProductDetails(parameters): Promise<any> {
+        const ticket = this.token;
+        const httpHeaders = new HttpHeaders({
+            Ticket : ticket
+        });
+        return this.http.post<any>(`${this.baseEndpoint}Services/MasProductService.svc/json/GetAndSearchPagedProductDetails`,
+            parameters,
+            {
+                headers: httpHeaders
+            }
+        ).toPromise();
+    }
+
+    UpdateProductDetails(parameters): Promise<any> {
+        const ticket = this.token;
+        const httpHeaders = new HttpHeaders({
+            Ticket : ticket
+        });
+        return this.http.post<any>(`${this.baseEndpoint}Services/MasProductService.svc/json/UpdateProductDetails`,
+            parameters,
+            {
+                headers: httpHeaders
+            }
+        ).toPromise();
+    }
+
+    InsertProductDetails(parameters): Promise<any> {
+        const ticket = this.token;
+        const httpHeaders = new HttpHeaders({
+            Ticket : ticket
+        });
+        return this.http.post<any>(`${this.baseEndpoint}Services/MasProductService.svc/json/InsertProductDetails`,
+            parameters,
+            {
+                headers: httpHeaders
+            }
+        ).toPromise();
+    }
+
+    DeleteProductDetails(productId, key = null): Promise<ProductGroup[]> {
+        const ticket = this.token;
+        const httpHeaders = new HttpHeaders({
+            Ticket : ticket
+        });
+        return this.http.get<ProductGroup[]>(
+            `${this.baseEndpoint}Services/MasProductService.svc/json/DeleteProductDetails?ProductID=${productId}&_=${key}`
+            ,{
+                headers: httpHeaders
+            }
+        ).toPromise();
+    }
+
     async getMainToken(): Promise<string> {
 
         return new Promise((resolve, reject) => {
@@ -248,15 +334,15 @@ export class HttpService{
   }
 
     searchBOLHDRForJason(parameters:GetQuotesParameters){
-        const ticket = this.token;
-        const httpHeaders = new HttpHeaders({
-            Ticket : ticket
-        });
-        return this.http.post<Quote[]>(this.baseEndpoint + 'Services/BOLHDRService.svc/json/SearchBOLHDRForJason', parameters
-        ,{
-            headers: httpHeaders
-          }
-          ).toPromise();
+      const ticket = this.token;
+      const httpHeaders = new HttpHeaders({
+        Ticket : ticket
+      });
+      return this.http.post<Quote[]>(this.baseEndpoint + 'Services/BOLHDRService.svc/json/SearchBOLHDRForJason', parameters
+      ,{
+        headers: httpHeaders
+        }
+      ).toPromise();
     }
 
     updateMasUser(masUser: MasUser){
@@ -628,18 +714,6 @@ export class HttpService{
           ).toPromise();
     }
 
-    GetLocationByTypeA(clientId: number, locationTypeId: number, locationName: string, keyId:string ){
-        const ticket = this.token;
-        const httpHeaders = new HttpHeaders({
-            Ticket : ticket
-        });
-        return this.http.get<Location[]>(String.Format(this.baseEndpoint + 'Services/MasLocationService.svc/json/GetLocationByType?ClientID={0}&LocationTypeID={1}&LocationName={2}&_={3}',clientId, locationTypeId, locationName, keyId)
-        ,{
-            headers: httpHeaders
-          }
-          ).toPromise();
-    }
-
     GetLocationByType(clientId: number, locationTypeId: number, locationName: string, keyId:string) {
         let opts = [];
         const ticket = this.token;
@@ -658,4 +732,112 @@ export class HttpService{
                 ,{headers: httpHeaders}
             ).toPromise();
     }
+
+    /* Start http Services for Reports */
+    GetShipmentModeForReport() {
+        const ticket = this.token;
+        const httpHeaders = new HttpHeaders({
+            Ticket : ticket
+        });
+        return this.http.get<ShipmentMode[]>(
+            this.baseEndpoint + 'Services/BOLHDRService.svc/json/GetShipmentMode'
+            ,{
+                headers: httpHeaders
+            }
+        ).toPromise();
+    }
+
+    public GetClientsForReportByUserAndClientName(userID:number, val:string) {
+        const ticket = this.token;
+        const httpHeaders = new HttpHeaders({
+            Ticket : ticket
+        });
+        return this.http.get<Client[]>(
+            this.baseEndpoint + 'Services/MASClientService.svc/json/GetClientForUser?userID=' + userID + '&ClientName=' + val
+            ,{
+                headers: httpHeaders
+            }
+        ).toPromise();
+    }
+    /* END */
+
+    /* Start http Services for Dash board */
+    public DashBoard_GetTotalShipmentByMTDByDate(clientID: number, dateFrom: string, dateTo: string, isIncludeSubClient: boolean) {
+        const ticket = this.token;
+        const httpHeaders = new HttpHeaders({
+            Ticket : ticket
+        });
+        return this.http.get<weightcostCompareModel[]>(
+            this.baseEndpoint + 'Services/DashBoardService.svc/json/DashBoard_GetTotalShipmentByMTDByDate?clientID=' + clientID + '&shipFromdate=' + dateFrom + '&shipTodate=' + dateTo + '&IsIncludeSubClient=' + isIncludeSubClient
+            ,{
+                headers: httpHeaders
+            }
+        ).toPromise();
+    }
+
+    public DashBoard_GetTopAccesorial(clientID: number, dateFrom: string, dateTo: string, isIncludeSubClient: boolean) {
+        const ticket = this.token;
+        const httpHeaders = new HttpHeaders({
+            Ticket : ticket
+        });
+        return this.http.get<AccessorialPerformance[]>(
+            this.baseEndpoint + 'Services/DashBoardService.svc/json/DashBoard_GetTopAccesorial?clientID=' + clientID + '&shipFromdate=' + dateFrom + '&shipTodate=' + dateTo + '&IsIncludeSubClient=' + isIncludeSubClient
+            ,{
+                headers: httpHeaders
+            }
+        ).toPromise();
+    }
+
+    public DashBoard_GetTopCarriers(clientID: number, dateFrom: string, dateTo: string, isIncludeSubClient: boolean) {
+        const ticket = this.token;
+        const httpHeaders = new HttpHeaders({
+            Ticket : ticket
+        });
+        return this.http.get<CarrierPerformanceModel[]>(
+            this.baseEndpoint + 'Services/DashBoardService.svc/json/DashBoard_GetTopCarriers?clientID=' + clientID + '&shipFromdate=' + dateFrom + '&shipTodate=' + dateTo + '&ByVolume=true&IsIncludeSubClient=' + isIncludeSubClient
+            ,{
+                headers: httpHeaders
+            }
+        ).toPromise();
+    }
+
+    public DashBoard_GetTopLaneForZip(clientID: number, dateFrom: string, dateTo: string, isIncludeSubClient: boolean) {
+        const ticket = this.token;
+        const httpHeaders = new HttpHeaders({
+            Ticket : ticket
+        });
+        return this.http.get<TopLanes[]>(
+            this.baseEndpoint + 'Services/DashBoardService.svc/json/DashBoard_GetTopLaneForZip?clientID=' + clientID + '&shipFromdate=' + dateFrom + '&shipTodate=' + dateTo + '&TopValue=10&OrderBy=1&IsIncludeSubClient=' + isIncludeSubClient
+            ,{
+                headers: httpHeaders
+            }
+        ).toPromise();
+    }
+
+    public DashBoard_GetTopLaneForZipCity(clientID: number, dateFrom: string, dateTo: string, isIncludeSubClient: boolean) {
+        const ticket = this.token;
+        const httpHeaders = new HttpHeaders({
+            Ticket : ticket
+        });
+        return this.http.get<TopLanes[]>(
+            this.baseEndpoint + 'Services/DashBoardService.svc/json/DashBoard_GetTopLaneForZipCity?clientID=' + clientID + '&shipFromdate=' + dateFrom + '&shipTodate=' + dateTo + '&TopValue=10&OrderBy=1&IsIncludeSubClient=' + isIncludeSubClient
+            ,{
+                headers: httpHeaders
+            }
+        ).toPromise();
+    }
+
+    public DashBoard_GetTopLaneForState(clientID: number, dateFrom: string, dateTo: string, isIncludeSubClient: boolean) {
+        const ticket = this.token;
+        const httpHeaders = new HttpHeaders({
+            Ticket : ticket
+        });
+        return this.http.get<TopLanes[]>(
+            this.baseEndpoint + 'Services/DashBoardService.svc/json/DashBoard_GetTopLaneForState?clientID=' + clientID + '&shipFromdate=' + dateFrom + '&shipTodate=' + dateTo + '&TopValue=10&OrderBy=1&IsIncludeSubClient=' + isIncludeSubClient
+            ,{
+                headers: httpHeaders
+            }
+        ).toPromise();
+    }
+    /* END */
 }

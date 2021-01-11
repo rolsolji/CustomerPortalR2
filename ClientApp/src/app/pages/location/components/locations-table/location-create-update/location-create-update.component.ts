@@ -18,6 +18,8 @@ import {PostalData} from "../../../../../Entities/PostalData";
 import {String} from "typescript-string-operations";
 import {User} from "../../../../../Entities/user.model";
 import {MatAutocompleteSelectedEvent} from "@angular/material/autocomplete";
+import {MatSnackBar} from "@angular/material/snack-bar";
+import {AuthenticationService} from "../../../../../common/authentication.service";
 
 @Component({
   selector: 'vex-location-create-update',
@@ -45,13 +47,13 @@ export class LocationCreateUpdateComponent implements OnInit {
 
   checked: boolean = true;
   approved: number = 1;
+  clientID: number;
 
   locationTypes: {} = [];
   locationTypeSelected: null;
   originCountries: PostalData[] | Country = [];
   statesAndCities: PostalData[] = [];
   postalData: PostalData[];
-  postalDataDest: PostalData[];
   filteredCountriesOptions: Observable<PostalData[]>;
   filteredStatesOptions: Observable<PostalData[]>;
   filteredCitiesOptions: Observable<PostalData[]>;
@@ -65,10 +67,15 @@ export class LocationCreateUpdateComponent implements OnInit {
   public states: BehaviorSubject<PostalData[]> = new BehaviorSubject<PostalData[]>(null);
   public cities: BehaviorSubject<PostalData[]> = new BehaviorSubject<PostalData[]>(null);
 
-  constructor(private httpService : HttpService, @Inject(MAT_DIALOG_DATA) public defaults: any,
-              private dialogRef: MatDialogRef<LocationCreateUpdateComponent>,
-              private fb: FormBuilder,
-              public datepipe: DatePipe) {
+  constructor(
+      private httpService : HttpService, @Inject(MAT_DIALOG_DATA) public defaults: any,
+      private dialogRef: MatDialogRef<LocationCreateUpdateComponent>,
+      private fb: FormBuilder,
+      private snackBar: MatSnackBar,
+      private au: AuthenticationService,
+      public datepipe: DatePipe
+  ) {
+    this.clientID = this.au.getDefaultClient().ClientID;
   }
 
   async ngOnInit() {
@@ -173,12 +180,20 @@ export class LocationCreateUpdateComponent implements OnInit {
 
   async createLocation() {
     const location = this.form.value;
-    return await this.mapNewLocation(location);
+    const newLocation = await this.mapNewLocation(location);
+    this.snackBar.open('Location added', null, {
+      duration: 5000
+    });
+    return newLocation;
   }
 
   async updateLocation(): Promise<Location> {
     const location = this.form.value;
-    return await this.mapLocation(location);
+    const locationUpdated = await this.mapLocation(location);
+    this.snackBar.open('Location modified', null, {
+      duration: 5000
+    });
+    return locationUpdated;
   }
 
   isCreateMode() {
@@ -459,9 +474,9 @@ export class LocationCreateUpdateComponent implements OnInit {
     location.CreatedDate = String.Format('/Date({0})/', currentTime.getTime());
     location.ModifiedBy = this.user.UserName;
     location.ModifiedDate = String.Format('/Date({0})/', currentTime.getTime());
-    location.ClientId = this.user.ClientID;
+    location.ClientId = this.clientID;
 
-    const groupLocations = await this.httpService.GetLocationGroupByClient(this.user.ClientID);
+    const groupLocations = await this.httpService.GetLocationGroupByClient(this.clientID);
     const group = groupLocations.find(groupLocation => groupLocation.GroupCode === 'STD');
 
     location.LocationGroupID = group.LocationGroupID;

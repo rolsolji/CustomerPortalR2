@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit, ViewChild, ElementRef, Input,
-          Output, EventEmitter, HostListener, Pipe, PipeTransform } from '@angular/core';
+          Output, EventEmitter, HostListener, Pipe, PipeTransform, Sanitizer } from '@angular/core';
 import { DatePipe } from '@angular/common';
 
 import icVisibility from '@iconify/icons-ic/twotone-visibility';
@@ -66,6 +66,7 @@ import { SendEmailParameters, InvoiceParameter } from '../../../../Entities/Send
 import { SaveQuoteResponse } from '../../../../Entities/SaveQuoteResponse';
 import { HtmlMsgByClient } from 'src/app/Entities/HtmlMsgByClient';
 import { PCFClientDefaults } from '../../../../Entities/PCFClientDefaults';
+import { Brand } from 'src/app/Entities/Brand';
 
 export interface CountryState {
   name: string;
@@ -225,6 +226,10 @@ export class FormQuickQuoteComponent implements OnInit {
   htmlContentByClient: string;
 
   rightPanelImage: any = 'assets/img/demo/R2TestImage.png';
+
+  promotionImageByClient: any;
+  promotionImageTitle: string;
+
   noRatesFoundText = null;
 
   //#region Origin Fields
@@ -292,10 +297,13 @@ export class FormQuickQuoteComponent implements OnInit {
 
     let htmlMsgByClientObj: HtmlMsgByClient[];
     htmlMsgByClientObj = this.authenticationService.getClientHtmlMessages();
-    if (htmlMsgByClientObj && htmlMsgByClientObj.length > 0){
-      this.htmlContentByClient = htmlMsgByClientObj[0].HtmlMsg2;
-    }
+    // if (htmlMsgByClientObj && htmlMsgByClientObj.length > 0){
+    //   this.htmlContentByClient = htmlMsgByClientObj[0].HtmlMsg2;
+    // }
     
+    this.promotionImageByClient = environment.baseEndpoint + `Handlers/PromotionImageHandler.ashx?ClientID=${this.authenticationService.getDefaultClient().ClientID}&id=e(${Math.random().toString().slice(2,11)})/&Ticket=${this.securityToken}`;    
+    
+    this.promotionImageTitle = this.authenticationService.getDefaultClient().ClientName;
     const responseData = await this.httpService.getCountryList(this.keyId);
     this.clientDefaultData = await this.httpService.getClientDefaultsByClient(this.ClientID, this.keyId);
 
@@ -672,7 +680,8 @@ export class FormQuickQuoteComponent implements OnInit {
         DestCountry: this.DestinationPostalData.CountryCode,
         DestStateCode: this.DestinationPostalData.StateCode,
         DestCityName: this.DestinationPostalData.CityName,
-        ShipmentDate: String.Format('/Date({0})/',this.quickQuoteFormGroup.get('originpickupdate').value.getTime()),
+        // ShipmentDate: String.Format('/Date({0})/',this.quickQuoteFormGroup.get('originpickupdate').value.getTime()),
+        ShipmentDate: this.utilitiesService.ConvertDateToJsonFormate(this.quickQuoteFormGroup.get('originpickupdate').value),
         Accessorials: this.accessorials,
         AccessorialCodes: [],
         TopN: this.quickQuoteFormGroup.get('showCarriers').value,
@@ -779,7 +788,7 @@ export class FormQuickQuoteComponent implements OnInit {
     console.log(index);
 
     const selectedRate = this.ratesFiltered[index];
-
+    
     console.log('save quote start',selectedRate);
 
     const arrayProducts = this.quickQuoteFormGroup.get('products').value;
@@ -874,7 +883,8 @@ export class FormQuickQuoteComponent implements OnInit {
 
     this.saveQuoteParameters = {
         ClientId: this.ClientID,
-        PickupDate: String.Format('/Date({0})/',this.quickQuoteFormGroup.get('originpickupdate').value.getTime()),
+        // PickupDate: String.Format('/Date({0})/',this.quickQuoteFormGroup.get('originpickupdate').value.getTime()),
+        PickupDate: this.utilitiesService.ConvertDateToJsonFormate(this.quickQuoteFormGroup.get('originpickupdate').value),
         OrgName: 'NA',
         OrgAdr1: 'NA',
         OrgCity: Number(this.OriginPostalData.CityID),
@@ -943,7 +953,8 @@ export class FormQuickQuoteComponent implements OnInit {
         orgTerminalCityStateZipCode:String.Format('{0},{1},{2}',selectedRate.OriginTerminalCity,selectedRate.OriginTerminalState,selectedRate.OriginTerminalZipCode),
         destTerminalCityStateZipCode:String.Format('{0},{1},{2}',selectedRate.DestTerminalCity,selectedRate.DestTerminalState,selectedRate.DestTerminalZipCode),
         WaterfallDetailsList:null,
-        EquipmentID: null
+        EquipmentID: null,
+        RequestedDeliveryDate: this.utilitiesService.ConvertDateToJsonFormate(new Date(selectedRate.ETA)),
     };
 
     console.log('saveQuoteParameters',this.saveQuoteParameters)
@@ -1237,5 +1248,5 @@ export class FormQuickQuoteComponent implements OnInit {
 
       this.clearQuoteAndFields();
     }
-  }
+  }  
 }

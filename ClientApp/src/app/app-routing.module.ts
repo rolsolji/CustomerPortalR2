@@ -4,6 +4,7 @@ import { VexRoutes } from '../@vex/interfaces/vex-route.interface';
 import { CustomLayoutComponent } from './custom-layout/custom-layout.component';
 import {AuthGuardService as AuthGuard} from './common/auth-guard.service';
 import { LocationListComponent } from './pages/location/location-list.component'
+import { ProductListComponent } from './pages/product/product-list.component'
 
 const childrenRoutes: VexRoutes = [
   {
@@ -55,7 +56,17 @@ const childrenRoutes: VexRoutes = [
         },
       ],
       canActivate: [AuthGuard]
-    },
+  },
+  {
+    path:'products',
+    children:[
+      {
+        path: 'list',
+        component: ProductListComponent
+      },
+    ],
+    canActivate: [AuthGuard]
+  },
   {
     path: 'apps',
     children: [
@@ -189,6 +200,29 @@ const childrenRoutes: VexRoutes = [
   {
     path: 'documentation',
     loadChildren: () => import('./pages/documentation/documentation.module').then(m => m.DocumentationModule),
+  },
+  {      
+    path:'reports',
+    children:[
+      {
+        path: 'KPI',        
+        loadChildren: () => import('./pages/ui/Reports/KPI/KPI-routing.module').then(m => m.KeyPerformanceIndicatorRoutingModule),
+        //loadChildren: () => import('./pages/ui/Reports/MasterReport/MasterReport-routing.module').then(m => m.MasterReportRoutingModule),
+      },
+      {
+        path: 'CarrierPerformance',        
+        loadChildren: () => import('./pages/ui/Reports/CarrierPerformance/CarrierPerformance-routing.module').then(m => m.CarrierPerformanceRoutingModule),        
+      },
+      {
+        path: 'ShipmentHistory',        
+        loadChildren: () => import('./pages/ui/Reports/ShipmentHistory/ShipmentHistory-routing.module').then(m => m.ShipmentHistoryRoutingModule),        
+      },
+      {
+        path: 'DailyActivity',        
+        loadChildren: () => import('./pages/ui/Reports/DailyActivity/DailyActivity-routing.module').then(m => m.DailyActivityRoutingModule),        
+      }
+    ],
+    canActivate: [AuthGuard] 
   },
   {
     path: '**',

@@ -564,9 +564,10 @@
           </div>
           
           <ng-template [ngIf]="!getQuoteButtonClicked"> 
-              <div [innerHtml]=htmlContentByClient>
+              <!-- <div [innerHtml]=htmlContentByClient>
                 
-              </div>             
+              </div>              -->
+              <img [alt]="promotionImageTitle" [src]="promotionImageByClient" style="height: 100%; width:100%">
               <!-- <img [src]="rightPanelImage" > -->
           </ng-template>
          

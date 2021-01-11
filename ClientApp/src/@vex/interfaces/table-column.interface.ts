@@ -4,4 +4,5 @@ export interface TableColumn<T> {
   type: 'text' | 'image' | 'badge' | 'progress' | 'checkbox' | 'button' | 'edit' | 'more';
   visible?: boolean;
   cssClasses?: string[];
+  footer?: string;
 }

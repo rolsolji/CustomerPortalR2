@@ -82,6 +82,7 @@ export interface SaveQuoteParameters {
   OriginEmail?:                 string;
   RequestedPickupTimeFrom?:     string;
   RequestedPickupTimeTo?:       string;
+  RequestedDeliveryDate?:       string;
 }
 
 export interface BOlProductsList {

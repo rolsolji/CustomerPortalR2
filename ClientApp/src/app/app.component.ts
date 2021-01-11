@@ -162,11 +162,6 @@ export class AppComponent {
             label: 'Products',
             route: '/products/list',
             icon: icBaselineDvr,
-            badge: {
-              value: '16',
-              bgClass: 'bg-cyan',
-              textClass: 'text-cyan-contrast',
-            },
           },
           {
             type: 'dropdown',
@@ -176,23 +171,30 @@ export class AppComponent {
               {
                 type: 'link',
                 label: 'Key Performance Indicator',
-                route: '/apps/social2',
+                // route: '/apps/social2',
+                route: '/reports/KPI',
                 routerLinkActiveOptions: { exact: true }
               },
               {
                 type: 'link',
                 label: 'Carrier Performance',
-                route: '/apps/social/timeline2'
+                // route: '/apps/social/timeline2'
+                route: '/reports/CarrierPerformance',
+                routerLinkActiveOptions: { exact: true }
               },
               {
                 type: 'link',
                 label: 'Shipment History',
-                route: '/apps/social/timeline2'
+                // route: '/apps/social/timeline2'
+                route: '/reports/ShipmentHistory',
+                routerLinkActiveOptions: { exact: true }
               },
               {
                 type: 'link',
                 label: 'Daily Activity',
-                route: '/apps/social/timeline2'
+                // route: '/apps/social/timeline2'
+                route: '/reports/DailyActivity',
+                routerLinkActiveOptions: { exact: true }
               }
             ]
           },

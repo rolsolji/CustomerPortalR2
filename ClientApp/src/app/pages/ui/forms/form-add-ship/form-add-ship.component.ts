@@ -589,9 +589,6 @@ export class FormAddShipComponent implements OnInit {
     
     for (let i = 0; i <  productsList.length; i++){
       const formGroup = productsList.controls[i] as FormGroup;
-
-      console.log('formGroup', formGroup);
-  
   
       this.pAutoCompleteOptions = formGroup.get('ProductDescription').valueChanges
         .pipe(
@@ -599,18 +596,6 @@ export class FormAddShipComponent implements OnInit {
           map(val => this.productsByClientFilter((val)))
         ); 
     }
-    
-
-    // for (let i = 0; i <  productsList.length; i++){
-
-    //   console.log('prod', productsList.at(i), 'i', i);
-
-    //   this.pAutoCompleteOptions = productsList.at(i).get('ProductDescription').valueChanges
-    //   .pipe(
-    //     startWith(''),
-    //     map(val => this.productsByClientFilter((val)))
-    //   ); 
-    // } 
 
   }
 
@@ -622,30 +607,24 @@ export class FormAddShipComponent implements OnInit {
     return this.originAndDestinationFormGroup.get('destemail');
   } 
 
-private productsByClientFilter(value = ''): ProductByClient[]{
+  private productsByClientFilter(value = ''): ProductByClient[]{
 
-  console.log('IsAutoCompleteProductSelected', this.IsAutoCompleteProductSelected);
-
-  console.log('prodfilter', value);
-
-  console.log('productList', this.productList);
-  
-  if (!this.IsAutoCompleteProductSelected && value !== null && value !== '' )
-    return this.productList.filter(p => p.Description.toLowerCase().includes(value.toLocaleLowerCase()))  
-  
-  this.IsAutoCompleteProductSelected = false;
-  const prodBase: ProductByClient[] = [];
-  return prodBase; 
-}
+    if (!this.IsAutoCompleteProductSelected && value !== null && value !== '' ){
+      let productListResult = this.productList.filter(p => p.Description.toLowerCase().includes(value.toLocaleLowerCase()));
+      return this.productList.filter(p => p.Description.toLowerCase().includes(value.toLocaleLowerCase()))  
+    }
+      
+    this.IsAutoCompleteProductSelected = false;
+    const prodBase: ProductByClient[] = [];
+    return prodBase; 
+  }
 
   pcoAutoCompleteFilter(val: string): Observable<any[]> {
-    console.log('pcoAutoCompleteFilter', val);
     const CountryId = this.originSelectedCountry == null ? '1': this.originSelectedCountry.CountryId.toString();
     return this.httpService.postalCodeAutocomplete(val, CountryId, this.keyId)
   }
 
   pcoAutoCompleteSelected(event: MatAutocompleteSelectedEvent): void {
-    console.log('pcoAutoCompleteSelected', event.option.value);
     this.originAndDestinationFormGroup.get('originstatename').setValue(event.option.value.StateName.trim());
     this.OriginPostalCode = String.Format('{0}-{1}',event.option.value.PostalCode,event.option.value.CityName.trim());
     this.OriginPostalData = event.option.value;
@@ -653,12 +632,10 @@ private productsByClientFilter(value = ''): ProductByClient[]{
   }
 
   loAutoCompleteFilter(val: string): Observable<any[]> {
-    console.log('Autocomplete origin filter:', val);
     return this.httpService.GetLocationByType(this.authenticationService.getDefaultClient().ClientID,1,val, this.keyId);
   }
 
   loAutoCompleteSelected(event: MatAutocompleteSelectedEvent): void {
-    console.log('Autocomplete origin selected', event.option.value);
     this.originAndDestinationFormGroup.get('originname').setValue(event.option.value.Name.trim());
     this.originAndDestinationFormGroup.get('originadddress1').setValue(event.option.value.Address1.trim());
     this.originAndDestinationFormGroup.get('originadddress2').setValue(event.option.value.Address2.trim());
@@ -671,13 +648,11 @@ private productsByClientFilter(value = ''): ProductByClient[]{
   }
 
   pcdAutoCompletefilter(val: string): Observable<any[]> {
-    console.log('Autocomplete dest filter:', val);
     const CountryId = this.destinationSelectedCountry == null ? '1': this.destinationSelectedCountry.CountryId.toString();
     return this.httpService.postalCodeAutocomplete(val, CountryId, this.keyId)
   }
 
   pcdAutoCompleteSelected(event: MatAutocompleteSelectedEvent): void {
-    console.log('Autocomplete dest selected');
     this.originAndDestinationFormGroup.get('deststatename').setValue(event.option.value.StateName.trim());
     this.DestinationPostalCode = String.Format('{0}-{1}',event.option.value.PostalCode,event.option.value.CityName.trim());
     this.DestinationPostalData = event.option.value;
@@ -685,12 +660,10 @@ private productsByClientFilter(value = ''): ProductByClient[]{
   }
 
   ldAutoCompletefilter(val: string): Observable<any[]> {
-    console.log('Autocomplete dest filter:', val);
     return this.httpService.GetLocationByType(this.authenticationService.getDefaultClient().ClientID,2,val, this.keyId);
   }
 
   ldAutoCompleteSelected(event: MatAutocompleteSelectedEvent): void {
-    console.log('Autocomplete dest selected', event.option.value);
     this.originAndDestinationFormGroup.get('destname').setValue(event.option.value.Name.trim());
     this.originAndDestinationFormGroup.get('destadddress1').setValue(event.option.value.Address1.trim());
     this.originAndDestinationFormGroup.get('destadddress2').setValue(event.option.value.Address2.trim());
@@ -784,37 +757,36 @@ private productsByClientFilter(value = ''): ProductByClient[]{
     }
   }
 
-  async validateProductByClient(event: KeyboardEvent){
+  async validateProductByClient(event: KeyboardEvent, index: number){
 
-    console.log('validateProductByClient', event);
+    const productsListControl = this.productsAndAccessorialsFormGroup.get('products') as FormArray;
+    if (productsListControl !== null && productsListControl.length > 0){
 
-    const CountryId = this.originSelectedCountry == null ? '1': this.originSelectedCountry.CountryId.toString();
-    this.OriginPostalCode = this.originAndDestinationFormGroup.get('originpostalcode').value;
-    if (this.OriginPostalCode != null && this.OriginPostalCode.trim().length == 5){
-      const responseData = await this.httpService.getPostalDataByPostalCode(this.OriginPostalCode,CountryId,this.keyId);
-      this.postalData = responseData;
-      if (this.postalData != null && this.postalData.length > 0){
-        this.originAndDestinationFormGroup.get('originstatename').setValue(this.postalData[0].StateName.trim());
-        this.OriginPostalCode = String.Format('{0}-{1}',this.postalData[0].PostalCode,this.postalData[0].CityName.trim());
-        this.OriginPostalData = this.postalData[0];
-        this.originAndDestinationFormGroup.get('originpostalcode').setValue(this.OriginPostalCode);
-      }
-      else{
-        this.OriginStateName = String.Empty;
-        this.OriginPostalCode = String.Empty;
-        this.OriginPostalData = null;
-      }
+      const formGroup = productsListControl.controls[index] as FormGroup;
+      let descriptionProduct = formGroup.get('ProductDescription').value;
+
+      const productSelected = this.productList.find(p => p.Description === descriptionProduct);
+
+      if (productSelected !== null){
+        formGroup.get('Pallets').setValue(productSelected.Pallets);
+        formGroup.get('Pieces').setValue(productSelected.Pieces);
+        formGroup.get('ProductClass').setValue(productSelected.Class.trim());
+        formGroup.get('ProductDescription').setValue(productSelected.Description.trim());
+        formGroup.get('NmfcNumber').setValue(productSelected.NMFC.trim());
+        formGroup.get('Length').setValue(productSelected.Lenght);
+        formGroup.get('Width').setValue(productSelected.Width);
+        formGroup.get('Height').setValue(productSelected.Height);
+        formGroup.get('Weight').setValue(productSelected.Weight);
+        formGroup.get('Hazmat').setValue(productSelected.Hazmat);
+        this.onChangeCalculatePCF(index);
+      }    
     }
   }
 
   pAutoCompleteSelected(event: MatAutocompleteSelectedEvent, index: number): void {
-    console.log('Autocomplete Prod selected', event.option.value, index);
-
     this.IsAutoCompleteProductSelected = true;
 
     const productSelected = this.productList.find(p => p.Description === event.option.value);
-
-    console.log('productSelected', productSelected, productSelected !== null);
 
     if (productSelected !== null){
       const productsList = this.productsAndAccessorialsFormGroup.get('products') as FormArray;
@@ -822,7 +794,6 @@ private productsByClientFilter(value = ''): ProductByClient[]{
   
       formGroup.get('Pallets').setValue(productSelected.Pallets);
       formGroup.get('Pieces').setValue(productSelected.Pieces);
-      formGroup.get('PackageTypeID').setValue(productSelected.PackageTypeID);
       formGroup.get('ProductClass').setValue(productSelected.Class.trim());
       formGroup.get('ProductDescription').setValue(productSelected.Description.trim());
       formGroup.get('NmfcNumber').setValue(productSelected.NMFC.trim());
@@ -836,21 +807,10 @@ private productsByClientFilter(value = ''): ProductByClient[]{
   }
   //#endregion
 
-  customTrackBy(index: number, obj: any): any {
-    return  index;
-  }
-
   onKeypressProdDesc(event: any, index: number){
-    console.log('key press evento', event, 'index', index);
-
     const productsList = this.productsAndAccessorialsFormGroup.get('products') as FormArray;
-
     if (productsList.length - 1 !== index){
-      const productsList = this.productsAndAccessorialsFormGroup.get('products') as FormArray;
       const formGroup = productsList.controls[index] as FormGroup;
-
-      console.log('press key - formGroup', formGroup);
-      console.log('press key -- productsList.length', productsList.length);
 
       this.pAutoCompleteOptions = formGroup.get('ProductDescription').valueChanges
         .pipe(
@@ -860,15 +820,21 @@ private productsByClientFilter(value = ''): ProductByClient[]{
     }
   }
 
+  focusFunction(index: number){
+    const productsList = this.productsAndAccessorialsFormGroup.get('products') as FormArray;
+    const formGroup = productsList.controls[index] as FormGroup;
+
+    this.pAutoCompleteOptions = formGroup.get('ProductDescription').valueChanges
+      .pipe(
+        startWith(''),
+        map(val => this.productsByClientFilter(formGroup.get('ProductDescription').value))
+      ); 
+  }
+
   addNewProdField(): void {
     (this.productsAndAccessorialsFormGroup.get('products') as FormArray).push(this.addProductFormGroup());
-
     const productsList = this.productsAndAccessorialsFormGroup.get('products') as FormArray;
     const formGroup = productsList.controls[productsList.length - 1] as FormGroup;
-
-    console.log('formGroup', formGroup);
-    console.log('productsList.length', productsList.length);
-
     this.pAutoCompleteOptions = formGroup.get('ProductDescription').valueChanges
       .pipe(
         startWith(''),

@@ -96,9 +96,12 @@ export class FormAddShipComponent implements OnInit {
     private route: ActivatedRoute
   ) {
     this.securityToken = this.authenticationService.ticket$.value;
-  }
+  }  
 
-  get formProducts() { return this.productsAndAccessorialsFormGroup.get('products') as FormArray; }
+  productCounter: number = 1;
+  get formProducts() {     
+    return this.productsAndAccessorialsFormGroup.get('products') as FormArray;
+  }
   get originPckupDate() {
     return this.originAndDestinationFormGroup.get('originpickupdate').value == null ? '' : new Date(this.originAndDestinationFormGroup.get('originpickupdate').value).toDateString();
   }
@@ -195,7 +198,8 @@ export class FormAddShipComponent implements OnInit {
   };
 
   originAndDestinationFormGroup: FormGroup;
-  productsAndAccessorialsFormGroup: FormGroup;
+  productsAndAccessorialsFormGroup: FormGroup;  
+
   shipmentInfoFormGroup: FormGroup;
   confirmFormGroup: FormGroup;
   emailFormGroup: FormGroup;
@@ -280,7 +284,9 @@ export class FormAddShipComponent implements OnInit {
         addToProductMaster: [false],
         Stackable: [false],
         Hazmat: [false],
-        PackageTypeDescription: [null]
+        PackageTypeDescription: [null],
+        BOLProductID: [0],
+        Status: [1]
     })
   }
 
@@ -360,7 +366,7 @@ export class FormAddShipComponent implements OnInit {
         this.addProductFormGroup()
       ])
     });
-    // --
+    // --     
 
     // -- shipmentInfoFormGroup fields
     this.shipmentInfoFormGroup = this.fb.group({
@@ -639,10 +645,39 @@ export class FormAddShipComponent implements OnInit {
 
   addNewProdField(): void {
     (this.productsAndAccessorialsFormGroup.get('products') as FormArray).push(this.addProductFormGroup());
+
+    /* Start counter of products */
+    const arrayProducts = (this.productsAndAccessorialsFormGroup.get('products') as FormArray); 
+    this.productCounter = 0;
+    for (const control of arrayProducts.controls) {
+      const product = control.value;
+      if (product.Status !== 3){         
+        this.productCounter ++;
+      }
+   }
+    /* End */
   }
 
   removeNewProdField(index: number): void {
-    (this.productsAndAccessorialsFormGroup.get('products') as FormArray).removeAt(index);
+    // (this.productsAndAccessorialsFormGroup.get('products') as FormArray).removeAt(index);
+    const product = this.productsAndAccessorialsFormGroup.get('products').value[index];
+    if(product && product.BOLProductID && product.BOLProductID !== 0){
+      (this.productsAndAccessorialsFormGroup.controls.products as FormArray).at(index).get('Status').setValue(3);
+    }
+    else{
+      (this.productsAndAccessorialsFormGroup.get('products') as FormArray).removeAt(index);
+    }    
+
+    /* Start counter of products */
+    const arrayProducts = (this.productsAndAccessorialsFormGroup.get('products') as FormArray); 
+    this.productCounter = 0;
+    for (const control of arrayProducts.controls) {
+      const product = control.value;
+      if (product.Status !== 3){         
+        this.productCounter ++;
+      }
+   }
+    /* End */
   }
 
   BookShipmentSubmit() {    
@@ -885,7 +920,7 @@ export class FormAddShipComponent implements OnInit {
     const objRate = {
       ClientID: this.ClientID,
       ProfileID: this.clientDefaultData.ProfileID,
-      Products: arrayProducts,
+      Products: arrayProducts.filter(a=>a.Status !== 3),
       SourcePostalCode: this.OriginPostalData.PostalCode,
       SourceCityID: this.OriginPostalData.CityID,
       SourceStateID: this.OriginPostalData.StateId,
@@ -1316,7 +1351,8 @@ export class FormAddShipComponent implements OnInit {
         (this.productsAndAccessorialsFormGroup.controls.products as FormArray).at(currentProductIndex).get('Stackable').setValue(p.Stackable);
         (this.productsAndAccessorialsFormGroup.controls.products as FormArray).at(currentProductIndex).get('Hazmat').setValue(p.Hazmat);
         (this.productsAndAccessorialsFormGroup.controls.products as FormArray).at(currentProductIndex).get('ProductDescription').setValue(p.Description === 'NA' ? '' : p.Description);
-
+        (this.productsAndAccessorialsFormGroup.controls.products as FormArray).at(currentProductIndex).get('BOLProductID').setValue(p.BOLProductID);
+        (this.productsAndAccessorialsFormGroup.controls.products as FormArray).at(currentProductIndex).get('Status').setValue(2);
         counter += 1;
       });
     }
@@ -2128,17 +2164,17 @@ export class FormAddShipComponent implements OnInit {
     console.log('Quote has been rerated, selectedRate: ',selectedRate);
 
     const arrayProducts = this.productsAndAccessorialsFormGroup.get('products').value;
-    const productList: BOlProductsListSBL[] = [];
+    const productList: BOlProductsListSBL[] = [];    
     
     arrayProducts.forEach(p => {
       
-      let tempProductID = 0;
-      if (localShipmentByLadingObject.BOlProductsList != null && localShipmentByLadingObject.BOlProductsList.length > 0){
-        tempProductID = localShipmentByLadingObject.BOlProductsList[0].BOLProductID;
-      }
+      // let tempProductID = 0;
+      // if (localShipmentByLadingObject.BOlProductsList != null && localShipmentByLadingObject.BOlProductsList.length > 0){
+      //   tempProductID = localShipmentByLadingObject.BOlProductsList[0].BOLProductID;
+      // }
 
       const prod : BOlProductsListSBL = {
-        BOLProductID: tempProductID,
+        BOLProductID: p.BOLProductID,
         Description: p.ProductDescription,
         Pallets: p.Pallets,
         Pieces: p.Pieces,
@@ -2152,7 +2188,7 @@ export class FormAddShipComponent implements OnInit {
         PackageTypeID: p.PackageTypeID,
         PCF: p.PCF,
         selectedProduct: {},
-        Status: 2, // *
+        Status: p.Status, // *
         SelectedProductClass: {},
         AddProductToParent: false, // *
         Stackable: p.Stackable,

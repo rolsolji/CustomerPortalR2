@@ -310,12 +310,13 @@
           <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="5px">
             <div @fadeInUp class="card" fxFlex="75%">
               <div fxLayout="row" fxLayoutGap="8px" class="ml-5">
-                <div><h2 class="OriginDestinationTitle">Product(s) <label class="QuantityLabel">{{formProducts.length}}</label></h2></div>
+                <!-- <div><h2 class="OriginDestinationTitle">Product(s) <label class="QuantityLabel">{{formProducts.length}}</label></h2></div> -->
+                <div><h2 class="OriginDestinationTitle">Product(s) <label class="QuantityLabel">{{productCounter}}</label></h2></div>
               </div>
               <div  [ngClass]="{'ProductsSection': formProducts.length >= 3}">
                <div formArrayName='products' *ngFor="let prod of formProducts.controls; let i = index" > 
-                  <hr *ngIf="i > 0" >
-                  <div [formGroupName]="i">
+                  <hr *ngIf="i > 0 && prod.value.Status !== 3">
+                  <div [formGroupName]="i" *ngIf="prod.value.Status !== 3">
                     <div fxLayout="column" class="pt-5" class="expansion-panel-cont-style">
                       <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="5px">
                         <div fxFlex="12%">
@@ -426,7 +427,7 @@
                       </div> 
                       <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="5px" class="pb-2 pt-2">                     
                         <div fxLayoutAlign="end center">
-                          <ng-container *ngIf="formProducts.length > 1">
+                          <ng-container *ngIf="productCounter > 1">
                             <button id="{{'remoeMinus'+i}}" (click)="removeNewProdField(i)" 
                                     mat-button type="button">Remove</button>
                           </ng-container>
@@ -749,14 +750,15 @@
                   </div>
                   <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="5px" >
                     <div fxFlex="100%">
-                      <h3 class="OriginDestinationSubTitle">Product(s): {{formProducts.length}}</h3>
+                      <!-- <h3 class="OriginDestinationSubTitle">Product(s): {{formProducts.length}}</h3> -->
+                      <h3 class="OriginDestinationSubTitle">Product(s): {{productCounter}}</h3>
                     </div>                    
                   </div>
                   <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="5px">
                     <div style="width: 100%;">
                       <div *ngFor="let prod of formProducts.value; let i = index">
-                        <hr *ngIf="i > 0" >
-                        <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="5px">
+                        <hr *ngIf="i > 0 && prod.Status !== 3">
+                        <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="5px" *ngIf="prod.Status !== 3">
                           <div fxFlex="33.33%">
                             <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="5px">
                               <div fxFlex="100%">
@@ -779,7 +781,7 @@
                             </div>                          
                           </div>
                         </div>
-                        <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="5px">
+                        <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="5px" *ngIf="prod.Status !== 3">
                           <div fxFlex="33.33%">
                             <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="5px">
                               <div fxFlex="100%">
@@ -802,7 +804,7 @@
                             </div>                         
                           </div>                            
                         </div>   
-                        <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="5px">
+                        <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="5px" *ngIf="prod.Status !== 3">
                           <div fxFlex="33.33%">
                             <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="5px">
                               <div fxFlex="100%">
@@ -825,7 +827,7 @@
                             </div>                          
                           </div>
                         </div>
-                        <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="5px">
+                        <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="5px" *ngIf="prod.Status !== 3">
                           <div fxFlex="66.66%">
                             <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="5px">
                               <div fxFlex="100%">

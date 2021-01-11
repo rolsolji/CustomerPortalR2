@@ -47,7 +47,48 @@
                     <div fxFlex="100%">
                       <mat-form-field>
                         <mat-label>Name</mat-label>
-                        <input name="originname" formControlName="originname" matInput maxlength="150" required >
+                        <input name="originname" formControlName="originname" matInput maxlength="150" required 
+                                [matAutocomplete]="loAutoComplete"
+                                (keydown.tab)="validateOriginLocation($event)">
+                                <mat-autocomplete #loAutoComplete="matAutocomplete" (optionSelected)="loAutoCompleteSelected($event)">
+                                  <mat-option *ngFor="let option of loAutoCompleteOptions | async" [value]="option" class="autoCompleteStyleControl">
+                                    <div class="divAutoCompleteStyleControl">
+                                      <span fxFlex="20%">Name:</span>
+                                      <span fxFlex="80%">{{option.Name}}</span>
+                                    </div>
+                                    
+                                    <div class="divAutoCompleteStyleControl">
+                                      <span fxFlex="20%">Address:</span>
+                                      <span fxFlex="80%">{{option.Address1}}</span>
+                                    </div>
+
+                                    <div class="divAutoCompleteStyleControl">
+                                      <span fxFlex="20%">Address:</span>
+                                      <span fxFlex="80%">{{option.Address1}}</span>
+                                    </div>
+
+                                    <div class="divAutoCompleteStyleControl">
+                                      <span fxFlex="20%">State:</span>
+                                      <span fxFlex="80%">{{option.StateName}}</span>
+                                    </div>
+
+                                    <div class="divAutoCompleteStyleControl">
+                                      <span fxFlex="20%">City:</span>
+                                      <span fxFlex="80%">{{option.CityName}}</span>
+                                    </div>
+
+                                    <div class="divAutoCompleteStyleControl">
+                                      <span fxFlex="20%">Zip:</span>
+                                      <span fxFlex="80%">{{option.PostalCode}}</span>
+                                    </div>
+
+                                    <div class="divAutoCompleteStyleControl">
+                                      <span fxFlex="20%">Email:</span>
+                                      <span fxFlex="80%">{{option.ContactEmail}}</span>
+                                    </div>
+                                    <hr>
+                                  </mat-option>
+                                </mat-autocomplete>
                       </mat-form-field>
                     </div>                                 
                   </div>
@@ -82,9 +123,9 @@
                                 [matAutocomplete]="pcoAutoComplete"
                                 (keydown.tab)="validateOriginPostalCode($event)">
                           <mat-autocomplete #pcoAutoComplete="matAutocomplete" (optionSelected)="pcoAutoCompleteSelected($event)">
-                              <mat-option *ngFor="let option of pcoAutoCompleteOptions | async" [value]="option">
+                              <mat-option *ngFor="let option of pcoAutoCompleteOptions | async" [value]="option" style="height:fit-content;">
                                 {{option.PostalCode}} - {{option.CityName}}
-                                </mat-option>
+                              </mat-option>
                           </mat-autocomplete>       
                       </mat-form-field>
                     </div>                                 
@@ -179,7 +220,48 @@
                     <div fxFlex="100%">
                       <mat-form-field>
                         <mat-label>Name</mat-label>
-                        <input name="destname" formControlName="destname" matInput maxlength="150" required >
+                        <input name="destname" formControlName="destname" matInput maxlength="150" required 
+                                [matAutocomplete]="ldAutoComplete"
+                                (keydown.tab)="validateDestinationLocation($event)">
+                                <mat-autocomplete #ldAutoComplete="matAutocomplete" (optionSelected)="ldAutoCompleteSelected($event)">
+                                  <mat-option *ngFor="let option of ldAutoCompleteOptions | async" [value]="option" class="autoCompleteStyleControl">
+                                    <div class="divAutoCompleteStyleControl">
+                                      <span fxFlex="20%">Name:</span>
+                                      <span fxFlex="80%">{{option.Name}}</span>
+                                    </div>
+                                    
+                                    <div class="divAutoCompleteStyleControl">
+                                      <span fxFlex="20%">Address:</span>
+                                      <span fxFlex="80%">{{option.Address1}}</span>
+                                    </div>
+
+                                    <div class="divAutoCompleteStyleControl">
+                                      <span fxFlex="20%">Address:</span>
+                                      <span fxFlex="80%">{{option.Address1}}</span>
+                                    </div>
+
+                                    <div class="divAutoCompleteStyleControl">
+                                      <span fxFlex="20%">State:</span>
+                                      <span fxFlex="80%">{{option.StateName}}</span>
+                                    </div>
+
+                                    <div class="divAutoCompleteStyleControl">
+                                      <span fxFlex="20%">City:</span>
+                                      <span fxFlex="80%">{{option.CityName}}</span>
+                                    </div>
+
+                                    <div class="divAutoCompleteStyleControl">
+                                      <span fxFlex="20%">Zip:</span>
+                                      <span fxFlex="80%">{{option.PostalCode}}</span>
+                                    </div>
+
+                                    <div class="divAutoCompleteStyleControl">
+                                      <span fxFlex="20%">Email:</span>
+                                      <span fxFlex="80%">{{option.ContactEmail}}</span>
+                                    </div>
+                                    <hr>
+                                  </mat-option>
+                                </mat-autocomplete>
                       </mat-form-field>
                     </div>                                 
                   </div>
@@ -313,7 +395,7 @@
                 <div><h2 class="OriginDestinationTitle">Product(s) <label class="QuantityLabel">{{formProducts.length}}</label></h2></div>
               </div>
               <div  [ngClass]="{'ProductsSection': formProducts.length >= 3}">
-               <div formArrayName='products' *ngFor="let prod of formProducts.controls; let i = index" > 
+               <div formArrayName='products' *ngFor="let prod of formProducts.controls; let i = index;" > 
                   <hr *ngIf="i > 0" >
                   <div [formGroupName]="i">
                     <div fxLayout="column" class="pt-5" class="expansion-panel-cont-style">
@@ -366,7 +448,36 @@
                         <div fxFlex="28%">
                           <mat-form-field>
                             <mat-label>Description</mat-label>
-                            <input matInput type="text" maxlength="50" formControlName="ProductDescription" required>
+                            <input matInput type="text" maxlength="50" formControlName="ProductDescription" required
+                                    (keypress)="onKeypressProdDesc($event, i)"
+                                    (focus)="focusFunction(i)"
+                                    [matAutocomplete]="pAutoComplete" 
+                                    (keydown.tab)="validateProductByClient($event, i)">
+                                    <mat-autocomplete #pAutoComplete="matAutocomplete" (optionSelected)="pAutoCompleteSelected($event, i)">
+                                      <mat-option *ngFor="let option of pAutoCompleteOptions | async" [value]="option.Description" class="autoCompleteStyleControl">
+                                        <div class="divAutoCompleteStyleControl">
+                                          <span>Name:</span>
+                                          <span>{{option.Description}}</span>
+                                        </div>  
+                                        <div class="divAutoCompleteStyleControl">
+                                          <span>Class:</span>
+                                          <span>{{option.Class}}</span>
+                                        </div>  
+                                        <div class="divAutoCompleteStyleControl">
+                                          <span>NMFC:</span>
+                                          <span>{{option.NMFC}}</span>
+                                        </div> 
+                                        <div class="divAutoCompleteStyleControl">
+                                          <span>Weight:</span>
+                                          <span>{{option.Weight}}</span>
+                                        </div>  
+                                        <div class="divAutoCompleteStyleControl">
+                                          <span>Dimension:</span>
+                                          <span>{{option.Height}} x {{option.Lenght}} x {{option.Width}}</span>
+                                        </div>
+                                        <hr>
+                                      </mat-option>
+                                    </mat-autocomplete>
                           </mat-form-field>
                         </div>     
                       </div>

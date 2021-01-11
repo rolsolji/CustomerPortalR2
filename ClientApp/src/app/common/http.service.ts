@@ -47,6 +47,7 @@ import { weightcostCompareModel } from '../Entities/WeightCostCompareModel';
 import { AccessorialPerformance } from '../Entities/AccessorialPerformance';
 import { CarrierPerformanceModel } from '../Entities/CarrierPerformanceModel';
 import { TopLanes } from '../Entities/TopLanes';
+import { ProductByClient } from  '../Entities/ProductByClient';
 
 @Injectable({
     providedIn: 'root'
@@ -711,6 +712,25 @@ export class HttpService{
             headers: httpHeaders
           }
           ).toPromise();
+    }
+
+    GetLocationByType(clientId: number, locationTypeId: number, locationName: string, keyId:string) {
+        let opts = [];
+        const ticket = this.token;
+        const httpHeaders = new HttpHeaders({ Ticket : ticket });
+        return (locationName.length < 3) ?
+            of(opts) :
+            this.http.get<Location[]>(String.Format(this.baseEndpoint + 'Services/MasLocationService.svc/json/GetLocationByType?ClientID={0}&LocationTypeID={1}&LocationName={2}&_={3}',clientId, locationTypeId, locationName, keyId)
+                ,{headers: httpHeaders}
+            ).pipe(tap(data => opts = data))
+    }
+
+    GetProductByClient(clientId: number, keyId:string) {
+        const ticket = this.token;
+        const httpHeaders = new HttpHeaders({ Ticket : ticket });
+        return this.http.get<ProductByClient[]>(String.Format(this.baseEndpoint + 'Services/BOLHDRService.svc/json/GetProductByClient?ClientID={0}&_={1}',clientId, keyId)
+                ,{headers: httpHeaders}
+            ).toPromise();
     }
 
     /* Start http Services for Reports */

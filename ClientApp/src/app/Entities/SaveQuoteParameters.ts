@@ -102,6 +102,7 @@ export interface BOlProductsList {
   Status:               number;
   SelectedProductClass: SelectedProduct;
   Stackable:            boolean;
+  AddProductToParent:   boolean;
 }
 
 export interface SelectedProduct {

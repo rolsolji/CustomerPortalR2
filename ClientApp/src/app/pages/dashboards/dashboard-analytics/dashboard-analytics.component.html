@@ -19,7 +19,7 @@
         </div>
         <div fxFlex="16%" style="padding-left: 0px; padding-bottom: 0px;" class="py-4 px-6" fxLayout="row"
           fxLayoutAlign="start center">
-          <mat-form-field appearance="fill" class="matFormField">
+          <mat-form-field appearance="outline" class="matFormField">
             <mat-select [(value)]="this.selectedDateRange" (selectionChange)="onDateRangeselectionChange()">
               <mat-option *ngFor="let dateRange of this.dateRanges" [value]="dateRange.value">
                 {{dateRange.text}}

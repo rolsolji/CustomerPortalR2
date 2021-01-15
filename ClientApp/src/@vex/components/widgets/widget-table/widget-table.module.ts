@@ -9,10 +9,10 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { IconModule } from '@visurel/iconify-angular';
-import { PowerPipe } from "./widget-pipe";
+import { CurrencyPipe } from "./widget-pipe";
 
 @NgModule({
-  declarations: [WidgetTableComponent,PowerPipe],
+  declarations: [WidgetTableComponent,CurrencyPipe],
   imports: [
     CommonModule,
     MatTableModule,
@@ -25,7 +25,7 @@ import { PowerPipe } from "./widget-pipe";
     IconModule    
   ],
   exports: [WidgetTableComponent],
-  providers:[PowerPipe]
+  providers:[CurrencyPipe]
 })
 export class WidgetTableModule {
 }

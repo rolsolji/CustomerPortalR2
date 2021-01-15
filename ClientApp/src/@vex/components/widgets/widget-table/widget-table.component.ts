@@ -43,4 +43,14 @@ export class WidgetTableComponent<T> implements OnInit, OnChanges, AfterViewInit
     this.dataSource.paginator = this.paginator;
     this.dataSource.sort = this.sort;
   }
+
+  public calculateTotal(columnName: string) {
+    var col = this.columns.filter(a=>a.property === columnName);  
+    if(col !== null && col !== undefined && col.length > 0){
+      return col[0].footer;
+    }
+    else{
+      return "0";
+    }
+  }
 }

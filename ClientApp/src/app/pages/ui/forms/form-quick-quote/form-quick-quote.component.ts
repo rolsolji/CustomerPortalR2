@@ -810,7 +810,8 @@ export class FormQuickQuoteComponent implements OnInit {
         selectedProduct: {},
         Status: 1,
         SelectedProductClass: {},
-        Stackable: p.Stackable
+        Stackable: p.Stackable,
+        AddProductToParent: p.SaveProduct
       }
 
       console.log('p', p);

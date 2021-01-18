@@ -360,8 +360,10 @@ export class FormAddShipComponent implements OnInit {
       destexpdeldate: [null],
       destdelapptfrom: [null],
       destdelapptto: [null],
-      addToLocationsOrigin: [null],
-      addToLocationsDest: [null]
+      // addToLocationsOrigin: [null],
+      // addToLocationsDest: [null]
+      addToLocationsOrigin: [false],
+      addToLocationsDest: [false]
     });
     // --
 
@@ -774,7 +776,7 @@ export class FormAddShipComponent implements OnInit {
 
       const productSelected = this.productList.find(p => p.Description === descriptionProduct);
 
-      if (productSelected !== null){
+      if (productSelected !== null && productSelected !== undefined){
         formGroup.get('Pallets').setValue(productSelected.Pallets);
         formGroup.get('Pieces').setValue(productSelected.Pieces);
         formGroup.get('ProductClass').setValue(productSelected.Class.trim());
@@ -2019,7 +2021,7 @@ export class FormAddShipComponent implements OnInit {
         Description: p.ProductDescription,
         Pallets: p.Pallets == null ? 0 : p.Pallets,
         Pieces: p.Pieces  == null ? 0 : p.Pieces,
-        Hazmat: p.HazMat,
+        Hazmat: p.Hazmat,
         NMFC: p.NmfcNumber,
         Class: p.ProductClass,
         Weight: p.Weight,
@@ -2032,7 +2034,8 @@ export class FormAddShipComponent implements OnInit {
         Status: 1,
         SelectedProductClass: {},
         Stackable: p.Stackable,
-        PortCode: 'C'
+        PortCode: 'C',
+        AddProductToParent: p.addToProductMaster
       }
 
       console.log('p', p);
@@ -2241,7 +2244,9 @@ export class FormAddShipComponent implements OnInit {
       destTerminalCityStateZipCode:String.Format('{0},{1},{2}',selectedRate.DestTerminalCity,selectedRate.DestTerminalState,selectedRate.DestTerminalZipCode),
       WaterfallDetailsList: [],
       StatusReasonCodeId: statusReasonCodeId,
-      Status: (IsBookShipment || ModifiedQuote ? 2 : 10)
+      Status: (IsBookShipment || ModifiedQuote ? 2 : 10),
+      IsOriginAddToMaster: this.originAndDestinationFormGroup.get('addToLocationsOrigin').value,
+      IsDestintationAddToMaster: this.originAndDestinationFormGroup.get('addToLocationsDest').value
     }
 
     // Set error interceptor variable to false as default
@@ -2386,7 +2391,7 @@ export class FormAddShipComponent implements OnInit {
         Description: p.ProductDescription,
         Pallets: p.Pallets,
         Pieces: p.Pieces,
-        Hazmat: p.HazMat,
+        Hazmat: p.Hazmat,
         NMFC: p.NmfcNumber,
         Class: p.ProductClass,
         Weight: p.Weight,
@@ -2398,12 +2403,13 @@ export class FormAddShipComponent implements OnInit {
         selectedProduct: {},
         Status: p.Status, // *
         SelectedProductClass: {},
-        AddProductToParent: false, // *
+        // AddProductToParent: false, // *
+        AddProductToParent: p.addToProductMaster,
         Stackable: p.Stackable,
         PortCode: 'C',
         HazmatContact: null,
         LadingID: localShipmentByLadingObject.LadingID
-      }      
+      }
 
       productList.push(prod);
     });
@@ -2793,6 +2799,9 @@ export class FormAddShipComponent implements OnInit {
       localShipmentByLadingObject.BuyRates.AccountInvoiceCostList = localShipmentByLadingObject.SellRates.AccountInvoiceCostList;
     }
     // --
+
+    localShipmentByLadingObject.IsOriginAddToMaster = this.originAndDestinationFormGroup.get('addToLocationsOrigin').value;
+    localShipmentByLadingObject.IsDestintationAddToMaster = this.originAndDestinationFormGroup.get('addToLocationsDest').value;
     
     // Set error interceptor variable to false as default
     this.authenticationService.requestFailed$.next(false);
@@ -2868,7 +2877,7 @@ export class FormAddShipComponent implements OnInit {
           
 
         }else{
-          this.openDialog(false, 'Shipment Booked with LoadNo: ' + localShipmentByLadingObject.LadingID.toString() + '. ', null, 'ShipmentBooked');
+          this.openDialog(false, 'Shipment Booked with LoadNo: ' + localShipmentByLadingObject.ClientLadingNo.toString() + '. ', null, 'ShipmentBooked');
           const bolPrintURL = String.Format(environment.baseEndpoint + 'Handlers/PrintBOLHandler.ashx?LadingID={0}&ClientID={1}&Ticket={2}',
           localShipmentByLadingObject.LadingID.toString(),this.ClientID.toString(), this.securityToken);        
           window.open(bolPrintURL, '_blank');  

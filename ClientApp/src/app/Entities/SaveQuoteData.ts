@@ -23,6 +23,7 @@ export interface SelectedProductSQD {
         PortCode: string;
         Hazmat?:  boolean;
         Stackable?: boolean;
+        AddProductToParent: boolean;
     }
 
     export interface BOLAccesorialListSQD {
@@ -170,4 +171,6 @@ export interface SelectedProductSQD {
         WaterfallDetailsList: any[];
         StatusReasonCodeId: number;
         Status: number;
+        IsOriginAddToMaster: boolean;
+        IsDestintationAddToMaster: boolean;
     }

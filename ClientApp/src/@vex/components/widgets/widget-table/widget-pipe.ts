@@ -1,10 +1,10 @@
 import { Pipe, PipeTransform } from '@angular/core';
 
 @Pipe({
-    name: 'power'
+    name: 'currency'
   })
 
-  export class PowerPipe implements PipeTransform {
+  export class CurrencyPipe implements PipeTransform {
     transform(value: any, column: string): any {
         if(column === "CostPerShipment" || column === "TotalSpend")
         {

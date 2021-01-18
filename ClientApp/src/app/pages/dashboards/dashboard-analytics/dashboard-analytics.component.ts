@@ -214,18 +214,29 @@ export class DashboardAnalyticsComponent implements OnInit {
   }
 
   PrepareDetailsForChart() {
-    var tlshipment = Number(this.tableDataShipments.filter(a => a.Mode.trim() == "TL").map(a => a.ShipmentCount));
-    var ltlshipment = Number(this.tableDataShipments.filter(a => a.Mode.trim() == "LTL").map(a => a.ShipmentCount));
-    var oceanshipment = Number(this.tableDataShipments.filter(a => a.Mode.trim() == "OCEAN").map(a => a.ShipmentCount));
-    var smallPackageshipment = Number(this.tableDataShipments.filter(a => a.Mode.trim() == "Small Package").map(a => a.ShipmentCount));
-    var airFreightshipment = Number(this.tableDataShipments.filter(a => a.Mode.trim() == "AIR FREIGHT").map(a => a.ShipmentCount));
-    var intermodelshipment = Number(this.tableDataShipments.filter(a => a.Mode.trim() == "INTERMODAL").map(a => a.ShipmentCount));
-    var tlSpotquoteshipment = Number(this.tableDataShipments.filter(a => a.Mode.trim() == "TL Spot Quote").map(a => a.ShipmentCount));
+    // var tlshipment = Number(this.tableDataShipments.filter(a => a.Mode.trim() == "TL").map(a => a.ShipmentCount));
+    // var ltlshipment = Number(this.tableDataShipments.filter(a => a.Mode.trim() == "LTL").map(a => a.ShipmentCount));
+    // var oceanshipment = Number(this.tableDataShipments.filter(a => a.Mode.trim() == "OCEAN").map(a => a.ShipmentCount));
+    // var smallPackageshipment = Number(this.tableDataShipments.filter(a => a.Mode.trim() == "Small Package").map(a => a.ShipmentCount));
+    // var airFreightshipment = Number(this.tableDataShipments.filter(a => a.Mode.trim() == "AIR FREIGHT").map(a => a.ShipmentCount));
+    // var intermodelshipment = Number(this.tableDataShipments.filter(a => a.Mode.trim() == "INTERMODAL").map(a => a.ShipmentCount));
+    // var tlSpotquoteshipment = Number(this.tableDataShipments.filter(a => a.Mode.trim() == "TL Spot Quote").map(a => a.ShipmentCount));
 
-    this.SeriesOfTotalShipmentsChart = [tlshipment, ltlshipment, oceanshipment, smallPackageshipment, airFreightshipment, intermodelshipment, tlSpotquoteshipment];
-    this.labelsOfTotalShipmentsChart = ['TL', 'LTL', 'OCEAN', 'Small Package', 'AIR FREIGHT', 'INTERMODAL', 'TL Spot Quote'];
-    this.heightOfTopShipmentsChart = 470;
-    this.widthOfTopShipmentsChart = 590;
+    // this.SeriesOfTotalShipmentsChart = [tlshipment, ltlshipment, oceanshipment, smallPackageshipment, airFreightshipment, intermodelshipment, tlSpotquoteshipment];
+    // this.labelsOfTotalShipmentsChart = ['TL', 'LTL', 'OCEAN', 'Small Package', 'AIR FREIGHT', 'INTERMODAL', 'TL Spot Quote'];
+
+    var labelForTotalShipments: string[] = [];
+    var seriesForTotalShipments: ApexNonAxisChartSeries = [];
+
+    for (let i = 0; i < this.tableDataShipments.length; i++) {      
+      labelForTotalShipments.push(this.tableDataShipments[i].Mode);
+      seriesForTotalShipments.push(this.tableDataShipments[i].ShipmentCount);      
+    }
+
+    this.SeriesOfTotalShipmentsChart = seriesForTotalShipments;
+    this.labelsOfTotalShipmentsChart = labelForTotalShipments;
+    this.heightOfTopShipmentsChart = 450;
+    this.widthOfTopShipmentsChart = 580;
   }
 
   calculateTotal() {
@@ -322,7 +333,7 @@ export class DashboardAnalyticsComponent implements OnInit {
     this.SeriesOfTopAccessorialsChart = accCost;
     this.labelsOfTopAccessorialsChart = accDesc;
     this.heightOfTopAccessorialsChart = 450;
-    this.widthOfTopAccessorialsChart = 600;
+    this.widthOfTopAccessorialsChart = 630;
   }
 
   PrepareDetailsForByFirgationChart() {
@@ -354,7 +365,7 @@ export class DashboardAnalyticsComponent implements OnInit {
     this.SeriesOfCostByFirgationChart = accCost;
     this.labelsOfCostByFirgationChart = accDesc;
     this.heightOfCostByFirgationChart = 450;
-    this.widthOfCostByFirgationChart = 550;
+    this.widthOfCostByFirgationChart = 580;
   }
 
   async GetDetailsForTopCarriersChart() {

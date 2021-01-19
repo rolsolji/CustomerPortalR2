@@ -8,34 +8,22 @@
 
 <div class="p-gutter" style="padding-bottom: 0px;" vexContainer>
   <div gdColumn="-1 / 1" gdColumn.lt-md="-1 / 1" gdColumn.lt-sm="1">
-    <div class="card" fxLayout="column" style="height: 82px;">
-      <div fxLayout="row" fxLayoutGap="3px" class="ml-5">
-        <div fxFlex="7%" class="py-4 px-6"
-          style="padding-top: 0px; padding-right: 0px; padding-bottom: 0px; padding-left: 0px;" fxLayout="row"
+    <div class="card" fxLayout="column">
+      <div fxLayout="row" fxLayout.lt-md="column" class="ml-5 dashboardFilters">        
+        <div fxFlex="20%" class="py-4 mr-4"
           fxLayoutAlign="start center">
-          <div class="actionspan">
-            <span class="stepTitleStyle">Date Range</span>
-          </div>
-        </div>
-        <div fxFlex="16%" style="padding-left: 0px; padding-bottom: 0px;" class="py-4 px-6" fxLayout="row"
-          fxLayoutAlign="start center">
-          <mat-form-field appearance="outline" class="matFormField">
+          <mat-form-field appearance="outline" class="vex-flex-form-field matFormField" color="primary">
+            <mat-label>Date Range</mat-label>
             <mat-select [(value)]="this.selectedDateRange" (selectionChange)="onDateRangeselectionChange()">
               <mat-option *ngFor="let dateRange of this.dateRanges" [value]="dateRange.value">
                 {{dateRange.text}}
               </mat-option>
             </mat-select>
-          </mat-form-field>
+          </mat-form-field>                 
         </div>
-        <div fxFlex="48%" *ngIf="isDateRangeVisible">
-          <div fxFlex="7%" class="py-4 px-6"
-            style="padding-top: 0px; padding-right: 0px; padding-bottom: 0px; padding-left: 0px;" fxLayout="row"
-            fxLayoutAlign="start center">
-            <div class="actionspan">
-              <span class="stepTitleStyle">From</span>
-            </div>
-          </div>
-          <div fxFlex="35%" style="padding-left: 0px; padding-bottom: 0px;" class="py-4 px-6" fxLayout="row"
+        <div fxFlex="55%" *ngIf="isDateRangeVisible"> 
+          <div fxLayout="row" fxLayout.lt-md="column">
+            <div fxFlex="35%" class="py-4 mr-4"
             fxLayoutAlign="start center">
             <mat-form-field style="width: 100%;" appearance="outline">
               <mat-label>From Date</mat-label>
@@ -44,37 +32,30 @@
               <mat-datepicker-toggle [for]="formDatepicker" matSuffix></mat-datepicker-toggle>
               <mat-datepicker #formDatepicker></mat-datepicker>
             </mat-form-field>
-          </div>
-          <div fxFlex="5%" class="py-4 px-6"
-            style="padding-top: 0px; padding-right: 0px; padding-bottom: 0px; padding-left: 0px;" fxLayout="row"
-            fxLayoutAlign="start center">
-            <div class="actionspan">
-              <span class="stepTitleStyle">To</span>
+            </div>         
+            <div fxFlex="35%" class="py-4 mr-4"
+              fxLayoutAlign="start center">
+              <mat-form-field style="width: 100%;" appearance="outline">
+                <mat-label>To Date</mat-label>
+                <input (click)="toDatepicker.open()" (focus)="toDatepicker.open()" name="dateTo"
+                  [matDatepicker]="toDatepicker" [(ngModel)]="dateToForDatePicker" matInput readonly>
+                <mat-datepicker-toggle [for]="toDatepicker" matSuffix></mat-datepicker-toggle>
+                <mat-datepicker #toDatepicker></mat-datepicker>
+              </mat-form-field>
             </div>
-          </div>
-          <div fxFlex="35%" style="padding-left: 0px; padding-bottom: 0px;" class="py-4 px-6" fxLayout="row"
-            fxLayoutAlign="start center">
-            <mat-form-field style="width: 100%;" appearance="outline">
-              <mat-label>To Date</mat-label>
-              <input (click)="toDatepicker.open()" (focus)="toDatepicker.open()" name="dateTo"
-                [matDatepicker]="toDatepicker" [(ngModel)]="dateToForDatePicker" matInput readonly>
-              <mat-datepicker-toggle [for]="toDatepicker" matSuffix></mat-datepicker-toggle>
-              <mat-datepicker #toDatepicker></mat-datepicker>
-            </mat-form-field>
-          </div>
-          <div fxFlex="15%" class="py-4 px-6"
-            style="padding-top: 0px; padding-right: 0px; padding-bottom: 0px; padding-left: 0px;" fxLayout="row"
-            fxLayoutAlign="start center">
-            <button color="primary" (click)="refreshChartsUsingSelectedDate()" mat-raised-button>Refresh</button>
-          </div>
+            <div fxFlex="30%" class="py-4 mr-4"            
+              fxLayoutAlign="start center">
+              <button color="primary" (click)="refreshChartsUsingSelectedDate()" mat-raised-button>Refresh</button>
+            </div>
+          </div>                   
         </div>
-        <div fxFlex="13%" style="padding-left: 0px; padding-bottom: 0px; padding-top: 0px;"
-          class="py-4 px-6 matCheckandRadio" fxLayout="row" fxLayoutAlign="start center">
+        <div fxFlex="20%"
+          class="py-4 mr-4" fxLayoutAlign="start center">
           <mat-checkbox [(ngModel)]="isIncludeSubClient" color="primary" (change)='changedValueOfIsIncludeSubClient()'>
             Include SubClients</mat-checkbox>
         </div>
-        <div fxFlex="5%" style="padding-left: 0px; padding-bottom: 0px; padding-top: 0px;"
-          class="py-4 px-6 spinnerSection" fxLayout="row" fxLayoutAlign="start center" *ngIf="showSpinnerOnDateChanges">
+        <div fxFlex="5%"
+          class="py-4 spinnerSection" fxLayoutAlign="start center" *ngIf="showSpinnerOnDateChanges">
           <div>
             <mat-progress-spinner diameter="40" mode="indeterminate"></mat-progress-spinner>
           </div>

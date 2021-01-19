@@ -25,3 +25,13 @@
     margin-top: 5px;
     margin-bottom: 5px;
 }
+
+.dashboardFilters, .dashboardFilters span, .mat-cell, .mat-footer-cell{
+    font-size: 12px;
+}
+
+.mat-form-field {
+    font-size: 12px;   
+    width: 100%;
+    margin-bottom: -12px;
+}

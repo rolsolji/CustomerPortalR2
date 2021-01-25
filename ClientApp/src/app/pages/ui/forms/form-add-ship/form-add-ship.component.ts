@@ -1551,7 +1551,15 @@ export class FormAddShipComponent implements OnInit {
         (this.productsAndAccessorialsFormGroup.controls.products as FormArray).at(currentProductIndex).get('Pallets').setValue(p.Pallets);
         (this.productsAndAccessorialsFormGroup.controls.products as FormArray).at(currentProductIndex).get('Pieces').setValue(p.Pieces);
         (this.productsAndAccessorialsFormGroup.controls.products as FormArray).at(currentProductIndex).get('PackageTypeID').setValue(p.PackageTypeID);
-        (this.productsAndAccessorialsFormGroup.controls.products as FormArray).at(currentProductIndex).get('ProductClass').setValue(p.Class);
+        
+        if (p.Class === "92"){
+          (this.productsAndAccessorialsFormGroup.controls.products as FormArray).at(currentProductIndex).get('ProductClass').setValue("92.5");
+        }else if (p.Class === "77"){
+          (this.productsAndAccessorialsFormGroup.controls.products as FormArray).at(currentProductIndex).get('ProductClass').setValue("77.5");
+        }else {
+          (this.productsAndAccessorialsFormGroup.controls.products as FormArray).at(currentProductIndex).get('ProductClass').setValue(p.Class);
+        }
+        
         (this.productsAndAccessorialsFormGroup.controls.products as FormArray).at(currentProductIndex).get('NmfcNumber').setValue(p.NMFC);
         (this.productsAndAccessorialsFormGroup.controls.products as FormArray).at(currentProductIndex).get('Length').setValue(p.Lenght);
         (this.productsAndAccessorialsFormGroup.controls.products as FormArray).at(currentProductIndex).get('Width').setValue(p.Width);

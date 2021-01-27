@@ -1362,34 +1362,16 @@ export class FormAddShipComponent implements OnInit {
     console.log(event);
 
     if (event.selectedIndex === 2) // shipment info step selected
-    {
-        // -- Get Shipment Errors
-        this.ReferenceByClientOptions = await this.httpService.GetReferenceByClient(this.ClientID, this.keyId);
-        if (this.ReferenceByClientOptions != null && this.ReferenceByClientOptions.length > 0){
-          this.ReferenceByClientField1 = this.ReferenceByClientOptions[0].Description.trim();
-          this.ReferenceByClientIDField1 = this.ReferenceByClientOptions[0].ReferenceID;
-
-          if (this.ReferenceByClientOptions.length > 1){
-            this.ReferenceByClientField2 = this.ReferenceByClientOptions[1].Description.trim();
-            this.ReferenceByClientIDField2 = this.ReferenceByClientOptions[1].ReferenceID;
-          }
-
-          if (this.ReferenceByClientOptions.length > 2){
-            this.ReferenceByClientField3 = this.ReferenceByClientOptions[2].Description.trim();
-            this.ReferenceByClientIDField3 = this.ReferenceByClientOptions[2].ReferenceID;
-          }
-        }
-        else{ // If we can't get fields from API then set R2 fields as default
-          this.ReferenceByClientField1 = 'Customer Ref #';
-          this.ReferenceByClientField2 = 'R2 Order #';
-          this.ReferenceByClientField3 = 'R2 Pro number';
-        }
-
-
+    {        
+        this.SetReferenceFields();        
     }
 
     if (event.selectedIndex === 3) // last step selected
     {
+      if (this.ReferenceByClientOptions == null){
+        this.SetReferenceFields();
+      }
+
       this.formProducts.value.forEach(prod => {
         const PackageItem = this.packageTypes.filter(item => item.PackageTypeID == prod.PackageTypeID);
         prod.PackageTypeDescription = (PackageItem.length > 0 ? PackageItem[0].PackageType : '');
@@ -1551,7 +1533,7 @@ export class FormAddShipComponent implements OnInit {
         (this.productsAndAccessorialsFormGroup.controls.products as FormArray).at(currentProductIndex).get('Pallets').setValue(p.Pallets);
         (this.productsAndAccessorialsFormGroup.controls.products as FormArray).at(currentProductIndex).get('Pieces').setValue(p.Pieces);
         (this.productsAndAccessorialsFormGroup.controls.products as FormArray).at(currentProductIndex).get('PackageTypeID').setValue(p.PackageTypeID);
-        
+
         if (p.Class === "92"){
           (this.productsAndAccessorialsFormGroup.controls.products as FormArray).at(currentProductIndex).get('ProductClass').setValue("92.5");
         }else if (p.Class === "77"){
@@ -2470,6 +2452,11 @@ export class FormAddShipComponent implements OnInit {
     localShipmentByLadingObject.EquipmentID = this.shipmentInfoFormGroup.get('equipment').value;
     localShipmentByLadingObject.ProNumber = this.shipmentInfoFormGroup.get('pronumber').value.trim();
     localShipmentByLadingObject.SplNotes = this.shipmentInfoFormGroup.get('specialinstructions').value;   
+
+    localShipmentByLadingObject.Ref1ID = this.ReferenceByClientIDField1,
+    localShipmentByLadingObject.Ref2ID = this.ReferenceByClientIDField2,
+    localShipmentByLadingObject.Ref3ID = this.ReferenceByClientIDField3,
+
     localShipmentByLadingObject.Ref1Value = this.shipmentInfoFormGroup.get('customerref').value.trim();
     localShipmentByLadingObject.Ref2Value = this.shipmentInfoFormGroup.get('r2order').value.trim();
     localShipmentByLadingObject.Ref3Value = this.shipmentInfoFormGroup.get('r2pronumber').value.trim();
@@ -3104,5 +3091,29 @@ export class FormAddShipComponent implements OnInit {
     return warningMessage;
     
   }  
+
+  async SetReferenceFields() {
+    // -- Get Shipment Errors
+    this.ReferenceByClientOptions = await this.httpService.GetReferenceByClient(this.ClientID, this.keyId);
+    if (this.ReferenceByClientOptions != null && this.ReferenceByClientOptions.length > 0){
+      this.ReferenceByClientField1 = this.ReferenceByClientOptions[0].Description.trim();
+      this.ReferenceByClientIDField1 = this.ReferenceByClientOptions[0].ReferenceID;
+
+      if (this.ReferenceByClientOptions.length > 1){
+        this.ReferenceByClientField2 = this.ReferenceByClientOptions[1].Description.trim();
+        this.ReferenceByClientIDField2 = this.ReferenceByClientOptions[1].ReferenceID;
+      }
+
+      if (this.ReferenceByClientOptions.length > 2){
+        this.ReferenceByClientField3 = this.ReferenceByClientOptions[2].Description.trim();
+        this.ReferenceByClientIDField3 = this.ReferenceByClientOptions[2].ReferenceID;
+      }
+    }
+    else{ // If we can't get fields from API then set R2 fields as default
+      this.ReferenceByClientField1 = 'Customer Ref #';
+      this.ReferenceByClientField2 = 'R2 Order #';
+      this.ReferenceByClientField3 = 'R2 Pro number';
+    }
+  }
 
 }

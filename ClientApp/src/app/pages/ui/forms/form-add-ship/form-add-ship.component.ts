@@ -288,7 +288,7 @@ export class FormAddShipComponent implements OnInit {
         Weight: [null, Validators.required],
         addToProductMaster: [false],
         Stackable: [false],
-        Hazmat: [false],
+        HazMat: [false],
         PackageTypeDescription: [null],
         BOLProductID: [0],
         Status: [1]
@@ -786,7 +786,7 @@ export class FormAddShipComponent implements OnInit {
         formGroup.get('Width').setValue(productSelected.Width);
         formGroup.get('Height').setValue(productSelected.Height);
         formGroup.get('Weight').setValue(productSelected.Weight);
-        formGroup.get('Hazmat').setValue(productSelected.Hazmat);
+        formGroup.get('HazMat').setValue(productSelected.Hazmat);
         this.onChangeCalculatePCF(index);
       }    
     }
@@ -810,7 +810,7 @@ export class FormAddShipComponent implements OnInit {
       formGroup.get('Width').setValue(productSelected.Width);
       formGroup.get('Height').setValue(productSelected.Height);
       formGroup.get('Weight').setValue(productSelected.Weight);
-      formGroup.get('Hazmat').setValue(productSelected.Hazmat);
+      formGroup.get('HazMat').setValue(productSelected.Hazmat);
       this.onChangeCalculatePCF(index);
     }    
   }
@@ -1549,7 +1549,7 @@ export class FormAddShipComponent implements OnInit {
         (this.productsAndAccessorialsFormGroup.controls.products as FormArray).at(currentProductIndex).get('PCF').setValue(p.PCF);
         (this.productsAndAccessorialsFormGroup.controls.products as FormArray).at(currentProductIndex).get('Weight').setValue(p.Weight);
         (this.productsAndAccessorialsFormGroup.controls.products as FormArray).at(currentProductIndex).get('Stackable').setValue(p.Stackable);
-        (this.productsAndAccessorialsFormGroup.controls.products as FormArray).at(currentProductIndex).get('Hazmat').setValue(p.Hazmat);
+        (this.productsAndAccessorialsFormGroup.controls.products as FormArray).at(currentProductIndex).get('HazMat').setValue(p.Hazmat);
         (this.productsAndAccessorialsFormGroup.controls.products as FormArray).at(currentProductIndex).get('ProductDescription').setValue(p.Description === 'NA' ? '' : p.Description);
         (this.productsAndAccessorialsFormGroup.controls.products as FormArray).at(currentProductIndex).get('BOLProductID').setValue(p.BOLProductID);
         (this.productsAndAccessorialsFormGroup.controls.products as FormArray).at(currentProductIndex).get('Status').setValue(2);
@@ -2011,7 +2011,7 @@ export class FormAddShipComponent implements OnInit {
         Description: p.ProductDescription,
         Pallets: p.Pallets == null ? 0 : p.Pallets,
         Pieces: p.Pieces  == null ? 0 : p.Pieces,
-        Hazmat: p.Hazmat,
+        Hazmat: p.HazMat,
         NMFC: p.NmfcNumber,
         Class: p.ProductClass,
         Weight: p.Weight,
@@ -2381,7 +2381,7 @@ export class FormAddShipComponent implements OnInit {
         Description: p.ProductDescription,
         Pallets: p.Pallets,
         Pieces: p.Pieces,
-        Hazmat: p.Hazmat,
+        Hazmat: p.HazMat,
         NMFC: p.NmfcNumber,
         Class: p.ProductClass,
         Weight: p.Weight,

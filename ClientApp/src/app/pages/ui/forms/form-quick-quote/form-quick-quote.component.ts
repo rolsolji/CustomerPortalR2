@@ -775,7 +775,7 @@ export class FormQuickQuoteComponent implements OnInit {
 
   async saveQuote(index: number){
     await this.save(index, false, 1);
-    this.clearQuoteAndFields();
+    //this.clearQuoteAndFields();
     //this.router.navigate(['../shipmentboard/LTLTL/'], { relativeTo: this.route });
   }
 
@@ -970,7 +970,7 @@ export class FormQuickQuoteComponent implements OnInit {
           duration: 5000
         });
       }else{
-        this.openDialog(false, 'Quote saved successfully. Quote Number: ' + this.responseData.ClientLadingNo + '. ' + (action === 4 ? 'Email has been sent.' : ''), 'QuoteSaved', null, null, true);
+        this.openDialog(false, 'Quote saved successfully. Quote Number: ' + this.responseData.ClientLadingNo + '. ' + (action === 4 ? 'Email has been sent.' : ''), 'QuoteSaved', null, null, false);
       }
     }
     else{
@@ -1233,7 +1233,7 @@ export class FormQuickQuoteComponent implements OnInit {
 
         this.httpService.SendEmailManually(emailBOLParameters);
 
-        this.clearQuoteAndFields();
+        // this.clearQuoteAndFields(); -- clear all fields 
       }
     }
   }
@@ -1247,7 +1247,7 @@ export class FormQuickQuoteComponent implements OnInit {
 
       window.open(ratequotePrintURL, '_blank');
 
-      this.clearQuoteAndFields();
+      //this.clearQuoteAndFields();
     }
   }  
 }

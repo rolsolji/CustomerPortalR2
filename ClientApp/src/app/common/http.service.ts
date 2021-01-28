@@ -782,7 +782,8 @@ export class HttpService {
             Ticket: ticket
         });
         return this.http.get<AccessorialPerformance[]>(
-            this.baseEndpoint + 'Services/DashBoardService.svc/json/DashBoard_GetTopAccesorial?clientID=' + clientID + '&shipFromdate=' + dateFrom + '&shipTodate=' + dateTo + '&IsIncludeSubClient=' + isIncludeSubClient
+            this.baseEndpoint + 'Services/DashBoardService.svc/json/DashBoard_GetAllAccesorialsByClientAndShipDate?clientID=' + clientID + '&shipFromdate=' + dateFrom + '&shipTodate=' + dateTo + '&IsIncludeSubClient=' + isIncludeSubClient
+            // 'http://localhost:63784/Services/DashBoardService.svc/json/DashBoard_GetAllAccesorialsByClientAndShipDate?clientID=' + clientID + '&shipFromdate=' + dateFrom + '&shipTodate=' + dateTo + '&IsIncludeSubClient=' + isIncludeSubClient
             , {
                 headers: httpHeaders
             }
@@ -846,9 +847,9 @@ export class HttpService {
         const httpHeaders = new HttpHeaders({
             Ticket: ticket
         });
-        return this.http.get<weightcostCompareModel[]>(
-            this.baseEndpoint + 'Services/DashBoardService.svc/json/DashBoard_GetTopVendorForPPS?clientId=' + clientID + '&IsIncludeSubClient=' + isIncludeSubClient
-            //'http://localhost:63784/Services/DashBoardService.svc/json/DashBoard_GetTopVendorForPPS?clientId=' + clientID + '&IsIncludeSubClient=' + isIncludeSubClient
+        return this.http.get<weightcostCompareModel[]>(            
+            this.baseEndpoint + 'Services/DashBoardService.svc/json/DashBoard_GetTopVendorForPPSByDate?clientId=' + clientID + '&shipFromdate=' + dateFrom + '&shipTodate=' + dateTo + '&IsIncludeSubClient=' + isIncludeSubClient         
+            // 'http://localhost:63784/Services/DashBoardService.svc/json/DashBoard_GetTopVendorForPPSByDate?clientId=' + clientID + '&shipFromdate=' + dateFrom + '&shipTodate=' + dateTo + '&IsIncludeSubClient=' + isIncludeSubClient
             , {
                 headers: httpHeaders
             }

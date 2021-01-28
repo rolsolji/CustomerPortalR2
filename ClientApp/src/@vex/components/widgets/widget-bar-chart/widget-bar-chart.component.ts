@@ -34,6 +34,8 @@ export class WidgetBarChartComponent implements OnInit, OnChanges {
   @Input() series: ApexAxisChartSeries = [];
   @Input() labels: any;
   @Input() barHeight: string = "50";
+  @Input() chartHeight: number = 550;
+  @Input() chartWidth: number = 580;
 
   icMoreHoriz = icMoreHoriz;
   icCloudDownload = icCloudDownload;
@@ -54,8 +56,8 @@ export class WidgetBarChartComponent implements OnInit, OnChanges {
       series: this.series,
       chart: {
         type: "bar",
-        height: 550,
-        width: 580,
+        height: this.chartHeight,
+        width: this.chartWidth,
         toolbar: {
           show: false
         }

@@ -40,7 +40,7 @@ export class DashboardAnalyticsComponent implements OnInit {
   heightOfTopShipmentsChart: number = 450;
   widthOfTopShipmentsChart: number = 550;
 
-  chart2Name: string = "Cost By Firgation";
+  chart2Name: string = "Cost By Freight Fuel & Accessorial";
   chart2Type: ChartType = 'donut';
   SeriesOfCostByFirgationChart: ApexNonAxisChartSeries = [];
   labelsOfCostByFirgationChart: any;
@@ -57,6 +57,8 @@ export class DashboardAnalyticsComponent implements OnInit {
   SeriesOfTopCarriersChart: ApexAxisChartSeries = [];
   labelsOfTopCarriersChart: any;
   barHeightOfTopCarriersChart: string = "50";
+  heightOfTopCarriersChart: number = 550;
+  widthOfTopCarriersChart: number = 580;
 
   chart5Name: string = "Top 10 Lanes - Cost";
   SeriesOfTopLanesChart: ApexNonAxisChartSeries = [];
@@ -77,6 +79,8 @@ export class DashboardAnalyticsComponent implements OnInit {
   SeriesOfMissedDeliveriesChart: ApexAxisChartSeries = [];
   labelsOfMissedDeliveriesChart: any;
   barHeightOfMissedDeliveriesChart: string = "50";
+  heightOfMissedDeliverysChart: number = 550;
+  widthOfMissedDeliverysChart: number = 580;
 
   chart8Name: string = "Missed Pickups";
   SeriesOfMissedPickupsChart: ApexAxisChartSeries = [];
@@ -235,8 +239,8 @@ export class DashboardAnalyticsComponent implements OnInit {
 
     this.SeriesOfTotalShipmentsChart = seriesForTotalShipments;
     this.labelsOfTotalShipmentsChart = labelForTotalShipments;
-    this.heightOfTopShipmentsChart = 450;
-    this.widthOfTopShipmentsChart = 580;
+    this.heightOfTopShipmentsChart = 500;
+    this.widthOfTopShipmentsChart = 665;
   }
 
   calculateTotal() {
@@ -277,33 +281,33 @@ export class DashboardAnalyticsComponent implements OnInit {
         label: 'Qty Shipments',
         property: 'ShipmentCount',
         type: 'text',
-        footer: totalQtyShipment
+        footer: totalQtyShipment.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
       },
       {
         label: '$ Avg Cost',
         property: 'CostPerShipment',
         type: 'text',
         cssClasses: ['font-medium'],
-        footer: "$" + totalAvgCost
+        footer: "$" + totalAvgCost.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
       },
       {
         label: 'Weight',
         property: 'TotalWeight',
         type: 'text',
-        footer: totalWeight
+        footer: totalWeight.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
       },
       {
         label: 'Cost Per Pound',
         property: 'CostPerPound',
         type: 'text',
-        footer: totalCostPerPound
+        footer: totalCostPerPound.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
       },
       {
         label: '$ Total Spend',
         property: 'TotalSpend',
         type: 'text',
         cssClasses: ['font-medium'],
-        footer: "$" + totalSpend
+        footer: "$" + totalSpend.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
       }
     ];
 
@@ -321,13 +325,24 @@ export class DashboardAnalyticsComponent implements OnInit {
 
     var accDesc: string[] = [];
     var accCost: ApexNonAxisChartSeries = [];
+    var otherAccCharg: number = 0;
 
     for (let i = 0; i < this.topAccessorialDetails.length; i++) {
       if (this.topAccessorialDetails[i].Description !== "FREIGHT" && this.topAccessorialDetails[i].Description !== "FUEL"
         && this.topAccessorialDetails[i].Description !== "DISCOUNT") {
-        accDesc.push(this.topAccessorialDetails[i].Description);
-        accCost.push(this.topAccessorialDetails[i].AccessorialCost);
+          if(accDesc.length < 9){
+            accDesc.push(this.topAccessorialDetails[i].Description);
+            accCost.push(this.topAccessorialDetails[i].AccessorialCost);
+          }
+          else{
+            otherAccCharg = (otherAccCharg + this.topAccessorialDetails[i].AccessorialCost);
+          }        
       }
+    }
+
+    if (otherAccCharg !== 0){
+      accDesc.push("OTHER ACCESSORIALS");
+      accCost.push(Number(otherAccCharg.toFixed(2)));
     }
 
     this.SeriesOfTopAccessorialsChart = accCost;
@@ -353,19 +368,19 @@ export class DashboardAnalyticsComponent implements OnInit {
 
     if (fuel > 0) {
       accDesc.push("FUEL");
-      accCost.push(fuel);
+      accCost.push(Number(fuel.toFixed(2)));
     }
 
     var totalAccessorialChrg = this.topAccessorialDetails.filter(a => a.Description.trim() != "FREIGHT" && a.Description.trim() != "FUEL" && a.Description.trim() != "DISCOUNT").reduce((a, b) => a + b.AccessorialCost, 0);
     if (totalAccessorialChrg > 0) {
-      accDesc.push("Total Accessorials");
-      accCost.push(totalAccessorialChrg);
+      accDesc.push("TOTAL ACCESSORIALS");
+      accCost.push(Number(totalAccessorialChrg.toFixed(2)));
     }
 
     this.SeriesOfCostByFirgationChart = accCost;
     this.labelsOfCostByFirgationChart = accDesc;
-    this.heightOfCostByFirgationChart = 450;
-    this.widthOfCostByFirgationChart = 580;
+    this.heightOfCostByFirgationChart = 475;
+    this.widthOfCostByFirgationChart = 600;
   }
 
   async GetDetailsForTopCarriersChart() {
@@ -382,7 +397,7 @@ export class DashboardAnalyticsComponent implements OnInit {
     for (let i = 0; i < this.topCarriersDetails.length; i++) {
       costOfSeries1.push(this.topCarriersDetails[i].TotalBilledAmount);
       costOfSeries2.push(this.topCarriersDetails[i].ShipmentCount);
-      labelOfCarriers.push(this.topCarriersDetails[i].SCAC);
+      labelOfCarriers.push(this.topCarriersDetails[i].CarrierName);
     }
 
     this.SeriesOfTopCarriersChart = [
@@ -397,6 +412,8 @@ export class DashboardAnalyticsComponent implements OnInit {
     ];
     this.labelsOfTopCarriersChart = labelOfCarriers;
     this.barHeightOfTopCarriersChart = "100";
+    this.heightOfTopCarriersChart = 550;
+    this.widthOfTopCarriersChart = 660;
   }
 
   GetDetailsForTopLanesChart() {
@@ -594,6 +611,8 @@ export class DashboardAnalyticsComponent implements OnInit {
       ];
       this.labelsOfMissedDeliveriesChart = labelOfMissedDel;
       this.barHeightOfMissedDeliveriesChart = "60";
+      this.heightOfMissedDeliverysChart = 550;
+      this.widthOfMissedDeliverysChart = 660;
     }
   }
 

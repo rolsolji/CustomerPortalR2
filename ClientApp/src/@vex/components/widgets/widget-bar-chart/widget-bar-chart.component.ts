@@ -9,7 +9,7 @@ import {
   ApexDataLabels,
   ApexXAxis,
   ApexPlotOptions,
-  ApexStroke
+  ApexStroke  
 } from "ng-apexcharts";
 
 export type ChartOptions = {
@@ -44,14 +44,14 @@ export class WidgetBarChartComponent implements OnInit, OnChanges {
 
   ngOnInit() {
     this.labels = [];
-    this.chartInitialize();    
+    this.chartInitialize();
   }
 
   ngOnChanges() {
     this.chartInitialize();
   }
 
-  chartInitialize(){
+  chartInitialize() {
     this.chartOptions = {
       series: this.series,
       chart: {
@@ -84,10 +84,10 @@ export class WidgetBarChartComponent implements OnInit, OnChanges {
         width: 1,
         colors: ["#fff"]
       },
-      xaxis:{
-        type:'category',
-        categories:this.labels
-      }  
+      xaxis: {
+        type: 'category',
+        categories: this.labels
+      }      
     };
   }
 

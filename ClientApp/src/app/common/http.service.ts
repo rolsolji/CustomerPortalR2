@@ -890,8 +890,8 @@ export class HttpService {
             Ticket: ticket
         });
         return this.http.get<CarrierPerformanceModel[]>(
-            this.baseEndpoint + 'Services/DashBoardService.svc/json/DashBoard_GetCarrierPerformance?clientid=' + clientID + '&IsIncludeSubClient=' + isIncludeSubClient
-            // 'http://localhost:63784/Services/DashBoardService.svc/json/DashBoard_GetCarrierPerformance?clientid=' + clientID + '&IsIncludeSubClient=' + isIncludeSubClient
+            this.baseEndpoint + 'Services/DashBoardService.svc/json/DashBoard_GetCarrierPerformanceByDate?clientid=' + clientID + '&shipFromdate=' + dateFrom + '&shipTodate=' + dateTo + '&IsIncludeSubClient=' + isIncludeSubClient
+            // 'http://localhost:63784/Services/DashBoardService.svc/json/DashBoard_GetCarrierPerformanceByDate?clientid=' + clientID + '&IsIncludeSubClient=' + isIncludeSubClient
             , {
                 headers: httpHeaders
             }

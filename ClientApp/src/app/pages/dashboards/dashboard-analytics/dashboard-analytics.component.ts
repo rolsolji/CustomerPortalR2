@@ -106,8 +106,7 @@ export class DashboardAnalyticsComponent implements OnInit {
     { text: "This Month", value: "MTD" },
     { text: "Custom Dates", value: "Custom" }
   ];
-  //selectedDateRange: string = "MTD";
-
+  
   tableColumns: TableColumn<Order>[] = [
     {
       label: '',
@@ -166,11 +165,7 @@ export class DashboardAnalyticsComponent implements OnInit {
           name: ''
         }
       ];
-    }, 3000);
-
-    // this.calculationOfDateFromAndTo();
-
-    // this.prepareDetailsOfAllCharts();
+    }, 3000);    
     
     this.SetDateRangeForMTD();    
   }
@@ -218,17 +213,6 @@ export class DashboardAnalyticsComponent implements OnInit {
   }
 
   PrepareDetailsForChart() {
-    // var tlshipment = Number(this.tableDataShipments.filter(a => a.Mode.trim() == "TL").map(a => a.ShipmentCount));
-    // var ltlshipment = Number(this.tableDataShipments.filter(a => a.Mode.trim() == "LTL").map(a => a.ShipmentCount));
-    // var oceanshipment = Number(this.tableDataShipments.filter(a => a.Mode.trim() == "OCEAN").map(a => a.ShipmentCount));
-    // var smallPackageshipment = Number(this.tableDataShipments.filter(a => a.Mode.trim() == "Small Package").map(a => a.ShipmentCount));
-    // var airFreightshipment = Number(this.tableDataShipments.filter(a => a.Mode.trim() == "AIR FREIGHT").map(a => a.ShipmentCount));
-    // var intermodelshipment = Number(this.tableDataShipments.filter(a => a.Mode.trim() == "INTERMODAL").map(a => a.ShipmentCount));
-    // var tlSpotquoteshipment = Number(this.tableDataShipments.filter(a => a.Mode.trim() == "TL Spot Quote").map(a => a.ShipmentCount));
-
-    // this.SeriesOfTotalShipmentsChart = [tlshipment, ltlshipment, oceanshipment, smallPackageshipment, airFreightshipment, intermodelshipment, tlSpotquoteshipment];
-    // this.labelsOfTotalShipmentsChart = ['TL', 'LTL', 'OCEAN', 'Small Package', 'AIR FREIGHT', 'INTERMODAL', 'TL Spot Quote'];
-
     var labelForTotalShipments: string[] = [];
     var seriesForTotalShipments: ApexNonAxisChartSeries = [];
 
@@ -239,8 +223,8 @@ export class DashboardAnalyticsComponent implements OnInit {
 
     this.SeriesOfTotalShipmentsChart = seriesForTotalShipments;
     this.labelsOfTotalShipmentsChart = labelForTotalShipments;
-    this.heightOfTopShipmentsChart = 500;
-    this.widthOfTopShipmentsChart = 665;
+    this.heightOfTopShipmentsChart = 450;
+    this.widthOfTopShipmentsChart = 600;
   }
 
   calculateTotal() {
@@ -315,10 +299,8 @@ export class DashboardAnalyticsComponent implements OnInit {
 
   async GetDetailsForTopAccessorialsChart() {
     this.topAccessorialDetails = await this.dashBoardService.DashBoard_GetTopAccesorial(this.authenticationService.getDefaultClientFromStorage().ClientID, this.dateFrom, this.dateTo, this.isIncludeSubClient);
-    this.PrepareDetailsForTopAccessorialsChart();
-    /* Start Details of Cost By firgation chart. */
-    this.PrepareDetailsForByFirgationChart();
-    /* END */
+    this.PrepareDetailsForTopAccessorialsChart();    
+    this.PrepareDetailsForByFirgationChart();    
   }
 
   PrepareDetailsForTopAccessorialsChart() {
@@ -347,8 +329,8 @@ export class DashboardAnalyticsComponent implements OnInit {
 
     this.SeriesOfTopAccessorialsChart = accCost;
     this.labelsOfTopAccessorialsChart = accDesc;
-    this.heightOfTopAccessorialsChart = 450;
-    this.widthOfTopAccessorialsChart = 630;
+    // this.heightOfTopAccessorialsChart = 430;
+    // this.widthOfTopAccessorialsChart = 520;
   }
 
   PrepareDetailsForByFirgationChart() {
@@ -379,8 +361,8 @@ export class DashboardAnalyticsComponent implements OnInit {
 
     this.SeriesOfCostByFirgationChart = accCost;
     this.labelsOfCostByFirgationChart = accDesc;
-    this.heightOfCostByFirgationChart = 475;
-    this.widthOfCostByFirgationChart = 600;
+    this.heightOfCostByFirgationChart = 430;
+    this.widthOfCostByFirgationChart = 520;    
   }
 
   async GetDetailsForTopCarriersChart() {
@@ -397,7 +379,7 @@ export class DashboardAnalyticsComponent implements OnInit {
     for (let i = 0; i < this.topCarriersDetails.length; i++) {
       costOfSeries1.push(this.topCarriersDetails[i].TotalBilledAmount);
       costOfSeries2.push(this.topCarriersDetails[i].ShipmentCount);
-      labelOfCarriers.push(this.topCarriersDetails[i].CarrierName);
+      labelOfCarriers.push(this.topCarriersDetails[i].CarrierName.trim());
     }
 
     this.SeriesOfTopCarriersChart = [
@@ -412,8 +394,6 @@ export class DashboardAnalyticsComponent implements OnInit {
     ];
     this.labelsOfTopCarriersChart = labelOfCarriers;
     this.barHeightOfTopCarriersChart = "100";
-    this.heightOfTopCarriersChart = 550;
-    this.widthOfTopCarriersChart = 660;
   }
 
   GetDetailsForTopLanesChart() {
@@ -568,7 +548,7 @@ export class DashboardAnalyticsComponent implements OnInit {
 
     for (let i = 0; i < this.topVendorsByVolume.length; i++) {
       costOfSeries1.push(this.topVendorsByVolume[i].ShipmentCount);
-      labelOfVendors.push(this.topVendorsByVolume[i].ClientName);
+      labelOfVendors.push(this.topVendorsByVolume[i].ClientName.trim());
     }
 
     this.SeriesOfTopVendorsByVolumeChart = [
@@ -600,7 +580,7 @@ export class DashboardAnalyticsComponent implements OnInit {
 
       for (let i = 0; i < this.missedDeliveryDetails.length; i++) {
         costOfSeries1.push(this.missedDeliveryDetails[i].ShipmentCount);
-        labelOfMissedDel.push(this.missedDeliveryDetails[i].CarrierName);
+        labelOfMissedDel.push(this.missedDeliveryDetails[i].CarrierName.trim());
       }
 
       this.SeriesOfMissedDeliveriesChart = [
@@ -611,8 +591,6 @@ export class DashboardAnalyticsComponent implements OnInit {
       ];
       this.labelsOfMissedDeliveriesChart = labelOfMissedDel;
       this.barHeightOfMissedDeliveriesChart = "60";
-      this.heightOfMissedDeliverysChart = 550;
-      this.widthOfMissedDeliverysChart = 660;
     }
   }
 
@@ -652,7 +630,7 @@ export class DashboardAnalyticsComponent implements OnInit {
       for (let i = 0; i < this.missedPickupDetails.length; i++) {
         costOfSeries1.push(this.missedPickupDetails[i].LatePickupTime);
         costOfSeries2.push(this.missedPickupDetails[i].OnTimePickup);
-        labelOfMissedPickup.push(this.missedPickupDetails[i].CarrierName);
+        labelOfMissedPickup.push(this.missedPickupDetails[i].CarrierName.trim());
       }
 
       this.SeriesOfMissedPickupsChart = [
@@ -719,7 +697,7 @@ export class DashboardAnalyticsComponent implements OnInit {
           costOfSeries2.push(0);
         }
 
-        labelOfCarrierPerformance.push(finalData[i].CarrierName);
+        labelOfCarrierPerformance.push(finalData[i].CarrierName.trim());
       }
 
       this.SeriesOfCarrierPerformanceChart = [

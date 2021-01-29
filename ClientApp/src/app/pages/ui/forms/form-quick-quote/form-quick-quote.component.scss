@@ -454,3 +454,12 @@ input.removeArrowsNumberInput[type=number] {
   font-size: 14px;
   margin-top: 6px;
 }
+
+.autoCompleteStyleControl{
+  height: fit-content; 
+  line-height: unset;
+}
+
+.divAutoCompleteStyleControl{
+  height: 20px;
+}

@@ -40,7 +40,7 @@ export class DashboardAnalyticsComponent implements OnInit {
   heightOfTopShipmentsChart: number = 450;
   widthOfTopShipmentsChart: number = 550;
 
-  chart2Name: string = "Cost By Firgation";
+  chart2Name: string = "Cost By Freight Fuel & Accessorial";
   chart2Type: ChartType = 'donut';
   SeriesOfCostByFirgationChart: ApexNonAxisChartSeries = [];
   labelsOfCostByFirgationChart: any;
@@ -57,6 +57,8 @@ export class DashboardAnalyticsComponent implements OnInit {
   SeriesOfTopCarriersChart: ApexAxisChartSeries = [];
   labelsOfTopCarriersChart: any;
   barHeightOfTopCarriersChart: string = "50";
+  heightOfTopCarriersChart: number = 550;
+  widthOfTopCarriersChart: number = 580;
 
   chart5Name: string = "Top 10 Lanes - Cost";
   SeriesOfTopLanesChart: ApexNonAxisChartSeries = [];
@@ -77,6 +79,8 @@ export class DashboardAnalyticsComponent implements OnInit {
   SeriesOfMissedDeliveriesChart: ApexAxisChartSeries = [];
   labelsOfMissedDeliveriesChart: any;
   barHeightOfMissedDeliveriesChart: string = "50";
+  heightOfMissedDeliverysChart: number = 550;
+  widthOfMissedDeliverysChart: number = 580;
 
   chart8Name: string = "Missed Pickups";
   SeriesOfMissedPickupsChart: ApexAxisChartSeries = [];
@@ -102,8 +106,7 @@ export class DashboardAnalyticsComponent implements OnInit {
     { text: "This Month", value: "MTD" },
     { text: "Custom Dates", value: "Custom" }
   ];
-  //selectedDateRange: string = "MTD";
-
+  
   tableColumns: TableColumn<Order>[] = [
     {
       label: '',
@@ -162,11 +165,7 @@ export class DashboardAnalyticsComponent implements OnInit {
           name: ''
         }
       ];
-    }, 3000);
-
-    // this.calculationOfDateFromAndTo();
-
-    // this.prepareDetailsOfAllCharts();
+    }, 3000);    
     
     this.SetDateRangeForMTD();    
   }
@@ -214,17 +213,6 @@ export class DashboardAnalyticsComponent implements OnInit {
   }
 
   PrepareDetailsForChart() {
-    // var tlshipment = Number(this.tableDataShipments.filter(a => a.Mode.trim() == "TL").map(a => a.ShipmentCount));
-    // var ltlshipment = Number(this.tableDataShipments.filter(a => a.Mode.trim() == "LTL").map(a => a.ShipmentCount));
-    // var oceanshipment = Number(this.tableDataShipments.filter(a => a.Mode.trim() == "OCEAN").map(a => a.ShipmentCount));
-    // var smallPackageshipment = Number(this.tableDataShipments.filter(a => a.Mode.trim() == "Small Package").map(a => a.ShipmentCount));
-    // var airFreightshipment = Number(this.tableDataShipments.filter(a => a.Mode.trim() == "AIR FREIGHT").map(a => a.ShipmentCount));
-    // var intermodelshipment = Number(this.tableDataShipments.filter(a => a.Mode.trim() == "INTERMODAL").map(a => a.ShipmentCount));
-    // var tlSpotquoteshipment = Number(this.tableDataShipments.filter(a => a.Mode.trim() == "TL Spot Quote").map(a => a.ShipmentCount));
-
-    // this.SeriesOfTotalShipmentsChart = [tlshipment, ltlshipment, oceanshipment, smallPackageshipment, airFreightshipment, intermodelshipment, tlSpotquoteshipment];
-    // this.labelsOfTotalShipmentsChart = ['TL', 'LTL', 'OCEAN', 'Small Package', 'AIR FREIGHT', 'INTERMODAL', 'TL Spot Quote'];
-
     var labelForTotalShipments: string[] = [];
     var seriesForTotalShipments: ApexNonAxisChartSeries = [];
 
@@ -236,7 +224,7 @@ export class DashboardAnalyticsComponent implements OnInit {
     this.SeriesOfTotalShipmentsChart = seriesForTotalShipments;
     this.labelsOfTotalShipmentsChart = labelForTotalShipments;
     this.heightOfTopShipmentsChart = 450;
-    this.widthOfTopShipmentsChart = 580;
+    this.widthOfTopShipmentsChart = 600;
   }
 
   calculateTotal() {
@@ -277,33 +265,33 @@ export class DashboardAnalyticsComponent implements OnInit {
         label: 'Qty Shipments',
         property: 'ShipmentCount',
         type: 'text',
-        footer: totalQtyShipment
+        footer: totalQtyShipment.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
       },
       {
         label: '$ Avg Cost',
         property: 'CostPerShipment',
         type: 'text',
         cssClasses: ['font-medium'],
-        footer: "$" + totalAvgCost
+        footer: "$" + totalAvgCost.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
       },
       {
         label: 'Weight',
         property: 'TotalWeight',
         type: 'text',
-        footer: totalWeight
+        footer: totalWeight.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
       },
       {
         label: 'Cost Per Pound',
         property: 'CostPerPound',
         type: 'text',
-        footer: totalCostPerPound
+        footer: totalCostPerPound.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
       },
       {
         label: '$ Total Spend',
         property: 'TotalSpend',
         type: 'text',
         cssClasses: ['font-medium'],
-        footer: "$" + totalSpend
+        footer: "$" + totalSpend.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
       }
     ];
 
@@ -311,29 +299,38 @@ export class DashboardAnalyticsComponent implements OnInit {
 
   async GetDetailsForTopAccessorialsChart() {
     this.topAccessorialDetails = await this.dashBoardService.DashBoard_GetTopAccesorial(this.authenticationService.getDefaultClientFromStorage().ClientID, this.dateFrom, this.dateTo, this.isIncludeSubClient);
-    this.PrepareDetailsForTopAccessorialsChart();
-    /* Start Details of Cost By firgation chart. */
-    this.PrepareDetailsForByFirgationChart();
-    /* END */
+    this.PrepareDetailsForTopAccessorialsChart();    
+    this.PrepareDetailsForByFirgationChart();    
   }
 
   PrepareDetailsForTopAccessorialsChart() {
 
     var accDesc: string[] = [];
     var accCost: ApexNonAxisChartSeries = [];
+    var otherAccCharg: number = 0;
 
     for (let i = 0; i < this.topAccessorialDetails.length; i++) {
       if (this.topAccessorialDetails[i].Description !== "FREIGHT" && this.topAccessorialDetails[i].Description !== "FUEL"
         && this.topAccessorialDetails[i].Description !== "DISCOUNT") {
-        accDesc.push(this.topAccessorialDetails[i].Description);
-        accCost.push(this.topAccessorialDetails[i].AccessorialCost);
+          if(accDesc.length < 9){
+            accDesc.push(this.topAccessorialDetails[i].Description);
+            accCost.push(this.topAccessorialDetails[i].AccessorialCost);
+          }
+          else{
+            otherAccCharg = (otherAccCharg + this.topAccessorialDetails[i].AccessorialCost);
+          }        
       }
+    }
+
+    if (otherAccCharg !== 0){
+      accDesc.push("OTHER ACCESSORIALS");
+      accCost.push(Number(otherAccCharg.toFixed(2)));
     }
 
     this.SeriesOfTopAccessorialsChart = accCost;
     this.labelsOfTopAccessorialsChart = accDesc;
-    this.heightOfTopAccessorialsChart = 450;
-    this.widthOfTopAccessorialsChart = 630;
+    // this.heightOfTopAccessorialsChart = 430;
+    // this.widthOfTopAccessorialsChart = 520;
   }
 
   PrepareDetailsForByFirgationChart() {
@@ -353,19 +350,19 @@ export class DashboardAnalyticsComponent implements OnInit {
 
     if (fuel > 0) {
       accDesc.push("FUEL");
-      accCost.push(fuel);
+      accCost.push(Number(fuel.toFixed(2)));
     }
 
     var totalAccessorialChrg = this.topAccessorialDetails.filter(a => a.Description.trim() != "FREIGHT" && a.Description.trim() != "FUEL" && a.Description.trim() != "DISCOUNT").reduce((a, b) => a + b.AccessorialCost, 0);
     if (totalAccessorialChrg > 0) {
-      accDesc.push("Total Accessorials");
-      accCost.push(totalAccessorialChrg);
+      accDesc.push("TOTAL ACCESSORIALS");
+      accCost.push(Number(totalAccessorialChrg.toFixed(2)));
     }
 
     this.SeriesOfCostByFirgationChart = accCost;
     this.labelsOfCostByFirgationChart = accDesc;
-    this.heightOfCostByFirgationChart = 450;
-    this.widthOfCostByFirgationChart = 580;
+    this.heightOfCostByFirgationChart = 430;
+    this.widthOfCostByFirgationChart = 520;    
   }
 
   async GetDetailsForTopCarriersChart() {
@@ -382,7 +379,7 @@ export class DashboardAnalyticsComponent implements OnInit {
     for (let i = 0; i < this.topCarriersDetails.length; i++) {
       costOfSeries1.push(this.topCarriersDetails[i].TotalBilledAmount);
       costOfSeries2.push(this.topCarriersDetails[i].ShipmentCount);
-      labelOfCarriers.push(this.topCarriersDetails[i].SCAC);
+      labelOfCarriers.push(this.topCarriersDetails[i].CarrierName.trim());
     }
 
     this.SeriesOfTopCarriersChart = [
@@ -551,7 +548,7 @@ export class DashboardAnalyticsComponent implements OnInit {
 
     for (let i = 0; i < this.topVendorsByVolume.length; i++) {
       costOfSeries1.push(this.topVendorsByVolume[i].ShipmentCount);
-      labelOfVendors.push(this.topVendorsByVolume[i].ClientName);
+      labelOfVendors.push(this.topVendorsByVolume[i].ClientName.trim());
     }
 
     this.SeriesOfTopVendorsByVolumeChart = [
@@ -583,7 +580,7 @@ export class DashboardAnalyticsComponent implements OnInit {
 
       for (let i = 0; i < this.missedDeliveryDetails.length; i++) {
         costOfSeries1.push(this.missedDeliveryDetails[i].ShipmentCount);
-        labelOfMissedDel.push(this.missedDeliveryDetails[i].CarrierName);
+        labelOfMissedDel.push(this.missedDeliveryDetails[i].CarrierName.trim());
       }
 
       this.SeriesOfMissedDeliveriesChart = [
@@ -633,7 +630,7 @@ export class DashboardAnalyticsComponent implements OnInit {
       for (let i = 0; i < this.missedPickupDetails.length; i++) {
         costOfSeries1.push(this.missedPickupDetails[i].LatePickupTime);
         costOfSeries2.push(this.missedPickupDetails[i].OnTimePickup);
-        labelOfMissedPickup.push(this.missedPickupDetails[i].CarrierName);
+        labelOfMissedPickup.push(this.missedPickupDetails[i].CarrierName.trim());
       }
 
       this.SeriesOfMissedPickupsChart = [
@@ -700,7 +697,7 @@ export class DashboardAnalyticsComponent implements OnInit {
           costOfSeries2.push(0);
         }
 
-        labelOfCarrierPerformance.push(finalData[i].CarrierName);
+        labelOfCarrierPerformance.push(finalData[i].CarrierName.trim());
       }
 
       this.SeriesOfCarrierPerformanceChart = [

@@ -377,7 +377,7 @@ export class DashboardAnalyticsComponent implements OnInit {
     var labelOfCarriers: string[] = [];
 
     for (let i = 0; i < this.topCarriersDetails.length; i++) {
-      costOfSeries1.push(this.topCarriersDetails[i].TotalBilledAmount);
+      costOfSeries1.push(Number(this.topCarriersDetails[i].TotalBilledAmount.toFixed(2)));
       costOfSeries2.push(this.topCarriersDetails[i].ShipmentCount);
       labelOfCarriers.push(this.topCarriersDetails[i].CarrierName.trim());
     }

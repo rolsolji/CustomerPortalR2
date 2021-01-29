@@ -796,7 +796,7 @@ export class HttpService {
             Ticket: ticket
         });
         return this.http.get<CarrierPerformanceModel[]>(
-            this.baseEndpoint + 'Services/DashBoardService.svc/json/DashBoard_GetTopCarriers?clientID=' + clientID + '&shipFromdate=' + dateFrom + '&shipTodate=' + dateTo + '&ByVolume=true&IsIncludeSubClient=' + isIncludeSubClient
+            this.baseEndpoint + 'Services/DashBoardService.svc/json/DashBoard_GetTopCarriers?clientID=' + clientID + '&shipFromdate=' + dateFrom + '&shipTodate=' + dateTo + '&ByVolume=false&IsIncludeSubClient=' + isIncludeSubClient
             , {
                 headers: httpHeaders
             }

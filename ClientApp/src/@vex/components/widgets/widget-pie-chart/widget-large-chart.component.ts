@@ -8,7 +8,7 @@ import {
   ApexResponsive,
   ApexChart,
   ChartComponent,
-  ChartType,
+  ChartType
 } from "ng-apexcharts";
 import { asapScheduler } from 'rxjs';
 
@@ -48,22 +48,7 @@ export class WidgetLargeChartComponent implements OnInit, OnChanges {
   }
 
   ngOnChanges() {
-    this.chartInitialize();
-    // if (this.series && this.series.length > 0) {
-    //   this.chartOptions.series = this.series;
-    // }
-    // if (this.labels && this.labels.length > 0) {
-    //   this.chartOptions.labels = this.labels;
-    // }
-    // if(this.chartOptions && this.chartType){
-    //   this.chartOptions.chart.type = this.chartType;
-    // }
-    // if(this.chartOptions && this.chartHeight){
-    //   this.chartOptions.chart.height = this.chartHeight;
-    // }
-    // if(this.chartOptions && this.chartWidth){
-    //   this.chartOptions.chart.width = this.chartWidth;
-    // }
+    this.chartInitialize();    
   }
 
   chartInitialize(){
@@ -80,7 +65,7 @@ export class WidgetLargeChartComponent implements OnInit, OnChanges {
           enabled: false
         },
       },
-      labels: this.labels,
+      labels: this.labels
     };
   }
 }

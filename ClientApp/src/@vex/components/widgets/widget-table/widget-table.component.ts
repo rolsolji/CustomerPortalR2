@@ -8,7 +8,8 @@ import { TableColumn } from '../../../interfaces/table-column.interface';
 
 @Component({
   selector: 'vex-widget-table',
-  templateUrl: './widget-table.component.html'
+  templateUrl: './widget-table.component.html',
+  styleUrls: ['./widget-table.component.scss']
 })
 export class WidgetTableComponent<T> implements OnInit, OnChanges, AfterViewInit {
 

@@ -9,9 +9,8 @@
 <div class="p-gutter" style="padding-bottom: 0px;" vexContainer>
   <div gdColumn="-1 / 1" gdColumn.lt-md="-1 / 1" gdColumn.lt-sm="1">
     <div class="card" fxLayout="column">
-      <div fxLayout="row" fxLayout.lt-md="column" class="ml-5 dashboardFilters">        
-        <div fxFlex="20%" class="py-4 mr-4"
-          fxLayoutAlign="start center">
+      <div fxLayout="row" fxLayout.lt-md="column" class="ml-5 dashboardFilters">
+        <div fxFlex="20%" class="py-4 mr-4" fxLayoutAlign="start center">
           <mat-form-field appearance="outline" class="vex-flex-form-field matFormField" color="primary">
             <mat-label>Date Range</mat-label>
             <mat-select [(value)]="this.selectedDateRange" (selectionChange)="onDateRangeselectionChange()">
@@ -19,22 +18,20 @@
                 {{dateRange.text}}
               </mat-option>
             </mat-select>
-          </mat-form-field>                 
+          </mat-form-field>
         </div>
-        <div fxFlex="55%" *ngIf="isDateRangeVisible"> 
+        <div fxFlex="55%" *ngIf="isDateRangeVisible">
           <div fxLayout="row" fxLayout.lt-md="column">
-            <div fxFlex="35%" class="py-4 mr-4"
-            fxLayoutAlign="start center">
-            <mat-form-field style="width: 100%;" appearance="outline">
-              <mat-label>From Date</mat-label>
-              <input (click)="formDatepicker.open()" (focus)="formDatepicker.open()" name="dateFrom"
-                [matDatepicker]="formDatepicker" [(ngModel)]="dateFromForDatePicker" matInput readonly>
-              <mat-datepicker-toggle [for]="formDatepicker" matSuffix></mat-datepicker-toggle>
-              <mat-datepicker #formDatepicker></mat-datepicker>
-            </mat-form-field>
-            </div>         
-            <div fxFlex="35%" class="py-4 mr-4"
-              fxLayoutAlign="start center">
+            <div fxFlex="35%" class="py-4 mr-4" fxLayoutAlign="start center">
+              <mat-form-field style="width: 100%;" appearance="outline">
+                <mat-label>From Date</mat-label>
+                <input (click)="formDatepicker.open()" (focus)="formDatepicker.open()" name="dateFrom"
+                  [matDatepicker]="formDatepicker" [(ngModel)]="dateFromForDatePicker" matInput readonly>
+                <mat-datepicker-toggle [for]="formDatepicker" matSuffix></mat-datepicker-toggle>
+                <mat-datepicker #formDatepicker></mat-datepicker>
+              </mat-form-field>
+            </div>
+            <div fxFlex="35%" class="py-4 mr-4" fxLayoutAlign="start center">
               <mat-form-field style="width: 100%;" appearance="outline">
                 <mat-label>To Date</mat-label>
                 <input (click)="toDatepicker.open()" (focus)="toDatepicker.open()" name="dateTo"
@@ -43,19 +40,16 @@
                 <mat-datepicker #toDatepicker></mat-datepicker>
               </mat-form-field>
             </div>
-            <div fxFlex="30%" class="py-4 mr-4"            
-              fxLayoutAlign="start center">
+            <div fxFlex="30%" class="py-4 mr-4" fxLayoutAlign="start center">
               <button color="primary" (click)="refreshChartsUsingSelectedDate()" mat-raised-button>Refresh</button>
             </div>
-          </div>                   
+          </div>
         </div>
-        <div fxFlex="20%"
-          class="py-4 mr-4" fxLayoutAlign="start center">
+        <div fxFlex="20%" class="py-4 mr-4" fxLayoutAlign="start center">
           <mat-checkbox [(ngModel)]="isIncludeSubClient" color="primary" (change)='changedValueOfIsIncludeSubClient()'>
             Include SubClients</mat-checkbox>
         </div>
-        <div fxFlex="5%"
-          class="py-4 spinnerSection" fxLayoutAlign="start center" *ngIf="showSpinnerOnDateChanges">
+        <div fxFlex="5%" class="py-4 spinnerSection" fxLayoutAlign="start center" *ngIf="showSpinnerOnDateChanges">
           <div>
             <mat-progress-spinner diameter="40" mode="indeterminate"></mat-progress-spinner>
           </div>
@@ -71,7 +65,7 @@
   </div>
 </div> -->
 
-<div class="p-gutter" gdColumns="1fr 1fr 1fr 1fr" gdColumns.lt-md="1fr 1fr" gdColumns.lt-sm="1fr"
+<div class="p-gutter" gdColumns="1fr 1fr" gdColumns.lt-md="1fr 1fr" gdColumns.lt-sm="1fr"
   style="column-gap: 16px; row-gap: 0px;" vexContainer>
 
   <vex-widget-large-chart [series]="SeriesOfTotalShipmentsChart" [labels]="labelsOfTotalShipmentsChart"
@@ -140,7 +134,8 @@
   </div>
 
   <vex-widget-bar-chart [series]="SeriesOfTopCarriersChart" [labels]="labelsOfTopCarriersChart" [titleName]="chart4Name"
-    [barHeight]="barHeightOfTopCarriersChart" gdColumn="1 / 1" gdColumn.lt-md="1 / -1" gdColumn.lt-sm="1">
+    [barHeight]="barHeightOfTopCarriersChart" [chartHeight]="heightOfTopCarriersChart"
+    [chartWidth]="widthOfTopCarriersChart" gdColumn="1 / 1" gdColumn.lt-md="1 / -1" gdColumn.lt-sm="1">
   </vex-widget-bar-chart>
 
   <vex-widget-bar-chart [series]="SeriesOfTopVendorsByVolumeChart" [labels]="labelsOfTopVendorsByVolumeChart"
@@ -148,8 +143,9 @@
     gdColumn.lt-sm="1"></vex-widget-bar-chart>
 
   <vex-widget-bar-chart [series]="SeriesOfMissedDeliveriesChart" [labels]="labelsOfMissedDeliveriesChart"
-    [titleName]="chart7Name" [barHeight]="barHeightOfMissedDeliveriesChart" gdColumn="1 / 1" gdColumn.lt-md="1 / -1"
-    gdColumn.lt-sm="1"></vex-widget-bar-chart>
+    [titleName]="chart7Name" [barHeight]="barHeightOfMissedDeliveriesChart" [chartHeight]="heightOfMissedDeliverysChart"
+    [chartWidth]="widthOfMissedDeliverysChart" gdColumn="1 / 1" gdColumn.lt-md="1 / -1" gdColumn.lt-sm="1">
+  </vex-widget-bar-chart>
 
   <vex-widget-bar-chart [series]="SeriesOfMissedPickupsChart" [labels]="labelsOfMissedPickupsChart"
     [titleName]="chart8Name" [barHeight]="barHeightOfMissedPickupsChart" gdColumn="-1 / 2" gdColumn.lt-md="1 / -1"

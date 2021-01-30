@@ -401,6 +401,41 @@
                   <div [formGroupName]="i" *ngIf="prod.value.Status !== 3">
                     <div fxLayout="column" class="pt-5" class="expansion-panel-cont-style">
                       <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="5px">
+                        <div fxFlex="28%">
+                          <mat-form-field>
+                            <mat-label>Description</mat-label>
+                            <input matInput type="text" maxlength="50" formControlName="ProductDescription" required
+                                    (keypress)="onKeypressProdDesc($event, i)"
+                                    (focus)="focusFunction(i)"
+                                    [matAutocomplete]="pAutoComplete" 
+                                    (keydown.tab)="validateProductByClient($event, i)">
+                                    <mat-autocomplete #pAutoComplete="matAutocomplete" (optionSelected)="pAutoCompleteSelected($event, i)">
+                                      <mat-option *ngFor="let option of pAutoCompleteOptions | async" [value]="option.Description" class="autoCompleteStyleControl">
+                                        <div class="divAutoCompleteStyleControl">
+                                          <span>Name:</span>
+                                          <span>{{option.Description}}</span>
+                                        </div>  
+                                        <div class="divAutoCompleteStyleControl">
+                                          <span>Class:</span>
+                                          <span>{{option.Class}}</span>
+                                        </div>  
+                                        <div class="divAutoCompleteStyleControl">
+                                          <span>NMFC:</span>
+                                          <span>{{option.NMFC}}</span>
+                                        </div> 
+                                        <div class="divAutoCompleteStyleControl">
+                                          <span>Weight:</span>
+                                          <span>{{option.Weight}}</span>
+                                        </div>  
+                                        <div class="divAutoCompleteStyleControl">
+                                          <span>Dimension:</span>
+                                          <span>{{option.Height}} x {{option.Lenght}} x {{option.Width}}</span>
+                                        </div>
+                                        <hr>
+                                      </mat-option>
+                                    </mat-autocomplete>
+                          </mat-form-field>
+                        </div>  
                         <div fxFlex="12%">
                           <mat-form-field fxFlex="none">
                             <mat-label>Pallet</mat-label>
@@ -445,42 +480,7 @@
                               <mat-option value="500">500</mat-option>
                             </mat-select>
                           </mat-form-field>
-                        </div>                         
-                        <div fxFlex="28%">
-                          <mat-form-field>
-                            <mat-label>Description</mat-label>
-                            <input matInput type="text" maxlength="50" formControlName="ProductDescription" required
-                                    (keypress)="onKeypressProdDesc($event, i)"
-                                    (focus)="focusFunction(i)"
-                                    [matAutocomplete]="pAutoComplete" 
-                                    (keydown.tab)="validateProductByClient($event, i)">
-                                    <mat-autocomplete #pAutoComplete="matAutocomplete" (optionSelected)="pAutoCompleteSelected($event, i)">
-                                      <mat-option *ngFor="let option of pAutoCompleteOptions | async" [value]="option.Description" class="autoCompleteStyleControl">
-                                        <div class="divAutoCompleteStyleControl">
-                                          <span>Name:</span>
-                                          <span>{{option.Description}}</span>
-                                        </div>  
-                                        <div class="divAutoCompleteStyleControl">
-                                          <span>Class:</span>
-                                          <span>{{option.Class}}</span>
-                                        </div>  
-                                        <div class="divAutoCompleteStyleControl">
-                                          <span>NMFC:</span>
-                                          <span>{{option.NMFC}}</span>
-                                        </div> 
-                                        <div class="divAutoCompleteStyleControl">
-                                          <span>Weight:</span>
-                                          <span>{{option.Weight}}</span>
-                                        </div>  
-                                        <div class="divAutoCompleteStyleControl">
-                                          <span>Dimension:</span>
-                                          <span>{{option.Height}} x {{option.Lenght}} x {{option.Width}}</span>
-                                        </div>
-                                        <hr>
-                                      </mat-option>
-                                    </mat-autocomplete>
-                          </mat-form-field>
-                        </div>     
+                        </div>                            
                       </div>
         
                       <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="5px">   

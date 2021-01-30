@@ -67,6 +67,7 @@ import { SaveQuoteResponse } from '../../../../Entities/SaveQuoteResponse';
 import { HtmlMsgByClient } from 'src/app/Entities/HtmlMsgByClient';
 import { PCFClientDefaults } from '../../../../Entities/PCFClientDefaults';
 import { Brand } from 'src/app/Entities/Brand';
+import { ProductByClient } from  '../../../../Entities/ProductByClient'
 
 export interface CountryState {
   name: string;
@@ -213,6 +214,7 @@ export class FormQuickQuoteComponent implements OnInit {
 
   pcoAutoCompleteOptions: Observable<PostalData[]>;
   pcdAutoCompleteOptions: Observable<PostalData[]>;
+  pAutoCompleteOptions: Observable<ProductByClient[]>;
 
   saveQuoteParameters: SaveQuoteParameters;
 
@@ -247,6 +249,9 @@ export class FormQuickQuoteComponent implements OnInit {
   DestinationStateName: string;
   DestinationPostalData: PostalData;
   //#endregion
+
+  IsAutoCompleteProductSelected = false;
+  productList: ProductByClient[];
 
   @Input() childProductField: ProductFeatures;
   @Output() parentProductFields = new EventEmitter<ProductFeatures>();
@@ -307,6 +312,8 @@ export class FormQuickQuoteComponent implements OnInit {
     const responseData = await this.httpService.getCountryList(this.keyId);
     this.clientDefaultData = await this.httpService.getClientDefaultsByClient(this.ClientID, this.keyId);
 
+    this.productList = await this.httpService.GetProductByClient(this.ClientID, this.keyId);
+
     this.originCountries = responseData;
     this.destinationCountries = responseData;
     this.originSelectedCountry = responseData[0]; // US as default
@@ -334,12 +341,34 @@ export class FormQuickQuoteComponent implements OnInit {
         })
       );
 
+    const productsList = this.formProducts;
+  
+    for (let i = 0; i <  productsList.length; i++){
+      const formGroup = productsList.controls[i] as FormGroup;
+  
+      this.pAutoCompleteOptions = formGroup.get('Description').valueChanges
+        .pipe(
+          startWith(''),
+          map(val => this.productsByClientFilter((val)))
+        ); 
+    }
+    
     this.ratesOpened = []; // initiate ratesOpened array
 
   }
 
   
+  private productsByClientFilter(value = ''): ProductByClient[]{
 
+    if (!this.IsAutoCompleteProductSelected && value !== null && value !== '' ){
+      let productListResult = this.productList.filter(p => p.Description.toLowerCase().includes(value.toLocaleLowerCase()));
+      return this.productList.filter(p => p.Description.toLowerCase().includes(value.toLocaleLowerCase()))  
+    }
+      
+    this.IsAutoCompleteProductSelected = false;
+    const prodBase: ProductByClient[] = [];
+    return prodBase; 
+  }
   
   pcoAutoCompleteFilter(val: string): Observable<any[]> {
     const CountryId = this.originSelectedCountry == null ? '1': this.originSelectedCountry.CountryId.toString();
@@ -365,8 +394,82 @@ export class FormQuickQuoteComponent implements OnInit {
     this.quickQuoteFormGroup.get('destinationpostalcode').setValue(this.DestinationPostalCode);
   }
 
+  onKeypressProdDesc(event: any, index: number){
+    const productsList = this.formProducts;
+    if (productsList.length - 1 !== index){
+      const formGroup = productsList.controls[index] as FormGroup;
+
+      this.pAutoCompleteOptions = formGroup.get('Description').valueChanges
+        .pipe(
+          startWith(''),
+          map(val => this.productsByClientFilter((val)))
+        ); 
+    }
+  }
+
+  focusFunction(index: number){
+    const productsList = this.formProducts;
+    const formGroup = productsList.controls[index] as FormGroup;
+
+    this.pAutoCompleteOptions = formGroup.get('Description').valueChanges
+      .pipe(
+        startWith(''),
+        map(val => this.productsByClientFilter(formGroup.get('Description').value))
+      ); 
+  }
+
+  async validateProductByClient(event: KeyboardEvent, index: number){
+
+    const productsListControl = this.formProducts;
+    if (productsListControl !== null && productsListControl.length > 0){
+
+      const formGroup = productsListControl.controls[index] as FormGroup;
+      let descriptionProduct = formGroup.get('Description').value;
+
+      const productSelected = this.productList.find(p => p.Description === descriptionProduct);
+
+      if (productSelected !== null){
+        formGroup.get('Pallets').setValue(productSelected.Pallets);
+        formGroup.get('Pieces').setValue(productSelected.Pieces);
+        formGroup.get('ProductClass').setValue(productSelected.Class.trim());
+        formGroup.get('Description').setValue(productSelected.Description.trim());
+        formGroup.get('NmfcNumber').setValue(productSelected.NMFC.trim());
+        formGroup.get('Length').setValue(productSelected.Lenght);
+        formGroup.get('Width').setValue(productSelected.Width);
+        formGroup.get('Height').setValue(productSelected.Height);
+        formGroup.get('Weight').setValue(productSelected.Weight);
+        formGroup.get('Hazmat').setValue(productSelected.Hazmat);
+        this.onChangeCalculatePCF(index);
+      }    
+    }
+  }
+
+  pAutoCompleteSelected(event: MatAutocompleteSelectedEvent, index: number): void {
+    this.IsAutoCompleteProductSelected = true;
+
+    const productSelected = this.productList.find(p => p.Description === event.option.value);
+
+    if (productSelected !== null){
+      const productsList = this.formProducts;
+      const formGroup = productsList.controls[index] as FormGroup;
+  
+      formGroup.get('Pallets').setValue(productSelected.Pallets);
+      formGroup.get('Pieces').setValue(productSelected.Pieces);
+      formGroup.get('ProductClass').setValue(productSelected.Class.trim());
+      formGroup.get('Description').setValue(productSelected.Description.trim());
+      formGroup.get('NmfcNumber').setValue(productSelected.NMFC.trim());
+      formGroup.get('Length').setValue(productSelected.Lenght);
+      formGroup.get('Width').setValue(productSelected.Width);
+      formGroup.get('Height').setValue(productSelected.Height);
+      formGroup.get('Weight').setValue(productSelected.Weight);
+      formGroup.get('Hazmat').setValue(productSelected.Hazmat);
+      this.onChangeCalculatePCF(index);
+    }    
+  }
+
   addProductFormGroup(): FormGroup{
     return this.fb.group({
+      Description: [null, Validators.required],
       Pallets: [0, Validators.required],
       Pieces: [0],
       PackageTypeID: [3],
@@ -795,7 +898,7 @@ export class FormQuickQuoteComponent implements OnInit {
     const productList: BOlProductsList[] = [];
     arrayProducts.forEach(p => {
       const prod : BOlProductsList = {
-        Description: 'NA',
+        Description: p.Description,
         Pallets: p.Pallets == null ? 0 : p.Pallets,
         Pieces: p.Pieces  == null ? 0 : p.Pieces,
         Hazmat: p.HazMat,

@@ -12,6 +12,7 @@ import {Location} from '../../../../../Entities/Location';
 import {HttpService} from "../../../../../common/http.service";
 import {DatePipe} from "@angular/common";
 import {GetLocationsParameters} from "../../../../../Entities/GetLocationsParameters";
+import {AuthenticationService} from "../../../../../common/authentication.service";
 
 @Component({
   selector: 'vex-location-search-modal',
@@ -44,7 +45,8 @@ export class LocationSearchModalComponent implements OnInit {
   constructor(private httpService : HttpService, @Inject(MAT_DIALOG_DATA) public defaults: any,
               private dialogRef: MatDialogRef<LocationSearchModalComponent>,
               private fb: FormBuilder,
-              public datepipe: DatePipe) {
+              public datepipe: DatePipe,
+              private au: AuthenticationService) {
   }
 
   async ngOnInit() {
@@ -73,7 +75,7 @@ export class LocationSearchModalComponent implements OnInit {
 
   initGetLocationsParameter(data) {
     this.getLocationsParameters = {
-      ClientId: 1,
+      ClientId: this.au.getDefaultClient().ClientID,
       IsAccending: false,
       LocationID: null,
       Name: data.Name,

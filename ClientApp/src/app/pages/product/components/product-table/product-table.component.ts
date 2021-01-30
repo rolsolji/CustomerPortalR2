@@ -86,7 +86,7 @@ export class ProductTableComponent implements OnInit, AfterViewInit, OnDestroy {
   searchCtrl = new FormControl();
 
   labels = [];
-  productClasses = [50, 55, 60, 65, 70, 77.5, 85, 92.5, 100, 110, 125, 150, 175, 200, 250, 300, 400, 500, '']
+  productClasses = ['Any',50, 55, 60, 65, 70, 77.5, 85, 92.5, 100, 110, 125, 150, 175, 200, 250, 300, 400, 500]
 
   icPhone = icPhone;
   icMail = icMail;
@@ -159,7 +159,7 @@ export class ProductTableComponent implements OnInit, AfterViewInit, OnDestroy {
       description: '',
       hazMatSearchSelected: ['null'],
       statusSearchSelected: ['null'],
-      productClass: '50'
+      productClass: 'Any'
     });
     this.searchCtrl.valueChanges.pipe(
         untilDestroyed(this)
@@ -176,7 +176,7 @@ export class ProductTableComponent implements OnInit, AfterViewInit, OnDestroy {
         descriptionValue === '' ? null : descriptionValue,
         hazMatSearchSelected === 'null' ? null : hazMatSearchSelected === 'true',
         null,
-        productClassSelected === '' ? null : productClassSelected,
+        productClassSelected === 'Any' ? null : productClassSelected,
         commodityValue === '' ? null : commodityValue,
         statusSearchSelected === 'null' ? null : statusSearchSelected === 'true'
     );
@@ -347,6 +347,23 @@ export class ProductTableComponent implements OnInit, AfterViewInit, OnDestroy {
       Commodity: Commodity,
       Status: Status
     };
+  }
+
+  async clear(){
+    this.formGroup.get('commodity').setValue('');
+    this.formGroup.get('description').setValue('');   
+    this.formGroup.get('productClass').setValue('Any');       
+
+    const { GetAndSearchPagedProductDetailsResult } = await this.getData();
+    this.dataSource = new PaginatedDataSource<Product, ProductQuery>(
+        (request, query, hasDelete) =>
+            this.productsService.page(request, query, hasDelete, GetAndSearchPagedProductDetailsResult, this.httpService),
+        this.initialSort,
+        {search: '', registration: undefined},
+        this.pageSize,
+        GetAndSearchPagedProductDetailsResult,
+        this.initialDelete
+    )
   }
 }
 

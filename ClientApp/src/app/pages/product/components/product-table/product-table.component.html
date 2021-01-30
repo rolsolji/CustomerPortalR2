@@ -233,48 +233,57 @@
 
 <div fxLayout="row" fxLayoutAlign="space-between" class="py-2 pr-2">
   <mat-sidenav #searchModal position="end" class="search-container" (click)="close('search')">
-    <form *ngIf="formGroup" (ngSubmit)="search()" [formGroup]="formGroup">
-      <div fxLayout="row" fxLayoutGap="5px" class="ml-2 mr-2">
-        <div fxFlex="220px">
-          <mat-form-field appearance="outline">
-            <mat-label>Commodity</mat-label>
-            <input name="commodity" matInput formControlName="commodity">
-          </mat-form-field>
+    <div @fadeInUp class="card">
+      <form *ngIf="formGroup" (ngSubmit)="search()" [formGroup]="formGroup">
+        <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="5px" class="ml-2 mr-2">
+          <div fxFlex="50%">
+            <mat-form-field appearance="outline">
+              <mat-label>Commodity</mat-label>
+              <input name="commodity" matInput formControlName="commodity">
+            </mat-form-field>
+          </div>
+          <div fxFlex="50%">
+            <mat-form-field appearance="outline">
+              <mat-label>Description</mat-label>
+              <input name="description" matInput formControlName="description">
+            </mat-form-field>
+          </div>
         </div>
-        <div fxFlex="200px" fxFlexFill>
-          <mat-form-field appearance="outline">
-            <mat-label>Description</mat-label>
-            <input name="description" matInput formControlName="description">
-          </mat-form-field>
+        <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="5px" class="ml-2 mr-2 mb-5">
+          <div fxFlex="100%" >
+            <mat-radio-group aria-label="HazMat" name="HazMat" formControlName="hazMatSearchSelected" color="primary">
+              <mat-label>HazMat</mat-label>
+              <mat-radio-button class="sm:m-2" value="true">Yes</mat-radio-button>
+              <mat-radio-button class="sm:m-2" value="false">No</mat-radio-button>
+              <mat-radio-button class="sm:m-2" value="null">All</mat-radio-button>
+            </mat-radio-group>
+          </div>          
+        </div>        
+        <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="5px" class="ml-2 mr-2 mb-5">
+          <div fxFlex="100%">
+            <mat-radio-group aria-label="Status" name="Status" formControlName="statusSearchSelected" color="primary">
+              <mat-label>Is Active</mat-label>
+              <mat-radio-button class="sm:m-2" value="true">Yes</mat-radio-button>
+              <mat-radio-button class="sm:m-2" value="false">No</mat-radio-button>
+              <mat-radio-button class="sm:m-2" value="null">All</mat-radio-button>
+            </mat-radio-group>
+          </div>
         </div>
-      </div>
-      <div fxLayout="row" fxLayoutGap="5px" class="ml-2 mr-2" fxLayoutAlign="center center">
-        <mat-radio-group aria-label="HazMat" name="HazMat" formControlName="hazMatSearchSelected" color="primary">
-          <mat-label>HazMat</mat-label>
-          <mat-radio-button class="sm:m-2" value="true">Yes</mat-radio-button>
-          <mat-radio-button class="sm:m-2" value="false">No</mat-radio-button>
-          <mat-radio-button class="sm:m-2" value="null">All</mat-radio-button>
-        </mat-radio-group>
-      </div>
-      <div fxLayout="row" fxLayoutGap="5px" class="ml-2 mr-2" fxLayoutAlign="center center">
-        <mat-radio-group aria-label="Status" name="Status" formControlName="statusSearchSelected" color="primary">
-          <mat-label>Is Active</mat-label>
-          <mat-radio-button class="sm:m-2" value="true">Yes</mat-radio-button>
-          <mat-radio-button class="sm:m-2" value="false">No</mat-radio-button>
-          <mat-radio-button class="sm:m-2" value="null">All</mat-radio-button>
-        </mat-radio-group>
-      </div>
-      <div fxLayout="row" fxLayoutGap="5px" class="ml-2 mr-2">
-        <mat-form-field class="flex-auto">
-          <mat-label>Product Class</mat-label>
-          <mat-select formControlName="productClass">
-            <mat-option *ngFor="let class of productClasses" value="{{class}}">{{class}}</mat-option>
-          </mat-select>
-        </mat-form-field>
-      </div>
-      <div fxLayout="row" fxLayoutGap="5px" class="ml-2 mr-2">
-        <button color="primary" mat-button type="submit" [disabled]="!formGroup.valid">Search</button>
-      </div>
-    </form>
+        <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="5px" class="ml-2 mr-2">
+          <div fxFlex="50%">
+            <mat-form-field appearance="outline" class="flex-auto"> 
+              <mat-label>Product Class</mat-label>
+              <mat-select formControlName="productClass">
+                <mat-option *ngFor="let class of productClasses" value="{{class}}">{{class}}</mat-option>
+              </mat-select>
+            </mat-form-field>
+          </div>
+        </div>
+        <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="5px" class="ml-2 mr-2">
+          <button (click)="clear()" mat-button type="button">Clear</button>  
+          <button color="warn" mat-raised-button type="submit" [disabled]="!formGroup.valid">Search</button>                  
+        </div>
+      </form>
+    </div>
   </mat-sidenav>
 </div>

@@ -410,7 +410,7 @@
                                     [matAutocomplete]="pAutoComplete" 
                                     (keydown.tab)="validateProductByClient($event, i)">
                                     <mat-autocomplete #pAutoComplete="matAutocomplete" (optionSelected)="pAutoCompleteSelected($event, i)">
-                                      <mat-option *ngFor="let option of pAutoCompleteOptions | async" [value]="option.Description" class="autoCompleteStyleControl">
+                                      <mat-option *ngFor="let option of pAutoCompleteOptions | async" [value]="option.ProductID" class="autoCompleteStyleControl">
                                         <div class="divAutoCompleteStyleControl">
                                           <span>Name:</span>
                                           <span>{{option.Description}}</span>

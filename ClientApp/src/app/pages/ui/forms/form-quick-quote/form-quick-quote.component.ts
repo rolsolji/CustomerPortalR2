@@ -314,6 +314,8 @@ export class FormQuickQuoteComponent implements OnInit {
 
     this.productList = await this.httpService.GetProductByClient(this.ClientID, this.keyId);
 
+    console.log("Lista Productos", this.productList);
+
     this.originCountries = responseData;
     this.destinationCountries = responseData;
     this.originSelectedCountry = responseData[0]; // US as default
@@ -447,7 +449,7 @@ export class FormQuickQuoteComponent implements OnInit {
   pAutoCompleteSelected(event: MatAutocompleteSelectedEvent, index: number): void {
     this.IsAutoCompleteProductSelected = true;
 
-    const productSelected = this.productList.find(p => p.Description === event.option.value);
+    const productSelected = this.productList.find(p => p.ProductID === event.option.value);
 
     if (productSelected !== null){
       const productsList = this.formProducts;

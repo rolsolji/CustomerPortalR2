@@ -795,7 +795,7 @@ export class FormAddShipComponent implements OnInit {
   pAutoCompleteSelected(event: MatAutocompleteSelectedEvent, index: number): void {
     this.IsAutoCompleteProductSelected = true;
 
-    const productSelected = this.productList.find(p => p.Description === event.option.value);
+    const productSelected = this.productList.find(p => p.ProductID === event.option.value);
 
     if (productSelected !== null){
       const productsList = this.productsAndAccessorialsFormGroup.get('products') as FormArray;

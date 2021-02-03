@@ -7,7 +7,7 @@
                              [class.px-gutter]="layoutCtrl === 'fullwidth'"
                              class="-mt-6">
 
-        <div class="card overflow-auto -mt-16">
+        <div class="card overflow-auto -mt-16" (click)="close('close')">
             <div class="bg-app-bar px-6 h-16 border-b sticky left-0" fxLayout="row" fxLayoutAlign="start center">
                 <h2 class="title my-0 ltr:pr-4 rtl:pl-4 ltr:mr-4 rtl:ml-4 ltr:border-r rtl:border-l" fxFlex="none" fxHide.xs>
                     <span *ngIf="selection.isEmpty()">Locations</span>
@@ -45,13 +45,22 @@
                     <mat-icon [icIcon]="icSearch"></mat-icon>
                 </button>
 
-                <button (click)="searchLocationModal()"
+                <!-- <button (click)="searchLocationModal()"
                         class="ml-4"
                         fxFlex="none"
                         mat-icon-button
                         matTooltip="Search"
                         type="button">
                     <mat-icon [icIcon]="icFilterList"></mat-icon>
+                </button> -->
+
+                <button (click)="close('open')"
+                    class="ml-4"
+                    fxFlex="none"
+                    mat-icon-button
+                    matTooltip="Search"
+                    type="button">
+                    <mat-icon [icIcon]="icSearch"></mat-icon>
                 </button>
 
                 <button (click)="createLocation()"
@@ -225,3 +234,52 @@
         </button>
     </ng-template>
 </mat-menu>
+
+<div fxLayout="row" fxLayoutAlign="space-between" class="py-2 pr-2">
+    <mat-sidenav #searchModal position="end" class="search-container" (click)="close('search')">
+      <div @fadeInUp class="card">
+        <form *ngIf="formGroup" (ngSubmit)="search()" [formGroup]="formGroup">            
+            <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="5px" class="ml-2 mr-2">
+                <div fxFlex="50%">
+                    <mat-form-field appearance="outline">
+                        <mat-label>Location Name</mat-label>
+                        <input name="Name" matInput formControlName="Name">
+                    </mat-form-field>                  
+                </div>
+                <div fxFlex="50%">
+                  <mat-form-field appearance="outline">
+                    <mat-label>Short Name</mat-label>
+                    <input name="ShortName" matInput formControlName="ShortName">
+                  </mat-form-field>
+                </div>
+            </div>
+            <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="5px" class="ml-2 mr-2">
+                <div fxFlex="50%">
+                  <mat-form-field appearance="outline">
+                    <mat-label>Contact Name</mat-label>
+                    <input name="ContactName" matInput formControlName="ContactName">
+                  </mat-form-field>
+                </div>
+                <div fxFlex="50%">
+                  <mat-form-field appearance="outline">
+                    <mat-label>Contact Phone</mat-label>
+                    <input name="ContactPhone" matInput formControlName="ContactPhone">
+                  </mat-form-field>
+                </div>
+            </div>
+            <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="5px" class="ml-2 mr-2">
+                <div fxFlex="100%">
+                  <mat-form-field appearance="outline">
+                    <mat-label>Contact Email</mat-label>
+                    <input name="ContactEmail" matInput formControlName="ContactEmail">
+                  </mat-form-field>
+                </div>                
+            </div>                            
+            <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="5px" class="ml-2 mr-2">
+                <button (click)="clear()" mat-button type="button">Clear</button>  
+                <button color="warn" mat-raised-button type="submit" [disabled]="!formGroup.valid">Search</button>                  
+            </div>
+          </form>
+      </div>
+    </mat-sidenav>
+  </div>

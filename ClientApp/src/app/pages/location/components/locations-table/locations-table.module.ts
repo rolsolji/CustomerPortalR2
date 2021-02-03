@@ -18,6 +18,9 @@ import {MatTableModule} from "@angular/material/table";
 import {MatSelectModule} from "@angular/material/select";
 import {MatPaginatorModule} from "@angular/material/paginator";
 import {MatSortModule} from "@angular/material/sort";
+import { MatSidenavModule } from "@angular/material/sidenav";
+import { MatInputModule } from "@angular/material/input";
+import { MatFormFieldModule } from '@angular/material/form-field';
 
 @NgModule({
   declarations: [LocationsTableComponent],
@@ -39,7 +42,10 @@ import {MatSortModule} from "@angular/material/sort";
         MatSelectModule,
         MatPaginatorModule,
         FormsModule,
-        MatSortModule
+        MatSortModule,
+        MatSidenavModule,
+        MatInputModule,
+        MatFormFieldModule,
     ],
   exports: [
     LocationsTableComponent

@@ -14,6 +14,8 @@ import {MatSelectModule} from "@angular/material/select";
 import {MatPaginatorModule} from "@angular/material/paginator";
 import {AppModule} from "../../app.module";
 import {LocationsTableModule} from "./components/locations-table/locations-table.module";
+import { MatSidenavModule } from "@angular/material/sidenav";
+import { MatInputModule } from "@angular/material/input";
 
 
 @NgModule({
@@ -35,6 +37,8 @@ import {LocationsTableModule} from "./components/locations-table/locations-table
     FormsModule,
     AppModule,
     LocationsTableModule,
+    MatSidenavModule,
+    MatInputModule
   ]
 })
 export class LocationListModule { }

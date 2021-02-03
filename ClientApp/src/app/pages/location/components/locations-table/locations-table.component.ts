@@ -2,7 +2,7 @@ import {AfterViewInit, Component, Input, OnDestroy, OnInit, ViewChild} from '@an
 import {fadeInUp400ms} from "../../../../../@vex/animations/fade-in-up.animation";
 import {stagger40ms} from "../../../../../@vex/animations/stagger.animation";
 import {MAT_FORM_FIELD_DEFAULT_OPTIONS, MatFormFieldDefaultOptions} from "@angular/material/form-field";
-import {FormControl} from "@angular/forms";
+import {FormBuilder, FormGroup, FormControl} from "@angular/forms";
 import {Observable, ReplaySubject} from "rxjs";
 import {TableColumn} from "../../../../../@vex/interfaces/table-column.interface";
 import {MatTableDataSource} from "@angular/material/table";
@@ -31,6 +31,7 @@ import {LocationSearchModalComponent} from "./location-search-modal/location-sea
 import {User} from "../../../../Entities/user.model";
 import {AuthenticationService} from "../../../../common/authentication.service";
 import {MatSnackBar} from "@angular/material/snack-bar";
+import { MatSidenav } from '@angular/material/sidenav';
 
 @Component({
   selector: 'vex-locations-table',
@@ -54,6 +55,7 @@ export class LocationsTableComponent implements OnInit, AfterViewInit, OnDestroy
   layoutCtrl = 'fullwidth';
   user: User;
   clientID: number;
+  formGroup: FormGroup;
   /**
    * Simulating a service with HTTP that returns Observables
    * You probably want to remove this and do all requests in a service with HTTP
@@ -97,16 +99,17 @@ export class LocationsTableComponent implements OnInit, AfterViewInit, OnDestroy
 
   @ViewChild(MatPaginator, { static: true }) paginator: MatPaginator;
   @ViewChild(MatSort, { static: true }) sort: MatSort;
+  @ViewChild('searchModal') sidenav: MatSidenav;
 
   constructor(
       private dialog: MatDialog,
       private httpService : HttpService,
       private au: AuthenticationService,
-      private snackBar: MatSnackBar
+      private snackBar: MatSnackBar,
+      private fb: FormBuilder     
   ) {
     this.user = this.httpService.getUserFromStorage();
-    this.clientID = this.au.getDefaultClient().ClientID;
-    this.initGetLocationsParameter();
+    this.clientID = this.au.getDefaultClient().ClientID;    
   }
 
   getLocationsParameters: GetLocationsParameters;
@@ -124,6 +127,16 @@ export class LocationsTableComponent implements OnInit, AfterViewInit, OnDestroy
   }
 
   ngOnInit() {
+    this.formGroup = this.fb.group({
+      ShortName: '',
+      Name: '',
+      ContactName: '',
+      ContactPhone: '',
+      ContactEmail: '',
+    });
+
+    this.initGetLocationsParameter(this.formGroup.value);
+
     this.getData().then(responseData => this.subject$.next(responseData));
     this.dataSource = new MatTableDataSource();
 
@@ -137,6 +150,10 @@ export class LocationsTableComponent implements OnInit, AfterViewInit, OnDestroy
     this.searchCtrl.valueChanges.pipe(
         untilDestroyed(this)
     ).subscribe(value => this.onFilterChange(value));
+
+    
+
+    
   }
 
   async ngAfterViewInit() {
@@ -243,20 +260,107 @@ export class LocationsTableComponent implements OnInit, AfterViewInit, OnDestroy
   ngOnDestroy() {
   }
 
-  initGetLocationsParameter() {
+  // initGetLocationsParameter() {
+  //   this.getLocationsParameters = {
+  //     ClientId: this.clientID,
+  //     IsAccending: false,
+  //     LocationID: null,
+  //     Name: null,
+  //     ShortName: null,
+  //     ContactName: null,
+  //     ContactEmail: null,
+  //     ContactPhone: null,
+  //     OrderBy: "",
+  //     PageNumber: 1,
+  //     PageSize: 100000,
+  //     Status: null,
+  //   }
+  // }
+
+  close(reason: string) {
+    if (reason === 'open' || reason === 'search')
+    {
+      this.sidenav.open();
+      event.stopPropagation();
+      event.stopImmediatePropagation();
+    }
+    else
+    {
+      this.sidenav.close();
+      event.stopPropagation();
+      event.stopImmediatePropagation();
+    }
+  }
+
+  async search() {
+    let location = this.formGroup.value;
+    this.initGetLocationsParameter(location);
+    const locationsSearchResult = await this.httpService.getMasLocations(this.getLocationsParameters);
+
+    this.data$.pipe(
+      filter<Location[]>(Boolean)
+    ).subscribe(locations => {
+      this.locations = locationsSearchResult;
+      this.dataSource.data = locationsSearchResult;
+    });
+
+    // const commodityValue = this.formGroup.get('commodity').value;
+    // const descriptionValue = this.formGroup.get('description').value;
+    // const hazMatSearchSelected = this.formGroup.get('hazMatSearchSelected').value;
+    // const statusSearchSelected = this.formGroup.get('statusSearchSelected').value;
+    // const productClassSelected = this.formGroup.get('productClass').value;
+    // const { GetAndSearchPagedProductDetailsResult } = await this.getData(
+    //     descriptionValue === '' ? null : descriptionValue,
+    //     hazMatSearchSelected === 'null' ? null : hazMatSearchSelected === 'true',
+    //     null,
+    //     productClassSelected === 'Any' ? null : productClassSelected,
+    //     commodityValue === '' ? null : commodityValue,
+    //     statusSearchSelected === 'null' ? null : statusSearchSelected === 'true'
+    // );
+    // this.dataSource.queryBy({
+    //   search: GetAndSearchPagedLocationsResult,
+    //   registration: undefined
+    // });
+    this.close('close');
+
+  }
+
+  initGetLocationsParameter(data) {
     this.getLocationsParameters = {
-      ClientId: this.clientID,
+      ClientId: this.au.getDefaultClient().ClientID,
       IsAccending: false,
       LocationID: null,
-      Name: null,
-      ShortName: null,
-      ContactName: null,
-      ContactEmail: null,
-      ContactPhone: null,
+      Name: data.Name,
+      ShortName: data.ShortName,
+      ContactName: data.ContactName,
+      ContactEmail: data.ContactEmail,
+      ContactPhone: data.ContactPhone,
       OrderBy: "",
       PageNumber: 1,
-      PageSize: 100000,
+      PageSize: 1000,
       Status: null,
     }
+  }
+
+  async clear(){    
+
+    this.formGroup.get('ShortName').setValue('');
+    this.formGroup.get('Name').setValue('');   
+    this.formGroup.get('ContactName').setValue(''); 
+    this.formGroup.get('ContactPhone').setValue('');  
+    this.formGroup.get('ContactEmail').setValue('');        
+
+    let location = this.formGroup.value;
+    this.initGetLocationsParameter(location);
+    const locationsSearchResult = await this.httpService.getMasLocations(this.getLocationsParameters);
+
+    this.data$.pipe(
+      filter<Location[]>(Boolean)
+    ).subscribe(locations => {
+      this.locations = locationsSearchResult;
+      this.dataSource.data = locationsSearchResult;
+    });
+
+    this.close('close');
   }
 }

@@ -364,6 +364,8 @@ export class ProductTableComponent implements OnInit, AfterViewInit, OnDestroy {
         GetAndSearchPagedProductDetailsResult,
         this.initialDelete
     )
+
+    this.close('close');
   }
 }
 

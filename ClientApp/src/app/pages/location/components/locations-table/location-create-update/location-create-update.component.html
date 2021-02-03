@@ -26,12 +26,11 @@
 
       <mat-form-field class="sm:mt-6 sm:ml-6 flex-auto">
         <mat-label>Location Type</mat-label>
-        <mat-select [(value)]="this.locationTypeSelected" formControlName="LocationType">
+        <mat-select name="LocationType" formControlName="LocationType">
           <mat-option *ngFor="let locationType of this.locationTypes" [value]="locationType.LocationTypeID">
             {{locationType.LocationType}}
           </mat-option>
-        </mat-select>
-
+        </mat-select>                                
       </mat-form-field>
     </div>
 
@@ -130,20 +129,20 @@
       <mat-form-field class="flex-auto">
         <mat-label>State</mat-label>
         <input
+          name="state"
           formControlName="state"
           type="text"
           placeholder="State"
-          matInput
-          [matAutocomplete]="stateAutoComplete"
+          matInput          
           required
         >
-        <mat-autocomplete
+        <!-- <mat-autocomplete
                 [displayWith]="displayState.bind(this)" #stateAutoComplete="matAutocomplete">
           <mat-option *ngFor="let state of filteredStatesOptions | async"
                       [value]="state">
             {{state.StateName}}
           </mat-option>
-        </mat-autocomplete>
+        </mat-autocomplete> -->
 
       </mat-form-field>
 
@@ -158,19 +157,19 @@
       <mat-form-field class="flex-auto">
         <mat-label>City</mat-label>
         <input
+          name="city"
           formControlName="city"
           type="text"
           placeholder="Pick one"
-          matInput
-          [matAutocomplete]="cityAutoComplete"
+          matInput          
           required
         >
-        <mat-autocomplete [displayWith]="displayCity.bind(this)" #cityAutoComplete="matAutocomplete">
+        <!-- <mat-autocomplete [displayWith]="displayCity.bind(this)" #cityAutoComplete="matAutocomplete">
           <mat-option *ngFor="let city of filteredCitiesOptions | async"
                       [value]="city">
             {{city.CityName}}
           </mat-option>
-        </mat-autocomplete>
+        </mat-autocomplete> -->
 
       </mat-form-field>
 
@@ -218,7 +217,7 @@
   <mat-dialog-actions align="end">
     <button mat-button mat-dialog-close type="button">CANCEL</button>
     <button *ngIf="isCreateMode()" color="primary" mat-button type="submit" [disabled]="!form.valid || this.OriginPostalData == null">CREATE LOCATION</button>
-    <button *ngIf="isUpdateMode()" color="primary" mat-button type="submit" [disabled]="!form.valid || this.OriginPostalData == null">UPDATE LOCATION</button>
+    <button *ngIf="isUpdateMode()" color="primary" mat-button type="submit" [disabled]="!form.valid">UPDATE LOCATION</button>
   </mat-dialog-actions>
 </form>
 

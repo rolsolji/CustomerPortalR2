@@ -102,26 +102,29 @@ export class LocationCreateUpdateComponent implements OnInit {
       Address1: this.defaults.Address1 || '',
       Address2: this.defaults.Address2 || '',
       DeactivateDate: deactivateDate || '',
-      country: this.getCountryNameById(this.defaults.CountryId || 1) || '',
+      country: this.getCountryNameById((this.defaults.CountryId === 0 && this.defaults.CountryName === 'USA' ? 1 : 0) || 1) || '',
       ReferenceCode: this.defaults.ReferenceCode || '',
       PostalCode: this.defaults.PostalCode || '',
       InAccountCode: this.defaults.InAccountCode || '',
-      state: this.getStateNameById(this.defaults.CityId || '') || '',
+      state: this.defaults.StateCode || '',
       OutAccountCode: this.defaults.OutAccountCode || '',
-      city: this.getCityNameById(this.defaults.CityId || '') || '',
+      city: this.defaults.CityName || '', //this.getCityNameById(this.defaults.CityId || '') || '',
       CreatedBy: new FormControl({value: this.defaults.CreatedBy ?? this.user.UserName, disabled: true}) || '',
       ContactName: this.defaults.ContactName || '',
       ContactPhone: this.defaults.ContactPhone || '',
       ContactEmail: this.defaults.ContactEmail || '',
       Notes: this.defaults.Notes || '',
       LocationType: this.defaults.LocationType || 4
-    });
-    this.checked = this.defaults.Status || true;
-    this.approved = this.defaults.IsApproveLocation || 0;
+    });  
 
-    if (this.defaults.IsApproveLocation instanceof String) {
-      this.approved = this.defaults.IsApproveLocation === 'YesLoc' ? 1 : 0;
-    }
+    this.form.get('LocationType').setValue(this.defaults.LocationTypeID == null ? 4 : this.defaults.LocationTypeID);
+
+    this.checked = this.defaults.Status;
+    this.approved = this.defaults.UserID == null ? 1 : 0;
+
+    // if (this.defaults.IsApproveLocation instanceof String) {
+    //   this.approved = this.defaults.IsApproveLocation === 'YesLoc' ? 1 : 0;
+    // }
 
     this.pcoAutoCompleteOptions = this.form.get('PostalCode').valueChanges
         .pipe(
@@ -141,21 +144,21 @@ export class LocationCreateUpdateComponent implements OnInit {
           return this._filterCountries(val || '')
         })
     );
-    this.filteredStatesOptions = this.form.get('state').valueChanges.pipe(
-        startWith(''),
-        debounceTime(400),
-        distinctUntilChanged(),
-        switchMap(val => {
-          return this._filterStates(val || '')
-        })
-    );
-    this.filteredCitiesOptions = this.form.get('city').valueChanges.pipe(
-        startWith(''),
-        debounceTime(400),
-        distinctUntilChanged(),
-        switchMap(val => {
-          return this._filterCities(val || '')
-        }));
+    // this.filteredStatesOptions = this.form.get('state').valueChanges.pipe(
+    //     startWith(''),
+    //     debounceTime(400),
+    //     distinctUntilChanged(),
+    //     switchMap(val => {
+    //       return this._filterStates(val || '')
+    //     })
+    // );
+    // this.filteredCitiesOptions = this.form.get('city').valueChanges.pipe(
+    //     startWith(''),
+    //     debounceTime(400),
+    //     distinctUntilChanged(),
+    //     switchMap(val => {
+    //       return this._filterCities(val || '')
+    //     }));
 
     this.form.get('PostalCode').valueChanges.subscribe(value => {
       return this._changeStateAndCity(value)
@@ -206,19 +209,21 @@ export class LocationCreateUpdateComponent implements OnInit {
 
   async setCountryStatesCities(event) {
     this.statesAndCities = null;
-    const countryId = event.option.value.CountryId;
-    this.statesAndCities = await this.httpService.getPostalDataByPostalCode('', countryId.toString(), this.keyId);
+    let countryId = event.option.value.CountryId;
+    countryId = countryId === null || countryId === undefined || countryId === 0 ? '1' : countryId.toString()
+    this.statesAndCities = await this.httpService.getPostalDataByPostalCode('', countryId === null ? '1' : countryId, this.keyId);
   }
 
   pcoAutoCompleteSelected(event: MatAutocompleteSelectedEvent): void {
     this.OriginPostalData = event.option.value;
-    this.form.get('PostalCode').setValue(event.option.value.StateName.trim());
+    this.form.get('state').setValue(event.option.value.StateName.trim());
     this.OriginPostalCode = String.Format('{0}-{1}',event.option.value.PostalCode,event.option.value.CityName.trim());
     this.form.get('PostalCode').setValue(this.OriginPostalCode);
+    this.form.get('city').setValue(event.option.value.CityName.trim());
   }
 
   pcoAutoCompleteFilter(val: string): Observable<any[]> {
-    const CountryId = this.defaults.CountryId ?? '1';
+    const CountryId = this.defaults.CountryId === null || this.defaults.CountryId === undefined || this.defaults.CountryId === 0 ? '1' : this.defaults.CountryId;
     return this.httpService.postalCodeAutocomplete(val, CountryId, this.keyId)
   }
 
@@ -255,34 +260,34 @@ export class LocationCreateUpdateComponent implements OnInit {
     return this.countries.asObservable();
   }
 
-  private _filterStates(value: string | PostalData): Observable<PostalData[]> {
-    if (value) {
-      const filterValue = (typeof value === 'string') ? value.toLowerCase() : value.StateName.toLowerCase();
-      if (filterValue.length >= 4) {
-        this.states.next(this.statesAndCities.filter(
-            (option: PostalData) => option.StateName.toLowerCase().indexOf(filterValue) === 0));
-        this.states.next(this.getUniqueListBy(this.states.value, 'StateName'));
-        return this.states.asObservable();
-      }
-    }
-    this.states.next([]);
-    return this.states.asObservable();
-  }
+  // private _filterStates(value: string | PostalData): Observable<PostalData[]> {
+  //   if (value) {
+  //     const filterValue = (typeof value === 'string') ? value.toLowerCase() : value.StateName.toLowerCase();
+  //     if (filterValue.length >= 4) {
+  //       this.states.next(this.statesAndCities.filter(
+  //           (option: PostalData) => option.StateName.toLowerCase().indexOf(filterValue) === 0));
+  //       this.states.next(this.getUniqueListBy(this.states.value, 'StateName'));
+  //       return this.states.asObservable();
+  //     }
+  //   }
+  //   this.states.next([]);
+  //   return this.states.asObservable();
+  // }
 
-  private _filterCities(value: string | PostalData): Observable<PostalData[]> {
-    if (value) {
-      const filterValue = (typeof value === 'string') ? value.toLowerCase() : value.CityName.toLowerCase();
+  // private _filterCities(value: string | PostalData): Observable<PostalData[]> {
+  //   if (value) {
+  //     const filterValue = (typeof value === 'string') ? value.toLowerCase() : value.CityName.toLowerCase();
 
-      if (filterValue.length >= 4) {
-        this.cities.next(this.statesAndCities.filter(
-            (option: PostalData) => option.CityName.toLowerCase().indexOf(filterValue) === 0));
-        this.cities.next(this.getUniqueListBy(this.cities.value, 'CityName'));
-        return this.cities.asObservable();
-      }
-    }
-    this.cities.next([]);
-    return this.cities.asObservable();
-  }
+  //     if (filterValue.length >= 4) {
+  //       this.cities.next(this.statesAndCities.filter(
+  //           (option: PostalData) => option.CityName.toLowerCase().indexOf(filterValue) === 0));
+  //       this.cities.next(this.getUniqueListBy(this.cities.value, 'CityName'));
+  //       return this.cities.asObservable();
+  //     }
+  //   }
+  //   this.cities.next([]);
+  //   return this.cities.asObservable();
+  // }
 
   getUniqueListBy(arr: PostalData[], key): PostalData[] {
     return [...new Map(arr.map(item => [item[key], item])).values()]
@@ -366,7 +371,8 @@ export class LocationCreateUpdateComponent implements OnInit {
     location.Notes = locationData.Notes ?? this.defaults.Notes;
     location.OutAccountCode = locationData.OutAccountCode ?? this.defaults.OutAccountCode;
 
-    const postalCode = await this.httpService.getPostalDataByPostalCode(locationData.PostalCode, location.CountryId.toString(), this.keyId);
+    let tempPostalCode = this.OriginPostalData === null || this.OriginPostalData == undefined ? locationData.PostalCode : this.OriginPostalData.PostalCode;
+    const postalCode = await this.httpService.getPostalDataByPostalCode(tempPostalCode, location.CountryId.toString(), this.keyId);
     if (postalCode[0]) {
       location.PostalCode = locationData.PostalCode ?? this.defaults.PostalCode;
       location.PostalID = postalCode[0].PostalID ?? this.defaults.PostalID;
@@ -407,8 +413,8 @@ export class LocationCreateUpdateComponent implements OnInit {
     location.LocationGroup = this.defaults.LocationGroup;
     location.LocationGroupID = this.defaults.LocationGroupID;
     location.LocationID = this.defaults.LocationID;
-    location.LocationType = this.defaults.LocationType;
-    location.LocationTypeID = this.defaults.LocationTypeID;
+    location.LocationType = this.getLocationNameById(locationData.LocationType);
+    location.LocationTypeID = locationData.LocationType;
     location.ModifiedBy = this.user.UserName ?? this.defaults.ModifiedBy;
     const currentTime = new Date();
     location.ModifiedDate = String.Format('/Date({0})/', currentTime.getTime()) ?? this.defaults.ModifiedDate;
@@ -491,7 +497,7 @@ export class LocationCreateUpdateComponent implements OnInit {
   }
 
   async validateOriginPostalCode(event: KeyboardEvent) {
-    const CountryId = this.defaults.CountryId ?? '1';
+    const CountryId = this.defaults.CountryId === null || this.defaults.CountryId === undefined || this.defaults.CountryId === 0 ? '1' : this.defaults.CountryId;
     this.OriginPostalCode = this.form.get('PostalCode').value;
     if (this.OriginPostalCode != null && this.OriginPostalCode.trim().length == 5){
       const responseData = await this.httpService.getPostalDataByPostalCode(this.OriginPostalCode,CountryId,this.keyId);
@@ -508,5 +514,16 @@ export class LocationCreateUpdateComponent implements OnInit {
         this.OriginPostalData = null;
       }
     }
+  }
+
+  getLocationNameById(locationId){
+
+    for (let i = 0; i < (this.locationTypes as Array<{}>).length; i++) {
+      if (this.locationTypes[i].LocationTypeID === locationId){
+        return this.locationTypes[i].LocationType;
+      }
+    }   
+
+    return null;
   }
 }

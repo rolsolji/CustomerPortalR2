@@ -363,8 +363,8 @@ export class FormQuickQuoteComponent implements OnInit {
   private productsByClientFilter(value = ''): ProductByClient[]{
 
     if (!this.IsAutoCompleteProductSelected && value !== null && value !== '' ){
-      let productListResult = this.productList.filter(p => p.Description.toLowerCase().includes(value.toLocaleLowerCase()));
-      return this.productList.filter(p => p.Description.toLowerCase().includes(value.toLocaleLowerCase()))  
+      let productListResult = this.productList.filter(p => p.Description.toLowerCase().includes(value.toString().toLocaleLowerCase()));
+      return this.productList.filter(p => p.Description.toLowerCase().includes(value.toString().toLocaleLowerCase()))  
     }
       
     this.IsAutoCompleteProductSelected = false;
@@ -464,7 +464,7 @@ export class FormQuickQuoteComponent implements OnInit {
       formGroup.get('Width').setValue(productSelected.Width);
       formGroup.get('Height').setValue(productSelected.Height);
       formGroup.get('Weight').setValue(productSelected.Weight);
-      formGroup.get('Hazmat').setValue(productSelected.Hazmat);
+      formGroup.get('HazMat').setValue(productSelected.Hazmat);
       this.onChangeCalculatePCF(index);
     }    
   }

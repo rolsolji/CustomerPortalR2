@@ -616,11 +616,10 @@ export class FormAddShipComponent implements OnInit {
     return this.originAndDestinationFormGroup.get('destemail');
   } 
 
-  private productsByClientFilter(value = ''): ProductByClient[]{
-
-    if (!this.IsAutoCompleteProductSelected && value !== null && value !== '' ){
-      let productListResult = this.productList.filter(p => p.Description.toLowerCase().includes(value.toLocaleLowerCase()));
-      return this.productList.filter(p => p.Description.toLowerCase().includes(value.toLocaleLowerCase()))  
+  private productsByClientFilter(value = ''): ProductByClient[]{    
+    if (!this.IsAutoCompleteProductSelected && value != null && value != undefined && value !== '' ){      
+      let productListResult = this.productList.filter(p => p.Description.toLowerCase().includes(value.toString().toLowerCase()));
+      return this.productList.filter(p => p.Description.toLowerCase().includes(value.toString().toLowerCase()))  
     }
       
     this.IsAutoCompleteProductSelected = false;

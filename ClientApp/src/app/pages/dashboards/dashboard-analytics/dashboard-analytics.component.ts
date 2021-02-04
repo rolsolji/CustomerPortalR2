@@ -34,7 +34,7 @@ export class DashboardAnalyticsComponent implements OnInit {
   dateToForDatePicker: Date = null;
   showSpinnerOnDateChanges: boolean = false;
 
-  chart1Name: string = "Total Shipments By MTD";
+  chart1Name: string = "Total Shipments By Mode";
   SeriesOfTotalShipmentsChart: ApexNonAxisChartSeries = [];
   labelsOfTotalShipmentsChart: any;
   heightOfTopShipmentsChart: number = 450;

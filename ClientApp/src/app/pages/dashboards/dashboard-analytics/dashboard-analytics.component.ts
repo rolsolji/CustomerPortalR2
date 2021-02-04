@@ -70,7 +70,7 @@ export class DashboardAnalyticsComponent implements OnInit {
   selectedLaneType: number = 1;
   showSpinner: boolean;
 
-  chart6Name: string = "Top Vendors By Volume YTD";
+  chart6Name: string = "Top Vendors By Volume";
   SeriesOfTopVendorsByVolumeChart: ApexAxisChartSeries = [];
   labelsOfTopVendorsByVolumeChart: any;
   barHeightOfTopVendorsByVolumeChart: string = "50";

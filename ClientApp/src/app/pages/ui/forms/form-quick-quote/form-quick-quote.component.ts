@@ -432,7 +432,7 @@ export class FormQuickQuoteComponent implements OnInit {
 
       if (productSelected !== null){
         formGroup.get('Pallets').setValue(productSelected.Pallets);
-        formGroup.get('Pieces').setValue(productSelected.Pieces);
+        formGroup.get('Pieces').setValue(productSelected.Pieces == null || productSelected.Pieces == undefined ? 0 : productSelected.Pieces);
         formGroup.get('ProductClass').setValue(productSelected.Class.trim());
         formGroup.get('Description').setValue(productSelected.Description.trim());
         formGroup.get('NmfcNumber').setValue(productSelected.NMFC.trim());
@@ -456,7 +456,7 @@ export class FormQuickQuoteComponent implements OnInit {
       const formGroup = productsList.controls[index] as FormGroup;
   
       formGroup.get('Pallets').setValue(productSelected.Pallets);
-      formGroup.get('Pieces').setValue(productSelected.Pieces);
+      formGroup.get('Pieces').setValue(productSelected.Pieces == null || productSelected.Pieces == undefined ? 0 : productSelected.Pieces);
       formGroup.get('ProductClass').setValue(productSelected.Class.trim());
       formGroup.get('Description').setValue(productSelected.Description.trim());
       formGroup.get('NmfcNumber').setValue(productSelected.NMFC.trim());
@@ -471,7 +471,7 @@ export class FormQuickQuoteComponent implements OnInit {
 
   addProductFormGroup(): FormGroup{
     return this.fb.group({
-      Description: [null, Validators.required],
+      Description: [null],
       Pallets: [0, Validators.required],
       Pieces: [0],
       PackageTypeID: [3],
@@ -765,7 +765,12 @@ export class FormQuickQuoteComponent implements OnInit {
       this.spinnerMessage = 'Loading...';
 
       const pickupDate = this.OriginPickupDate;
+
+
       const arrayProducts = this.quickQuoteFormGroup.get('products').value;
+      arrayProducts.forEach(p => {
+        p.Pieces = p.Pieces  == null ? 0 : p.Pieces
+      });
 
       const objRate = {
         ClientID: this.ClientID,

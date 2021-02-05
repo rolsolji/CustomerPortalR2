@@ -8,6 +8,8 @@ export class User {
   TokenString: string;
   UserID: number;
   UserName: string;
+  TokenIssueDate: string;
+  TokenExpiryDate: string;
 
   constructor(user?: any) {
     this.ClientID = user && user.ClientID ? user.ClientID : null;
@@ -19,6 +21,8 @@ export class User {
     this.TokenString = user && user.TokenString ? user.TokenString : null;
     this.UserID = user && user.UserID ? user.UserID : null;
     this.UserName = user && user.UserName ? user.UserName : null;
+    this.TokenIssueDate = user && user.TokenIssueDate ? user.TokenIssueDate : null;
+    this.TokenExpiryDate = user && user.TokenExpiryDate ? user.TokenExpiryDate : null;
   }
 
 }

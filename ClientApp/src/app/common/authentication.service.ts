@@ -1,13 +1,14 @@
-import {Injectable} from '@angular/core';
-import {User} from '../Entities/user.model';
-import {HttpClient, HttpHeaders} from '@angular/common/http';
-import {BehaviorSubject} from 'rxjs';
-import {environment} from '../../environments/environment';
-import {Router} from '@angular/router';
-import {Client} from '../Entities/client.model';
-import {MasUser} from '../Entities/mas-user.model';
+import { Injectable } from '@angular/core';
+import { User } from '../Entities/user.model';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { BehaviorSubject } from 'rxjs';
+import { environment } from '../../environments/environment';
+import { Router } from '@angular/router';
+import { Client } from '../Entities/client.model';
+import { MasUser } from '../Entities/mas-user.model';
 import { HtmlMsgByClient } from '../Entities/HtmlMsgByClient';
 import { Brand } from '../Entities/Brand';
+import { TicketDataModel } from '../Entities/TicketDataModel';
 
 @Injectable({
   providedIn: 'root'
@@ -15,7 +16,7 @@ import { Brand } from '../Entities/Brand';
 export class AuthenticationService {
 
   private baseEndpoint: string;
-  constructor (
+  constructor(
     private http: HttpClient,
     public router: Router
   ) {
@@ -23,6 +24,7 @@ export class AuthenticationService {
     this.loading$.next(false);
     this.requestFailed$.next(false);
     this.init();
+    this.isTokenRefreshing$.next(false);
   }
 
   public authState$ = new BehaviorSubject(false);
@@ -34,6 +36,10 @@ export class AuthenticationService {
   public requestFailed$: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
   public clientHtmlMessages$: BehaviorSubject<HtmlMsgByClient[]> = new BehaviorSubject<HtmlMsgByClient[]>(null);
   public MasBrandForClient$: BehaviorSubject<Brand[]> = new BehaviorSubject<Brand[]>(null);
+  public tokenIssueDate$: BehaviorSubject<string> = new BehaviorSubject<string>(null);
+  public tokenExpiryDate$: BehaviorSubject<string> = new BehaviorSubject<string>(null);
+
+  public isTokenRefreshing$ = new BehaviorSubject(false);
 
   public init(): boolean {
     const ticket = this.getTicketFromStorage();
@@ -42,6 +48,8 @@ export class AuthenticationService {
     const defaultClient = this.getDefaultClientFromStorage();
     const clientHtmlMessages = this.getClientHtmlMessagesFromStorage();
     const masBrands = this.getMasBrandFromStorage();
+    const tokenIssueDate = this.getTokenIssueDateFromStorage();
+    const tokenExpiryDate = this.getTokenExpiryDateFromStorage();
 
     if (ticket && user) {
       this.ticket$.next(ticket);
@@ -51,6 +59,8 @@ export class AuthenticationService {
       this.defaultClient$.next(defaultClient);
       this.clientHtmlMessages$.next(clientHtmlMessages);
       this.MasBrandForClient$.next(masBrands);
+      this.tokenIssueDate$.next(tokenIssueDate);
+      this.tokenExpiryDate$.next(tokenExpiryDate);
 
       return true;
     }
@@ -69,45 +79,52 @@ export class AuthenticationService {
       this.http
         .get(
           `${environment.baseEndpoint}Services/LoginService.svc/Json/DoLogin?Username=${username}&Password=${password}&userType=C`,
-          {observe: 'response'}
+          { observe: 'response' }
         )
         .subscribe(async resp => {
-            const {body, headers} = resp;
-            const ticket = headers.get('ticket');
-            const user = resp && body ? new User(body) : {};
+          const { body, headers } = resp;
+          const ticket = headers.get('ticket');
+          const user = resp && body ? new User(body) : {};
 
-            this.ticket$.next(ticket);
-            localStorage.setItem('ticket', ticket);
-            this.authState$.next(true);
+          if (user instanceof User) {
+            this.tokenIssueDate$.next(user.TokenIssueDate);
+            localStorage.setItem('tokenIssueDate', user.TokenIssueDate);
+            this.tokenExpiryDate$.next(user.TokenExpiryDate);
+            localStorage.setItem('tokenExpiryDate', user.TokenExpiryDate);
+          }
 
-            if (user instanceof User) {
-              this.authenticatedUser$.next(user);
-              localStorage.setItem('authenticatedUser', JSON.stringify(user));
+          this.ticket$.next(ticket);
+          localStorage.setItem('ticket', ticket);
+          this.authState$.next(true);
 
-              await this.getClientsForUser(user.UserID);
-              const masUser = await this.getMasUser(user.UserID);
-              localStorage.setItem('masUser', JSON.stringify(masUser));
+          if (user instanceof User) {
+            this.authenticatedUser$.next(user);
+            localStorage.setItem('authenticatedUser', JSON.stringify(user));
 
-              const defaultClient = this.clientsForUser$.value.find(
-                (client: Client) => client.ClientID === user.ClientID);
-              localStorage.setItem('defaultClient', JSON.stringify(defaultClient));
-              this.defaultClient$.next(defaultClient);
+            await this.getClientsForUser(user.UserID);
+            const masUser = await this.getMasUser(user.UserID);
+            localStorage.setItem('masUser', JSON.stringify(masUser));
 
-              const clientHtmlMessagesSetup = await this.getClientHtmlMsgByClientID(defaultClient.ClientID);
-              localStorage.setItem('clientHtmlMessages', JSON.stringify(clientHtmlMessagesSetup));
-              this.clientHtmlMessages$.next(clientHtmlMessagesSetup);
+            const defaultClient = this.clientsForUser$.value.find(
+              (client: Client) => client.ClientID === user.ClientID);
+            localStorage.setItem('defaultClient', JSON.stringify(defaultClient));
+            this.defaultClient$.next(defaultClient);
 
-              const masBrandsSetup = await this.getMasBrandsByClientID(defaultClient.ClientID);
-              localStorage.setItem('masBrands', JSON.stringify(masBrandsSetup));
-              this.MasBrandForClient$.next(masBrandsSetup);
-            }
+            const clientHtmlMessagesSetup = await this.getClientHtmlMsgByClientID(defaultClient.ClientID);
+            localStorage.setItem('clientHtmlMessages', JSON.stringify(clientHtmlMessagesSetup));
+            this.clientHtmlMessages$.next(clientHtmlMessagesSetup);
 
-            resolve({ticket, status: true, user});
+            const masBrandsSetup = await this.getMasBrandsByClientID(defaultClient.ClientID);
+            localStorage.setItem('masBrands', JSON.stringify(masBrandsSetup));
+            this.MasBrandForClient$.next(masBrandsSetup);
+          }
 
-          },
+          resolve({ ticket, status: true, user });
+
+        },
           error => {
             this.authState$.next(false);
-            resolve({status: false, message: error.error.ErrorMessage})
+            resolve({ status: false, message: error.error.ErrorMessage })
 
           });
 
@@ -127,24 +144,20 @@ export class AuthenticationService {
     this.authState$.next(false);
     this.defaultClient$.next(null);
     this.loading$.next(false);
+    this.tokenIssueDate$.next(null);
+    this.tokenExpiryDate$.next(null);
     localStorage.removeItem('authenticatedUser');
     localStorage.removeItem('ticket');
     localStorage.removeItem('defaultClient');
     localStorage.removeItem('clientsForUser');
+    localStorage.removeItem('tokenIssueDate');
+    localStorage.removeItem('tokenExpiryDate');
     localStorage.clear();
+    this.isTokenRefreshing$.next(false);
   }
 
   public async getClientsForUser(userID: number) {
-    const ticket = this.ticket$.value;
-
-    const httpHeaders = new HttpHeaders({
-      Ticket : ticket
-    });
-
     const clients = await this.http.get<Client[]>(`${this.baseEndpoint}Services/MASClientService.svc/json/GetClientForUser?userID=${userID}&ClientName=`
-      ,{
-        headers: httpHeaders
-      }
     ).toPromise();
 
     localStorage.setItem('clientsForUser', JSON.stringify(clients));
@@ -199,91 +212,117 @@ export class AuthenticationService {
   }
 
   public async getMasUser(userId): Promise<MasUser> {
-    const ticket = this.ticket$.value;
-
-    const httpHeaders = new HttpHeaders({
-      Ticket : ticket
-    });
-
     return await this.http.get<MasUser>(`${this.baseEndpoint}Services/MASUserService.svc/json//GetMasUserByID?UserID=${userId}`
-      , {
-        headers: httpHeaders
-      }
     ).toPromise();
   }
 
-  public async getClientHtmlMsgByClientID(clientID:number){
-    const ticket = this.ticket$.value;
-    const httpHeaders = new HttpHeaders({
-        Ticket : ticket
-    });
+  public async getClientHtmlMsgByClientID(clientID: number) {
     return this.http.get<HtmlMsgByClient[]>(`${this.baseEndpoint}Services/MasClientHtmlMessageService.svc/json/GetClientHtmlMsgByClientID?ClientID=${clientID}`
-    ,{
-        headers: httpHeaders
-      }
-      ).toPromise();
+    ).toPromise();
   }
 
-  public async getMasBrandsByClientID(clientID:number){
-    const ticket = this.ticket$.value;
-    const httpHeaders = new HttpHeaders({
-        Ticket : ticket
-    });
+  public async getMasBrandsByClientID(clientID: number) {
     return this.http.get<Brand[]>(`${this.baseEndpoint}Services/MasBrandsService.svc/json/GetMasBrandsDataByClientID?ClientID=${clientID}`
-    ,{
-        headers: httpHeaders
-      }
-      ).toPromise();
+    ).toPromise();
   }
 
   public async getLoginDetailsUsingTicket(ticket: string) {
-    this.loading$.next(true);    
+    this.loading$.next(true);
+    this.ticket$.next(ticket);
+    localStorage.setItem('ticket', ticket);
     const httpHeaders = new HttpHeaders({
-        Ticket : ticket
+      Ticket: ticket
     });
     return new Promise((resolve, reject) => {
 
       this.http
         .get(
-          `${environment.baseEndpoint}Services/LoginService.svc/Json/GetDetailsUsingTicket?ticket=${ticket}`,          
-          { headers: httpHeaders, observe: 'response'}
+          `${environment.baseEndpoint}Services/LoginService.svc/Json/GetDetailsUsingTicket?ticket=${ticket}`,
+          { headers: httpHeaders, observe: 'response' }
         )
         .subscribe(async resp => {
-            const {body, headers} = resp;
-            const ticket = headers.get('ticket');
-            const user = resp && body ? new User(body) : {};
+          const { body, headers } = resp;
+          const ticket = headers.get('ticket');
+          const user = resp && body ? new User(body) : {};
 
-            this.ticket$.next(ticket);
-            localStorage.setItem('ticket', ticket);
-            this.authState$.next(true);
+          if (user instanceof User) {
+            this.tokenIssueDate$.next(user.TokenIssueDate);
+            localStorage.setItem('tokenIssueDate', user.TokenIssueDate);
+            this.tokenExpiryDate$.next(user.TokenExpiryDate);
+            localStorage.setItem('tokenExpiryDate', user.TokenExpiryDate);
+          }
 
-            if (user instanceof User) {
-              this.authenticatedUser$.next(user);
-              localStorage.setItem('authenticatedUser', JSON.stringify(user));
+          this.ticket$.next(ticket);
+          localStorage.setItem('ticket', ticket);
+          this.authState$.next(true);
 
-              await this.getClientsForUser(user.UserID);
-              const masUser = await this.getMasUser(user.UserID);
-              localStorage.setItem('masUser', JSON.stringify(masUser));
+          if (user instanceof User) {
+            this.authenticatedUser$.next(user);
+            localStorage.setItem('authenticatedUser', JSON.stringify(user));
 
-              const defaultClient = this.clientsForUser$.value.find(
-                (client: Client) => client.ClientID === user.ClientID);
-              localStorage.setItem('defaultClient', JSON.stringify(defaultClient));
-              this.defaultClient$.next(defaultClient);
+            await this.getClientsForUser(user.UserID);
+            const masUser = await this.getMasUser(user.UserID);
+            localStorage.setItem('masUser', JSON.stringify(masUser));
 
-              const clientHtmlMessagesSetup = await this.getClientHtmlMsgByClientID(defaultClient.ClientID);
-              localStorage.setItem('clientHtmlMessages', JSON.stringify(clientHtmlMessagesSetup));
-              this.clientHtmlMessages$.next(clientHtmlMessagesSetup);
+            const defaultClient = this.clientsForUser$.value.find(
+              (client: Client) => client.ClientID === user.ClientID);
+            localStorage.setItem('defaultClient', JSON.stringify(defaultClient));
+            this.defaultClient$.next(defaultClient);
 
-              const masBrandsSetup = await this.getMasBrandsByClientID(defaultClient.ClientID);
-              localStorage.setItem('masBrands', JSON.stringify(masBrandsSetup));
-              this.MasBrandForClient$.next(masBrandsSetup);
-            }
+            const clientHtmlMessagesSetup = await this.getClientHtmlMsgByClientID(defaultClient.ClientID);
+            localStorage.setItem('clientHtmlMessages', JSON.stringify(clientHtmlMessagesSetup));
+            this.clientHtmlMessages$.next(clientHtmlMessagesSetup);
 
-            resolve({ticket, status: true, user});
-          },
+            const masBrandsSetup = await this.getMasBrandsByClientID(defaultClient.ClientID);
+            localStorage.setItem('masBrands', JSON.stringify(masBrandsSetup));
+            this.MasBrandForClient$.next(masBrandsSetup);
+          }
+
+          resolve({ ticket, status: true, user });
+        },
           error => {
             this.authState$.next(false);
-            resolve({status: false, message: error.error.ErrorMessage})
+            resolve({ status: false, message: error.error.ErrorMessage })
+          });
+    })
+  }
+
+  public getTokenIssueDateFromStorage(): string {
+    return localStorage.getItem('tokenIssueDate');
+  }
+
+  public getTokenExpiryDateFromStorage(): string {
+    return localStorage.getItem('tokenExpiryDate');
+  }
+
+  public async refreshToken() {
+    return new Promise((resolve, reject) => {
+
+      this.http.post(this.baseEndpoint + 'Services/LoginService.svc/json/RefreshToken', "",
+        { observe: 'response' }
+      )
+        .subscribe(async resp => {
+          const { body } = resp;
+          const ticketModel = resp && body ? new TicketDataModel(body) : {};
+
+          var ticket = '';
+          if (ticketModel instanceof TicketDataModel) {
+            this.tokenIssueDate$.next(ticketModel.TokenIssueDate);
+            localStorage.setItem('tokenIssueDate', ticketModel.TokenIssueDate);
+            this.tokenExpiryDate$.next(ticketModel.TokenExpiryDate);
+            localStorage.setItem('tokenExpiryDate', ticketModel.TokenExpiryDate);
+            this.ticket$.next(ticketModel.TokenString);
+            localStorage.setItem('ticket', ticketModel.TokenString);
+            ticket = ticketModel.TokenString;
+          }
+
+          this.isTokenRefreshing$.next(false);
+
+          resolve({ ticket, status: true, ticketModel });
+        },
+          error => {
+            this.authState$.next(false);
+            resolve({ status: false, message: error.error.ErrorMessage })
           });
     })
   }

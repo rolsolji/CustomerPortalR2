@@ -86,7 +86,27 @@ export class ProductTableComponent implements OnInit, AfterViewInit, OnDestroy {
   searchCtrl = new FormControl();
 
   labels = [];
-  productClasses = ['Any',50, 55, 60, 65, 70, 77.5, 85, 92.5, 100, 110, 125, 150, 175, 200, 250, 300, 400, 500]
+
+  // productClasses = ['Any',50, 55, 60, 65, 70, 77.5, 85, 92.5, 100, 110, 125, 150, 175, 200, 250, 300, 400, 500]
+  productClasses = [{ classes: "Any", Effectiveclass: "Any" },
+                    { classes: "50", Effectiveclass: "50" },
+                    { classes: "55", Effectiveclass: "55" },
+                    { classes: "60", Effectiveclass: "60" },
+                    { classes: "65", Effectiveclass: "65" },
+                    { classes: "70", Effectiveclass: "70" },
+                    { classes: "77.5", Effectiveclass: "77" },
+                    { classes: "85", Effectiveclass: "85" },
+                    { classes: "92.5", Effectiveclass: "92" },
+                    { classes: "100", Effectiveclass: "100" },
+                    { classes: "110", Effectiveclass: "110" },
+                    { classes: "125", Effectiveclass: "125" },
+                    { classes: "150", Effectiveclass: "150" },
+                    { classes: "175", Effectiveclass: "175" },
+                    { classes: "200", Effectiveclass: "200" },
+                    { classes: "250", Effectiveclass: "250" },
+                    { classes: "300", Effectiveclass: "300" },
+                    { classes: "400", Effectiveclass: "400" },
+                    { classes: "500", Effectiveclass: "500" }]
 
   icPhone = icPhone;
   icMail = icMail;

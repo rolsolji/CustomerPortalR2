@@ -274,7 +274,7 @@
             <mat-form-field appearance="outline" class="flex-auto"> 
               <mat-label>Product Class</mat-label>
               <mat-select formControlName="productClass">
-                <mat-option *ngFor="let class of productClasses" value="{{class}}">{{class}}</mat-option>
+                <mat-option *ngFor="let class of productClasses" value="{{class.Effectiveclass}}">{{class.classes}}</mat-option>
               </mat-select>
             </mat-form-field>
           </div>

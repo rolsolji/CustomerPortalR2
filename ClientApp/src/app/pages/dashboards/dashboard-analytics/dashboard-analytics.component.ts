@@ -53,7 +53,7 @@ export class DashboardAnalyticsComponent implements OnInit {
   heightOfTopAccessorialsChart: number = 450;
   widthOfTopAccessorialsChart: number = 550;
 
-  chart4Name: string = "Top Carriers";
+  chart4Name: string = "Top Carriers By Shipment Count";
   SeriesOfTopCarriersChart: ApexAxisChartSeries = [];
   labelsOfTopCarriersChart: any;
   barHeightOfTopCarriersChart: string = "50";
@@ -91,6 +91,13 @@ export class DashboardAnalyticsComponent implements OnInit {
   SeriesOfCarrierPerformanceChart: ApexAxisChartSeries = [];
   labelsOfCarrierPerformanceChart: any;
   barHeightOfCarrierPerformanceChart: string = "50";
+
+  chart10Name: string = "Top Carriers By Shipment Value";
+  SeriesOfTopCarriersByShipmentValueChart: ApexAxisChartSeries = [];
+  labelsOfTopCarriersByShipmentValueChart: any;
+  barHeightOfTopCarriersByShipmentValueChart: string = "50";
+  heightOfTopCarriersByShipmentValueChart: number = 550;
+  widthOfTopCarriersByShipmentValueChart: number = 580;
 
   dateRanges: any = [
     { text: "This Year", value: "YTD" },
@@ -144,6 +151,7 @@ export class DashboardAnalyticsComponent implements OnInit {
   missedDeliveryDetails: CarrierPerformanceModel[] = [];
   missedPickupDetails: DashBoardMissedPickupModel[] = [];
   carrierPerformanceDetails: CarrierPerformanceModel[] = [];
+  topCarriersByShipmentValueDetails: CarrierPerformanceModel[] = [];
 
   icGroup = icGroup;
   icPageView = icPageView;
@@ -182,6 +190,10 @@ export class DashboardAnalyticsComponent implements OnInit {
 
     /* Start Details of Top Carriers chart. */
     this.GetDetailsForTopCarriersChart();
+    /* END */
+
+    /* Start Details of Top Carriers By Shipment value chart. */
+    this.GetDetailsForTopCarriersByShipmentValueChart();
     /* END */
 
     /* Start Details of Top Lanes Chart. */
@@ -371,29 +383,48 @@ export class DashboardAnalyticsComponent implements OnInit {
   }
 
   PrepareDetailsForTopCarriersChart() {
-
-    var costOfSeries1: number[] = [];
+    
     var costOfSeries2: number[] = [];
     var labelOfCarriers: string[] = [];
 
     for (let i = 0; i < this.topCarriersDetails.length; i++) {
-      costOfSeries1.push(Number(this.topCarriersDetails[i].TotalBilledAmount.toFixed(2)));
       costOfSeries2.push(this.topCarriersDetails[i].ShipmentCount);
       labelOfCarriers.push(this.topCarriersDetails[i].CarrierName.trim());
     }
 
     this.SeriesOfTopCarriersChart = [
       {
-        name: "TotalBilledAmount",
-        data: costOfSeries1
-      },
-      {
         name: "ShipCountData",
         data: costOfSeries2
       }
     ];
     this.labelsOfTopCarriersChart = labelOfCarriers;
-    this.barHeightOfTopCarriersChart = "100";
+    this.barHeightOfTopCarriersChart = "60";
+  }
+
+  async GetDetailsForTopCarriersByShipmentValueChart() {
+    this.topCarriersByShipmentValueDetails = await this.dashBoardService.DashBoard_GetTopCarriersByShipmentValue(this.authenticationService.getDefaultClientFromStorage().ClientID, this.dateFrom, this.dateTo, this.isIncludeSubClient);
+    this.PrepareDetailsForTopCarriersByShipmentValueChart();
+  }
+
+  PrepareDetailsForTopCarriersByShipmentValueChart() {
+
+    var costOfSeries1: number[] = [];
+    var labelOfCarriers: string[] = [];
+
+    for (let i = 0; i < this.topCarriersByShipmentValueDetails.length; i++) {
+      costOfSeries1.push(Number(this.topCarriersByShipmentValueDetails[i].TotalBilledAmount.toFixed(2)));
+      labelOfCarriers.push(this.topCarriersByShipmentValueDetails[i].CarrierName.trim());
+    }
+
+    this.SeriesOfTopCarriersByShipmentValueChart = [
+      {
+        name: "TotalBilledAmount",
+        data: costOfSeries1
+      }
+    ];
+    this.labelsOfTopCarriersByShipmentValueChart = labelOfCarriers;
+    this.barHeightOfTopCarriersByShipmentValueChart = "60";
   }
 
   GetDetailsForTopLanesChart() {

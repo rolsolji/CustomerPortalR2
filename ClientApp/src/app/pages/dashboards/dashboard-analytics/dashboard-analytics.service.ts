@@ -28,6 +28,11 @@ export class DashBoardService {
         return data;
     }
 
+    public async DashBoard_GetTopCarriersByShipmentValue(clientID: number, dateFrom: string, dateTo: string, isIncludeSubClient: boolean) {
+        const data = await this.httpService.DashBoard_GetTopCarriersByShipmentValue(clientID, dateFrom, dateTo, isIncludeSubClient);
+        return data;
+    }
+
     public async DashBoard_GetTopLaneForZip(clientID: number, dateFrom: string, dateTo: string, isIncludeSubClient: boolean) {
         const data = await this.httpService.DashBoard_GetTopLaneForZip(clientID, dateFrom, dateTo, isIncludeSubClient);
         return data;

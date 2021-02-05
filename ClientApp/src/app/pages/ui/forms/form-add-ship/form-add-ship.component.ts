@@ -778,7 +778,17 @@ export class FormAddShipComponent implements OnInit {
       if (productSelected !== null && productSelected !== undefined){
         formGroup.get('Pallets').setValue(productSelected.Pallets);
         formGroup.get('Pieces').setValue(productSelected.Pieces);
-        formGroup.get('ProductClass').setValue(productSelected.Class.trim());
+
+        let tempClass = "";
+        if (productSelected.Class != null && productSelected.Class.trim() === "92"){
+          tempClass = "92.5"
+        }else if(productSelected.Class != null && productSelected.Class.trim() === "77"){
+          tempClass = "77.5"
+        }else  {
+          tempClass = productSelected.Class != null ? productSelected.Class.trim() : productSelected.Class;
+        }
+
+        formGroup.get('ProductClass').setValue(tempClass);
         formGroup.get('ProductDescription').setValue(productSelected.Description.trim());
         formGroup.get('NmfcNumber').setValue(productSelected.NMFC.trim());
         formGroup.get('Length').setValue(productSelected.Lenght);
@@ -802,7 +812,17 @@ export class FormAddShipComponent implements OnInit {
   
       formGroup.get('Pallets').setValue(productSelected.Pallets);
       formGroup.get('Pieces').setValue(productSelected.Pieces);
-      formGroup.get('ProductClass').setValue(productSelected.Class.trim());
+
+      let tempClass = "";
+      if (productSelected.Class != null && productSelected.Class.trim() === "92"){
+        tempClass = "92.5"
+      }else if(productSelected.Class != null && productSelected.Class.trim() === "77"){
+        tempClass = "77.5"
+      }else  {
+        tempClass = productSelected.Class != null ? productSelected.Class.trim() : productSelected.Class;
+      }
+
+      formGroup.get('ProductClass').setValue(tempClass);
       formGroup.get('ProductDescription').setValue(productSelected.Description.trim());
       formGroup.get('NmfcNumber').setValue(productSelected.NMFC.trim());
       formGroup.get('Length').setValue(productSelected.Lenght);
@@ -1115,6 +1135,21 @@ export class FormAddShipComponent implements OnInit {
 
     const pickupDate = this.OriginPickupDate;
     const arrayProducts = this.productsAndAccessorialsFormGroup.get('products').value;
+    arrayProducts.forEach(p => {
+      p.Pieces = p.Pieces  == null ? 0 : p.Pieces
+
+      let tempClass = "";
+      if (p.ProductClass != null && p.ProductClass.trim() === "92.5"){
+        tempClass = "92"
+      }else if(p.ProductClass != null && p.ProductClass.trim() === "77.5"){
+        tempClass = "77"
+      }else  {
+        tempClass = p.ProductClass != null ? p.ProductClass.trim() : p.ProductClass;
+      }
+
+      p.ProductClass = tempClass
+    });
+
 
     if (this.confirmFormGroup.get('carrier').value == null || this.confirmFormGroup.get('carrier').value === ''){
       this.carrierSelected = '';
@@ -1828,7 +1863,16 @@ export class FormAddShipComponent implements OnInit {
           }
 
           if (this.productsUsedToRate != null && this.productsUsedToRate.length > 0){
-            if (p.ProductClass !== (this.productsAndAccessorialsFormGroup.controls.products as FormArray).at(currentProductIndex).get('ProductClass').value){
+            let tempClass = "";
+            if (p.ProductClass != null && p.ProductClass.trim() === "92"){
+              tempClass = "92.5"
+            }else if(p.ProductClass != null && p.ProductClass.trim() === "77"){
+              tempClass = "77.5"
+            }else  {
+              tempClass = p.ProductClass != null ? p.ProductClass.trim() : p.ProductClass;
+            }
+
+            if (tempClass !== (this.productsAndAccessorialsFormGroup.controls.products as FormArray).at(currentProductIndex).get('ProductClass').value){
               productHasChanged = true;
               return true;
             }
@@ -1843,7 +1887,16 @@ export class FormAddShipComponent implements OnInit {
               return true;
             }
           }else{
-            if (p.Class !== (this.productsAndAccessorialsFormGroup.controls.products as FormArray).at(currentProductIndex).get('ProductClass').value){
+            let tempClass = "";
+            if (p.Class != null && p.Class.trim() === "92"){
+              tempClass = "92.5"
+            }else if(p.Class != null && p.Class.trim() === "77"){
+              tempClass = "77.5"
+            }else  {
+              tempClass = p.Class != null ? p.Class.trim() : p.Class;
+            }
+
+            if (tempClass !== (this.productsAndAccessorialsFormGroup.controls.products as FormArray).at(currentProductIndex).get('ProductClass').value){
               productHasChanged = true;
               return true;
             }
@@ -2005,6 +2058,15 @@ export class FormAddShipComponent implements OnInit {
     const productList: BOlProductsListSQD[] = [];
     let productsCounter = 1;
     arrayProducts.forEach(p => {
+      let tempClass = "";
+      if (p.ProductClass != null && p.ProductClass.trim() === "92.5"){
+        tempClass = "92"
+      }else if(p.ProductClass != null && p.ProductClass.trim() === "77.5"){
+        tempClass = "77"
+      }else  {
+        tempClass = p.ProductClass != null ? p.ProductClass.trim() : p.ProductClass;
+      }
+
       const prod : BOlProductsListSQD = {
         BOLProductID: productsCounter,
         Description: p.ProductDescription,
@@ -2012,7 +2074,7 @@ export class FormAddShipComponent implements OnInit {
         Pieces: p.Pieces  == null ? 0 : p.Pieces,
         Hazmat: p.HazMat,
         NMFC: p.NmfcNumber,
-        Class: p.ProductClass,
+        Class: tempClass,
         Weight: p.Weight,
         Height: p.Height,
         Lenght: p.Length,
@@ -2374,6 +2436,14 @@ export class FormAddShipComponent implements OnInit {
       // if (localShipmentByLadingObject.BOlProductsList != null && localShipmentByLadingObject.BOlProductsList.length > 0){
       //   tempProductID = localShipmentByLadingObject.BOlProductsList[0].BOLProductID;
       // }
+      let tempClass = "";
+      if (p.ProductClass != null && p.ProductClass.trim() === "92.5"){
+        tempClass = "92"
+      }else if(p.ProductClass != null && p.ProductClass.trim() === "77.5"){
+        tempClass = "77"
+      }else  {
+        tempClass = p.ProductClass != null ? p.ProductClass.trim() : p.ProductClass;
+      }
 
       const prod : BOlProductsListSBL = {
         BOLProductID: p.BOLProductID,
@@ -2382,7 +2452,7 @@ export class FormAddShipComponent implements OnInit {
         Pieces: p.Pieces,
         Hazmat: p.HazMat,
         NMFC: p.NmfcNumber,
-        Class: p.ProductClass,
+        Class: tempClass,
         Weight: p.Weight,
         Height: p.Height,
         Lenght: p.Length,

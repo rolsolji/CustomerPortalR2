@@ -171,12 +171,15 @@ export class ProductCreateUpdateComponent implements OnInit {
     product.IsApprove = this.approved;
     product.Hazmat = this.hazmat;
     product.ModifiedBy = this.user.UserName;
-    product.ModifiedDate = String.Format('/Date({0})/', currentTime.getTime());
-    product.ProductGroup = this.defaults.ProductGroup ?? 'STANDARD';
+    product.ModifiedDate = String.Format('/Date({0})/', currentTime.getTime());    
 
-    const productGroupType = this.productGroupType.find((item) => item.Description === product.ProductGroup);
-    product.ProductGroupID = productGroupType?.ProductGroupID;
-
+    let productGroupType = this.productGroupType.find((item) => item.GroupCode === "STD");    
+    try{
+      product.ProductGroupID = productGroupType?.ProductGroupID;
+    }catch{
+      product.ProductGroupID = 0
+    }
+    
     return product
   }
 }

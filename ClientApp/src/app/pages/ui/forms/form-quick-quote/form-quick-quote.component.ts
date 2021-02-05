@@ -433,7 +433,17 @@ export class FormQuickQuoteComponent implements OnInit {
       if (productSelected !== null){
         formGroup.get('Pallets').setValue(productSelected.Pallets);
         formGroup.get('Pieces').setValue(productSelected.Pieces == null || productSelected.Pieces == undefined ? 0 : productSelected.Pieces);
-        formGroup.get('ProductClass').setValue(productSelected.Class.trim());
+
+        let tempClass = "";
+        if (productSelected.Class != null && productSelected.Class.trim() === "92"){
+          tempClass = "92.5"
+        }else if(productSelected.Class != null && productSelected.Class.trim() === "77"){
+          tempClass = "77.5"
+        }else  {
+          tempClass = productSelected.Class != null ? productSelected.Class.trim() : productSelected.Class;
+        }
+          
+        formGroup.get('ProductClass').setValue(tempClass);
         formGroup.get('Description').setValue(productSelected.Description.trim());
         formGroup.get('NmfcNumber').setValue(productSelected.NMFC.trim());
         formGroup.get('Length').setValue(productSelected.Lenght);
@@ -457,7 +467,17 @@ export class FormQuickQuoteComponent implements OnInit {
   
       formGroup.get('Pallets').setValue(productSelected.Pallets);
       formGroup.get('Pieces').setValue(productSelected.Pieces == null || productSelected.Pieces == undefined ? 0 : productSelected.Pieces);
-      formGroup.get('ProductClass').setValue(productSelected.Class.trim());
+      
+      let tempClass = "";
+        if (productSelected.Class != null && productSelected.Class.trim() === "92"){
+          tempClass = "92.5"
+        }else if(productSelected.Class != null && productSelected.Class.trim() === "77"){
+          tempClass = "77.5"
+        }else  {
+          tempClass = productSelected.Class != null ? productSelected.Class.trim() : productSelected.Class;
+        }
+
+      formGroup.get('ProductClass').setValue(tempClass);
       formGroup.get('Description').setValue(productSelected.Description.trim());
       formGroup.get('NmfcNumber').setValue(productSelected.NMFC.trim());
       formGroup.get('Length').setValue(productSelected.Lenght);
@@ -766,10 +786,20 @@ export class FormQuickQuoteComponent implements OnInit {
 
       const pickupDate = this.OriginPickupDate;
 
-
       const arrayProducts = this.quickQuoteFormGroup.get('products').value;
       arrayProducts.forEach(p => {
         p.Pieces = p.Pieces  == null ? 0 : p.Pieces
+
+        let tempClass = "";
+        if (p.ProductClass != null && p.ProductClass.trim() === "92.5"){
+          tempClass = "92"
+        }else if(p.ProductClass != null && p.ProductClass.trim() === "77.5"){
+          tempClass = "77"
+        }else  {
+          tempClass = p.ProductClass != null ? p.ProductClass.trim() : p.ProductClass;
+        }
+
+        p.ProductClass = tempClass
       });
 
       const objRate = {

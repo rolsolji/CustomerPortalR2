@@ -21,7 +21,7 @@ import { MatDatepickerModule } from "@angular/material/datepicker";
 import { MatNativeDateModule } from "@angular/material/core";
 import { MatAutocompleteModule } from "@angular/material/autocomplete";
 import { OnlyNumberDirective } from "./shared/directives/OnlyNumber.directive";
-
+import { RefreshTokenInterceptor } from './common/refreshToken-interceptor';
 
 @NgModule({
   declarations: [AppComponent, OnlyNumberDirective],
@@ -53,6 +53,12 @@ import { OnlyNumberDirective } from "./shared/directives/OnlyNumber.directive";
       useClass: HttpErrorInterceptor,
       multi: true,
       deps: [AuthenticationService, MatSnackBar]
+    },
+    {
+      provide: HTTP_INTERCEPTORS,
+      useClass: RefreshTokenInterceptor,
+      multi: true,
+      deps: [AuthenticationService]
     }
   ],
   exports: [

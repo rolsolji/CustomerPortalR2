@@ -796,6 +796,19 @@ export class HttpService {
             Ticket: ticket
         });
         return this.http.get<CarrierPerformanceModel[]>(
+            this.baseEndpoint + 'Services/DashBoardService.svc/json/DashBoard_GetTopCarriers?clientID=' + clientID + '&shipFromdate=' + dateFrom + '&shipTodate=' + dateTo + '&ByVolume=true&IsIncludeSubClient=' + isIncludeSubClient
+            , {
+                headers: httpHeaders
+            }
+        ).toPromise();
+    }
+
+    public DashBoard_GetTopCarriersByShipmentValue(clientID: number, dateFrom: string, dateTo: string, isIncludeSubClient: boolean) {
+        const ticket = this.token;
+        const httpHeaders = new HttpHeaders({
+            Ticket: ticket
+        });
+        return this.http.get<CarrierPerformanceModel[]>(
             this.baseEndpoint + 'Services/DashBoardService.svc/json/DashBoard_GetTopCarriers?clientID=' + clientID + '&shipFromdate=' + dateFrom + '&shipTodate=' + dateTo + '&ByVolume=false&IsIncludeSubClient=' + isIncludeSubClient
             , {
                 headers: httpHeaders

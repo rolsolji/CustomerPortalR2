@@ -5,6 +5,7 @@
 export const environment = {
   production: false,
   baseEndpoint: 'https://beta-customer.r2logistics.com/'
+  // baseEndpoint: 'http://localhost:63784/'
 };
 
 /*

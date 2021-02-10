@@ -430,7 +430,7 @@ export class FormQuickQuoteComponent implements OnInit {
 
       const productSelected = this.productList.find(p => p.Description === descriptionProduct);
 
-      if (productSelected !== null){
+      if (productSelected !== null && productSelected !== undefined){
         formGroup.get('Pallets').setValue(productSelected.Pallets);
         formGroup.get('Pieces').setValue(productSelected.Pieces == null || productSelected.Pieces == undefined ? 0 : productSelected.Pieces);
 

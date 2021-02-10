@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { Router } from '@angular/router';
+import { Router, ActivatedRoute } from '@angular/router';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import icVisibility from '@iconify/icons-ic/twotone-visibility';
 import icVisibilityOff from '@iconify/icons-ic/twotone-visibility-off';
@@ -33,7 +33,8 @@ export class LoginComponent implements OnInit {
     private fb: FormBuilder,
     private cd: ChangeDetectorRef,
     private snackbar: MatSnackBar,
-    public authService: AuthenticationService
+    public authService: AuthenticationService,
+    private activatedRoute: ActivatedRoute
   ) {}
 
   ngOnInit() {
@@ -41,6 +42,11 @@ export class LoginComponent implements OnInit {
       username: ['', Validators.required],
       password: ['', Validators.required]
     });
+
+    var ticket = this.activatedRoute.snapshot.queryParamMap.get("ticket");
+    if(ticket != null && ticket != undefined && ticket != ''){
+      this.getLoginDetailsUsingTicket(ticket);
+    }
   }
 
   async send() {
@@ -71,5 +77,21 @@ export class LoginComponent implements OnInit {
       this.visible = true;
       this.cd.markForCheck();
     }
+  }
+
+  async getLoginDetailsUsingTicket(ticket: string) {
+    if (ticket != null && ticket != undefined && ticket != '') {      
+      const response: any = await this.authService.getLoginDetailsUsingTicket(ticket.toString());
+      if (response.status) {
+        this.router.navigate(['/']);
+        this.authService.loading$.next(false);
+        return true;
+      }
+    }
+    this.authService.loading$.next(false);
+    this.snackbar.open('No valid credentials needed.', '', {
+      duration: 5000
+    });
+    return false;
   }
 }

@@ -307,7 +307,7 @@ export class FormQuickQuoteComponent implements OnInit {
     // }
     
     this.promotionImageByClient = environment.baseEndpoint + `Handlers/PromotionImageHandler.ashx?ClientID=${this.authenticationService.getDefaultClient().ClientID}&id=e(${Math.random().toString().slice(2,11)})/&Ticket=${this.securityToken}`;    
-    
+   
     this.promotionImageTitle = this.authenticationService.getDefaultClient().ClientName;
     const responseData = await this.httpService.getCountryList(this.keyId);
     this.clientDefaultData = await this.httpService.getClientDefaultsByClient(this.ClientID, this.keyId);

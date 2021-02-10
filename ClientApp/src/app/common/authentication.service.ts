@@ -97,9 +97,17 @@ export class AuthenticationService {
               localStorage.setItem('clientHtmlMessages', JSON.stringify(clientHtmlMessagesSetup));
               this.clientHtmlMessages$.next(clientHtmlMessagesSetup);
 
-              const masBrandsSetup = await this.getMasBrandsByClientID(defaultClient.ClientID);
+              let masBrandsSetup = await this.getMasBrandsByClientID(defaultClient.ClientID);
+              if(masBrandsSetup && masBrandsSetup.length > 0){
+                let ClientBannerText = masBrandsSetup[0].BannerText;
+                if (ClientBannerText == null || ClientBannerText === ''){
+                  masBrandsSetup = await this.getMasBrandsByClientID(8473); // Get Client info with R2 Client as default
+                }
+              }
               localStorage.setItem('masBrands', JSON.stringify(masBrandsSetup));
               this.MasBrandForClient$.next(masBrandsSetup);
+
+              
             }
 
             resolve({ticket, status: true, user});

@@ -404,7 +404,7 @@
                         <div fxFlex="28%">
                           <mat-form-field>
                             <mat-label>Description</mat-label>
-                            <input matInput type="text" maxlength="50" formControlName="ProductDescription" required
+                            <input matInput type="text" maxlength="150" formControlName="ProductDescription" required
                                     (keypress)="onKeypressProdDesc($event, i)"
                                     (focus)="focusFunction(i)"
                                     [matAutocomplete]="pAutoComplete" 

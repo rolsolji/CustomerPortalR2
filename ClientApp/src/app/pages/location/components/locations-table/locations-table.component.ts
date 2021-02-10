@@ -361,6 +361,7 @@ export class LocationsTableComponent implements OnInit, AfterViewInit, OnDestroy
       this.dataSource.data = locationsSearchResult;
     });
 
+    this.searchCtrl.setValue('');
     this.close('close');
   }
 }

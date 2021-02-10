@@ -101,7 +101,15 @@ export class SidenavComponent implements OnInit {
         localStorage.setItem('clientHtmlMessages', JSON.stringify(clientHtmlMessagesSetup));
         this.authenticationService.clientHtmlMessages$.next(clientHtmlMessagesSetup);
 
-        const masBrandsSetup = await this.authenticationService.getMasBrandsByClientID(_defaultClient.ClientID);
+        let masBrandsSetup = await this.authenticationService.getMasBrandsByClientID(_defaultClient.ClientID);
+        if(masBrandsSetup && masBrandsSetup.length > 0){
+          let ClientBannerText = masBrandsSetup[0].BannerText;
+          if (ClientBannerText == null || ClientBannerText === ''){
+            masBrandsSetup = await this.authenticationService.getMasBrandsByClientID(1); // Get Client info with R2 Client as default
+          }
+        }
+    
+       
         localStorage.setItem('masBrands', JSON.stringify(masBrandsSetup));
         this.authenticationService.MasBrandForClient$.next(masBrandsSetup);
 

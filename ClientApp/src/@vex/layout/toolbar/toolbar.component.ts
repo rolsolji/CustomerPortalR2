@@ -99,7 +99,16 @@ export class ToolbarComponent implements OnInit {
     masBrandByClientObj = this.authenticationService.getMasBrands();
     if(masBrandByClientObj && masBrandByClientObj.length > 0){
       this.toolBarMessage = masBrandByClientObj[0].BannerText;
-    }    
+    }
+    
+    /* If Banner text is missing in sub client then used it to R2 logistics level. */
+    if (this.toolBarMessage == null || this.toolBarMessage == undefined || this.toolBarMessage == ''){
+      const masBrandsDetailsOfR2 = await this.authenticationService.getMasBrandsByClientID(8473);
+      if(masBrandsDetailsOfR2 != null && masBrandsDetailsOfR2 != undefined){
+        this.toolBarMessage = masBrandsDetailsOfR2[0].BannerText;
+      }
+    }
+    /* END */
     
     this.toolBarTitle = this.authenticationService.getDefaultClient().ClientName;
     this.defaultClient = this.authenticationService.getDefaultClient();

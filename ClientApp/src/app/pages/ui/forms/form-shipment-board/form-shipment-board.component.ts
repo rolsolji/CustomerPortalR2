@@ -76,6 +76,7 @@ import { SendEmailResponse } from '../../../../Entities/SendEmailResponse';
 import { TrackingDetails } from '../../../../Entities/TrackingDetails';
 import { importType } from '@angular/compiler/src/output/output_ast';
 import { TotalStatusRecords }  from '../../../../Entities/TotalStatusRecords';
+import { UtilitiesService } from '../../../../common/utilities.service';
 
 @Component({
   selector: 'vex-form-shipment-board',
@@ -111,6 +112,7 @@ export class FormShipmentBoardComponent implements OnInit {
     public datepipe: DatePipe,
     private authenticationService: AuthenticationService,
     private snackbar: MatSnackBar,
+    private utilitiesService: UtilitiesService
   ) {
     this.securityToken = this.authenticationService.ticket$.value;
     this.user = this.authenticationService.getUserFromStorage();
@@ -595,11 +597,13 @@ export class FormShipmentBoardComponent implements OnInit {
     this.quotesResponse.forEach(element => {
 
       if (!String.IsNullOrWhiteSpace(element.ActualShipDate)){
-        element.ActualShipDateWithFormat = this.datepipe.transform(element.ActualShipDate.replace(/(^.*\()|([+-].*$)/g, ''),'MM/dd/yyyy');
+        //element.ActualShipDateWithFormat = this.datepipe.transform(element.ActualShipDate.replace(/(^.*\()|([+-].*$)/g, ''),'MM/dd/yyyy');
+        element.ActualShipDateWithFormat = this.utilitiesService.ConverteJsonDateToLocalTimeZone(element.ActualShipDate);
       }
 
       if (!String.IsNullOrWhiteSpace(element.ExpectedDeliveryDate)){
-        element.ExpectedDeliveryDateWithFormat = this.datepipe.transform(element.ExpectedDeliveryDate.replace(/(^.*\()|([+-].*$)/g, ''),'MM/dd/yyyy');
+        //element.ExpectedDeliveryDateWithFormat = this.datepipe.transform(element.ExpectedDeliveryDate.replace(/(^.*\()|([+-].*$)/g, ''),'MM/dd/yyyy');
+        element.ExpectedDeliveryDateWithFormat = this.utilitiesService.ConverteJsonDateToLocalTimeZone(element.ExpectedDeliveryDate);
       }
 
       if (element.Status === 13 || element.Status === 14){
@@ -645,19 +649,23 @@ export class FormShipmentBoardComponent implements OnInit {
     this.shipmentInformation = await this.httpService.GetShipmentByLadingID(rowSelected.LadingID.toString(), this.keyId);
     if (this.shipmentInformation != null){
       if (this.shipmentInformation.RequestedPickupDateFrom != null && !String.IsNullOrWhiteSpace(this.shipmentInformation.RequestedPickupDateFrom.toString())){
-        this.shipmentInformation.RequestedPickupDateFromWithFormat = this.datepipe.transform(this.shipmentInformation.RequestedPickupDateFrom.toString().replace(/(^.*\()|([+-].*$)/g, ''),'MM/dd/yyyy');
+        //this.shipmentInformation.RequestedPickupDateFromWithFormat = this.datepipe.transform(this.shipmentInformation.RequestedPickupDateFrom.toString().replace(/(^.*\()|([+-].*$)/g, ''),'MM/dd/yyyy');
+        this.shipmentInformation.RequestedPickupDateFromWithFormat = this.utilitiesService.ConverteJsonDateToLocalTimeZone(this.shipmentInformation.RequestedPickupDateFrom.toString());
       }
 
       if (this.shipmentInformation.PickupDate != null && !String.IsNullOrWhiteSpace(this.shipmentInformation.PickupDate.toString())){
-        this.shipmentInformation.PickupDateWithFormat = this.datepipe.transform(this.shipmentInformation.PickupDate.toString().replace(/(^.*\()|([+-].*$)/g, ''),'MM/dd/yyyy');
+        //this.shipmentInformation.PickupDateWithFormat = this.datepipe.transform(this.shipmentInformation.PickupDate.toString().replace(/(^.*\()|([+-].*$)/g, ''),'MM/dd/yyyy');
+        this.shipmentInformation.PickupDateWithFormat = this.utilitiesService.ConverteJsonDateToLocalTimeZone(this.shipmentInformation.PickupDate.toString());
       }
 
       if (this.shipmentInformation.DeliveryDate != null && !String.IsNullOrWhiteSpace(this.shipmentInformation.DeliveryDate.toString())){
-        this.shipmentInformation.DeliveryDateWithFormat = this.datepipe.transform(this.shipmentInformation.DeliveryDate.toString().replace(/(^.*\()|([+-].*$)/g, ''),'MM/dd/yyyy');
+        //this.shipmentInformation.DeliveryDateWithFormat = this.datepipe.transform(this.shipmentInformation.DeliveryDate.toString().replace(/(^.*\()|([+-].*$)/g, ''),'MM/dd/yyyy');
+        this.shipmentInformation.DeliveryDateWithFormat = this.utilitiesService.ConverteJsonDateToLocalTimeZone(this.shipmentInformation.DeliveryDate.toString());
       }
 
       if (this.shipmentInformation.RequestedDeliveryDate != null && !String.IsNullOrWhiteSpace(this.shipmentInformation.RequestedDeliveryDate.toString())){
-        this.shipmentInformation.RequestedDeliveryDateWithFormat = this.datepipe.transform(this.shipmentInformation.RequestedDeliveryDate.toString().replace(/(^.*\()|([+-].*$)/g, ''),'MM/dd/yyyy');
+        //this.shipmentInformation.RequestedDeliveryDateWithFormat = this.datepipe.transform(this.shipmentInformation.RequestedDeliveryDate.toString().replace(/(^.*\()|([+-].*$)/g, ''),'MM/dd/yyyy');
+        this.shipmentInformation.RequestedDeliveryDateWithFormat = this.utilitiesService.ConverteJsonDateToLocalTimeZone(this.shipmentInformation.RequestedDeliveryDate.toString());
       }
     }
 

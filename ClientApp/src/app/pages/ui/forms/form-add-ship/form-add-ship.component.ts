@@ -637,6 +637,7 @@ export class FormAddShipComponent implements OnInit {
     this.originAndDestinationFormGroup.get('originstatename').setValue(event.option.value.StateName.trim());
     this.OriginPostalCode = String.Format('{0}-{1}',event.option.value.PostalCode,event.option.value.CityName.trim());
     this.OriginPostalData = event.option.value;
+    this.OriginPostalData.CityID = (event.option.value.CityId == null ? (event.option.value.CityID == null ? 0 : event.option.value.CityID) : event.option.value.CityId) ; // Set CityId value
     this.originAndDestinationFormGroup.get('originpostalcode').setValue(this.OriginPostalCode);
   }
 
@@ -651,6 +652,7 @@ export class FormAddShipComponent implements OnInit {
     this.originAndDestinationFormGroup.get('originstatename').setValue(event.option.value.StateName.trim());
     this.OriginPostalCode = String.Format('{0}-{1}',event.option.value.PostalCode,event.option.value.CityName.trim());
     this.OriginPostalData = event.option.value;
+    this.OriginPostalData.CityID = (event.option.value.CityId == null ? (event.option.value.CityID == null ? 0 : event.option.value.CityID) : event.option.value.CityId) ; // Set CityId value
     this.originAndDestinationFormGroup.get('originpostalcode').setValue(this.OriginPostalCode);
     this.originAndDestinationFormGroup.get('origincontact').setValue(event.option.value.ContactName.trim());
     this.originAndDestinationFormGroup.get('originemail').setValue(event.option.value.ContactEmail.trim());
@@ -665,9 +667,10 @@ export class FormAddShipComponent implements OnInit {
     this.originAndDestinationFormGroup.get('deststatename').setValue(event.option.value.StateName.trim());
     this.DestinationPostalCode = String.Format('{0}-{1}',event.option.value.PostalCode,event.option.value.CityName.trim());
     this.DestinationPostalData = event.option.value;
+    this.DestinationPostalData.CityID = (event.option.value.CityId == null ? (event.option.value.CityID == null ? 0 : event.option.value.CityID) : event.option.value.CityId) ; // Set CityId value
     this.originAndDestinationFormGroup.get('destpostalcode').setValue(this.DestinationPostalCode);
   }
-
+ 
   ldAutoCompletefilter(val: string): Observable<any[]> {
     return this.httpService.GetLocationByType(this.authenticationService.getDefaultClient().ClientID,2,val, this.keyId);
   }
@@ -679,6 +682,7 @@ export class FormAddShipComponent implements OnInit {
     this.originAndDestinationFormGroup.get('deststatename').setValue(event.option.value.StateName.trim());
     this.DestinationPostalCode = String.Format('{0}-{1}',event.option.value.PostalCode,event.option.value.CityName.trim());
     this.DestinationPostalData = event.option.value;
+    this.DestinationPostalData.CityID = (event.option.value.CityId == null ? (event.option.value.CityID == null ? 0 : event.option.value.CityID) : event.option.value.CityId) ; // Set CityId value
     this.originAndDestinationFormGroup.get('destpostalcode').setValue(this.DestinationPostalCode);
     this.originAndDestinationFormGroup.get('destcontact').setValue(event.option.value.ContactName.trim());
     this.originAndDestinationFormGroup.get('destemail').setValue(event.option.value.ContactEmail.trim());
@@ -1300,17 +1304,19 @@ export class FormAddShipComponent implements OnInit {
 
       this.costListFiltered.push(accessorialInvoiceFuelCost);
      
-      const accessorials = selectedRate.Accessorials.filter(a => a.AccessorialCharge > 0);
-      accessorials.forEach(a => {
-        const accessorialInvoice: AccountInvoiceCostList = {
-          AccessorialCode: a.AccessorialCode,
-          Description: a.AccessorialDescription,
-          BilledCost: a.AccessorialCharge
-        }
-
-        this.costListFiltered.push(accessorialInvoice);                       
-      });
-
+      if (selectedRate.Accessorials != null){
+        const accessorials = selectedRate.Accessorials.filter(a => a.AccessorialCharge > 0);
+        accessorials.forEach(a => {
+          const accessorialInvoice: AccountInvoiceCostList = {
+            AccessorialCode: a.AccessorialCode,
+            Description: a.AccessorialDescription,
+            BilledCost: a.AccessorialCharge
+          }
+  
+          this.costListFiltered.push(accessorialInvoice);                       
+        });
+      }
+      
       if (selectedRate.ShowTrueCost){
         this.TotalShipmentCost = selectedRate.TotalCost;
       }else{
@@ -1743,10 +1749,10 @@ export class FormAddShipComponent implements OnInit {
               return true;
             }
   
-            if (p.NmfcNumber !== (this.productsAndAccessorialsFormGroup.controls.products as FormArray).at(currentProductIndex).get('NmfcNumber').value){
-              productHasChanged = true;
-              return true;
-            }
+            // if (p.NmfcNumber !== (this.productsAndAccessorialsFormGroup.controls.products as FormArray).at(currentProductIndex).get('NmfcNumber').value){
+            //   productHasChanged = true;
+            //   return true;
+            // }
   
             if (p.Length !== (this.productsAndAccessorialsFormGroup.controls.products as FormArray).at(currentProductIndex).get('Length').value){
               productHasChanged = true;
@@ -1878,10 +1884,10 @@ export class FormAddShipComponent implements OnInit {
               return true;
             }
   
-            if (p.NmfcNumber !== (this.productsAndAccessorialsFormGroup.controls.products as FormArray).at(currentProductIndex).get('NmfcNumber').value){
-              productHasChanged = true;
-              return true;
-            }
+            // if (p.NmfcNumber !== (this.productsAndAccessorialsFormGroup.controls.products as FormArray).at(currentProductIndex).get('NmfcNumber').value){
+            //   productHasChanged = true;
+            //   return true;
+            // }
   
             if (p.Length !== (this.productsAndAccessorialsFormGroup.controls.products as FormArray).at(currentProductIndex).get('Length').value){
               productHasChanged = true;
@@ -1902,10 +1908,10 @@ export class FormAddShipComponent implements OnInit {
               return true;
             }
   
-            if (p.NMFC !== (this.productsAndAccessorialsFormGroup.controls.products as FormArray).at(currentProductIndex).get('NmfcNumber').value){
-              productHasChanged = true;
-              return true;
-            }
+            // if (p.NMFC !== (this.productsAndAccessorialsFormGroup.controls.products as FormArray).at(currentProductIndex).get('NmfcNumber').value){
+            //   productHasChanged = true;
+            //   return true;
+            // }
   
             if (p.Lenght !== (this.productsAndAccessorialsFormGroup.controls.products as FormArray).at(currentProductIndex).get('Length').value){
               productHasChanged = true;
@@ -2100,18 +2106,20 @@ export class FormAddShipComponent implements OnInit {
     });
 
     const accountInvoiceCostList: AccountInvoiceCostListSQD[] = [];
-    const filteredSelectRateAccessorials = selectedRate.Accessorials.filter(acc => acc.AccessorialCharge > 0);
-    filteredSelectRateAccessorials.forEach(a => {
-      const accountInvoiceCost: AccountInvoiceCostListSQD = {
-        AccessorialID: a.AccessorialID,
-        AccessorialCode: a.AccessorialCode,
-        RatedCost: a.AccessorialCharge,
-        BilledCost: a.AccessorialCharge,
-        Description: a.AccessorialDescription,
-        CostStatus: 1 // Ask
-      }
-      accountInvoiceCostList.push(accountInvoiceCost);
-    })
+    if (selectedRate.Accessorials != null){
+      const filteredSelectRateAccessorials = selectedRate.Accessorials.filter(acc => acc.AccessorialCharge > 0);
+      filteredSelectRateAccessorials.forEach(a => {
+        const accountInvoiceCost: AccountInvoiceCostListSQD = {
+          AccessorialID: a.AccessorialID,
+          AccessorialCode: a.AccessorialCode,
+          RatedCost: a.AccessorialCharge,
+          BilledCost: a.AccessorialCharge,
+          Description: a.AccessorialDescription,
+          CostStatus: 1 // Ask
+        }
+        accountInvoiceCostList.push(accountInvoiceCost);
+      })
+    }    
 
     // Ask
     // Freight
@@ -2303,7 +2311,7 @@ export class FormAddShipComponent implements OnInit {
 
     // Set error interceptor variable to false as default
     this.authenticationService.requestFailed$.next(false);
-
+    this.authenticationService.requestFailedMessage$.next('');
     if (ModifiedQuote){
       try{
         const responseData = await this.httpService.ModifiedQuote(this.saveQuoteData);
@@ -2314,91 +2322,111 @@ export class FormAddShipComponent implements OnInit {
           this.router.navigate(['../../../shipmentboard/LTLTL/'], { relativeTo: this.route });
         }else{
           this.authenticationService.requestFailed$.next(false);
-          this.snackbar.open('Error setting the record as modified.', null, {
-            duration: 5000
-          });
+          this.openDialog(false, 'Error setting the record as modified. ' + this.authenticationService.requestFailedMessage$.value.toString(), null);
+          this.authenticationService.requestFailedMessage$.next('');          
         }      
       }catch(e){
-        this.authenticationService.requestFailed$.next(false);
-        this.snackbar.open('Error setting the record as modified.', null, {
-          duration: 5000
-        });
+          this.authenticationService.requestFailed$.next(false);
+          this.openDialog(false, 'Error setting the record as modified. ' + this.authenticationService.requestFailedMessage$.value.toString(), null);
+          this.authenticationService.requestFailedMessage$.next('');
       }      
       return;
     }
 
     if (IsBookShipment){
-      const responseData = await this.httpService.OpenShipment(this.saveQuoteData);
-      if (responseData != null && !String.IsNullOrWhiteSpace(responseData.ClientLadingNo))
-      {
-        this.messageService.SendQuoteParameter(responseData.ClientLadingNo);
-        this.messageService.SendLadingIDParameter(responseData.LadingID.toString());
-        // this.snackbar.open('Shipment Booked with LoadNo ' + responseData.ClientLadingNo, null, {
-        //   duration: 5000
-        // });
-        this.openDialog(false, 'Shipment Booked with LoadNo: ' + responseData.ClientLadingNo + '. ', null, 'ShipmentBooked');
-        const bolPrintURL = String.Format(environment.baseEndpoint + 'Handlers/PrintBOLHandler.ashx?LadingID={0}&ClientID={1}&Ticket={2}',
-        responseData.LadingID.toString(),this.ClientID.toString(), this.securityToken);        
-        window.open(bolPrintURL, '_blank');       
-      }
-      else{
-        this.snackbar.open('Error booking the shipment.', null, {
-          duration: 5000
-        });
-      }
+      try{
+        const responseData = await this.httpService.OpenShipment(this.saveQuoteData);
+        if (!this.authenticationService.requestFailed$.value){
+          if (responseData != null && !String.IsNullOrWhiteSpace(responseData.ClientLadingNo))
+          {
+            this.messageService.SendQuoteParameter(responseData.ClientLadingNo);
+            this.messageService.SendLadingIDParameter(responseData.LadingID.toString());
+            // this.snackbar.open('Shipment Booked with LoadNo ' + responseData.ClientLadingNo, null, {
+            //   duration: 5000
+            // });
+            this.openDialog(false, 'Shipment Booked with LoadNo: ' + responseData.ClientLadingNo + '. ', null, 'ShipmentBooked');
+            const bolPrintURL = String.Format(environment.baseEndpoint + 'Handlers/PrintBOLHandler.ashx?LadingID={0}&ClientID={1}&Ticket={2}',
+            responseData.LadingID.toString(),this.ClientID.toString(), this.securityToken);        
+            window.open(bolPrintURL, '_blank');       
+          }
+          else{
+            this.openDialog(false, 'Error booking the shipment. ' + this.authenticationService.requestFailedMessage$.value.toString(), null);
+          }
+        }else{
+            this.authenticationService.requestFailed$.next(false);
+            this.openDialog(false, 'Error booking the shipment. ' + this.authenticationService.requestFailedMessage$.value.toString(), null);
+            this.authenticationService.requestFailedMessage$.next('');
+        }
+
+      }catch(e){
+          this.authenticationService.requestFailed$.next(false);
+          this.openDialog(false, 'Error booking the shipment. ' + this.authenticationService.requestFailedMessage$.value.toString(), null);
+          this.authenticationService.requestFailedMessage$.next('');
+      }                
     }else{
-      const responseData = await this.httpService.saveNewQuote(this.saveQuoteData);
-      if (responseData != null && !String.IsNullOrWhiteSpace(responseData.ClientLadingNo))
-      {
-        this.messageService.SendQuoteParameter(responseData.ClientLadingNo);
-        this.messageService.SendLadingIDParameter(responseData.LadingID.toString());
-        // this.snackbar.open('Quote saved successfully with LoadNo ' + responseData.ClientLadingNo, null, {
-        //   duration: 5000
-        // });
-
-        this.openDialog(false, 'Quote saved successfully. Quote Number: ' + responseData.ClientLadingNo + '. ' + (objRateSelected != null && objRateSelected.rateSelectedAction === 4 ? 'Email has been sent.' : ''), null, 
-        'QuoteSavedAndRedirectToBoard', null, null, null);
-
-        if (objRateSelected != null){
-          switch (objRateSelected.rateSelectedAction) {
-            case 3: // print quote
-              const ratequotePrintURL = String.Format(environment.baseEndpoint + 'Handlers/PrintQuoteHandler.ashx?LadingID={0}&Ticket={1}',
-                                          responseData.LadingID,this.securityToken);
-              window.open(ratequotePrintURL, '_blank');
-              break;
-            case 4: // email quote
-              let emailBOLParameters: SendEmailParameters;
-  
-              const invoiceParameter: InvoiceParameter = {
-                InvoiceDetailIDs: []
-              };
+      try{
+        const responseData = await this.httpService.saveNewQuote(this.saveQuoteData);
+        if (!this.authenticationService.requestFailed$.value){
+          if (responseData != null && !String.IsNullOrWhiteSpace(responseData.ClientLadingNo))
+          {
+            this.messageService.SendQuoteParameter(responseData.ClientLadingNo);
+            this.messageService.SendLadingIDParameter(responseData.LadingID.toString());
+            // this.snackbar.open('Quote saved successfully with LoadNo ' + responseData.ClientLadingNo, null, {
+            //   duration: 5000
+            // });
+    
+            this.openDialog(false, 'Quote saved successfully. Quote Number: ' + responseData.ClientLadingNo + '. ' + (objRateSelected != null && objRateSelected.rateSelectedAction === 4 ? 'Email has been sent.' : ''), null, 
+            'QuoteSavedAndRedirectToBoard', null, null, null);
+    
+            if (objRateSelected != null){
+              switch (objRateSelected.rateSelectedAction) {
+                case 3: // print quote
+                  const ratequotePrintURL = String.Format(environment.baseEndpoint + 'Handlers/PrintQuoteHandler.ashx?LadingID={0}&Ticket={1}',
+                                              responseData.LadingID,this.securityToken);
+                  window.open(ratequotePrintURL, '_blank');
+                  break;
+                case 4: // email quote
+                  let emailBOLParameters: SendEmailParameters;
       
-              emailBOLParameters = {
-                ClientID: this.ClientID,
-                CarrierID : selectedRate.CarrierID,
-                ApplicationID: 56,
-                EventID: 39,
-                EmailAddresses: objRateSelected.keyValue,
-                LadingID: responseData.LadingID,
-                UserRowID: 1,
-                InvoiceParameter: invoiceParameter,
-                LadingIDs: [],
-              }
-      
-              this.httpService.SendEmailManually(emailBOLParameters);
-              break;
-          } 
-        }                
+                  const invoiceParameter: InvoiceParameter = {
+                    InvoiceDetailIDs: []
+                  };
+          
+                  emailBOLParameters = {
+                    ClientID: this.ClientID,
+                    CarrierID : selectedRate.CarrierID,
+                    ApplicationID: 56,
+                    EventID: 39,
+                    EmailAddresses: objRateSelected.keyValue,
+                    LadingID: responseData.LadingID,
+                    UserRowID: 1,
+                    InvoiceParameter: invoiceParameter,
+                    LadingIDs: [],
+                  }
+          
+                  this.httpService.SendEmailManually(emailBOLParameters);
+                  break;
+              } 
+            }                
+            
+          }
+          else{
+            this.openDialog(false, 'Error saving as quote. ' + this.authenticationService.requestFailedMessage$.value.toString(), null);
+          }
+        }else{
+          this.authenticationService.requestFailed$.next(false);
+          this.openDialog(false, 'Error saving as quote. ' + this.authenticationService.requestFailedMessage$.value.toString(), null);
+          this.authenticationService.requestFailedMessage$.next('');
+        }        
         
-      }
-      else{
-        this.snackbar.open('Error saving as quote.', null, {
-          duration: 5000
-        });
-      }
+      }catch(e){
+        this.authenticationService.requestFailed$.next(false);
+        this.openDialog(false, 'Error saving as quote. ' + this.authenticationService.requestFailedMessage$.value.toString(), null);
+        this.authenticationService.requestFailedMessage$.next('');
+      }   
+      
     }
     
-
     this.showSpinner = false;
   }
 
@@ -2590,43 +2618,46 @@ export class FormAddShipComponent implements OnInit {
       // -- accountInvoiceCostListSellRates
       const accountInvoiceCostListSellRates: AccountInvoiceCostListSBL[] = [];
 
-      const filteredSelectRateAccessorials = selectedRate.Accessorials.filter(acc => acc.AccessorialCharge > 0);
-      filteredSelectRateAccessorials.forEach(a => {
-
-        let tempCostDetailID = 0;
-        const filteredCostList = this.ShipmentCostObject.SellRates.AccountInvoiceCostList.filter(item => item.Description === a.AccessorialDescription);
-        if (filteredCostList != null && filteredCostList.length > 0){
-          tempCostDetailID = filteredCostList[0].CostDetailID;
-        }
-
-        const accountInvoiceCost: AccountInvoiceCostListSBL = {
-          AccessorialID: a.AccessorialID,
-          AccessorialCode: a.AccessorialCode,
-          RatedCost: a.AccessorialCharge,
-          BilledCost: a.AccessorialCharge,
-          Description: a.AccessorialDescription,
-          CostStatus: 1,
-          CostDetailID: tempCostDetailID
-        }
-        accountInvoiceCostListBuyRates.push(accountInvoiceCost);
-
-        let tempCostDetailIDSR = 0;
-        const filteredCostListSR = this.ShipmentCostObject.SellRates.AccountInvoiceCostList.filter(item => item.Description === a.AccessorialDescription);
-        if (filteredCostListSR != null && filteredCostListSR.length > 0){
-          tempCostDetailIDSR = filteredCostListSR[0].CostDetailID;
-        }
-
-        const accountInvoiceCostSR: AccountInvoiceCostListSBL = {
-          AccessorialID: a.AccessorialID,
-          AccessorialCode: a.AccessorialCode,
-          RatedCost: a.AccessorialCharge,
-          BilledCost: a.AccessorialCharge,
-          Description: a.AccessorialDescription,
-          CostStatus: 1,
-          CostDetailID: tempCostDetailIDSR
-        }
-        accountInvoiceCostListSellRates.push(accountInvoiceCostSR);
-      });
+      if (selectedRate.Accessorials != null){
+        const filteredSelectRateAccessorials = selectedRate.Accessorials.filter(acc => acc.AccessorialCharge > 0);
+        filteredSelectRateAccessorials.forEach(a => {
+  
+          let tempCostDetailID = 0;
+          const filteredCostList = this.ShipmentCostObject.SellRates.AccountInvoiceCostList.filter(item => item.Description === a.AccessorialDescription);
+          if (filteredCostList != null && filteredCostList.length > 0){
+            tempCostDetailID = filteredCostList[0].CostDetailID;
+          }
+  
+          const accountInvoiceCost: AccountInvoiceCostListSBL = {
+            AccessorialID: a.AccessorialID,
+            AccessorialCode: a.AccessorialCode,
+            RatedCost: a.AccessorialCharge,
+            BilledCost: a.AccessorialCharge,
+            Description: a.AccessorialDescription,
+            CostStatus: 1,
+            CostDetailID: tempCostDetailID
+          }
+          accountInvoiceCostListBuyRates.push(accountInvoiceCost);
+  
+          let tempCostDetailIDSR = 0;
+          const filteredCostListSR = this.ShipmentCostObject.SellRates.AccountInvoiceCostList.filter(item => item.Description === a.AccessorialDescription);
+          if (filteredCostListSR != null && filteredCostListSR.length > 0){
+            tempCostDetailIDSR = filteredCostListSR[0].CostDetailID;
+          }
+  
+          const accountInvoiceCostSR: AccountInvoiceCostListSBL = {
+            AccessorialID: a.AccessorialID,
+            AccessorialCode: a.AccessorialCode,
+            RatedCost: a.AccessorialCharge,
+            BilledCost: a.AccessorialCharge,
+            Description: a.AccessorialDescription,
+            CostStatus: 1,
+            CostDetailID: tempCostDetailIDSR
+          }
+          accountInvoiceCostListSellRates.push(accountInvoiceCostSR);
+        });
+      }
+      
         
       // Freight
       let FRTCostDetailID = 0;
@@ -2870,7 +2901,7 @@ export class FormAddShipComponent implements OnInit {
     
     // Set error interceptor variable to false as default
     this.authenticationService.requestFailed$.next(false);
-
+    this.authenticationService.requestFailedMessage$.next('');
     if (ModifiedQuote){
       try{
         const responseData = await this.httpService.ModifiedQuoteWithLadingData(localShipmentByLadingObject);
@@ -2883,21 +2914,19 @@ export class FormAddShipComponent implements OnInit {
           this.router.navigate(['../../../shipmentboard/LTLTL/'], { relativeTo: this.route });
         }else{
           this.authenticationService.requestFailed$.next(false);
-          this.snackbar.open('Error setting the record as modified.', null, {
-            duration: 5000
-          });
+          this.openDialog(false, 'Error setting the record as modified. ' + this.authenticationService.requestFailedMessage$.value.toString(), null);
+          this.authenticationService.requestFailedMessage$.next('');          
         }      
       }catch(e){
         this.authenticationService.requestFailed$.next(false);
-        this.snackbar.open('Error setting the record as modified.', null, {
-          duration: 5000
-        });
+        this.openDialog(false, 'Error setting the record as modified. ' + this.authenticationService.requestFailedMessage$.value.toString(), null);
+        this.authenticationService.requestFailedMessage$.next('');        
       }
 
       return;
     }
 
-    try{
+    try{            
       const responseData = await this.httpService.UpdateBOLHDR(localShipmentByLadingObject);
       if (!this.authenticationService.requestFailed$.value){
         this.messageService.SendQuoteParameter(localShipmentByLadingObject.ClientLadingNo);
@@ -2949,15 +2978,13 @@ export class FormAddShipComponent implements OnInit {
         }
       }else{
         this.authenticationService.requestFailed$.next(false);
-        this.snackbar.open('Error updating the record.', null, {
-          duration: 5000
-        });
+        this.openDialog(false, 'Error updating the record. ' + this.authenticationService.requestFailedMessage$.value.toString(), null);
+        this.authenticationService.requestFailedMessage$.next('');        
       }      
     }catch(e){
       this.authenticationService.requestFailed$.next(false);
-      this.snackbar.open('Error updating the record.', null, {
-        duration: 5000
-      });
+      this.openDialog(false, 'Error updating the record. ' + this.authenticationService.requestFailedMessage$.value.toString(), null);
+      this.authenticationService.requestFailedMessage$.next('');      
     }        
 
     this.showSpinner = false;

@@ -23,6 +23,7 @@ export class AuthenticationService {
     this.baseEndpoint = environment.baseEndpoint;
     this.loading$.next(false);
     this.requestFailed$.next(false);
+    this.requestFailedMessage$.next('');
     this.init();
     this.isTokenRefreshing$.next(false);
   }
@@ -34,6 +35,7 @@ export class AuthenticationService {
   public defaultClient$: BehaviorSubject<Client> = new BehaviorSubject<Client>(null);
   public loading$: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
   public requestFailed$: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
+  public requestFailedMessage$: BehaviorSubject<string> = new BehaviorSubject<string>('');
   public clientHtmlMessages$: BehaviorSubject<HtmlMsgByClient[]> = new BehaviorSubject<HtmlMsgByClient[]>(null);
   public MasBrandForClient$: BehaviorSubject<Brand[]> = new BehaviorSubject<Brand[]>(null);
   public tokenIssueDate$: BehaviorSubject<string> = new BehaviorSubject<string>(null);

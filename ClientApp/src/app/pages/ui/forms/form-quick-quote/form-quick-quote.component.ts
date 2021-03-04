@@ -1126,7 +1126,7 @@ export class FormQuickQuoteComponent implements OnInit {
     const product = this.quickQuoteFormGroup.get('products').value[index];
     const PCF = this.calculatePCF(product.Pallets, product.Length, product.Width, product.Height, product.Weight);
     if (PCF != null) {
-      if (this.clientDefaultData.IsCalculateClassByPCF){
+      if (this.clientDefaultData != null && this.clientDefaultData.IsCalculateClassByPCF){
         const pcfclass = this.EstimateClassFromPCF(PCF);
         if (product.ProductClass !== pcfclass.toString()) {
           this.openDialog(true, 'Selected class is ' + product.ProductClass + ' and Estimated class is ' + pcfclass + '. Do you want to change ?', 'UpdateProductPCFClass', index, pcfclass);          

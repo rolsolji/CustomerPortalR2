@@ -656,8 +656,14 @@ export class FormQuickQuoteComponent implements OnInit {
     else{
       console.log('unchecked', event.source.value);
 
-      this.accessorials = this.accessorials.filter(a => a.AccessorialID !== event.source.value);
-      this.accessorialIds = this.accessorialIds.filter(a => a !== event.source.value)
+      if (this.accessorials != null){
+        this.accessorials = this.accessorials.filter(a => a.AccessorialID !== event.source.value);
+      }
+      
+      if (this.accessorialIds != null){
+        this.accessorialIds = this.accessorialIds.filter(a => a !== event.source.value)
+      }
+      
     }
 
     console.log(this.accessorials);
@@ -700,8 +706,13 @@ export class FormQuickQuoteComponent implements OnInit {
         this.serviceLevels = this.serviceLevels.filter(s => s.ServiceLevelID !== event.source.value)
       }
       else {
-        this.accessorials = this.accessorials.filter(a => a.AccessorialID !== event.source.value);
-        this.accessorialIds = this.accessorialIds.filter(a => a !== event.source.value)
+        if (this.accessorials != null){
+          this.accessorials = this.accessorials.filter(a => a.AccessorialID !== event.source.value);
+        }
+
+        if (this.accessorialIds != null){
+          this.accessorialIds = this.accessorialIds.filter(a => a !== event.source.value)
+        }        
       }
     }
 
@@ -963,16 +974,18 @@ export class FormQuickQuoteComponent implements OnInit {
 
     const accountInvoiceCostList: AccountInvoiceCost[] = [];
 
-    selectedRate.Accessorials.forEach(a => {
-      const accountInvoiceCost: AccountInvoiceCost = {
-        AccessorialID: a.AccessorialID,
-        RatedCost: a.AccessorialCharge,
-        BilledCost: a.AccessorialCharge,
-        Description: a.AccessorialDescription,
-        CostStatus: 1 // Ask
-      }
-      accountInvoiceCostList.push(accountInvoiceCost);
-    })
+    if (selectedRate.Accessorials != null){
+      selectedRate.Accessorials.forEach(a => {
+        const accountInvoiceCost: AccountInvoiceCost = {
+          AccessorialID: a.AccessorialID,
+          RatedCost: a.AccessorialCharge,
+          BilledCost: a.AccessorialCharge,
+          Description: a.AccessorialDescription,
+          CostStatus: 1 // Ask
+        }
+        accountInvoiceCostList.push(accountInvoiceCost);
+      })
+    }    
 
     // Ask
     // Freight

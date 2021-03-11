@@ -1323,11 +1323,19 @@ export class FormAddShipComponent implements OnInit {
         this.TotalShipmentCost = selectedRate.TotalCostWithOutTrueCost;
       }
       
-      this.confirmFormGroup.get('carrier').setValue(selectedRate.CarrierName);      
+      this.confirmFormGroup.get('carrier').setValue(selectedRate.CarrierName);  
+      
+
+      //-- Set Exp. Delivery Date base on selected rate
+      if (!String.IsNullOrWhiteSpace(selectedRate.TransitTime)){
+        if (this.ShipmentByLadingObject.PickupDate != null) {
+          const strExpDelDate = this.ConverteJsonDateToLocalTimeZone(selectedRate.ExpectedDeliveryDate);
+          const expDelDate = new Date(strExpDelDate);
+          this.originAndDestinationFormGroup.controls.destexpdeldate.setValue(expDelDate, {onlySelf: false});
+        }                      
+      }  
+      //--    
     }
-
-
-
   }
 
   // actions = 1:save / 2:ship / 3:print / 4:email
@@ -2540,8 +2548,9 @@ export class FormAddShipComponent implements OnInit {
     localShipmentByLadingObject.RequestedPickupTimeFrom = this.originAndDestinationFormGroup.get('originpickupopen').value;
     localShipmentByLadingObject.RequestedPickupTimeTo = this.originAndDestinationFormGroup.get('originpickupclose').value;   
 
-    // localShipmentByLadingObject.ExpectedDeliveryDate = String.Format('/Date({0})/',this.originAndDestinationFormGroup.get('destexpdeldate').value.getTime());
+    
     localShipmentByLadingObject.ExpectedDeliveryDate = this.utilitiesService.ConvertDateToJsonFormate(this.originAndDestinationFormGroup.get('destexpdeldate').value);
+    localShipmentByLadingObject.RequestedDeliveryDate = this.utilitiesService.ConvertDateToJsonFormate(this.originAndDestinationFormGroup.get('destexpdeldate').value);
     localShipmentByLadingObject.DeliveryAppointmentTimeFrom = this.originAndDestinationFormGroup.get('destdelapptfrom').value;
     localShipmentByLadingObject.DeliveryAppointmentTimeTo = this.originAndDestinationFormGroup.get('destdelapptto').value;   
     // --

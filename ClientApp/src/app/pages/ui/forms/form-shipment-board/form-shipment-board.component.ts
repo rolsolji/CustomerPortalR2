@@ -245,6 +245,9 @@ export class FormShipmentBoardComponent implements OnInit {
   othDocumentURL: string;
   othDocumentURLIsEnabled: boolean = false;
 
+  rwtDocumentURL: string;
+  rwtDocumentURLIsEnabled: boolean = false;
+
   notesList:[];
   notesIsEnabled: boolean = false;
 
@@ -702,22 +705,28 @@ export class FormShipmentBoardComponent implements OnInit {
     if (this.shipmentInformation.BolDocumentsList != null && this.shipmentInformation.BolDocumentsList.length > 0)
     {
       const BOLDocument = this.shipmentInformation.BolDocumentsList.find(d => d.DocType === 'BOL');
-      if (BOLDocument != null){
+      if (BOLDocument !== null && BOLDocument !== undefined){
         this.bolDocumentURL = String.Format(environment.baseEndpoint + 'Handlers/DownLoadPODHandler.ashx?userToken={0}&clientID={1}&imageName={2}&docType={3}&TMWUrl={4}&Ticket={5}',
                                               this.user.TokenString,this.shipmentInformation.ShortName,BOLDocument.FilePath,BOLDocument.DocType,BOLDocument.TMWUrl,this.securityToken);
         this.bolDocumentURLIsEnabled = true;
       }
       
       const PODDocument = this.shipmentInformation.BolDocumentsList.find(d => d.DocType === 'POD');
-      if (PODDocument != null){
+      if (PODDocument !== null && PODDocument !== undefined){
         this.podDocumentURL = String.Format(environment.baseEndpoint + 'Handlers/DownLoadPODHandler.ashx?userToken={0}&clientID={1}&imageName={2}&docType={3}&TMWUrl={4}&Ticket={5}',
                                               this.user.TokenString,this.shipmentInformation.ShortName,PODDocument.FilePath,PODDocument.DocType,PODDocument.TMWUrl,this.securityToken);
-                                              https://customer.r2logistics.com/Handlers/DownLoadPODHandler.ashx?userToken=132074&clientID=TU125&imageName=\TU125\RTS44670_29412623703_TU125POD.pdf&docType=POD&TMWUrl=&Ticket=003D162102968BE6E4800B08AC36E6D546D89B0158B1C189E5E3F22BDC9393019B56772A91D35934E9EC048DC456FEC03285BE3B9DA295E5FC41962BAA2DBF2E27D5106C90E58CA780C15C0727698C25BDE33F8D5354B675038AB7677B2D80CA5EBAAB5280A4F9F0A11E9004DF9DA5FB41A11D5386C0591473968C413DC78D691AA1A53813589261DB8E626CC8BC3D99D6F92E43C7A3F15CF1D1830985EA7CF1
         this.podDocumentURLIsEnabled = true;
       }
 
+      const RWTDocument = this.shipmentInformation.BolDocumentsList.find(d => d.DocType === 'RWT');
+      if (RWTDocument !== null && RWTDocument !== undefined){
+        this.rwtDocumentURL = String.Format(environment.baseEndpoint + 'Handlers/DownLoadPODHandler.ashx?userToken={0}&clientID={1}&imageName={2}&docType={3}&TMWUrl={4}&Ticket={5}',
+                                              this.user.TokenString,this.shipmentInformation.ShortName,RWTDocument.FilePath,RWTDocument.DocType,RWTDocument.TMWUrl,this.securityToken);
+        this.rwtDocumentURLIsEnabled = true;
+      }
+
       const OTHDocument = this.shipmentInformation.BolDocumentsList.find(d => d.DocType === 'OTH');
-      if (OTHDocument != null){
+      if (OTHDocument !== null && OTHDocument !== undefined){
         this.othDocumentURL = String.Format(environment.baseEndpoint + 'Handlers/DownLoadPODHandler.ashx?userToken={0}&clientID={1}&imageName={2}&docType={3}&TMWUrl={4}&Ticket={5}',
                                               this.user.TokenString,this.shipmentInformation.ShortName,OTHDocument.FilePath,OTHDocument.DocType,OTHDocument.TMWUrl,this.securityToken);
         this.othDocumentURLIsEnabled = true;
@@ -726,12 +735,12 @@ export class FormShipmentBoardComponent implements OnInit {
 
     if (this.shipmentInformation.BOLDispatchNotesList != null && this.shipmentInformation.BOLDispatchNotesList.length > 0){
       const notes = this.shipmentInformation.BOLDispatchNotesList.find(n => n.NoteTypeId === 1);
-      if (notes != null && notes.length > 0){
+      if (notes !== null && notes !== undefined){
 
       }
 
       const auditLog = this.shipmentInformation.BOLDispatchNotesList.find(n => n.NoteTypeId === 3);
-      if (auditLog != null && auditLog.length > 0){
+      if (auditLog !== null && auditLog !== undefined){
 
       }
     }
@@ -914,5 +923,29 @@ export class FormShipmentBoardComponent implements OnInit {
     }
 
     this.statusSelectedDescription = String.Format('{0} status selected', this.statusSelected.length);
+  }
+
+  BolDocumentsButtonClick() {
+    if(this.bolDocumentURL !== null && this.bolDocumentURL !== undefined && this.bolDocumentURL !== ""){
+      window.open(this.bolDocumentURL);
+    }
+  }
+
+  PodDocumentsButtonClick() {
+    if(this.podDocumentURL !== null && this.podDocumentURL !== undefined && this.podDocumentURL !== ""){
+      window.open(this.podDocumentURL);
+    }
+  }
+
+  RwtDocumentsButtonClick() {
+    if(this.rwtDocumentURL !== null && this.rwtDocumentURL !== undefined && this.rwtDocumentURL !== ""){
+      window.open(this.rwtDocumentURL);
+    }
+  }
+
+  OthDocumentsButtonClick() {
+    if(this.othDocumentURL !== null && this.othDocumentURL !== undefined && this.othDocumentURL !== ""){
+      window.open(this.othDocumentURL);
+    }
   }
 }

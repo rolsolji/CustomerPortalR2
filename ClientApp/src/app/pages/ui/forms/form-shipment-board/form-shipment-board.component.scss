@@ -375,6 +375,9 @@ tr.example-element-row:not(.example-expanded-row):active {
 
   .mat-cell, .mat-footer-cell {
     font-size: 12px;
+    white-space: normal;
+    padding-bottom: 2px;
+    padding-top: 2px;
   }
 
   .disabled {

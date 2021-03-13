@@ -241,6 +241,7 @@ export class FormAddShipComponent implements OnInit {
   ExpectedDeliveryDateCalculated: string;
   LoadNumber: string;
   ShowSaveAsQuoteButton = false;
+  BookShipmentButtonText: string;
 
   ShipmentAccessorialsStored: BOLAccesorialListSBL[];
 
@@ -511,6 +512,8 @@ export class FormAddShipComponent implements OnInit {
     // -- Get Shipment information
     // this.ladingIdParameter = "2386566";
     // this.ladingIdParameter = "2386567";
+
+    this.BookShipmentButtonText = "Book Shipment";
 
     if (localLadingIdParameter != null && localLadingIdParameter.length > 0){
       // -- Get Service Level Options
@@ -1328,7 +1331,7 @@ export class FormAddShipComponent implements OnInit {
 
       //-- Set Exp. Delivery Date base on selected rate
       if (!String.IsNullOrWhiteSpace(selectedRate.TransitTime)){
-        if (this.ShipmentByLadingObject.PickupDate != null) {
+        if (selectedRate.ExpectedDeliveryDate != null) {
           const strExpDelDate = this.ConverteJsonDateToLocalTimeZone(selectedRate.ExpectedDeliveryDate);
           const expDelDate = new Date(strExpDelDate);
           this.originAndDestinationFormGroup.controls.destexpdeldate.setValue(expDelDate, {onlySelf: false});
@@ -1446,6 +1449,15 @@ export class FormAddShipComponent implements OnInit {
     }        
 
     this.LoadNumber = this.ShipmentByLadingObject.ClientLadingNo;
+    
+    this.BookShipmentButtonText = (this.ShipmentByLadingObject.Status === 2 || this.ShipmentByLadingObject.Status === 1
+      || this.ShipmentByLadingObject.Status === 9
+      || this.ShipmentByLadingObject.Status === 6
+      || this.ShipmentByLadingObject.Status === 5
+      || this.ShipmentByLadingObject.Status === 15
+      || this.ShipmentByLadingObject.Status === 16
+      || this.ShipmentByLadingObject.Status === 0 ? "Update Shipment" : "Book Shipment");
+
     this.ShowSaveAsQuoteButton = (this.ShipmentByLadingObject.Status === 18 || this.ShipmentByLadingObject.Status === 17
       || this.ShipmentByLadingObject.Status === 12
       || this.ShipmentByLadingObject.Status === 10
@@ -1750,9 +1762,18 @@ export class FormAddShipComponent implements OnInit {
             if (p.PackageTypeID !== (this.productsAndAccessorialsFormGroup.controls.products as FormArray).at(currentProductIndex).get('PackageTypeID').value){
               productHasChanged = true;
               return true;
+            }             
+
+            let tempClass = "";
+            if (p.ProductClass != null && p.ProductClass.trim() === "92"){
+              tempClass = "92.5"
+            }else if(p.ProductClass != null && p.ProductClass.trim() === "77"){
+              tempClass = "77.5"
+            }else  {
+              tempClass = p.ProductClass != null ? p.ProductClass.trim() : p.ProductClass;
             }
-  
-            if (p.ProductClass !== (this.productsAndAccessorialsFormGroup.controls.products as FormArray).at(currentProductIndex).get('ProductClass').value){
+
+            if (tempClass !== (this.productsAndAccessorialsFormGroup.controls.products as FormArray).at(currentProductIndex).get('ProductClass').value){
               productHasChanged = true;
               return true;
             }
@@ -2347,8 +2368,8 @@ export class FormAddShipComponent implements OnInit {
         if (!this.authenticationService.requestFailed$.value){
           if (responseData != null && !String.IsNullOrWhiteSpace(responseData.ClientLadingNo))
           {
-            this.messageService.SendQuoteParameter(responseData.ClientLadingNo);
-            this.messageService.SendLadingIDParameter(responseData.LadingID.toString());
+            // this.messageService.SendQuoteParameter(responseData.ClientLadingNo);
+            // this.messageService.SendLadingIDParameter(responseData.LadingID.toString());
             // this.snackbar.open('Shipment Booked with LoadNo ' + responseData.ClientLadingNo, null, {
             //   duration: 5000
             // });
@@ -2377,8 +2398,8 @@ export class FormAddShipComponent implements OnInit {
         if (!this.authenticationService.requestFailed$.value){
           if (responseData != null && !String.IsNullOrWhiteSpace(responseData.ClientLadingNo))
           {
-            this.messageService.SendQuoteParameter(responseData.ClientLadingNo);
-            this.messageService.SendLadingIDParameter(responseData.LadingID.toString());
+            // this.messageService.SendQuoteParameter(responseData.ClientLadingNo);
+            // this.messageService.SendLadingIDParameter(responseData.LadingID.toString());
             // this.snackbar.open('Quote saved successfully with LoadNo ' + responseData.ClientLadingNo, null, {
             //   duration: 5000
             // });
@@ -2915,8 +2936,8 @@ export class FormAddShipComponent implements OnInit {
       try{
         const responseData = await this.httpService.ModifiedQuoteWithLadingData(localShipmentByLadingObject);
         if (!this.authenticationService.requestFailed$.value){
-          this.messageService.SendQuoteParameter(localShipmentByLadingObject.ClientLadingNo);
-          this.messageService.SendLadingIDParameter(localShipmentByLadingObject.LadingID.toString());
+          // this.messageService.SendQuoteParameter(localShipmentByLadingObject.ClientLadingNo);
+          // this.messageService.SendLadingIDParameter(localShipmentByLadingObject.LadingID.toString());
           this.snackbar.open('Lading quote has been modified', null, {
             duration: 5000
           });
@@ -2938,8 +2959,8 @@ export class FormAddShipComponent implements OnInit {
     try{            
       const responseData = await this.httpService.UpdateBOLHDR(localShipmentByLadingObject);
       if (!this.authenticationService.requestFailed$.value){
-        this.messageService.SendQuoteParameter(localShipmentByLadingObject.ClientLadingNo);
-        this.messageService.SendLadingIDParameter(localShipmentByLadingObject.LadingID.toString());
+        // this.messageService.SendQuoteParameter(localShipmentByLadingObject.ClientLadingNo);
+        // this.messageService.SendLadingIDParameter(localShipmentByLadingObject.LadingID.toString());
         if (!bookShipment){
           // this.snackbar.open('Quote saved successfully', null, {
           //   duration: 5000

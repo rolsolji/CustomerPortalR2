@@ -437,3 +437,8 @@ tr.example-element-row:not(.example-expanded-row):active {
     padding: 0 -24px 16px;
     font-size: 10px;
   }
+
+  .TrackingDetailsTable{
+    overflow: auto;
+    height: 375px;
+  }

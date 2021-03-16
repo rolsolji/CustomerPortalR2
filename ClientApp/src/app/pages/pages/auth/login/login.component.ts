@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
-import { MatSnackBar } from '@angular/material/snack-bar';
+import { MatSnackBar, MatSnackBarHorizontalPosition, MatSnackBarVerticalPosition } from '@angular/material/snack-bar';
 import icVisibility from '@iconify/icons-ic/twotone-visibility';
 import icVisibilityOff from '@iconify/icons-ic/twotone-visibility-off';
 import { fadeInUp400ms } from '../../../../../@vex/animations/fade-in-up.animation';
@@ -28,6 +28,10 @@ export class LoginComponent implements OnInit {
   icVisibility = icVisibility;
   icVisibilityOff = icVisibilityOff;
 
+  isLoginEnabled: boolean = true;
+  horizontalPosition: MatSnackBarHorizontalPosition = 'center';
+  verticalPosition: MatSnackBarVerticalPosition = 'top';
+
   constructor(
     private router: Router,
     private fb: FormBuilder,
@@ -45,6 +49,14 @@ export class LoginComponent implements OnInit {
 
     var ticket = this.activatedRoute.snapshot.queryParamMap.get("ticket");
     if(ticket != null && ticket != undefined && ticket != ''){
+      this.snackbar.open('Logging in...', '', {
+        duration: 5000,
+        verticalPosition: this.verticalPosition,
+        horizontalPosition: this.horizontalPosition
+      });
+      this.isLoginEnabled = false;
+      this.form.controls['username'].disable();
+      this.form.controls['password'].disable();
       this.getLoginDetailsUsingTicket(ticket);
     }
   }

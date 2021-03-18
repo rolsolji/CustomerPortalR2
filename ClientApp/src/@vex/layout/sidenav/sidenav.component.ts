@@ -11,6 +11,7 @@ import {Client} from '../../../app/Entities/client.model';
 import {BehaviorSubject, Observable} from 'rxjs';
 import {FormBuilder, FormGroup} from '@angular/forms';
 import {HttpService} from '../../../app/common/http.service';
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'vex-sidenav',
@@ -36,7 +37,7 @@ export class SidenavComponent implements OnInit {
   filteredOptions: Observable<Client[]>;
   clientsForm: FormGroup;
   public clientsForUser$: BehaviorSubject<Client[]> = new BehaviorSubject<Client[]>(null);
-
+  private baseEndpoint: string;
   constructor(private navigationService: NavigationService,
               private layoutService: LayoutService,
               private configService: ConfigService,
@@ -44,11 +45,12 @@ export class SidenavComponent implements OnInit {
               private fb: FormBuilder,
               private httpService: HttpService
   ) {
+    this.baseEndpoint = environment.baseEndpoint;
   }
 
   async ngOnInit() {
     this.securityToken = this.authenticationService.ticket$.value;
-    this.clientImage = `https://beta-customer.r2logistics.com/Handlers/ClientLogoHandler.ashx?ClientID=${this.authenticationService.getDefaultClient().ClientID}&id=e(${Math.random().toString().slice(2,11)})/&Ticket=${this.securityToken}`;
+    this.clientImage = this.baseEndpoint + `Handlers/ClientLogoHandler.ashx?ClientID=${this.authenticationService.getDefaultClient().ClientID}&id=e(${Math.random().toString().slice(2,11)})/&Ticket=${this.securityToken}`;
     this.defaultClient = this.authenticationService.getDefaultClient();
     this.configService.updateConfig({
       sidenav: {

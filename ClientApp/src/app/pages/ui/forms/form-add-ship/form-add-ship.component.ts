@@ -547,56 +547,56 @@ export class FormAddShipComponent implements OnInit {
     // --
 
     this.carrierAutoCompleteOptions = this.confirmFormGroup.get('carrier').valueChanges
-      .pipe(
+    .pipe(
         startWith(''),
         debounceTime(400),
         distinctUntilChanged(),
         switchMap(val => {
           return this.carrierAutoCompletefilter(val || '')
         })
-      );
+    );
 
 
 
-      this.ratesOpened = []; // initiate ratesOpened array
-      this.messageService.SendLadingIDParameter(String.Empty); // Clean LadingId parameter
-      this.messageService.SendQuoteParameter(String.Empty); // Clean LadingCode parameter
+    this.ratesOpened = []; // initiate ratesOpened array
+    this.messageService.SendLadingIDParameter(String.Empty); // Clean LadingId parameter
+    this.messageService.SendQuoteParameter(String.Empty); // Clean LadingCode parameter
 
-      this.originAndDestinationFormGroup.get('originpostalcode')
-      .valueChanges
-      .pipe(pairwise())
-      .subscribe(([prev, next]: [any, any]) => {
+    this.originAndDestinationFormGroup.get('originpostalcode')
+    .valueChanges
+    .pipe(pairwise())
+    .subscribe(([prev, next]: [any, any]) => {
         console.log('originpostalcode PREV1', prev);
         console.log('originpostalcode NEXT1', next);
         if (prev !== next && this.costListFiltered != null && this.costListFiltered.length > 0){
           // if previous value is dif from the current value and also costs has already been calculated, force re-rate
           this.ForceToReRate = true;
         }
-      });
+    });
 
-      this.originAndDestinationFormGroup.get('destpostalcode')
-      .valueChanges
-      .pipe(pairwise())
-      .subscribe(([prev, next]: [any, any]) => {
+    this.originAndDestinationFormGroup.get('destpostalcode')
+    .valueChanges
+    .pipe(pairwise())
+    .subscribe(([prev, next]: [any, any]) => {
         console.log('destpostalcode PREV1', prev);
         console.log('destpostalcode NEXT1', next);
         if (prev !== next && this.costListFiltered != null && this.costListFiltered.length > 0){
           // if previous value is dif from the current value and also costs has already been calculated, force re-rate
           this.ForceToReRate = true;
         }
-      });
+    });
 
-      this.originAndDestinationFormGroup.get('originpickupdate')
-      .valueChanges
-      .pipe(pairwise())
-      .subscribe(([prev, next]: [any, any]) => {
+    this.originAndDestinationFormGroup.get('originpickupdate')
+    .valueChanges
+    .pipe(pairwise())
+    .subscribe(([prev, next]: [any, any]) => {
         console.log('originpickupdate PREV1', prev);
         console.log('originpickupdate NEXT1', next);
         if (prev !== next && this.costListFiltered != null && this.costListFiltered.length > 0){
           // if previous value is dif from the current value and also costs has already been calculated, force re-rate
           this.ForceToReRate = true;
         }
-      });     
+    });     
 
     const productsList = this.productsAndAccessorialsFormGroup.get('products') as FormArray;
     
@@ -1754,7 +1754,8 @@ export class FormAddShipComponent implements OnInit {
               return true;
             }
   
-            if (p.Pieces !== (this.productsAndAccessorialsFormGroup.controls.products as FormArray).at(currentProductIndex).get('Pieces').value){
+            let tempCurrentPiecesValue = (this.productsAndAccessorialsFormGroup.controls.products as FormArray).at(currentProductIndex).get('Pieces').value == null ? 0 : (this.productsAndAccessorialsFormGroup.controls.products as FormArray).at(currentProductIndex).get('Pieces').value;
+            if (p.Pieces !== tempCurrentPiecesValue){
               productHasChanged = true;
               return true;
             }

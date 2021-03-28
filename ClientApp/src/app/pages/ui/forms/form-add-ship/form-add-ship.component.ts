@@ -2000,32 +2000,14 @@ export class FormAddShipComponent implements OnInit {
           if (accessorialHasChanged){
             return true;
           }
-
         }
-      }
-
-      // if (this.ShipmentAccessorialsStored != null && this.ShipmentAccessorialsStored.length > 0){
-      //   if (this.ShipmentAccessorialsStored.length !== this.accessorials.length)
-      //   {
-      //     // accessorials selected are different from the ones previously selected, so return true to re-rate
-      //     return true;
-      //   }else{
-      //     let accessorialArrayFound: AccessorialBase[];
-      //     let accessorialHasChanged = false;
-      //     this.ShipmentAccessorialsStored.forEach(BOLAccesorial => {
-      //       accessorialArrayFound = this.accessorials.filter(item => item.AccessorialID === BOLAccesorial.AccesorialID);
-      //       if (accessorialArrayFound == null || accessorialArrayFound.length === 0){
-      //         accessorialHasChanged = true;
-      //         return true; // Previous accessorial selected not found in current list of accessorials, so return true (re-rate)
-      //       }
-      //     });
-
-      //     if (accessorialHasChanged){
-      //       return true;
-      //     }
-      //   }
-      // }
-
+      }else{
+        if (this.accessorialsUsedToRate.length !== this.accessorials.length)
+        {
+          // accessorials selected are different from the ones previously selected, so return true to re-rate
+          return true;
+        }
+      }             
     }
 
     return bFieldsHaveChanged;

@@ -1842,7 +1842,13 @@ export class FormAddShipComponent implements OnInit {
             }
 
           }
-        }
+        }else{
+          if (this.accessorialsUsedToRate.length !== this.accessorials.length)
+          {
+            // accessorials selected are different from the ones previously selected, so return true to re-rate
+            return true;
+          }
+        }       
     }
     else // costs have been already obtained, so compare current values with previous ones
     {

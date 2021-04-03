@@ -273,6 +273,12 @@ export class FormAddShipComponent implements OnInit {
   countryList: PostalData[];
   productList: ProductByClient[];
 
+  /* Start 02/04/2021 */
+  tempAccountInvoiceCostList: AccountInvoiceCostList[];
+  costListAtBuySide: AccountInvoiceCostList[];
+  filteredCostDetails: AccountInvoiceCostList[];
+  /* End 02/04/2021 */
+
   addProductFormGroup(): FormGroup{
     return this.fb.group({
       Pallets: [0, Validators.required],
@@ -523,14 +529,18 @@ export class FormAddShipComponent implements OnInit {
 
       // -- Get Shipment Costs
       this.ShipmentCostObject = await this.httpService.GetShipmentCostByLadingID(localLadingIdParameter, this.keyId);
-      this.AccountInvoiceCostList = this.ShipmentCostObject.SellRates.AccountInvoiceCostList;
-      // this.clientDefaultData = await this.httpService.getClientDefaultsByClient(this.ClientID, this.keyId);
+      this.AccountInvoiceCostList = this.ShipmentCostObject.SellRates.AccountInvoiceCostList;      
 
-      // if ( this.AccountInvoiceCostList != null &&  this.AccountInvoiceCostList.length > 0){
-      //   this.costListFiltered =  this.AccountInvoiceCostList.filter(item => item.BilledCost > 0);
-      // }
-
-      this.costListFiltered = this.AccountInvoiceCostList;
+      /* Start 02/04/2021 */
+      //this.costListFiltered = this.AccountInvoiceCostList;
+      this.costListAtBuySide = this.ShipmentCostObject.BuyRates.AccountInvoiceCostList;
+      this.costListFiltered = [];
+      this.AccountInvoiceCostList.forEach(a=>{
+        a.CostStatus = 2;
+        this.costListFiltered.push(a);
+      });
+      this.filteredCostDetails = this.costListFiltered.filter(item => item.CostStatus !== 3);
+      /* End 02/04/2021 */
       
       this.clientTLWeightLimit = (this.clientDefaultData.TLWeightLimit == null ? 0 : this.clientDefaultData.TLWeightLimit) + 'lb';
 
@@ -1281,12 +1291,36 @@ export class FormAddShipComponent implements OnInit {
 
     console.log(selectedRate);
     if (selectedRate != null){
-      this.costListFiltered = [];
+
+      /* Start 02/04/2021 */
+      // this.costListFiltered = [];
+      let tempLadingId;
+      this.tempAccountInvoiceCostList = [];
+
+      if(this.ShipmentByLadingObject !== null && this.ShipmentByLadingObject !== undefined && this.ShipmentByLadingObject.LadingID !== null && this.ShipmentByLadingObject.LadingID !== undefined) {
+        tempLadingId = this.ShipmentByLadingObject.LadingID;
+      }
+      
+      if(tempLadingId !== null && tempLadingId !== undefined && tempLadingId !== 0){
+        this.tempAccountInvoiceCostList = this.costListFiltered;
+        this.costListFiltered = [];
+        this.tempAccountInvoiceCostList.forEach(cost=>{
+          cost.CostStatus = 3;
+          this.costListFiltered.push(cost);
+        });
+      }
+      else {
+        this.costListFiltered = [];
+      }
+      /* End 02/04/2021 */
 
       const accessorialInvoiceFreightCost: AccountInvoiceCostList = {
         AccessorialCode: 'FRT',
         Description: 'Freight',
-        BilledCost: selectedRate.GrossAmount
+        BilledCost: selectedRate.GrossAmount,
+        RatedCost: selectedRate.GrossAmount,
+        AccessorialID:22,
+        CostStatus:1
       }
 
       this.costListFiltered.push(accessorialInvoiceFreightCost);
@@ -1294,7 +1328,10 @@ export class FormAddShipComponent implements OnInit {
       const accessorialInvoiceDiscount: AccountInvoiceCostList = {
         AccessorialCode: 'DIS',
         Description: 'Discount',
-        BilledCost: -selectedRate.Discount
+        BilledCost: -selectedRate.Discount,
+        RatedCost: -selectedRate.Discount,
+        AccessorialID: 24,
+        CostStatus: 1
       }
 
       this.costListFiltered.push(accessorialInvoiceDiscount);
@@ -1302,7 +1339,10 @@ export class FormAddShipComponent implements OnInit {
       const accessorialInvoiceFuelCost: AccountInvoiceCostList = {
         AccessorialCode: 'FSC',
         Description: 'Fuel',
-        BilledCost: selectedRate.FuelCost
+        BilledCost: selectedRate.FuelCost,
+        RatedCost: selectedRate.FuelCost,
+        AccessorialID: 23,
+        CostStatus: 1
       }
 
       this.costListFiltered.push(accessorialInvoiceFuelCost);
@@ -1313,12 +1353,19 @@ export class FormAddShipComponent implements OnInit {
           const accessorialInvoice: AccountInvoiceCostList = {
             AccessorialCode: a.AccessorialCode,
             Description: a.AccessorialDescription,
-            BilledCost: a.AccessorialCharge
+            BilledCost: a.AccessorialCharge,
+            RatedCost: a.AccessorialCharge,
+            AccessorialID: a.AccessorialID,
+            CostStatus: 1
           }
   
           this.costListFiltered.push(accessorialInvoice);                       
         });
       }
+      
+      /* Start 02/04/2021 */
+      this.filteredCostDetails = this.costListFiltered.filter(item => item.CostStatus !== 3);
+      /* End 02/04/2021 */
       
       if (selectedRate.ShowTrueCost){
         this.TotalShipmentCost = selectedRate.TotalCost;
@@ -2637,157 +2684,163 @@ export class FormAddShipComponent implements OnInit {
       // -- accountInvoiceCostListSellRates
       const accountInvoiceCostListSellRates: AccountInvoiceCostListSBL[] = [];
 
-      if (selectedRate.Accessorials != null){
-        const filteredSelectRateAccessorials = selectedRate.Accessorials.filter(acc => acc.AccessorialCharge > 0);
-        filteredSelectRateAccessorials.forEach(a => {
+      /* Start 02/04/2021 */
+      // if (selectedRate.Accessorials != null){
+      //   const filteredSelectRateAccessorials = selectedRate.Accessorials.filter(acc => acc.AccessorialCharge > 0);
+      //   filteredSelectRateAccessorials.forEach(a => {
   
-          let tempCostDetailID = 0;
-          const filteredCostList = this.ShipmentCostObject.SellRates.AccountInvoiceCostList.filter(item => item.Description === a.AccessorialDescription);
-          if (filteredCostList != null && filteredCostList.length > 0){
-            tempCostDetailID = filteredCostList[0].CostDetailID;
-          }
+      //     let tempCostDetailID = 0;
+      //     const filteredCostList = this.ShipmentCostObject.SellRates.AccountInvoiceCostList.filter(item => item.Description === a.AccessorialDescription);
+      //     if (filteredCostList != null && filteredCostList.length > 0){
+      //       tempCostDetailID = filteredCostList[0].CostDetailID;
+      //     }
   
-          const accountInvoiceCost: AccountInvoiceCostListSBL = {
-            AccessorialID: a.AccessorialID,
-            AccessorialCode: a.AccessorialCode,
-            RatedCost: a.AccessorialCharge,
-            BilledCost: a.AccessorialCharge,
-            Description: a.AccessorialDescription,
-            CostStatus: 1,
-            CostDetailID: tempCostDetailID
-          }
-          accountInvoiceCostListBuyRates.push(accountInvoiceCost);
+      //     const accountInvoiceCost: AccountInvoiceCostListSBL = {
+      //       AccessorialID: a.AccessorialID,
+      //       AccessorialCode: a.AccessorialCode,
+      //       RatedCost: a.AccessorialCharge,
+      //       BilledCost: a.AccessorialCharge,
+      //       Description: a.AccessorialDescription,
+      //       CostStatus: 1,
+      //       CostDetailID: tempCostDetailID
+      //     }
+      //     accountInvoiceCostListBuyRates.push(accountInvoiceCost);
   
-          let tempCostDetailIDSR = 0;
-          const filteredCostListSR = this.ShipmentCostObject.SellRates.AccountInvoiceCostList.filter(item => item.Description === a.AccessorialDescription);
-          if (filteredCostListSR != null && filteredCostListSR.length > 0){
-            tempCostDetailIDSR = filteredCostListSR[0].CostDetailID;
-          }
+      //     let tempCostDetailIDSR = 0;
+      //     const filteredCostListSR = this.ShipmentCostObject.SellRates.AccountInvoiceCostList.filter(item => item.Description === a.AccessorialDescription);
+      //     if (filteredCostListSR != null && filteredCostListSR.length > 0){
+      //       tempCostDetailIDSR = filteredCostListSR[0].CostDetailID;
+      //     }
   
-          const accountInvoiceCostSR: AccountInvoiceCostListSBL = {
-            AccessorialID: a.AccessorialID,
-            AccessorialCode: a.AccessorialCode,
-            RatedCost: a.AccessorialCharge,
-            BilledCost: a.AccessorialCharge,
-            Description: a.AccessorialDescription,
-            CostStatus: 1,
-            CostDetailID: tempCostDetailIDSR
-          }
-          accountInvoiceCostListSellRates.push(accountInvoiceCostSR);
-        });
-      }
+      //     const accountInvoiceCostSR: AccountInvoiceCostListSBL = {
+      //       AccessorialID: a.AccessorialID,
+      //       AccessorialCode: a.AccessorialCode,
+      //       RatedCost: a.AccessorialCharge,
+      //       BilledCost: a.AccessorialCharge,
+      //       Description: a.AccessorialDescription,
+      //       CostStatus: 1,
+      //       CostDetailID: tempCostDetailIDSR
+      //     }
+      //     accountInvoiceCostListSellRates.push(accountInvoiceCostSR);
+      //   });
+      // }
       
         
-      // Freight
-      let FRTCostDetailID = 0;
-      const filteredCostListFRT = this.ShipmentCostObject.SellRates.AccountInvoiceCostList.filter(item => item.AccessorialID === 22 && item.AccessorialCode === 'FRT');
-      if (filteredCostListFRT != null && filteredCostListFRT.length > 0){
-        FRTCostDetailID = filteredCostListFRT[0].CostDetailID;
-      }
-      const accountInvoiceFreight: AccountInvoiceCostListSBL = {
-        AccessorialID: 22,
-        RatedCost: selectedRate.GrossAmount,
-        BilledCost: selectedRate.GrossAmount,
-        Description: 'Freight',
-        AccessorialCode: 'FRT',
-        CostStatus: 1,
-        CostDetailID: FRTCostDetailID
-      }
-      accountInvoiceCostListBuyRates.push(accountInvoiceFreight);
+      // // Freight
+      // let FRTCostDetailID = 0;
+      // const filteredCostListFRT = this.ShipmentCostObject.SellRates.AccountInvoiceCostList.filter(item => item.AccessorialID === 22 && item.AccessorialCode === 'FRT');
+      // if (filteredCostListFRT != null && filteredCostListFRT.length > 0){
+      //   FRTCostDetailID = filteredCostListFRT[0].CostDetailID;
+      // }
+      // const accountInvoiceFreight: AccountInvoiceCostListSBL = {
+      //   AccessorialID: 22,
+      //   RatedCost: selectedRate.GrossAmount,
+      //   BilledCost: selectedRate.GrossAmount,
+      //   Description: 'Freight',
+      //   AccessorialCode: 'FRT',
+      //   CostStatus: 1,
+      //   CostDetailID: FRTCostDetailID
+      // }
+      // accountInvoiceCostListBuyRates.push(accountInvoiceFreight);
   
-      // Fuel
-      let FSCCostDetailID = 0;
-      const filteredCostListFSC = this.ShipmentCostObject.SellRates.AccountInvoiceCostList.filter(item => item.AccessorialID === 23 && item.AccessorialCode === 'FSC');
-      if (filteredCostListFSC != null && filteredCostListFSC.length > 0){
-        FSCCostDetailID = filteredCostListFSC[0].CostDetailID;
-      }
-      const accountInvoiceFuel: AccountInvoiceCostListSBL = {
-        AccessorialID: 23,
-        RatedCost: selectedRate.FuelCost,
-        BilledCost: selectedRate.FuelCost,
-        Description: 'Fuel',
-        AccessorialCode: 'FSC',
-        CostStatus: 1,
-        CostDetailID: FSCCostDetailID
-      }
-      accountInvoiceCostListBuyRates.push(accountInvoiceFuel);
+      // // Fuel
+      // let FSCCostDetailID = 0;
+      // const filteredCostListFSC = this.ShipmentCostObject.SellRates.AccountInvoiceCostList.filter(item => item.AccessorialID === 23 && item.AccessorialCode === 'FSC');
+      // if (filteredCostListFSC != null && filteredCostListFSC.length > 0){
+      //   FSCCostDetailID = filteredCostListFSC[0].CostDetailID;
+      // }
+      // const accountInvoiceFuel: AccountInvoiceCostListSBL = {
+      //   AccessorialID: 23,
+      //   RatedCost: selectedRate.FuelCost,
+      //   BilledCost: selectedRate.FuelCost,
+      //   Description: 'Fuel',
+      //   AccessorialCode: 'FSC',
+      //   CostStatus: 1,
+      //   CostDetailID: FSCCostDetailID
+      // }
+      // accountInvoiceCostListBuyRates.push(accountInvoiceFuel);
   
-      // Discount
-      let DISCostDetailID = 0;
-      const filteredCostListDIS = this.ShipmentCostObject.SellRates.AccountInvoiceCostList.filter(item => item.AccessorialID === 24 && item.AccessorialCode === 'DIS');
-      if (filteredCostListDIS != null && filteredCostListDIS.length > 0){
-        DISCostDetailID = filteredCostListDIS[0].CostDetailID;
-      }
-      const accountInvoiceDiscount: AccountInvoiceCostListSBL = {
-        AccessorialID: 24,
-        RatedCost: -1 * selectedRate.Discount,
-        BilledCost: -1 * selectedRate.Discount,
-        Description: 'Discount',
-        AccessorialCode: 'DIS',
-        CostStatus: 1,
-        CostDetailID: DISCostDetailID
-      }
-      accountInvoiceCostListBuyRates.push(accountInvoiceDiscount);
-      // --
+      // // Discount
+      // let DISCostDetailID = 0;
+      // const filteredCostListDIS = this.ShipmentCostObject.SellRates.AccountInvoiceCostList.filter(item => item.AccessorialID === 24 && item.AccessorialCode === 'DIS');
+      // if (filteredCostListDIS != null && filteredCostListDIS.length > 0){
+      //   DISCostDetailID = filteredCostListDIS[0].CostDetailID;
+      // }
+      // const accountInvoiceDiscount: AccountInvoiceCostListSBL = {
+      //   AccessorialID: 24,
+      //   RatedCost: -1 * selectedRate.Discount,
+      //   BilledCost: -1 * selectedRate.Discount,
+      //   Description: 'Discount',
+      //   AccessorialCode: 'DIS',
+      //   CostStatus: 1,
+      //   CostDetailID: DISCostDetailID
+      // }
+      // accountInvoiceCostListBuyRates.push(accountInvoiceDiscount);
+      // // --
         
-      // Freight
-      let FRTCostDetailIDSR = 0;
-      const filteredCostListSRFRT = this.ShipmentCostObject.SellRates.AccountInvoiceCostList.filter(item => item.AccessorialID === 22 && item.AccessorialCode === 'FRT');
-      if (filteredCostListSRFRT != null && filteredCostListSRFRT.length > 0){
-        FRTCostDetailIDSR = filteredCostListSRFRT[0].CostDetailID;
-      }
-      const accountInvoiceFreightSR: AccountInvoiceCostListSBL = {
-        AccessorialID: 22,
-        RatedCost: selectedRate.GrossAmount,
-        BilledCost: selectedRate.GrossAmount,
-        Description: 'Freight',
-        AccessorialCode: 'FRT',
-        CostStatus: 1,
-        CostDetailID: FRTCostDetailIDSR
-      }
-      accountInvoiceCostListSellRates.push(accountInvoiceFreightSR);
+      // // Freight
+      // let FRTCostDetailIDSR = 0;
+      // const filteredCostListSRFRT = this.ShipmentCostObject.SellRates.AccountInvoiceCostList.filter(item => item.AccessorialID === 22 && item.AccessorialCode === 'FRT');
+      // if (filteredCostListSRFRT != null && filteredCostListSRFRT.length > 0){
+      //   FRTCostDetailIDSR = filteredCostListSRFRT[0].CostDetailID;
+      // }
+      // const accountInvoiceFreightSR: AccountInvoiceCostListSBL = {
+      //   AccessorialID: 22,
+      //   RatedCost: selectedRate.GrossAmount,
+      //   BilledCost: selectedRate.GrossAmount,
+      //   Description: 'Freight',
+      //   AccessorialCode: 'FRT',
+      //   CostStatus: 1,
+      //   CostDetailID: FRTCostDetailIDSR
+      // }
+      // accountInvoiceCostListSellRates.push(accountInvoiceFreightSR);
   
-      // Fuel
-      let FSCCostDetailIDSR = 0;
-      const filteredCostListSRFSC = this.ShipmentCostObject.SellRates.AccountInvoiceCostList.filter(item => item.AccessorialID === 23 && item.AccessorialCode === 'FSC');
-      if (filteredCostListSRFSC != null && filteredCostListSRFSC.length > 0){
-        FSCCostDetailIDSR = filteredCostListSRFSC[0].CostDetailID;
-      }
-      const accountInvoiceFuelSR: AccountInvoiceCostListSBL = {
-        AccessorialID: 23,
-        RatedCost: selectedRate.FuelCost,
-        BilledCost: selectedRate.FuelCost,
-        Description: 'Fuel',
-        AccessorialCode: 'FSC',
-        CostStatus: 1,
-        CostDetailID: FSCCostDetailIDSR
-      }
-      accountInvoiceCostListSellRates.push(accountInvoiceFuelSR);
+      // // Fuel
+      // let FSCCostDetailIDSR = 0;
+      // const filteredCostListSRFSC = this.ShipmentCostObject.SellRates.AccountInvoiceCostList.filter(item => item.AccessorialID === 23 && item.AccessorialCode === 'FSC');
+      // if (filteredCostListSRFSC != null && filteredCostListSRFSC.length > 0){
+      //   FSCCostDetailIDSR = filteredCostListSRFSC[0].CostDetailID;
+      // }
+      // const accountInvoiceFuelSR: AccountInvoiceCostListSBL = {
+      //   AccessorialID: 23,
+      //   RatedCost: selectedRate.FuelCost,
+      //   BilledCost: selectedRate.FuelCost,
+      //   Description: 'Fuel',
+      //   AccessorialCode: 'FSC',
+      //   CostStatus: 1,
+      //   CostDetailID: FSCCostDetailIDSR
+      // }
+      // accountInvoiceCostListSellRates.push(accountInvoiceFuelSR);
   
-      // Discount
-      let DISCostDetailIDSR = 0;
-      const filteredCostListSRDIS = this.ShipmentCostObject.SellRates.AccountInvoiceCostList.filter(item => item.AccessorialID === 24 && item.AccessorialCode === 'DIS');
-      if (filteredCostListSRDIS != null && filteredCostListSRDIS.length > 0){
-        DISCostDetailIDSR = filteredCostListSRDIS[0].CostDetailID;
-      }
-      const accountInvoiceDiscountSR: AccountInvoiceCostListSBL = {
-        AccessorialID: 24,
-        RatedCost: -1 * selectedRate.Discount,
-        BilledCost: -1 * selectedRate.Discount,
-        Description: 'Discount',
-        AccessorialCode: 'DIS',
-        CostStatus: 1,
-        CostDetailID: DISCostDetailIDSR
-      }
-      accountInvoiceCostListSellRates.push(accountInvoiceDiscountSR);
+      // // Discount
+      // let DISCostDetailIDSR = 0;
+      // const filteredCostListSRDIS = this.ShipmentCostObject.SellRates.AccountInvoiceCostList.filter(item => item.AccessorialID === 24 && item.AccessorialCode === 'DIS');
+      // if (filteredCostListSRDIS != null && filteredCostListSRDIS.length > 0){
+      //   DISCostDetailIDSR = filteredCostListSRDIS[0].CostDetailID;
+      // }
+      // const accountInvoiceDiscountSR: AccountInvoiceCostListSBL = {
+      //   AccessorialID: 24,
+      //   RatedCost: -1 * selectedRate.Discount,
+      //   BilledCost: -1 * selectedRate.Discount,
+      //   Description: 'Discount',
+      //   AccessorialCode: 'DIS',
+      //   CostStatus: 1,
+      //   CostDetailID: DISCostDetailIDSR
+      // }
+      // accountInvoiceCostListSellRates.push(accountInvoiceDiscountSR);
       // --
-  
+      /* End 02/04/2021 */
+
       // -- Sell and Buy rates
       localShipmentByLadingObject.SellRates.SCAC = selectedRate.CarrierID;
       localShipmentByLadingObject.SellRates.CarrierName = selectedRate.CarrierName;
-      localShipmentByLadingObject.BuyRates.AccountInvoiceCostList = accountInvoiceCostListBuyRates;   
-      localShipmentByLadingObject.SellRates.AccountInvoiceCostList = accountInvoiceCostListSellRates;   
-                   
+      /* Start 02/04/2021 */
+      // localShipmentByLadingObject.BuyRates.AccountInvoiceCostList = accountInvoiceCostListBuyRates;   
+      // localShipmentByLadingObject.SellRates.AccountInvoiceCostList = accountInvoiceCostListSellRates; 
+      localShipmentByLadingObject.BuyRates.AccountInvoiceCostList = this.costListAtBuySide;   
+      localShipmentByLadingObject.SellRates.AccountInvoiceCostList = this.costListFiltered;   
+      /* End 02/04/2021 */
+
       localShipmentByLadingObject.SellRates.BolNumber = this.ShipmentCostObject.SellRates.BolNumber;
       localShipmentByLadingObject.SellRates.CarrierName = selectedRate.CarrierName;
       localShipmentByLadingObject.SellRates.CrAcID = this.ShipmentCostObject.SellRates.CrAcID;

@@ -2374,6 +2374,18 @@ export class FormAddShipComponent implements OnInit {
       IsDestintationAddToMaster: this.originAndDestinationFormGroup.get('addToLocationsDest').value
     }
 
+    /* Start 13/04/2021 */
+    if(this.saveQuoteData.ShipmentValue == null || this.saveQuoteData.ShipmentValue == undefined || this.saveQuoteData.ShipmentValue == "")
+    {
+      this.saveQuoteData.ShipmentValue = null;
+    }
+    else
+    {
+      let tempShipmentValue = this.saveQuoteData.ShipmentValue;
+      this.saveQuoteData.ShipmentValue = tempShipmentValue.toString().replace(/,/g, "");
+    }
+    /* End 13/04/2021 */
+
     // Set error interceptor variable to false as default
     this.authenticationService.requestFailed$.next(false);
     this.authenticationService.requestFailedMessage$.next('');
@@ -2625,7 +2637,18 @@ export class FormAddShipComponent implements OnInit {
     localShipmentByLadingObject.Ref2Value = this.shipmentInfoFormGroup.get('r2order').value.trim();
     localShipmentByLadingObject.Ref3Value = this.shipmentInfoFormGroup.get('r2pronumber').value.trim();
     localShipmentByLadingObject.PaymentTermID = this.shipmentInfoFormGroup.get('paymentterms').value;
-    localShipmentByLadingObject.ShipmentValue = this.shipmentInfoFormGroup.get('shipmentvalue').value;
+    /* Start 13/04/2021 */
+    // localShipmentByLadingObject.ShipmentValue = this.shipmentInfoFormGroup.get('shipmentvalue').value;
+    if(this.shipmentInfoFormGroup.get('shipmentvalue').value == null || this.shipmentInfoFormGroup.get('shipmentvalue').value == undefined || this.shipmentInfoFormGroup.get('shipmentvalue').value == "")
+    {      
+      localShipmentByLadingObject.ShipmentValue = null;
+    }
+    else
+    {
+      let tempShipmentValue = this.shipmentInfoFormGroup.get('shipmentvalue').value;
+      localShipmentByLadingObject.ShipmentValue = tempShipmentValue.toString().replace(/,/g, "");
+    }
+    /* End 13/04/2021 */
     localShipmentByLadingObject.ValuePerPound = this.shipmentInfoFormGroup.get('valueperpound').value;
     localShipmentByLadingObject.PriorityID = this.shipmentInfoFormGroup.get('priority').value;
 	  localShipmentByLadingObject.ServiceLevelID = this.shipmentInfoFormGroup.get('servicelevel').value;

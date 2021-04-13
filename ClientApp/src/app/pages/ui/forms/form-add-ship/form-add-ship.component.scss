@@ -537,6 +537,12 @@ table {
   height: 20px;
 }
 
+.divAutoCompleteStyleControlProdName{
+  height: 20px;
+  text-overflow: ellipsis;    
+  overflow: hidden;
+}
+
 .SummarySplitter{
   border-left: 1px solid lightgray;
 }

@@ -409,11 +409,11 @@
                                     (focus)="focusFunction(i)"
                                     [matAutocomplete]="pAutoComplete" 
                                     (keydown.tab)="validateProductByClient($event, i)">
-                                    <mat-autocomplete #pAutoComplete="matAutocomplete" (optionSelected)="pAutoCompleteSelected($event, i)">
+                                    <mat-autocomplete [panelWidth]="350" #pAutoComplete="matAutocomplete" (optionSelected)="pAutoCompleteSelected($event, i)">
                                       <mat-option *ngFor="let option of pAutoCompleteOptions | async" [value]="option.ProductID" class="autoCompleteStyleControl">
-                                        <div class="divAutoCompleteStyleControl">
+                                        <div class="divAutoCompleteStyleControlProdName">
                                           <span>Name:</span>
-                                          <span>{{option.Description}}</span>
+                                          <span title={{option.Description}}>{{option.Description}}</span>
                                         </div>  
                                         <div class="divAutoCompleteStyleControl">
                                           <span>Class:</span>

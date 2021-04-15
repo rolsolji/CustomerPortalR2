@@ -67,7 +67,7 @@ export class ProductTableComponent implements OnInit, AfterViewInit, OnDestroy {
   columns: TableColumn<Product>[] = [
     {label: 'Checkbox', property: 'checkbox', type: 'checkbox', visible: true},
     {label: 'Description', property: 'Description', type: 'text', visible: true, cssClasses: ['font-medium']},
-    {label: 'Active', property: 'Status', type: 'text', visible: true},
+    {label: 'Active', property: 'Status', type: 'text', visible: false},
     {label: 'Class', property: 'Class', type: 'text', visible: true},
     {label: 'Hazmat', property: 'Hazmat', type: 'text', visible: true},
     {label: 'NMFC', property: 'NMFC', type: 'text', visible: true, cssClasses: ['text-secondary', 'font-medium']},

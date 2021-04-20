@@ -279,7 +279,7 @@
                     <div fxFlex="15%">
                       <mat-form-field>
                         <mat-label>Pallet</mat-label>
-                        <input matInput type="number" maxlength="4" min="0" formControlName="Pallets" (change)="onChangeCalculatePCF(i)" required>
+                        <input matInput type="number" maxlength="4" min="0" formControlName="Pallets" (change)="onChangeCalculatePCF(i); CalculateLinearfeetOnDataChangeForQuickQuote(i)" required>
                       </mat-form-field>
                     </div>
                     <div fxFlex="15%">
@@ -324,42 +324,57 @@
                   </div>
     
                   <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="5px">   
-                    <div fxFlex="15%">
+                    <div fxFlex="13%">
                       <mat-form-field>
                         <mat-label>NMFC</mat-label>
                         <input matInput maxlength="50" formControlName="NmfcNumber">
                       </mat-form-field>
                     </div>              
-                    <div fxFlex="15%">
+                    <div fxFlex="12%">
                       <mat-form-field>
                         <mat-label>L</mat-label>
-                        <input matInput type="number" maxlength="4" min="0" formControlName="Length" (change)="onChangeCalculatePCF(i)" required class="removeArrowsNumberInput">
+                        <input matInput type="number" maxlength="4" min="0" formControlName="Length" (change)="onChangeCalculatePCF(i); CalculateLinearfeetOnDataChangeForQuickQuote(i)" required class="removeArrowsNumberInput">
                       </mat-form-field>
                     </div>  
-                    <div fxFlex="15%">
+                    <div fxFlex="12%">
                       <mat-form-field>
                         <mat-label>W</mat-label>
-                        <input matInput type="number" maxlength="4" min="0" formControlName="Width" (change)="onChangeCalculatePCF(i)" required class="removeArrowsNumberInput">
+                        <input matInput type="number" maxlength="4" min="0" formControlName="Width" (change)="onChangeCalculatePCF(i); CalculateLinearfeetOnDataChangeForQuickQuote(i)" required class="removeArrowsNumberInput">
                       </mat-form-field>
                     </div>  
-                    <div fxFlex="15%">
+                    <div fxFlex="12%">
                       <mat-form-field>
                         <mat-label>H</mat-label>
-                        <input matInput type="number" maxlength="4" min="0" formControlName="Height" (change)="onChangeCalculatePCF(i)" required class="removeArrowsNumberInput">
+                        <input matInput type="number" maxlength="4" min="0" formControlName="Height" (change)="onChangeCalculatePCF(i); CalculateLinearfeetOnDataChangeForQuickQuote(i)" required class="removeArrowsNumberInput">
                       </mat-form-field>
                     </div>
-                    <div fxFlex="15%">
+                    <div fxFlex="12%">
                       <mat-form-field>
                         <mat-label>PCF</mat-label>
                         <input matInput type="number" maxlength="4" min="0" formControlName="PCF" class="removeArrowsNumberInput">
                       </mat-form-field>
                     </div>
-                    <div fxFlex="20%">
+                    <div fxFlex="16%">
                       <mat-form-field>
                         <mat-label>Total Weight</mat-label>
                         <input matInput type="number" maxlength="4" min="0" formControlName="Weight" (change)="onChangeCalculatePCF(i)" required>
                       </mat-form-field>
-                    </div>  
+                    </div>
+                    <div fxFlex="12%">
+                      <mat-form-field>
+                        <mat-label>Linear Feet</mat-label>
+                        <input matInput type="number" formControlName="LinearFeet" class="removeArrowsNumberInput">
+                      </mat-form-field>
+                    </div>
+                    <div fxFlex="6%">                      
+                      <button (click)="CalculateLinearFeet(i)"                                  
+                              color="primary"
+                              fxFlex="none"                              
+                              matTooltip="Calculate Linearfeet"
+                              type="button">
+                        <mat-icon>keyboard_hide</mat-icon>
+                      </button>
+                    </div>
                   </div>
     
                   <div fxLayout="row" fxLayout.lt-md="column"> 
@@ -367,7 +382,7 @@
                       <mat-checkbox [checked]="false" formControlName="SaveProduct" color="primary">Add to my saved products</mat-checkbox>
                     </div>                    
                     <div fxFlex="20%">
-                      <mat-checkbox [checked]="false" formControlName="Stackable" color="warn">Stackable</mat-checkbox>
+                      <mat-checkbox [checked]="false" formControlName="Stackable" color="warn" (change)="CalculateLinearfeetOnDataChangeForQuickQuote(i)">Stackable</mat-checkbox>
                     </div>
                     <div fxFlex="20%">
                       <mat-checkbox [checked]="false" formControlName="HazMat" color="warn">Hazmat</mat-checkbox>

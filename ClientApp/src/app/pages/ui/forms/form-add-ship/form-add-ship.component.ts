@@ -60,7 +60,8 @@ import {ConfirmAlertDialogComponent} from '../../../../../app/shared/confirm-ale
 import { Country } from 'src/app/Entities/Country';
 import { InvoiceParameter, SendEmailParameters } from 'src/app/Entities/SendEmailParameters';
 import { PCFClientDefaults } from 'src/app/Entities/PCFClientDefaults';
-import { ProductByClient } from  '../../../../Entities/ProductByClient'
+import { ProductByClient } from  '../../../../Entities/ProductByClient';
+import { FormCalculateLinearFeetComponent } from "../form-calculate-linear-feet/form-calculate-linear-feet.component";
 
 @Component({
   selector: 'vex-form-add-ship',
@@ -298,7 +299,8 @@ export class FormAddShipComponent implements OnInit {
         HazMat: [false],
         PackageTypeDescription: [null],
         BOLProductID: [0],
-        Status: [1]
+        Status: [1],
+        LinearFeet: [null]
     })
   }
 
@@ -1166,6 +1168,20 @@ export class FormAddShipComponent implements OnInit {
       }
 
       p.ProductClass = tempClass
+
+      /* Start 20/04/2021 */
+      let tempLinearFeet = 0;
+      if(p.LinearFeet === null || p.LinearFeet === undefined || p.LinearFeet === "")
+      {
+        tempLinearFeet = 0;
+      }
+      else
+      {
+        tempLinearFeet = p.LinearFeet;
+      }
+
+      p.LinearFeet = tempLinearFeet;
+      /* End 20/04/2021 */
     });
 
 
@@ -1661,6 +1677,7 @@ export class FormAddShipComponent implements OnInit {
         (this.productsAndAccessorialsFormGroup.controls.products as FormArray).at(currentProductIndex).get('ProductDescription').setValue(p.Description === 'NA' ? '' : p.Description);
         (this.productsAndAccessorialsFormGroup.controls.products as FormArray).at(currentProductIndex).get('BOLProductID').setValue(p.BOLProductID);
         (this.productsAndAccessorialsFormGroup.controls.products as FormArray).at(currentProductIndex).get('Status').setValue(2);
+        (this.productsAndAccessorialsFormGroup.controls.products as FormArray).at(currentProductIndex).get('LinearFeet').setValue(p.LinearFeet);
         counter += 1;
       });
     }
@@ -2139,6 +2156,16 @@ export class FormAddShipComponent implements OnInit {
         tempClass = p.ProductClass != null ? p.ProductClass.trim() : p.ProductClass;
       }
 
+      let tempLinearFeet = 0;
+      if(p.LinearFeet === null || p.LinearFeet === undefined || p.LinearFeet === "")
+      {
+        tempLinearFeet = 0;
+      }
+      else
+      {
+        tempLinearFeet = p.LinearFeet;
+      }
+
       const prod : BOlProductsListSQD = {
         BOLProductID: productsCounter,
         Description: p.ProductDescription,
@@ -2158,7 +2185,8 @@ export class FormAddShipComponent implements OnInit {
         SelectedProductClass: {},
         Stackable: p.Stackable,
         PortCode: 'C',
-        AddProductToParent: p.addToProductMaster
+        AddProductToParent: p.addToProductMaster,
+        LinearFeet:tempLinearFeet
       }
 
       console.log('p', p);
@@ -2551,6 +2579,16 @@ export class FormAddShipComponent implements OnInit {
         tempClass = p.ProductClass != null ? p.ProductClass.trim() : p.ProductClass;
       }
 
+      let tempLinearFeet = 0;
+      if(p.LinearFeet === null || p.LinearFeet === undefined || p.LinearFeet === "")
+      {
+        tempLinearFeet = 0;
+      }
+      else
+      {
+        tempLinearFeet = p.LinearFeet;
+      }
+
       const prod : BOlProductsListSBL = {
         BOLProductID: p.BOLProductID,
         Description: p.ProductDescription,
@@ -2573,7 +2611,8 @@ export class FormAddShipComponent implements OnInit {
         Stackable: p.Stackable,
         PortCode: 'C',
         HazmatContact: null,
-        LadingID: localShipmentByLadingObject.LadingID
+        LadingID: localShipmentByLadingObject.LadingID,
+        LinearFeet:tempLinearFeet
       }
 
       productList.push(prod);
@@ -3306,6 +3345,34 @@ export class FormAddShipComponent implements OnInit {
       this.ReferenceByClientField2 = 'R2 Order #';
       this.ReferenceByClientField3 = 'R2 Pro number';
     }
+  }
+
+  CalculateLinearFeet(index: number){
+    // console.log("Click on Calculate linear feet..");
+    const product = this.productsAndAccessorialsFormGroup.get('products').value[index];
+    this.dialog.open(FormCalculateLinearFeetComponent, {
+      width:'440px',
+      height:'380px',
+      data: {
+        IsStackable: product.Stackable, 
+        NumberOfPallets: product.Pallets,
+        ProductLength: product.Length,
+        ProductWidth: product.Width,
+        ProductHeight: product.Height
+      }
+    }).afterClosed().subscribe(totalLinearFeet => {
+      if (totalLinearFeet != null && totalLinearFeet != undefined && totalLinearFeet != "") {
+        (this.productsAndAccessorialsFormGroup.controls.products as FormArray).at(index).get('LinearFeet').setValue(totalLinearFeet);
+      }
+    });
+  }
+
+  CalculateLinearfeetOnDataChangeForLongForm(index: number): void{
+    const product = this.productsAndAccessorialsFormGroup.get('products').value[index];    
+    const linearFeet = this.utilitiesService.CalculateLinearfeet("",product.Stackable,product.Pallets,product.Length,product.Width,product.Height)
+    if (linearFeet != null && linearFeet != undefined) {
+      (this.productsAndAccessorialsFormGroup.controls.products as FormArray).at(index).get('LinearFeet').setValue(linearFeet);
+    }    
   }
 
 }

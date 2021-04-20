@@ -68,6 +68,7 @@ import { HtmlMsgByClient } from 'src/app/Entities/HtmlMsgByClient';
 import { PCFClientDefaults } from '../../../../Entities/PCFClientDefaults';
 import { Brand } from 'src/app/Entities/Brand';
 import { ProductByClient } from  '../../../../Entities/ProductByClient'
+import { FormCalculateLinearFeetComponent } from "../form-calculate-linear-feet/form-calculate-linear-feet.component";
 
 export interface CountryState {
   name: string;
@@ -505,7 +506,8 @@ export class FormQuickQuoteComponent implements OnInit {
       HazMat: false,
       Stackable: false,
       Status: 1,
-      SaveProduct: false
+      SaveProduct: false,
+      LinearFeet: [null]
     })
   }
   checkScroll() {
@@ -811,6 +813,20 @@ export class FormQuickQuoteComponent implements OnInit {
         }
 
         p.ProductClass = tempClass
+
+        /* Start 20/04/2021 */
+        let tempLinearFeet = 0;
+        if(p.LinearFeet === null || p.LinearFeet === undefined || p.LinearFeet === "")
+        {
+          tempLinearFeet = 0;
+        }
+        else
+        {
+          tempLinearFeet = p.LinearFeet;
+        }
+
+        p.LinearFeet = tempLinearFeet;
+        /* End 20/04/2021 */
       });
 
       const objRate = {
@@ -945,6 +961,17 @@ export class FormQuickQuoteComponent implements OnInit {
     const arrayProducts = this.quickQuoteFormGroup.get('products').value;
     const productList: BOlProductsList[] = [];
     arrayProducts.forEach(p => {
+
+      let tempLinearFeet = 0;
+      if(p.LinearFeet === null || p.LinearFeet === undefined || p.LinearFeet === "")
+      {
+        tempLinearFeet = 0;
+      }
+      else
+      {
+        tempLinearFeet = p.LinearFeet;
+      }
+
       const prod : BOlProductsList = {
         Description: p.Description,
         Pallets: p.Pallets == null ? 0 : p.Pallets,
@@ -962,7 +989,8 @@ export class FormQuickQuoteComponent implements OnInit {
         Status: 1,
         SelectedProductClass: {},
         Stackable: p.Stackable,
-        AddProductToParent: p.SaveProduct
+        AddProductToParent: p.SaveProduct,
+        LinearFeet: tempLinearFeet
       }
 
       console.log('p', p);
@@ -1403,4 +1431,32 @@ export class FormQuickQuoteComponent implements OnInit {
       //this.clearQuoteAndFields();
     }
   }  
+
+  CalculateLinearFeet(index: number){
+    //console.log("Click on Calculate linear feet..");
+    const product = this.quickQuoteFormGroup.get('products').value[index];
+    this.dialog.open(FormCalculateLinearFeetComponent, {
+      width:'440px',
+      height:'380px',
+      data: {
+        IsStackable: product.Stackable, 
+        NumberOfPallets: product.Pallets,
+        ProductLength: product.Length,
+        ProductWidth: product.Width,
+        ProductHeight: product.Height
+      }
+    }).afterClosed().subscribe(totalLinearFeet => {
+      if (totalLinearFeet != null && totalLinearFeet != undefined && totalLinearFeet != "") {
+        (this.quickQuoteFormGroup.controls.products as FormArray).at(index).get('LinearFeet').setValue(totalLinearFeet);
+      }
+    });
+  }
+
+  CalculateLinearfeetOnDataChangeForQuickQuote(index: number): void{
+    const product = this.quickQuoteFormGroup.get('products').value[index];
+    const linearFeet = this.utilitiesService.CalculateLinearfeet("",product.Stackable,product.Pallets,product.Length,product.Width,product.Height)
+    if (linearFeet != null && linearFeet != undefined) {
+      (this.quickQuoteFormGroup.controls.products as FormArray).at(index).get('LinearFeet').setValue(linearFeet);
+    }    
+  }
 }

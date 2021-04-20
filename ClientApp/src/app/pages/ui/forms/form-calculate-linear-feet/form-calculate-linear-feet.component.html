@@ -1,0 +1,118 @@
+<div fxLayout="row" fxLayoutAlign="start center" mat-dialog-title style="text-align: center;">
+    <h2 class="headline m-0" fxFlex="auto">Calculate Linear feet</h2>
+
+    <!-- <button class="text-secondary" mat-dialog-close mat-icon-button type="button">
+        <mat-icon [icIcon]="icClose"></mat-icon>
+    </button> -->
+</div>
+
+<mat-divider class="-mx-6 text-border"></mat-divider>
+
+<div class="col-md-12" style="margin-top: 10px;">
+    <div class="col-md-12 noMargin ">
+        <div class="row noMargin smallMargintop">
+            <div class="col-md-12 noMargin">
+                <table border="0" style="width:100%">
+                    <tr>
+                        <td colspan="2">
+                            <table>
+                                <tr>
+                                    <td>
+                                        <label>Trailer Width: </label>
+                                        <label>102</label>
+                                    </td>
+                                    <td style="padding-left: 10px">
+                                        <label>Height: </label>
+                                        <label>150</label>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                        <td>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="3">
+                            <label style="font-weight: bold;">Product dimensions</label>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="3">
+                            <table style="width: 100%">
+                                <tr>
+                                    <td>
+                                        <label>Stackable: {{this.StackableValue}}</label>                                        
+                                    </td>
+                                    <td style="padding-left:5px">
+                                        <label>Length: {{this.ProductLength}}</label>                                        
+                                    </td>
+                                    <td style="padding-left:5px">
+                                        <label>Width: {{this.ProductWidth}}</label>                                        
+                                    </td>
+                                    <td style="padding-left:5px">
+                                        <label>Height: {{this.ProductHeight}}</label>                                        
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="3">
+                            <label style="font-weight: bold;">Load configuration</label>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="width: 50%">
+                            <label>Linear feet straight : </label>
+                        </td>
+                        <td style="padding-right:5px">
+                            <label style="width: 100%; text-align: right;">{{this.LinearfeetValueOfStraight}}</label>
+                        </td>
+                        <td style="padding-bottom:5px; width: 50%; text-align: right;">
+                            <button color="primary" style="width:80px" 
+                                    (click)="SelectLinearfeetStraight()" 
+                                    mat-raised-button 
+                                    [disabled]="(this.LinearfeetValueOfStraight > 0 ? false : true)">Select</button>                            
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="width: 50%">
+                            <label>Linear feet turned : </label>
+                        </td>
+                        <td style="padding-right:5px">                            
+                            <label style="width: 100%; text-align: right;">{{this.LinearfeetValueOfTurned}}</label>
+                        </td>
+                        <td style="padding-bottom:5px; width: 50%; text-align: right;">
+                            <button color="primary" style="width:80px" 
+                                    (click)="SelectLinearfeetTurned()" 
+                                    mat-raised-button 
+                                    [disabled]="(this.LinearfeetValueOfTurned > 0 ? false : true)">Select</button>                            
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="width: 50%">
+                            <label>Linear feet Pinwheeled : </label>
+                        </td>
+                        <td style="padding-right:5px">                            
+                            <label style="width: 100%; text-align: right;">{{this.LinearfeetValueOfPinWheeled}}</label>
+                        </td>
+                        <td style="padding-bottom:5px; width: 50%; text-align: right;">
+                            <button color="primary" style="width:80px" 
+                                    (click)="SelectLinearfeetPinWheeled()" 
+                                    mat-raised-button 
+                                    [disabled]="(this.LinearfeetValueOfPinWheeled > 0 ? false : true)">Select</button>                            
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<mat-divider class="-mx-6 text-border" style="margin-top: 10px;"></mat-divider>
+
+<div fxLayout="row" fxLayoutAlign="flex-end center" style="margin-top: 5px;">
+    <button color="accent" style="width:80px;" 
+        mat-raised-button
+        (click)="CloseDialogClick()">Cancel</button>
+</div>

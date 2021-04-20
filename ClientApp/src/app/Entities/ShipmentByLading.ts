@@ -34,7 +34,8 @@ export interface BOlProductsListSBL {
     Weight: number;
     Width: number;
     selectedProduct: {},
-    SelectedProductClass: {}
+    SelectedProductClass: {},
+    LinearFeet: number
 }
 
 export interface BolInfoList {

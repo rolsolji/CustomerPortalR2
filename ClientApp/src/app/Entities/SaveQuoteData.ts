@@ -24,6 +24,7 @@ export interface SelectedProductSQD {
         Hazmat?:  boolean;
         Stackable?: boolean;
         AddProductToParent: boolean;
+        LinearFeet: number;
     }
 
     export interface BOLAccesorialListSQD {

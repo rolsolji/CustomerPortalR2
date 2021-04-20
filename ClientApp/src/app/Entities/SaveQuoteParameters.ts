@@ -103,6 +103,7 @@ export interface BOlProductsList {
   SelectedProductClass: SelectedProduct;
   Stackable:            boolean;
   AddProductToParent:   boolean;
+  LinearFeet:           number;
 }
 
 export interface SelectedProduct {

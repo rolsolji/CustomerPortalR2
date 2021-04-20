@@ -507,7 +507,8 @@ export class FormQuickQuoteComponent implements OnInit {
       Stackable: false,
       Status: 1,
       SaveProduct: false,
-      LinearFeet: [null]
+      LinearFeet: [null],
+      LinearFeetType: [""]
     })
   }
   checkScroll() {
@@ -1445,16 +1446,19 @@ export class FormQuickQuoteComponent implements OnInit {
         ProductWidth: product.Width,
         ProductHeight: product.Height
       }
-    }).afterClosed().subscribe(totalLinearFeet => {
-      if (totalLinearFeet != null && totalLinearFeet != undefined && totalLinearFeet != "") {
-        (this.quickQuoteFormGroup.controls.products as FormArray).at(index).get('LinearFeet').setValue(totalLinearFeet);
+    }).afterClosed().subscribe((data) => {      
+      if (data.totalLinearFeet != null && data.totalLinearFeet != undefined && data.totalLinearFeet != "") {
+        (this.quickQuoteFormGroup.controls.products as FormArray).at(index).get('LinearFeet').setValue(data.totalLinearFeet);
+      }
+      if(data.linearFeetType != null && data.linearFeetType != undefined && data.linearFeetType != ""){
+        (this.quickQuoteFormGroup.controls.products as FormArray).at(index).get('LinearFeetType').setValue(data.linearFeetType);
       }
     });
   }
 
   CalculateLinearfeetOnDataChangeForQuickQuote(index: number): void{
     const product = this.quickQuoteFormGroup.get('products').value[index];
-    const linearFeet = this.utilitiesService.CalculateLinearfeet("",product.Stackable,product.Pallets,product.Length,product.Width,product.Height)
+    const linearFeet = this.utilitiesService.CalculateLinearfeet(product.LinearFeetType,product.Stackable,product.Pallets,product.Length,product.Width,product.Height)
     if (linearFeet != null && linearFeet != undefined) {
       (this.quickQuoteFormGroup.controls.products as FormArray).at(index).get('LinearFeet').setValue(linearFeet);
     }    

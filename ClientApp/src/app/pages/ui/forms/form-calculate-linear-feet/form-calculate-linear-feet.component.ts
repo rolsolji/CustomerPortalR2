@@ -9,6 +9,7 @@ import icDelete from '@iconify/icons-ic/twotone-delete';
 import icPhone from '@iconify/icons-ic/twotone-phone';
 import icPerson from '@iconify/icons-ic/twotone-person';
 import { UtilitiesService } from '../../../../common/utilities.service';
+import { LinearFeetModel } from '../../../../Entities/LinearFeetModel';
 
 @Component({
     selector: 'vex-form-calculate-linear-feet',
@@ -70,18 +71,28 @@ export class FormCalculateLinearFeetComponent implements OnInit {
     }
 
     SelectLinearfeetStraight() {
-        this.dialogRef.close(this.LinearfeetValueOfStraight);
+        let temp = new LinearFeetModel();
+        temp.linearFeetType = "Straight";
+        temp.totalLinearFeet = this.LinearfeetValueOfStraight;
+        this.dialogRef.close(temp);
     }
 
     SelectLinearfeetTurned() {
-        this.dialogRef.close(this.LinearfeetValueOfTurned);
+        let temp = new LinearFeetModel();
+        temp.linearFeetType = "Turned";
+        temp.totalLinearFeet = this.LinearfeetValueOfTurned;
+        this.dialogRef.close(temp);
     }
 
     SelectLinearfeetPinWheeled() {
-        this.dialogRef.close(this.LinearfeetValueOfPinWheeled);
+        let temp = new LinearFeetModel();
+        temp.linearFeetType = "PinWheeled";
+        temp.totalLinearFeet = this.LinearfeetValueOfPinWheeled;
+        this.dialogRef.close(temp);
     }
 
     CloseDialogClick(){
-        this.dialogRef.close("");
+        let temp = new LinearFeetModel();
+        this.dialogRef.close(temp);
     }
 }

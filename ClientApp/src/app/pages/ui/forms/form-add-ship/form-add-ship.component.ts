@@ -300,7 +300,8 @@ export class FormAddShipComponent implements OnInit {
         PackageTypeDescription: [null],
         BOLProductID: [0],
         Status: [1],
-        LinearFeet: [null]
+        LinearFeet: [null],
+        LinearFeetType: [""]
     })
   }
 
@@ -3360,16 +3361,19 @@ export class FormAddShipComponent implements OnInit {
         ProductWidth: product.Width,
         ProductHeight: product.Height
       }
-    }).afterClosed().subscribe(totalLinearFeet => {
-      if (totalLinearFeet != null && totalLinearFeet != undefined && totalLinearFeet != "") {
-        (this.productsAndAccessorialsFormGroup.controls.products as FormArray).at(index).get('LinearFeet').setValue(totalLinearFeet);
+    }).afterClosed().subscribe((data) => {      
+      if (data.totalLinearFeet != null && data.totalLinearFeet != undefined && data.totalLinearFeet != "") {
+        (this.productsAndAccessorialsFormGroup.controls.products as FormArray).at(index).get('LinearFeet').setValue(data.totalLinearFeet);
+      }
+      if(data.linearFeetType != null && data.linearFeetType != undefined && data.linearFeetType != ""){
+        (this.productsAndAccessorialsFormGroup.controls.products as FormArray).at(index).get('LinearFeetType').setValue(data.linearFeetType);
       }
     });
   }
 
   CalculateLinearfeetOnDataChangeForLongForm(index: number): void{
     const product = this.productsAndAccessorialsFormGroup.get('products').value[index];    
-    const linearFeet = this.utilitiesService.CalculateLinearfeet("",product.Stackable,product.Pallets,product.Length,product.Width,product.Height)
+    const linearFeet = this.utilitiesService.CalculateLinearfeet(product.LinearFeetType,product.Stackable,product.Pallets,product.Length,product.Width,product.Height)
     if (linearFeet != null && linearFeet != undefined) {
       (this.productsAndAccessorialsFormGroup.controls.products as FormArray).at(index).get('LinearFeet').setValue(linearFeet);
     }    

@@ -431,8 +431,56 @@ export class FormQuickQuoteComponent implements OnInit {
       const productSelected = this.productList.find(p => p.Description === descriptionProduct);
 
       if (productSelected !== null && productSelected !== undefined){
-        formGroup.get('Pallets').setValue(productSelected.Pallets);
-        formGroup.get('Pieces').setValue(productSelected.Pieces == null || productSelected.Pieces == undefined ? 0 : productSelected.Pieces);
+
+        /* Start 29/04/2021 */
+        // formGroup.get('Pallets').setValue(productSelected.Pallets);
+        // formGroup.get('Pieces').setValue(productSelected.Pieces == null || productSelected.Pieces == undefined ? 0 : productSelected.Pieces);
+
+        // let tempClass = "";
+        // if (productSelected.Class != null && productSelected.Class.trim() === "92"){
+        //   tempClass = "92.5"
+        // }else if(productSelected.Class != null && productSelected.Class.trim() === "77"){
+        //   tempClass = "77.5"
+        // }else  {
+        //   tempClass = productSelected.Class != null ? productSelected.Class.trim() : productSelected.Class;
+        // }
+          
+        // formGroup.get('ProductClass').setValue(tempClass);
+        // formGroup.get('Description').setValue(productSelected.Description.trim());
+        // formGroup.get('NmfcNumber').setValue(productSelected.NMFC.trim());
+        // formGroup.get('Length').setValue(productSelected.Lenght);
+        // formGroup.get('Width').setValue(productSelected.Width);
+        // formGroup.get('Height').setValue(productSelected.Height);
+        // formGroup.get('Weight').setValue(productSelected.Weight);
+        // formGroup.get('Hazmat').setValue(productSelected.Hazmat);
+
+        if (formGroup.get('Pallets').value == null || formGroup.get('Pallets').value == undefined || formGroup.get('Pallets').value == "") {
+          formGroup.get('Pallets').setValue(productSelected.Pallets == null || productSelected.Pallets == undefined ? 0 : productSelected.Pallets);
+        }
+        
+        if (formGroup.get('Pieces').value == null || formGroup.get('Pieces').value == undefined || formGroup.get('Pieces').value == "") {
+          formGroup.get('Pieces').setValue(productSelected.Pieces == null || productSelected.Pieces == undefined ? 0 : productSelected.Pieces);
+        }
+
+        if (formGroup.get('NmfcNumber').value == null || formGroup.get('NmfcNumber').value == undefined || formGroup.get('NmfcNumber').value == "") {
+          formGroup.get('NmfcNumber').setValue(productSelected.NMFC.trim());
+        }
+
+        if (formGroup.get('Weight').value == null || formGroup.get('Weight').value == undefined || formGroup.get('Weight').value == "") {
+          formGroup.get('HazMat').setValue(productSelected.Hazmat);
+        }
+
+        if (formGroup.get('Length').value == null || formGroup.get('Length').value == undefined || formGroup.get('Length').value == "") {
+          formGroup.get('Length').setValue(productSelected.Lenght);
+        }
+        
+        if (formGroup.get('Width').value == null || formGroup.get('Width').value == undefined || formGroup.get('Width').value == "") {
+          formGroup.get('Width').setValue(productSelected.Width);
+        }
+        
+        if (formGroup.get('Height').value == null || formGroup.get('Height').value == undefined || formGroup.get('Height').value == "") {
+          formGroup.get('Height').setValue(productSelected.Height);
+        }
 
         let tempClass = "";
         if (productSelected.Class != null && productSelected.Class.trim() === "92"){
@@ -442,15 +490,16 @@ export class FormQuickQuoteComponent implements OnInit {
         }else  {
           tempClass = productSelected.Class != null ? productSelected.Class.trim() : productSelected.Class;
         }
-          
+        
         formGroup.get('ProductClass').setValue(tempClass);
+
+        if (formGroup.get('Weight').value == null || formGroup.get('Weight').value == undefined || formGroup.get('Weight').value == "") {
+          formGroup.get('Weight').setValue(productSelected.Weight);
+        }
+        
         formGroup.get('Description').setValue(productSelected.Description.trim());
-        formGroup.get('NmfcNumber').setValue(productSelected.NMFC.trim());
-        formGroup.get('Length').setValue(productSelected.Lenght);
-        formGroup.get('Width').setValue(productSelected.Width);
-        formGroup.get('Height').setValue(productSelected.Height);
-        formGroup.get('Weight').setValue(productSelected.Weight);
-        formGroup.get('Hazmat').setValue(productSelected.Hazmat);
+        /* End 29/04/2021 */
+
         this.onChangeCalculatePCF(index);
       }    
     }
@@ -461,30 +510,81 @@ export class FormQuickQuoteComponent implements OnInit {
 
     const productSelected = this.productList.find(p => p.ProductID === event.option.value);
 
-    if (productSelected !== null){
+    if (productSelected !== null && productSelected !== undefined){
       const productsList = this.formProducts;
       const formGroup = productsList.controls[index] as FormGroup;
   
-      formGroup.get('Pallets').setValue(productSelected.Pallets);
-      formGroup.get('Pieces').setValue(productSelected.Pieces == null || productSelected.Pieces == undefined ? 0 : productSelected.Pieces);
+      /* Start 29/04/2021 */
+      // formGroup.get('Pallets').setValue(productSelected.Pallets);
+      // formGroup.get('Pieces').setValue(productSelected.Pieces == null || productSelected.Pieces == undefined ? 0 : productSelected.Pieces);
       
+      // let tempClass = "";
+      //   if (productSelected.Class != null && productSelected.Class.trim() === "92"){
+      //     tempClass = "92.5"
+      //   }else if(productSelected.Class != null && productSelected.Class.trim() === "77"){
+      //     tempClass = "77.5"
+      //   }else  {
+      //     tempClass = productSelected.Class != null ? productSelected.Class.trim() : productSelected.Class;
+      //   }
+
+      // formGroup.get('ProductClass').setValue(tempClass);
+      // formGroup.get('Description').setValue(productSelected.Description.trim());
+      // formGroup.get('NmfcNumber').setValue(productSelected.NMFC.trim());
+      // formGroup.get('Length').setValue(productSelected.Lenght);
+      // formGroup.get('Width').setValue(productSelected.Width);
+      // formGroup.get('Height').setValue(productSelected.Height);
+      // formGroup.get('Weight').setValue(productSelected.Weight);
+      // formGroup.get('HazMat').setValue(productSelected.Hazmat);
+
+      if (formGroup.get('Pallets').value == null || formGroup.get('Pallets').value == undefined || formGroup.get('Pallets').value == "") {
+        formGroup.get('Pallets').setValue(productSelected.Pallets == null || productSelected.Pallets == undefined ? 0 : productSelected.Pallets);
+      }
+      
+      if (formGroup.get('Pieces').value == null || formGroup.get('Pieces').value == undefined || formGroup.get('Pieces').value == "") {
+        formGroup.get('Pieces').setValue(productSelected.Pieces == null || productSelected.Pieces == undefined ? 0 : productSelected.Pieces);
+      }
+
+      if (formGroup.get('NmfcNumber').value == null || formGroup.get('NmfcNumber').value == undefined || formGroup.get('NmfcNumber').value == ""){
+        formGroup.get('NmfcNumber').setValue(productSelected.NMFC.trim());
+      }
+
+      if (formGroup.get('Weight').value == null || formGroup.get('Weight').value == undefined || formGroup.get('Weight').value == "") {
+        formGroup.get('HazMat').setValue(productSelected.Hazmat);
+      }
+      
+      if (formGroup.get('Length').value == null || formGroup.get('Length').value == undefined || formGroup.get('Length').value == "") {
+        formGroup.get('Length').setValue(productSelected.Lenght);
+      }
+      
+      if (formGroup.get('Width').value == null || formGroup.get('Width').value == undefined || formGroup.get('Width').value == "") {
+        formGroup.get('Width').setValue(productSelected.Width);
+      }
+      
+      if (formGroup.get('Height').value == null || formGroup.get('Height').value == undefined || formGroup.get('Height').value == "") {
+        formGroup.get('Height').setValue(productSelected.Height);
+      }
+
       let tempClass = "";
-        if (productSelected.Class != null && productSelected.Class.trim() === "92"){
-          tempClass = "92.5"
-        }else if(productSelected.Class != null && productSelected.Class.trim() === "77"){
-          tempClass = "77.5"
-        }else  {
-          tempClass = productSelected.Class != null ? productSelected.Class.trim() : productSelected.Class;
-        }
+      if (productSelected.Class != null && productSelected.Class.trim() === "92"){
+         tempClass = "92.5"
+      }
+      else if(productSelected.Class != null && productSelected.Class.trim() === "77"){
+        tempClass = "77.5"
+      }
+      else {
+        tempClass = productSelected.Class != null ? productSelected.Class.trim() : productSelected.Class;
+      }
 
       formGroup.get('ProductClass').setValue(tempClass);
+
+      if (formGroup.get('Weight').value == null || formGroup.get('Weight').value == undefined || formGroup.get('Weight').value == "") {
+        formGroup.get('Weight').setValue(productSelected.Weight);
+      }
+      
       formGroup.get('Description').setValue(productSelected.Description.trim());
-      formGroup.get('NmfcNumber').setValue(productSelected.NMFC.trim());
-      formGroup.get('Length').setValue(productSelected.Lenght);
-      formGroup.get('Width').setValue(productSelected.Width);
-      formGroup.get('Height').setValue(productSelected.Height);
-      formGroup.get('Weight').setValue(productSelected.Weight);
-      formGroup.get('HazMat').setValue(productSelected.Hazmat);
+
+      /* End 29/04/2021 */
+
       this.onChangeCalculatePCF(index);
     }    
   }

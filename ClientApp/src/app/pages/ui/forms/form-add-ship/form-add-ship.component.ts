@@ -3083,11 +3083,13 @@ export class FormAddShipComponent implements OnInit {
 
     }
 
-    // -- Validate if no buy rates are set up so put same rates from sell rates
-    if (localShipmentByLadingObject.BuyRates.AccountInvoiceCostList === null || localShipmentByLadingObject.BuyRates.AccountInvoiceCostList.length === 0){
-      localShipmentByLadingObject.BuyRates.AccountInvoiceCostList = localShipmentByLadingObject.SellRates.AccountInvoiceCostList;
-    }
+    /* Start 06/05/2021 : If Buy rate is missing than we can't copied from sell rate.*/
+    // -- Validate if no buy rates are set up so put same rates from sell rates    
+    // if (localShipmentByLadingObject.BuyRates.AccountInvoiceCostList === null || localShipmentByLadingObject.BuyRates.AccountInvoiceCostList.length === 0){
+    //   localShipmentByLadingObject.BuyRates.AccountInvoiceCostList = localShipmentByLadingObject.SellRates.AccountInvoiceCostList;
+    // }  
     // --
+    /* End 06/05/2021*/
 
     localShipmentByLadingObject.IsOriginAddToMaster = this.originAndDestinationFormGroup.get('addToLocationsOrigin').value;
     localShipmentByLadingObject.IsDestintationAddToMaster = this.originAndDestinationFormGroup.get('addToLocationsDest').value;

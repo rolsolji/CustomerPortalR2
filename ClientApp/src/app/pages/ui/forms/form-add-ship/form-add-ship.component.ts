@@ -669,6 +669,8 @@ export class FormAddShipComponent implements OnInit {
     this.originAndDestinationFormGroup.get('originpostalcode').setValue(this.OriginPostalCode);
     this.originAndDestinationFormGroup.get('origincontact').setValue(event.option.value.ContactName.trim());
     this.originAndDestinationFormGroup.get('originemail').setValue(event.option.value.ContactEmail.trim());
+    this.originAndDestinationFormGroup.get('originphone').setValue(event.option.value.ContactPhone.trim());
+    
   }
 
   pcdAutoCompletefilter(val: string): Observable<any[]> {
@@ -699,6 +701,7 @@ export class FormAddShipComponent implements OnInit {
     this.originAndDestinationFormGroup.get('destpostalcode').setValue(this.DestinationPostalCode);
     this.originAndDestinationFormGroup.get('destcontact').setValue(event.option.value.ContactName.trim());
     this.originAndDestinationFormGroup.get('destemail').setValue(event.option.value.ContactEmail.trim());
+    this.originAndDestinationFormGroup.get('destphone').setValue(event.option.value.ContactPhone.trim());
   }
 
   async validateOriginPostalCode(event: KeyboardEvent){

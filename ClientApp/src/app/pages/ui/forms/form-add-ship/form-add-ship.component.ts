@@ -670,7 +670,6 @@ export class FormAddShipComponent implements OnInit {
     this.originAndDestinationFormGroup.get('origincontact').setValue(event.option.value.ContactName.trim());
     this.originAndDestinationFormGroup.get('originemail').setValue(event.option.value.ContactEmail.trim());
     this.originAndDestinationFormGroup.get('originphone').setValue(event.option.value.ContactPhone.trim());
-    
   }
 
   pcdAutoCompletefilter(val: string): Observable<any[]> {
@@ -1189,7 +1188,9 @@ export class FormAddShipComponent implements OnInit {
       const accessorial: AccessorialBase = {
         AccessorialID: a.AccessorialID,
         AccessorialCode: a.AccesorialCode,
-        Description: a.Description        
+        Description: a.Description,
+        AccesorialID: a.AccessorialID,
+        AccesorialCode: a.AccesorialCode
       }
 
       this.accessorials.push(accessorial);
@@ -1773,7 +1774,9 @@ export class FormAddShipComponent implements OnInit {
             const accessorial: AccessorialBase = {
               AccessorialID: AvailableAccesorial.AccessorialID,
               AccessorialCode: AvailableAccesorial.AccesorialCode,
-              Description: AvailableAccesorial.Description
+              Description: AvailableAccesorial.Description,
+              AccesorialID: AvailableAccesorial.AccessorialID,
+              AccesorialCode: AvailableAccesorial.AccesorialCode
             }
 
             this.accessorials.push(accessorial);

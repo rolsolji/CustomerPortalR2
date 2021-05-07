@@ -746,7 +746,9 @@ export class FormQuickQuoteComponent implements OnInit {
       // Add a new control in the arrayForm
       const accessorial: AccessorialBase = {
         AccessorialID: event.source.value,
-        AccessorialCode: code
+        AccessorialCode: code,
+        AccesorialID: event.source.value,
+        AccesorialCode: code,
       }
 
       this.accessorials.push(accessorial);
@@ -792,7 +794,9 @@ export class FormQuickQuoteComponent implements OnInit {
       else {
         const accessorial: AccessorialBase = {
           AccessorialID: event.source.value,
-          AccessorialCode: code
+          AccessorialCode: code,
+          AccesorialID: event.source.value,
+          AccesorialCode: code
         }
 
         this.accessorials.push(accessorial);

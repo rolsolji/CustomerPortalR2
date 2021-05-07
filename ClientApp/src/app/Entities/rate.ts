@@ -32,6 +32,8 @@ export interface AccessorialBase {
     AccessorialCode: string;
     AccessorialID: number;
     Description?: string;
+    AccesorialID: number;
+    AccesorialCode: string;
 }
 
 export interface Accessorial {

@@ -538,9 +538,7 @@ table {
 }
 
 .divAutoCompleteStyleControlProdName{
-  height: 20px;
-  text-overflow: ellipsis;    
-  overflow: hidden;
+  white-space: normal;
 }
 
 .SummarySplitter{

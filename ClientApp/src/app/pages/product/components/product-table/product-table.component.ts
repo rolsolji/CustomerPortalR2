@@ -215,7 +215,7 @@ export class ProductTableComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   createProduct() {
-    this.dialog.open(ProductCreateUpdateComponent).afterClosed().subscribe((product: Product) => {
+    this.dialog.open(ProductCreateUpdateComponent, { width: '70vw' }).afterClosed().subscribe((product: Product) => {
       /**
        * Product is the updated product (if the user pressed Save - otherwise it's null)
        */
@@ -231,9 +231,7 @@ export class ProductTableComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   updateProduct(product: Product) {
-    this.dialog.open(ProductCreateUpdateComponent, {
-      data: product
-    }).afterClosed().subscribe(updatedProduct => {
+    this.dialog.open(ProductCreateUpdateComponent, { width: '70vw', data: product }).afterClosed().subscribe(updatedProduct => {
       /**
        * Product is the updated product (if the user pressed Save - otherwise it's null)
        */

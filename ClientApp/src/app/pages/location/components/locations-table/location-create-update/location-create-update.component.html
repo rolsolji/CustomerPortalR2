@@ -1,9 +1,11 @@
-<mat-progress-spinner
-        [diameter]="50"
-        *ngIf="!form || originCountries == null || statesAndCities == null"
-        mode="indeterminate"
-        color="accent">
-</mat-progress-spinner>
+<div fxLayout="row" fxLayoutAlign="center">
+  <mat-progress-spinner
+          [diameter]="50"
+          *ngIf="!form || originCountries == null || statesAndCities == null"
+          mode="indeterminate"
+          color="accent">
+  </mat-progress-spinner>
+</div>
 <form (ngSubmit)="save()" [formGroup]="form" *ngIf="form && originCountries !== null && statesAndCities !== null">
   <div fxLayout="row" fxLayoutAlign="start center" mat-dialog-title>
     <h2 *ngIf="isCreateMode()" class="headline m-0" fxFlex="auto">New Location</h2>
@@ -18,13 +20,13 @@
 
   <mat-dialog-content fxLayout="column">
     <div class="flex flex-col sm:flex-row">
-      <mat-form-field class="mt-6 flex-auto">
+      <mat-form-field class="flex-auto">
         <mat-label>Short Name</mat-label>
         <input cdkFocusInitial formControlName="ShortName" matInput required>
 
       </mat-form-field>
 
-      <mat-form-field class="sm:mt-6 sm:ml-6 flex-auto">
+      <mat-form-field class="sm:ml-6 flex-auto">
         <mat-label>Location Type</mat-label>
         <mat-select name="LocationType" formControlName="LocationType">
           <mat-option *ngFor="let locationType of this.locationTypes" [value]="locationType.LocationTypeID">
@@ -42,7 +44,7 @@
         <mat-datepicker #picker></mat-datepicker>
       </mat-form-field>
 
-      <mat-form-field class="sm:ml-6 sm:mr-4" appearance="fill">
+      <mat-form-field class="sm:ml-6 flex-auto" appearance="fill">
         <mat-label>Deactivation Date</mat-label>
         <input formControlName="DeactivateDate" matInput [matDatepicker]="picker2">
         <mat-datepicker-toggle matSuffix [for]="picker2"></mat-datepicker-toggle>
@@ -200,10 +202,10 @@
         <mat-label class="pl-2">Is Active</mat-label>
       </div>
 
-      <div class="sm:ml-6 sm:mr-6 flex-auto">
+      <div class="sm:ml-6 flex-auto">
         <mat-label class="float-left sm:mr-6">Approve</mat-label>
         <div *ngFor="let item of [1,2];  let i = index">
-          <mat-checkbox class="{{i === 0 ? 'float-left' : 'float-right'}}" color="primary" [checked]="this.approved === i" (change)="this.approved = i">{{i === 1 ? 'Yes' : 'No'}}</mat-checkbox>
+          <mat-checkbox class="float-left {{i === 0 ? '' : 'pl-5'}}" color="primary" [checked]="this.approved === i" (change)="this.approved = i">{{i === 1 ? 'Yes' : 'No'}}</mat-checkbox>
         </div>
       </div>
     </div>

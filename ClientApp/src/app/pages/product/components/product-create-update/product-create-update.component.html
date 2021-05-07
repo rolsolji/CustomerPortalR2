@@ -1,9 +1,12 @@
-<mat-progress-spinner
-        [diameter]="50"
-        *ngIf="!form || productGroupType == null"
-        mode="indeterminate"
-        color="accent">
-</mat-progress-spinner>
+
+<div fxLayout="row" fxLayoutAlign="center">
+  <mat-progress-spinner
+          [diameter]="50"
+          *ngIf="!form || productGroupType == null"
+          mode="indeterminate"
+          color="accent">
+  </mat-progress-spinner>
+</div>
 <form (ngSubmit)="save()" [formGroup]="form" *ngIf="form && productGroupType !== null">
   <div fxLayout="row" fxLayoutAlign="start center" mat-dialog-title>
     <h2 *ngIf="isCreateMode()" class="headline m-0" fxFlex="auto">New Product</h2>
@@ -18,15 +21,12 @@
 
   <mat-dialog-content fxLayout="column">
     <div class="flex flex-col sm:flex-row">
-      <mat-form-field class="mt-6 flex-auto">
+      <mat-form-field class="mt-4 flex-auto">
         <mat-label>Description</mat-label>
         <input maxlength="200" cdkFocusInitial formControlName="Description" matInput required>
       </mat-form-field>
 
-      <mat-form-field class="sm:mt-6 sm:ml-6 flex-auto">
-        <mat-label>Product Weight</mat-label>
-        <input appOnlyNumber formControlName="Weight" matInput>
-      </mat-form-field>
+      
     </div>
 
     <div class="flex flex-col sm:flex-row">
@@ -36,16 +36,17 @@
       </mat-form-field>
 
       <mat-form-field class="sm:ml-6 flex-auto">
-        <mat-label>Pieces</mat-label>
-        <input appOnlyNumber formControlName="Pieces" matInput>
+        <mat-label>Product Weight</mat-label>
+        <input appOnlyNumber formControlName="Weight" matInput>
       </mat-form-field>
+           
     </div>
 
     <div class="flex flex-col sm:flex-row">
       <mat-form-field class="flex-auto">
-        <mat-label>NMFC</mat-label>
-        <input formControlName="NMFC" matInput placeholder="123456-00">
-      </mat-form-field>
+        <mat-label>Pieces</mat-label>
+        <input appOnlyNumber formControlName="Pieces" matInput>
+      </mat-form-field>      
 
       <mat-form-field class="sm:ml-6 flex-auto">
         <mat-label>Product Length</mat-label>
@@ -55,11 +56,9 @@
 
     <div class="flex flex-col sm:flex-row">
       <mat-form-field class="flex-auto">
-        <mat-label>Product Class</mat-label>
-        <mat-select formControlName="Class">
-          <mat-option *ngFor="let class of productClasses" value="{{class.Effectiveclass}}">{{class.classes}}</mat-option>
-        </mat-select>
-      </mat-form-field>
+        <mat-label>NMFC</mat-label>
+        <input formControlName="NMFC" matInput placeholder="123456-00">
+      </mat-form-field>      
 
       <mat-form-field class="sm:ml-6 flex-auto">
         <mat-label>Product Height</mat-label>
@@ -69,9 +68,11 @@
 
     <div class="flex flex-col sm:flex-row">
       <mat-form-field class="flex-auto">
-        <mat-label>Commodity</mat-label>
-        <input formControlName="Commodity" matInput>
-      </mat-form-field>
+        <mat-label>Product Class</mat-label>
+        <mat-select formControlName="Class">
+          <mat-option *ngFor="let class of productClasses" value="{{class.Effectiveclass}}">{{class.classes}}</mat-option>
+        </mat-select>
+      </mat-form-field>      
 
       <mat-form-field class="sm:ml-6 flex-auto">
         <mat-label>Product Width</mat-label>
@@ -79,22 +80,26 @@
       </mat-form-field>
     </div>
 
-    <div class="flex flex-col sm:flex-row sm:pb-5">
-      <div class="sm:ml-6 flex-auto">
-        <mat-checkbox color="primary" [checked]="this.hazmat" (change)="this.hazmat = $event.checked"></mat-checkbox>
-        <mat-label class="pl-2">Hazmat</mat-label>
-      </div>
+    <div class="flex flex-col sm:flex-row">
+      <mat-form-field class="flex-auto">
+        <mat-label>Commodity</mat-label>
+        <input formControlName="Commodity" matInput>
+      </mat-form-field>
+      
+      <mat-form-field class="sm:ml-6 flex-auto">
+        <mat-label>Hazmat Contact</mat-label>
+        <input formControlName="HazmatContact" matInput>
+      </mat-form-field>      
+      
       <!-- <div class="sm:ml-6 flex-auto">
         <mat-checkbox color="primary" [checked]="this.active" (change)="this.active = $event.checked"></mat-checkbox>
         <mat-label class="pl-2">Is Active</mat-label>
       </div> -->
     </div>
-    <div class="flex flex-col sm:flex-row sm:pb-5">
-      <div class="sm:mr-6 flex-auto">
-        <mat-form-field>
-          <mat-label>Hazmat Contact</mat-label>
-          <input formControlName="HazmatContact" matInput>
-        </mat-form-field>
+    <div class="flex flex-col sm:flex-row">
+      <div class="flex-auto">
+        <mat-checkbox color="primary" [checked]="this.hazmat" (change)="this.hazmat = $event.checked"></mat-checkbox>
+        <mat-label class="pl-2">Hazmat</mat-label>
       </div>
 
       <!-- <div class="sm:ml-6 sm:mr-6 flex-auto">

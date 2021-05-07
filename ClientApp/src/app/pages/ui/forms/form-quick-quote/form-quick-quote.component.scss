@@ -465,10 +465,8 @@ input.removeArrowsNumberInput[type=number] {
   height: 20px;
 }
 
-.divAutoCompleteStyleControlProdName{
-  height: 20px;
-  text-overflow: ellipsis;    
-  overflow: hidden;
+.divAutoCompleteStyleControlProdName{ 
+  white-space: normal;
 }
 
 .matAutocompleteProducts{

@@ -168,7 +168,7 @@ export class LocationsTableComponent implements OnInit, AfterViewInit, OnDestroy
   }
 
   createLocation() {
-    this.dialog.open(LocationCreateUpdateComponent).afterClosed().subscribe((location: Location) => {
+    this.dialog.open(LocationCreateUpdateComponent,{ width: '70vw' }).afterClosed().subscribe((location: Location) => {
       /**
        * Location is the inserted location (if the user pressed Save - otherwise it's null)
        */
@@ -181,7 +181,7 @@ export class LocationsTableComponent implements OnInit, AfterViewInit, OnDestroy
   }
 
   updateLocation(location: Location) {
-    this.dialog.open(LocationCreateUpdateComponent, {
+    this.dialog.open(LocationCreateUpdateComponent, { width: '70vw', 
       data: location
     }).afterClosed().subscribe(updatedLocation => {
       /**

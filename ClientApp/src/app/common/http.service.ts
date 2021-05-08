@@ -168,9 +168,15 @@ export class HttpService {
         })
     }
 
+    // getStateDataByCountryId(countryId: string, keyId: string) {
+    //     countryId = countryId !== '' ? countryId : '1';
+    //     return this.http.get(String.Format(this.baseEndpoint + 'Services/MASCityStatePostalService.svc/json//GetStateDataByCountryId?MASCountryId={0}', countryId)
+    //     ).toPromise();
+    // }
+
     getStateDataByCountryId(countryId: string, keyId: string) {
         countryId = countryId !== '' ? countryId : '1';
-        return this.http.get(String.Format(this.baseEndpoint + 'Services/MASCityStatePostalService.svc/json//GetStateDataByCountryId?MASCountryId={0}', countryId)
+        return this.http.get<PostalData[]>(String.Format(this.baseEndpoint + 'Services/MASCityStatePostalService.svc/json//GetStateDataByCountryId?MASCountryId={0}', countryId)
         ).toPromise();
     }
 

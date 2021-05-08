@@ -260,6 +260,11 @@ export class FormAddShipComponent implements OnInit {
   OriginPostalData: PostalData;
   OriginPickupDate: string;
 
+  /* Start 08/05/2021 */
+  OrgpostalDataWithState: PostalData[] = [];
+  DestpostalDataWithState: PostalData[] = [];
+  /* End 08/05/2021 */
+
   //#region Destination Fields
   DestinationPostalCode: string;
   DestinationStateName: string;
@@ -658,7 +663,7 @@ export class FormAddShipComponent implements OnInit {
     return this.httpService.GetLocationByType(this.authenticationService.getDefaultClient().ClientID,1,val, this.keyId);
   }
 
-  loAutoCompleteSelected(event: MatAutocompleteSelectedEvent): void {
+  async loAutoCompleteSelected(event: MatAutocompleteSelectedEvent) {
     this.originAndDestinationFormGroup.get('originname').setValue(event.option.value.Name.trim());
     this.originAndDestinationFormGroup.get('originadddress1').setValue(event.option.value.Address1.trim());
     this.originAndDestinationFormGroup.get('originadddress2').setValue(event.option.value.Address2.trim());
@@ -670,6 +675,18 @@ export class FormAddShipComponent implements OnInit {
     this.originAndDestinationFormGroup.get('origincontact').setValue(event.option.value.ContactName.trim());
     this.originAndDestinationFormGroup.get('originemail').setValue(event.option.value.ContactEmail.trim());
     this.originAndDestinationFormGroup.get('originphone').setValue(event.option.value.ContactPhone.trim());
+    /* Start 08/05/2021 */
+    const responseData = await this.httpService.getStateDataByCountryId(event.option.value.CountryId,this.keyId);
+    this.OrgpostalDataWithState = responseData;
+    if(this.OrgpostalDataWithState !== null && this.OrgpostalDataWithState.length > 0){
+      const responseData1 = this.OrgpostalDataWithState.filter(a=>a.StateId == event.option.value.StateId);
+      this.OriginPostalData.StateCode = responseData1[0].StateCode.trim();
+    }
+    if(this.OriginPostalData !== null && this.OriginPostalData !== undefined && (this.OriginPostalData.CountryCode == null || this.OriginPostalData.CountryCode == undefined || this.OriginPostalData.CountryCode == "")){
+      const responseData2 = this.countryList.filter(a=>a.CountryId == event.option.value.CountryId);
+      this.OriginPostalData.CountryCode = responseData2[0].CountryCode.trim();
+    }
+    /* end 08/05/2021 */
   }
 
   pcdAutoCompletefilter(val: string): Observable<any[]> {
@@ -689,7 +706,7 @@ export class FormAddShipComponent implements OnInit {
     return this.httpService.GetLocationByType(this.authenticationService.getDefaultClient().ClientID,2,val, this.keyId);
   }
 
-  ldAutoCompleteSelected(event: MatAutocompleteSelectedEvent): void {
+  async ldAutoCompleteSelected(event: MatAutocompleteSelectedEvent) {
     this.originAndDestinationFormGroup.get('destname').setValue(event.option.value.Name.trim());
     this.originAndDestinationFormGroup.get('destadddress1').setValue(event.option.value.Address1.trim());
     this.originAndDestinationFormGroup.get('destadddress2').setValue(event.option.value.Address2.trim());
@@ -701,6 +718,18 @@ export class FormAddShipComponent implements OnInit {
     this.originAndDestinationFormGroup.get('destcontact').setValue(event.option.value.ContactName.trim());
     this.originAndDestinationFormGroup.get('destemail').setValue(event.option.value.ContactEmail.trim());
     this.originAndDestinationFormGroup.get('destphone').setValue(event.option.value.ContactPhone.trim());
+    /* Start 08/05/2021 */
+    const responseData = await this.httpService.getStateDataByCountryId(event.option.value.CountryId,this.keyId);
+    this.DestpostalDataWithState = responseData;
+    if(this.DestpostalDataWithState !== null && this.DestpostalDataWithState.length > 0){
+      const responseData1 = this.DestpostalDataWithState.filter(a=>a.StateId == event.option.value.StateId);
+      this.DestinationPostalData.StateCode = responseData1[0].StateCode.trim();
+    }
+    if(this.DestinationPostalData !== null && this.DestinationPostalData !== undefined && (this.DestinationPostalData.CountryCode == null || this.DestinationPostalData.CountryCode == undefined || this.DestinationPostalData.CountryCode == "")){
+      const responseData2 = this.countryList.filter(a=>a.CountryId == event.option.value.CountryId);
+      this.DestinationPostalData.CountryCode = responseData2[0].CountryCode.trim();
+    }
+    /* End 08/05/2021 */
   }
 
   async validateOriginPostalCode(event: KeyboardEvent){

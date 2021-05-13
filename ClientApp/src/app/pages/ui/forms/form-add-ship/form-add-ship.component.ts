@@ -1934,11 +1934,11 @@ export class FormAddShipComponent implements OnInit {
               return true;
             }
   
-            let tempCurrentPiecesValue = (this.productsAndAccessorialsFormGroup.controls.products as FormArray).at(currentProductIndex).get('Pieces').value == null ? 0 : (this.productsAndAccessorialsFormGroup.controls.products as FormArray).at(currentProductIndex).get('Pieces').value;
-            if (p.Pieces !== tempCurrentPiecesValue){
-              productHasChanged = true;
-              return true;
-            }
+            // let tempCurrentPiecesValue = (this.productsAndAccessorialsFormGroup.controls.products as FormArray).at(currentProductIndex).get('Pieces').value == null ? 0 : (this.productsAndAccessorialsFormGroup.controls.products as FormArray).at(currentProductIndex).get('Pieces').value;
+            // if (p.Pieces !== tempCurrentPiecesValue){
+            //   productHasChanged = true;
+            //   return true;
+            // }
   
             if (p.PackageTypeID !== (this.productsAndAccessorialsFormGroup.controls.products as FormArray).at(currentProductIndex).get('PackageTypeID').value){
               productHasChanged = true;
@@ -2074,11 +2074,11 @@ export class FormAddShipComponent implements OnInit {
             return true;
           }
 
-          let tempCurrentPiecesValue = (this.productsAndAccessorialsFormGroup.controls.products as FormArray).at(currentProductIndex).get('Pieces').value == null ? 0 : (this.productsAndAccessorialsFormGroup.controls.products as FormArray).at(currentProductIndex).get('Pieces').value;
-          if (p.Pieces !== tempCurrentPiecesValue){
-              productHasChanged = true;
-              return true;
-          }          
+          // let tempCurrentPiecesValue = (this.productsAndAccessorialsFormGroup.controls.products as FormArray).at(currentProductIndex).get('Pieces').value == null ? 0 : (this.productsAndAccessorialsFormGroup.controls.products as FormArray).at(currentProductIndex).get('Pieces').value;
+          // if (p.Pieces !== tempCurrentPiecesValue){
+          //     productHasChanged = true;
+          //     return true;
+          // }          
           
           if (p.PackageTypeID !== (this.productsAndAccessorialsFormGroup.controls.products as FormArray).at(currentProductIndex).get('PackageTypeID').value){
             productHasChanged = true;

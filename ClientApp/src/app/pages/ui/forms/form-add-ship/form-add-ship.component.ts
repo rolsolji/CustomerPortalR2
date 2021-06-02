@@ -126,6 +126,7 @@ export class FormAddShipComponent implements OnInit {
   EquipmentOptions: EquipmentType[];
   PriorityOptions: ShipmentPriority[];
   ServiceLevelOptions: ServiceLevelDetail[];
+  ServiceLevelOptionsWithoutDefaultServiceLevel: ServiceLevelDetail[];  
   PaymentTerms: PaymentTerm[];
   ShipmentModeOptions: ShipmentMode[];
   ShipmentErrorOptions: ShipmentError[];
@@ -402,7 +403,7 @@ export class FormAddShipComponent implements OnInit {
       shipmentvalue: [null],
       valueperpound: [null],
       os_d: [null],
-      servicelevel: [1, Validators.required],
+      servicelevel: [0, Validators.required],
       r2refno: [{ value: null, disabled: true }],
       statuscode: [null],
       specialinstructions: [null],
@@ -491,7 +492,31 @@ export class FormAddShipComponent implements OnInit {
     this.PriorityOptions = await this.httpService.getMasShipmentPriority();
 
     // -- Get Service Level Options
-    this.ServiceLevelOptions = await this.httpService.getMasServiceLevel(this.ClientID, this.keyId);
+
+    /* Start 02/06/2021 */
+    // this.ServiceLevelOptions = await this.httpService.getMasServiceLevel(this.ClientID, this.keyId);
+    this.ServiceLevelOptions = [];
+    this.ServiceLevelOptionsWithoutDefaultServiceLevel = await this.httpService.getMasServiceLevel(this.ClientID, this.keyId);    
+    
+    const defaultServiceLevel : ServiceLevelDetail = {      
+      ClientID: 1,
+      Description: "Select Service Level",
+      IsAccending: false,
+      OrderBy: null,
+      ServiceLevelCode: "",
+      ServiceLevelGroupID: 1,
+      ServiceLevelID: 0,
+      Status: true,
+    }   
+
+    if(this.ServiceLevelOptions !== null && this.ServiceLevelOptions !== undefined) {
+      this.ServiceLevelOptions.push(defaultServiceLevel);      
+    }
+
+    this.ServiceLevelOptionsWithoutDefaultServiceLevel.forEach(serviceLvl => {
+      this.ServiceLevelOptions.push(serviceLvl);
+    });
+    /* End 02/06/2021 */
 
     // -- Get Payment Terms
     this.PaymentTerms = await this.httpService.getMasPaymentTerms();
@@ -518,7 +543,10 @@ export class FormAddShipComponent implements OnInit {
     this.fetchPriority(0);
 
     // Get service level description by default
-    this.fetchServiceLevel(1);
+    /* Start 02/06/2021 */
+    // this.fetchServiceLevel(1);
+    this.fetchServiceLevel(0);
+    /* End 02/06/2021 */
 
     // -- Get Shipment information
     // this.ladingIdParameter = "2386566";

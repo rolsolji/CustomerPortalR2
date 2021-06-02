@@ -1110,7 +1110,7 @@
                                             {{rate.TotalCostWithOutTrueCost}}
                                           </span>
                                         </div>
-                                        <div>                 
+                                        <div *ngIf="rate.CarrierTypeID !== 3">                 
                                           <button color="warn" class="button--small" mat-raised-button type="button" (click)="selectQuote(j)">Select</button>           
                                         </div>
                                       </div>

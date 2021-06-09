@@ -236,12 +236,12 @@
     <div @fadeInUp class="card">
       <form *ngIf="formGroup" (ngSubmit)="search()" [formGroup]="formGroup">
         <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="5px" class="ml-2 mr-2">
-          <div fxFlex="50%">
+          <!-- <div fxFlex="50%">
             <mat-form-field appearance="outline">
               <mat-label>Commodity</mat-label>
               <input name="commodity" matInput formControlName="commodity">
             </mat-form-field>
-          </div>
+          </div> -->
           <div fxFlex="50%">
             <mat-form-field appearance="outline">
               <mat-label>Description</mat-label>

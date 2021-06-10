@@ -602,11 +602,16 @@
           </div>
           
           <ng-template [ngIf]="!getQuoteButtonClicked"> 
-              <!-- <div [innerHtml]=htmlContentByClient>
-                
-              </div>              -->
-              <img [alt]="promotionImageTitle" [src]="promotionImageByClient" style="height: 100%; width:100%">
-              <!-- <img [src]="rightPanelImage" > -->
+              
+              <!-- <img [alt]="promotionImageTitle" [src]="promotionImageByClient" style="height: 100%; width:100%"> -->
+
+              <mat-video [src]="promotionVideoImageByClient" 
+                        [autoplay]="true" [preload]="true" [loop]="true" [fullscreen]="false" [download]="false" [muted]="true"
+                        color="accent" spinner="spin"
+                        style="height: 100%; width: 100%;"
+                        >
+              </mat-video>
+              
           </ng-template>
          
         </div>

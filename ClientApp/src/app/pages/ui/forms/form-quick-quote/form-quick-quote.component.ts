@@ -232,6 +232,8 @@ export class FormQuickQuoteComponent implements OnInit {
   promotionImageByClient: any;
   promotionImageTitle: string;
 
+  promotionVideoImageByClient: any;
+
   noRatesFoundText = null;
 
   //#region Origin Fields
@@ -305,8 +307,9 @@ export class FormQuickQuoteComponent implements OnInit {
     // if (htmlMsgByClientObj && htmlMsgByClientObj.length > 0){
     //   this.htmlContentByClient = htmlMsgByClientObj[0].HtmlMsg2;
     // }
-    
-    this.promotionImageByClient = environment.baseEndpoint + `Handlers/PromotionImageHandler.ashx?ClientID=${this.authenticationService.getDefaultClient().ClientID}&id=e(${Math.random().toString().slice(2,11)})/&Ticket=${this.securityToken}`;    
+        
+    //this.promotionImageByClient = environment.baseEndpoint + `Handlers/PromotionImageHandler.ashx?ClientID=${this.authenticationService.getDefaultClient().ClientID}&id=e(${Math.random().toString().slice(2,11)})/&Ticket=${this.securityToken}`;    
+    this.promotionVideoImageByClient = `http://localhost:63784/Handlers/DownloadVideoHandler.ashx?ClientID=${this.authenticationService.getDefaultClient().ClientID}&id=e(${Math.random().toString().slice(2,11)})/&Ticket=${this.securityToken}`;
    
     this.promotionImageTitle = this.authenticationService.getDefaultClient().ClientName;
     const responseData = await this.httpService.getCountryList(this.keyId);

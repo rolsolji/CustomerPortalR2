@@ -469,4 +469,11 @@ export class HttpService {
         ).toPromise();
     }
     /* END */
+
+    /* Start 18/06/2021 */
+    public GetPromotionVideoByClientID(clientId: number, keyId:string) {
+        return this.http.get<String>(String.Format(this.baseEndpoint + 'Services/MasBrandsService.svc/json/GetPromotionVideoByClientID?ClientID={0}&_={1}',clientId, keyId)
+            ).toPromise();
+    }
+    /* End 18/06/2021 */
 }

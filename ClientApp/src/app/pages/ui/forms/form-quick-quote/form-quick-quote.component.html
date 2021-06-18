@@ -603,9 +603,9 @@
           
           <ng-template [ngIf]="!getQuoteButtonClicked"> 
               
-              <!-- <img [alt]="promotionImageTitle" [src]="promotionImageByClient" style="height: 100%; width:100%"> -->
+              <img *ngIf="!IsVideoShowingOrNot" [alt]="promotionImageTitle" [src]="promotionImageByClient" style="height: 100%; width:100%">
 
-              <mat-video [src]="promotionVideoImageByClient" 
+              <mat-video *ngIf="IsVideoShowingOrNot" [src]="promotionVideoImageByClient" 
                         [autoplay]="true" [preload]="true" [loop]="true" [fullscreen]="false" [download]="false" [muted]="true"
                         color="accent" spinner="spin"
                         style="height: 100%; width: 100%;"

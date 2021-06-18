@@ -234,6 +234,8 @@ export class FormQuickQuoteComponent implements OnInit {
 
   promotionVideoImageByClient: any;
 
+  IsVideoShowingOrNot: boolean = false;
+
   noRatesFoundText = null;
 
   //#region Origin Fields
@@ -307,9 +309,27 @@ export class FormQuickQuoteComponent implements OnInit {
     // if (htmlMsgByClientObj && htmlMsgByClientObj.length > 0){
     //   this.htmlContentByClient = htmlMsgByClientObj[0].HtmlMsg2;
     // }
-        
-    //this.promotionImageByClient = environment.baseEndpoint + `Handlers/PromotionImageHandler.ashx?ClientID=${this.authenticationService.getDefaultClient().ClientID}&id=e(${Math.random().toString().slice(2,11)})/&Ticket=${this.securityToken}`;    
-    this.promotionVideoImageByClient = environment.baseEndpoint +  `Handlers/DownloadVideoHandler.ashx?ClientID=${this.authenticationService.getDefaultClient().ClientID}&id=e(${Math.random().toString().slice(2,11)})/&Ticket=${this.securityToken}`;
+    
+    var videoPath = await this.httpService.GetPromotionVideoByClientID(this.ClientID, this.keyId);
+    if(videoPath == null || videoPath == undefined || videoPath == "")
+    {      
+      videoPath = await this.httpService.GetPromotionVideoByClientID(8473, this.keyId);
+      if(videoPath == null || videoPath == undefined || videoPath == "")
+      {
+        this.IsVideoShowingOrNot = false;
+      }
+      else
+      {
+        this.IsVideoShowingOrNot = true;
+      }
+    }
+    else
+    {
+      this.IsVideoShowingOrNot = true;
+    }
+
+    this.promotionImageByClient = environment.baseEndpoint + `Handlers/PromotionImageHandler.ashx?ClientID=${this.authenticationService.getDefaultClient().ClientID}&id=e(${Math.random().toString().slice(2,11)})/&Ticket=${this.securityToken}`;        
+    this.promotionVideoImageByClient = environment.baseEndpoint +  `Handlers/DownloadVideoHandler.ashx?ClientID=${this.authenticationService.getDefaultClient().ClientID}&id=e(${Math.random().toString().slice(2,11)})/&Ticket=${this.securityToken}`;    
    
     this.promotionImageTitle = this.authenticationService.getDefaultClient().ClientName;
     const responseData = await this.httpService.getCountryList(this.keyId);

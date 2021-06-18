@@ -232,6 +232,13 @@ export class FormAddShipComponent implements OnInit {
   ReferenceByClientIDField3 = 0;
   IsAutoCompleteProductSelected = false;
 
+  /* Start 15/06/2021 */
+  ReferenceByClientField4 = '';
+  ReferenceByClientIDField4 = 0;
+  ReferenceByClientField5 = '';
+  ReferenceByClientIDField5 = 0;
+  /* End 15/06/2021 */
+
   ForceToReRate = false;
   accessorialsUsedToRate: AccessorialBase[] = [];
   productsUsedToRate: any[] = [];
@@ -407,7 +414,9 @@ export class FormAddShipComponent implements OnInit {
       r2refno: [{ value: null, disabled: true }],
       statuscode: [null],
       specialinstructions: [null],
-      internalnote: [{ value: null, disabled: true }]
+      internalnote: [{ value: null, disabled: true }],
+      reference4: [null],
+      reference5: [null],
     });
     // --
 
@@ -1786,6 +1795,10 @@ export class FormAddShipComponent implements OnInit {
     this.shipmentInfoFormGroup.controls.pronumber.setValue(this.ShipmentByLadingObject.ProNumber === 'NA' ? '' : this.ShipmentByLadingObject.ProNumber, {onlySelf: false});    
     this.shipmentInfoFormGroup.controls.r2refno.setValue(this.ShipmentByLadingObject.BrokerReferenceNo === 'NA' ? '' : this.ShipmentByLadingObject.BrokerReferenceNo, {onlySelf: false});  
     this.shipmentInfoFormGroup.controls.specialinstructions.setValue(this.ShipmentByLadingObject.SplNotes === 'NA' ? '' : this.ShipmentByLadingObject.SplNotes, {onlySelf: false});       
+    /* Start 15/06/2021 */
+    this.shipmentInfoFormGroup.controls.reference4.setValue(this.ShipmentByLadingObject.Ref4Value === 'NA' ? '' : this.ShipmentByLadingObject.Ref4Value, {onlySelf: false});    
+    this.shipmentInfoFormGroup.controls.reference5.setValue(this.ShipmentByLadingObject.Ref5Value === 'NA' ? '' : this.ShipmentByLadingObject.Ref5Value, {onlySelf: false});    
+    /* End 15/06/2021 */
     // --
 
     // -- Set default values "Products and Accesorials" step
@@ -2532,7 +2545,11 @@ export class FormAddShipComponent implements OnInit {
       StatusReasonCodeId: statusReasonCodeId,
       Status: (IsBookShipment || ModifiedQuote ? 2 : 10),
       IsOriginAddToMaster: this.originAndDestinationFormGroup.get('addToLocationsOrigin').value,
-      IsDestintationAddToMaster: this.originAndDestinationFormGroup.get('addToLocationsDest').value
+      IsDestintationAddToMaster: this.originAndDestinationFormGroup.get('addToLocationsDest').value,
+      Ref4ID: this.ReferenceByClientIDField4,
+      Ref5ID: this.ReferenceByClientIDField5,      
+      Ref4Value: (this.shipmentInfoFormGroup.get('reference4').value != null ? this.shipmentInfoFormGroup.get('reference4').value.trim() : ''),
+      Ref5Value: (this.shipmentInfoFormGroup.get('reference5').value != null ? this.shipmentInfoFormGroup.get('reference5').value.trim() : ''),
     }
 
     /* Start 13/04/2021 */
@@ -2792,11 +2809,20 @@ export class FormAddShipComponent implements OnInit {
 
     localShipmentByLadingObject.Ref1ID = this.ReferenceByClientIDField1,
     localShipmentByLadingObject.Ref2ID = this.ReferenceByClientIDField2,
-    localShipmentByLadingObject.Ref3ID = this.ReferenceByClientIDField3,
+    localShipmentByLadingObject.Ref3ID = this.ReferenceByClientIDField3,    
 
     localShipmentByLadingObject.Ref1Value = this.shipmentInfoFormGroup.get('customerref').value.trim();
     localShipmentByLadingObject.Ref2Value = this.shipmentInfoFormGroup.get('r2order').value.trim();
     localShipmentByLadingObject.Ref3Value = this.shipmentInfoFormGroup.get('r2pronumber').value.trim();
+
+    /* Start 15/06/2021 */
+    localShipmentByLadingObject.Ref4ID = this.ReferenceByClientIDField4;
+    localShipmentByLadingObject.Ref5ID = this.ReferenceByClientIDField5;      
+
+    localShipmentByLadingObject.Ref4Value = this.shipmentInfoFormGroup.get('reference4').value.trim();
+    localShipmentByLadingObject.Ref5Value = this.shipmentInfoFormGroup.get('reference5').value.trim();
+    /* End 15/06/2021 */
+
     localShipmentByLadingObject.PaymentTermID = this.shipmentInfoFormGroup.get('paymentterms').value;
     /* Start 13/04/2021 */
     // localShipmentByLadingObject.ShipmentValue = this.shipmentInfoFormGroup.get('shipmentvalue').value;
@@ -3463,11 +3489,34 @@ export class FormAddShipComponent implements OnInit {
         this.ReferenceByClientField3 = this.ReferenceByClientOptions[2].Description.trim();
         this.ReferenceByClientIDField3 = this.ReferenceByClientOptions[2].ReferenceID;
       }
+
+      /* Start 15/06/2021 */
+      if (this.ReferenceByClientOptions.length > 3){
+        this.ReferenceByClientField4 = this.ReferenceByClientOptions[3].Description.trim();
+        this.ReferenceByClientIDField4 = this.ReferenceByClientOptions[3].ReferenceID;
+      }
+
+      if (this.ReferenceByClientOptions.length > 4){
+        this.ReferenceByClientField5 = this.ReferenceByClientOptions[4].Description.trim();
+        this.ReferenceByClientIDField5 = this.ReferenceByClientOptions[4].ReferenceID;
+      }
+      /* End 15/06/2021 */
     }
     else{ // If we can't get fields from API then set R2 fields as default
       this.ReferenceByClientField1 = 'Customer Ref #';
       this.ReferenceByClientField2 = 'R2 Order #';
       this.ReferenceByClientField3 = 'R2 Pro number';
+      /* Start 15/06/2021 */
+      this.ReferenceByClientField4 = 'Ref # 4';
+      this.ReferenceByClientField5 = 'Ref # 5';
+      /* End 15/06/2021 */
+    }
+
+    if(this.ReferenceByClientField4 == null || this.ReferenceByClientField4 == undefined || this.ReferenceByClientField4 == ""){
+      this.ReferenceByClientField4 = 'Ref # 4';
+    }
+    if(this.ReferenceByClientField5 == null || this.ReferenceByClientField5 == undefined || this.ReferenceByClientField5 == ""){
+      this.ReferenceByClientField5 = 'Ref # 5';
     }
   }
 

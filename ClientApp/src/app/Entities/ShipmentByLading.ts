@@ -424,6 +424,8 @@ export interface ShipmentByLading {
     Ref3Value: string;
     Ref4ID?: any;
     Ref4Value: string;
+    Ref5ID?: any;
+    Ref5Value: string;
     RefNo: number;
     RequestedDeliveryCloseTime?: any;
     RequestedDeliveryDate?: any;

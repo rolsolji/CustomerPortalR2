@@ -628,6 +628,22 @@
                       </mat-form-field>
                     </div>                                 
                   </div>
+                  <!--Start 15/06/2021-->
+                  <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="5px">
+                    <div fxFlex="50%">
+                      <mat-form-field>
+                        <mat-label>{{ReferenceByClientField4}}</mat-label>
+                        <input name="reference4" formControlName="reference4" matInput >
+                      </mat-form-field>
+                    </div>
+                    <div fxFlex="50%">
+                      <mat-form-field>
+                        <mat-label>{{ReferenceByClientField5}}</mat-label>
+                        <input name="reference5" formControlName="reference5" matInput >
+                      </mat-form-field>
+                    </div>                                 
+                  </div>
+                  <!--End 15/06/2021-->
                   <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="5px">                  
                     <div fxFlex="50%">
                       <mat-form-field>
@@ -984,12 +1000,22 @@
                   </div>
                   <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="5px">
                     <div fxFlex="50%">
-                      <mat-label class="SummaryFieldLabelTitle">{{ReferenceByClientField1}}</mat-label><mat-label class="InfoLabel">{{shipmentInfoFormGroup.get('customerref').value}}</mat-label>
+                      <mat-label class="SummaryFieldLabelTitle">{{ReferenceByClientField1}}</mat-label>: <mat-label class="InfoLabel">{{shipmentInfoFormGroup.get('customerref').value}}</mat-label>
                     </div>
                     <div fxFlex="50%">
-                      <mat-label class="SummaryFieldLabelTitle">{{ReferenceByClientField2}}</mat-label><mat-label class="InfoLabel">{{shipmentInfoFormGroup.get('r2order').value}}</mat-label>
+                      <mat-label class="SummaryFieldLabelTitle">{{ReferenceByClientField2}}</mat-label>: <mat-label class="InfoLabel">{{shipmentInfoFormGroup.get('r2order').value}}</mat-label>
                     </div>                                 
                   </div>
+                  <!--Start 15/06/2021-->
+                  <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="5px">
+                    <div fxFlex="50%">
+                      <mat-label class="SummaryFieldLabelTitle">{{ReferenceByClientField4}}</mat-label>: <mat-label class="InfoLabel">{{shipmentInfoFormGroup.get('reference4').value}}</mat-label>
+                    </div>
+                    <div fxFlex="50%">
+                      <mat-label class="SummaryFieldLabelTitle">{{ReferenceByClientField5}}</mat-label>: <mat-label class="InfoLabel">{{shipmentInfoFormGroup.get('reference5').value}}</mat-label>
+                    </div>                                 
+                  </div>
+                  <!--End 15/06/2021-->
                   <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="5px">
                     <div fxFlex="50%">
                       <mat-label class="SummaryFieldLabelTitle">Service Level: </mat-label><mat-label class="InfoLabel">{{serviceLevelDescriptionSelected}}</mat-label>

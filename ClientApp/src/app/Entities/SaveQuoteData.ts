@@ -173,4 +173,8 @@ export interface SelectedProductSQD {
         Status: number;
         IsOriginAddToMaster: boolean;
         IsDestintationAddToMaster: boolean;
+        Ref4ID: number;
+        Ref5ID: number;        
+        Ref4Value: string;
+        Ref5Value: string;
     }

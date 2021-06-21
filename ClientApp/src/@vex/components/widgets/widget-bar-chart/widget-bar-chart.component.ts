@@ -9,7 +9,7 @@ import {
   ApexDataLabels,
   ApexXAxis,
   ApexPlotOptions,
-  ApexStroke  
+  ApexStroke 
 } from "ng-apexcharts";
 
 export type ChartOptions = {
@@ -36,6 +36,7 @@ export class WidgetBarChartComponent implements OnInit, OnChanges {
   @Input() barHeight: string = "50";
   @Input() chartHeight: number = 550;
   @Input() chartWidth: number = 580;
+  @Input() dataLabels: ApexDataLabels;
 
   icMoreHoriz = icMoreHoriz;
   icCloudDownload = icCloudDownload;
@@ -66,19 +67,22 @@ export class WidgetBarChartComponent implements OnInit, OnChanges {
         bar: {
           horizontal: true,
           dataLabels: {
-            position: "center"
+            //position: "top",
+            orientation:"horizontal"
           },
           barHeight: this.barHeight
         }
       },
-      dataLabels: {
-        enabled: true,
-        offsetX: -6,
-        style: {
-          fontSize: "12px",
-          colors: ["#fff"]
-        }
-      },
+      // dataLabels: {
+      //   enabled: true,
+      //   // offsetX: 0,
+      //   // offsetY: 0,        
+      //   style: {
+      //     fontSize: "12px",
+      //     colors: ["#000"]
+      //   }
+      // },
+      dataLabels: this.dataLabels,
       stroke: {
         show: true,
         width: 1,
@@ -87,7 +91,7 @@ export class WidgetBarChartComponent implements OnInit, OnChanges {
       xaxis: {
         type: 'category',
         categories: this.labels
-      }      
+      }   
     };
   }
 

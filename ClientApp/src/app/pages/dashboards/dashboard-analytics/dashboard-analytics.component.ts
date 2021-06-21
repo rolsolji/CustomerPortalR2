@@ -53,12 +53,13 @@ export class DashboardAnalyticsComponent implements OnInit {
   heightOfTopAccessorialsChart: number = 450;
   widthOfTopAccessorialsChart: number = 550;
 
-  chart4Name: string = "Top Carriers By Shipment Count";
+  chart4Name: string = "Top Carriers by Volume";
   SeriesOfTopCarriersChart: ApexAxisChartSeries = [];
   labelsOfTopCarriersChart: any;
   barHeightOfTopCarriersChart: string = "50";
   heightOfTopCarriersChart: number = 550;
   widthOfTopCarriersChart: number = 580;
+  DataLabelsOfTopCarriersChart: ApexDataLabels;
 
   chart5Name: string = "Top 10 Lanes - Cost";
   SeriesOfTopLanesChart: ApexNonAxisChartSeries = [];
@@ -74,6 +75,7 @@ export class DashboardAnalyticsComponent implements OnInit {
   SeriesOfTopVendorsByVolumeChart: ApexAxisChartSeries = [];
   labelsOfTopVendorsByVolumeChart: any;
   barHeightOfTopVendorsByVolumeChart: string = "50";
+  DataLabelsOfTopVendorsByVolumeChart: ApexDataLabels;
 
   chart7Name: string = "Missed Deliveries";
   SeriesOfMissedDeliveriesChart: ApexAxisChartSeries = [];
@@ -81,33 +83,39 @@ export class DashboardAnalyticsComponent implements OnInit {
   barHeightOfMissedDeliveriesChart: string = "50";
   heightOfMissedDeliverysChart: number = 550;
   widthOfMissedDeliverysChart: number = 580;
+  DataLabelsOfMissedDeliverysChart: ApexDataLabels;
 
   chart8Name: string = "Missed Pickups - Late";
   SeriesOfMissedPickupsChart: ApexAxisChartSeries = [];
   labelsOfMissedPickupsChart: any;
   barHeightOfMissedPickupsChart: string = "50";
+  DataLabelsOfMissedPickupsChart: ApexDataLabels;
 
   chart11Name: string = "Missed Pickups - On Time";
   SeriesOfMissedPickupsOnTimeChart: ApexAxisChartSeries = [];
   labelsOfMissedPickupsOnTimeChart: any;
   barHeightOfMissedPickupsOnTimeChart: string = "50";
+  DataLabelsOfMissedPickupsOnTimeChart: ApexDataLabels;
 
   chart9Name: string = "Performance By Carrier - Late";
   SeriesOfCarrierPerformanceChart: ApexAxisChartSeries = [];
   labelsOfCarrierPerformanceChart: any;
   barHeightOfCarrierPerformanceChart: string = "50";
+  DataLabelsOfCarrierPerformanceChart: ApexDataLabels;
 
   chart12Name: string = "Performance By Carrier - On Time";
   SeriesOfCarrierPerformanceOnTimeChart: ApexAxisChartSeries = [];
   labelsOfCarrierPerformanceOnTimeChart: any;
   barHeightOfCarrierPerformanceOnTimeChart: string = "50";
+  DataLabelsOfCarrierPerformanceOnTimeChart: ApexDataLabels;
 
-  chart10Name: string = "Top Carriers By Shipment Value";
+  chart10Name: string = "Top Carriers by Revenue";
   SeriesOfTopCarriersByShipmentValueChart: ApexAxisChartSeries = [];
   labelsOfTopCarriersByShipmentValueChart: any;
   barHeightOfTopCarriersByShipmentValueChart: string = "50";
   heightOfTopCarriersByShipmentValueChart: number = 550;
   widthOfTopCarriersByShipmentValueChart: number = 580;
+  DataLabelsOfTopCarriersByShipmentValueChart: ApexDataLabels;
 
   dateRanges: any = [
     { text: "This Year", value: "YTD" },
@@ -414,12 +422,22 @@ export class DashboardAnalyticsComponent implements OnInit {
 
     this.SeriesOfTopCarriersChart = [
       {
-        name: "ShipCountData",
+        name: "Shipments Count",
         data: costOfSeries2
       }
     ];
     this.labelsOfTopCarriersChart = labelOfCarriers;
     this.barHeightOfTopCarriersChart = "60";
+    this.DataLabelsOfTopCarriersChart = {
+      enabled: true,
+      formatter: function (val, opt) {
+        return val == 0 ? "" : val.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+      },
+      style: {
+          fontSize: "13px",
+          colors: ["#000"]
+      }
+    };
   }
 
   async GetDetailsForTopCarriersByShipmentValueChart() {
@@ -439,12 +457,23 @@ export class DashboardAnalyticsComponent implements OnInit {
 
     this.SeriesOfTopCarriersByShipmentValueChart = [
       {
-        name: "TotalBilledAmount",
+        name: "Total Amount",
         data: costOfSeries1
       }
     ];
     this.labelsOfTopCarriersByShipmentValueChart = labelOfCarriers;
     this.barHeightOfTopCarriersByShipmentValueChart = "60";
+    this.DataLabelsOfTopCarriersByShipmentValueChart = {
+      enabled: true,
+      offsetX: 15,
+      formatter: function (val, opt) {
+        return "$" + val.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+      },
+      style: {
+          fontSize: "13px",
+          colors: ["#000"]
+      }
+    };
   }
 
   GetDetailsForTopLanesChart() {
@@ -604,12 +633,22 @@ export class DashboardAnalyticsComponent implements OnInit {
 
     this.SeriesOfTopVendorsByVolumeChart = [
       {
-        name: "ShipmentCount",
+        name: "Shipments Count",
         data: costOfSeries1
       }
     ];
     this.labelsOfTopVendorsByVolumeChart = labelOfVendors;
     this.barHeightOfTopVendorsByVolumeChart = "60";
+    this.DataLabelsOfTopVendorsByVolumeChart = {
+      enabled: true,
+      formatter: function (val, opt) {
+        return val == 0 ? "" : val.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+      },
+      style: {
+          fontSize: "13px",
+          colors: ["#000"]
+      }
+    };
   }
 
   async GetDetailsForMissedDeliveryChart() {
@@ -636,12 +675,22 @@ export class DashboardAnalyticsComponent implements OnInit {
 
       this.SeriesOfMissedDeliveriesChart = [
         {
-          name: "Late",
+          name: "Late Shipments Count",
           data: costOfSeries1
         }
       ];
       this.labelsOfMissedDeliveriesChart = labelOfMissedDel;
       this.barHeightOfMissedDeliveriesChart = "60";
+      this.DataLabelsOfMissedDeliverysChart = {
+        enabled: true,
+        formatter: function (val, opt) {
+          return val == 0 ? "" : val.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+        },
+        style: {
+            fontSize: "13px",
+            colors: ["#000"]
+        }
+      };
     }
   }
 
@@ -690,6 +739,16 @@ export class DashboardAnalyticsComponent implements OnInit {
       ];
       this.labelsOfMissedPickupsChart = labelOfMissedPickup;
       this.barHeightOfMissedPickupsChart = "60";
+      this.DataLabelsOfMissedPickupsChart = {
+        enabled: true,
+        formatter: function (val, opt) {
+          return val == 0 ? "" : val.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+        },
+        style: {
+            fontSize: "13px",
+            colors: ["#000"]
+        }
+      };  
     }
   }
 
@@ -748,6 +807,16 @@ export class DashboardAnalyticsComponent implements OnInit {
       ];
       this.labelsOfCarrierPerformanceChart = labelOfCarrierPerformance;
       this.barHeightOfCarrierPerformanceChart = "60";
+      this.DataLabelsOfCarrierPerformanceChart = {
+        enabled: true,
+        formatter: function (val, opt) {
+          return val == 0 ? "" : val.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+        },
+        style: {
+            fontSize: "13px",
+            colors: ["#000"]
+        }
+      };
     }
   }
 
@@ -867,7 +936,17 @@ export class DashboardAnalyticsComponent implements OnInit {
         }
       ];
       this.labelsOfMissedPickupsOnTimeChart = labelOfMissedPickupOnTime;
-      this.barHeightOfMissedPickupsChart = "60";
+      this.barHeightOfMissedPickupsOnTimeChart = "60";
+      this.DataLabelsOfMissedPickupsOnTimeChart = {
+        enabled: true,
+        formatter: function (val, opt) {
+          return val == 0 ? "" : val.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+        },
+        style: {
+            fontSize: "13px",
+            colors: ["#000"]
+        }
+      };
     }
   }
 
@@ -929,6 +1008,16 @@ export class DashboardAnalyticsComponent implements OnInit {
       ];
       this.labelsOfCarrierPerformanceOnTimeChart = labelOfCarrierPerformanceOnTime;
       this.barHeightOfCarrierPerformanceOnTimeChart = "60";
+      this.DataLabelsOfCarrierPerformanceOnTimeChart = {
+        enabled: true,
+        formatter: function (val, opt) {
+          return val == 0 ? "" : val.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+        },
+        style: {
+            fontSize: "13px",
+            colors: ["#000"]
+        }
+      };
     }
   }
 }

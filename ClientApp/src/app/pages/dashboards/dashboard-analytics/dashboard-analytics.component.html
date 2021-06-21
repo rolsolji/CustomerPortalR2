@@ -135,37 +135,45 @@
 
   <vex-widget-bar-chart [series]="SeriesOfTopCarriersChart" [labels]="labelsOfTopCarriersChart" [titleName]="chart4Name"
     [barHeight]="barHeightOfTopCarriersChart" [chartHeight]="heightOfTopCarriersChart"
-    [chartWidth]="widthOfTopCarriersChart" gdColumn="1 / 1" gdColumn.lt-md="1 / -1" gdColumn.lt-sm="1">
+    [chartWidth]="widthOfTopCarriersChart" [dataLabels]="DataLabelsOfTopCarriersChart" 
+    gdColumn="1 / 1" gdColumn.lt-md="1 / -1" gdColumn.lt-sm="1">
   </vex-widget-bar-chart>
 
   <vex-widget-bar-chart [series]="SeriesOfTopCarriersByShipmentValueChart"
     [labels]="labelsOfTopCarriersByShipmentValueChart" [titleName]="chart10Name"
-    [barHeight]="barHeightOfTopCarriersByShipmentValueChart" gdColumn="-1 / 2" gdColumn.lt-md="1 / -1"
-    gdColumn.lt-sm="1"></vex-widget-bar-chart>
+    [barHeight]="barHeightOfTopCarriersByShipmentValueChart" [dataLabels]="DataLabelsOfTopCarriersByShipmentValueChart" 
+    gdColumn="-1 / 2" gdColumn.lt-md="1 / -1" gdColumn.lt-sm="1">
+  </vex-widget-bar-chart>
 
   <vex-widget-bar-chart [series]="SeriesOfMissedDeliveriesChart" [labels]="labelsOfMissedDeliveriesChart"
     [titleName]="chart7Name" [barHeight]="barHeightOfMissedDeliveriesChart" [chartHeight]="heightOfMissedDeliverysChart"
-    [chartWidth]="widthOfMissedDeliverysChart" gdColumn="1 / 1" gdColumn.lt-md="1 / -1" gdColumn.lt-sm="1">
+    [chartWidth]="widthOfMissedDeliverysChart" [dataLabels]="DataLabelsOfMissedDeliverysChart" 
+    gdColumn="1 / 1" gdColumn.lt-md="1 / -1" gdColumn.lt-sm="1">
   </vex-widget-bar-chart>
 
   <vex-widget-bar-chart [series]="SeriesOfTopVendorsByVolumeChart" [labels]="labelsOfTopVendorsByVolumeChart"
-  [titleName]="chart6Name" [barHeight]="barHeightOfTopVendorsByVolumeChart" gdColumn="-1 / 2" gdColumn.lt-md="1 / -1"
-  gdColumn.lt-sm="1"></vex-widget-bar-chart>
+    [titleName]="chart6Name" [barHeight]="barHeightOfTopVendorsByVolumeChart" [dataLabels]="DataLabelsOfTopVendorsByVolumeChart" 
+    gdColumn="-1 / 2" gdColumn.lt-md="1 / -1" gdColumn.lt-sm="1">
+  </vex-widget-bar-chart>
 
   <vex-widget-bar-chart [series]="SeriesOfMissedPickupsChart" [labels]="labelsOfMissedPickupsChart"
-    [titleName]="chart8Name" [barHeight]="barHeightOfMissedPickupsChart" gdColumn="1 / 1" gdColumn.lt-md="1 / -1"
-    gdColumn.lt-sm="1"></vex-widget-bar-chart>
+    [titleName]="chart8Name" [barHeight]="barHeightOfMissedPickupsChart" [dataLabels]="DataLabelsOfMissedPickupsChart" 
+    gdColumn="1 / 1" gdColumn.lt-md="1 / -1" gdColumn.lt-sm="1">
+  </vex-widget-bar-chart>
 
   <vex-widget-bar-chart [series]="SeriesOfMissedPickupsOnTimeChart" [labels]="labelsOfMissedPickupsOnTimeChart"
-    [titleName]="chart11Name" [barHeight]="barHeightOfMissedPickupsOnTimeChart" gdColumn="-1 / 2" gdColumn.lt-md="1 / -1"
-    gdColumn.lt-sm="1"></vex-widget-bar-chart>
+    [titleName]="chart11Name" [barHeight]="barHeightOfMissedPickupsOnTimeChart" [dataLabels]="DataLabelsOfMissedPickupsOnTimeChart" 
+    gdColumn="-1 / 2" gdColumn.lt-md="1 / -1" gdColumn.lt-sm="1">
+  </vex-widget-bar-chart>
 
   <vex-widget-bar-chart [series]="SeriesOfCarrierPerformanceChart" [labels]="labelsOfCarrierPerformanceChart"
-    [titleName]="chart9Name" [barHeight]="barHeightOfCarrierPerformanceChart" gdColumn="1 / 1" gdColumn.lt-md="1 / -1"
-    gdColumn.lt-sm="1"></vex-widget-bar-chart>
+    [titleName]="chart9Name" [barHeight]="barHeightOfCarrierPerformanceChart" [dataLabels]="DataLabelsOfCarrierPerformanceChart" 
+    gdColumn="1 / 1" gdColumn.lt-md="1 / -1" gdColumn.lt-sm="1">
+  </vex-widget-bar-chart>
 
   <vex-widget-bar-chart [series]="SeriesOfCarrierPerformanceOnTimeChart" [labels]="labelsOfCarrierPerformanceOnTimeChart"
-    [titleName]="chart12Name" [barHeight]="barHeightOfCarrierPerformanceOnTimeChart" gdColumn="-1 / 2" gdColumn.lt-md="1 / -1"
-    gdColumn.lt-sm="1"></vex-widget-bar-chart>
+    [titleName]="chart12Name" [barHeight]="barHeightOfCarrierPerformanceOnTimeChart" [dataLabels]="DataLabelsOfCarrierPerformanceOnTimeChart" 
+    gdColumn="-1 / 2" gdColumn.lt-md="1 / -1" gdColumn.lt-sm="1">
+  </vex-widget-bar-chart>
 
 </div>

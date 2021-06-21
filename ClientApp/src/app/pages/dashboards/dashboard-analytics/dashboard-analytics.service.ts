@@ -63,8 +63,18 @@ export class DashBoardService {
         return data;
     }
 
+    public async DashBoard_GetMissedPickupOnTime(clientID: number, dateFrom: string, dateTo: string, isIncludeSubClient: boolean) {
+        const data = await this.httpService.DashBoard_GetMissedPickupOnTime(clientID, dateFrom, dateTo, isIncludeSubClient);
+        return data;
+    }
+
     public async DashBoard_GetCarrierPerformance(clientID: number, dateFrom: string, dateTo: string, isIncludeSubClient: boolean) {
         const data = await this.httpService.DashBoard_GetCarrierPerformance(clientID, dateFrom, dateTo, isIncludeSubClient);
+        return data;
+    }
+
+    public async DashBoard_GetCarrierPerformanceOnTime(clientID: number, dateFrom: string, dateTo: string, isIncludeSubClient: boolean) {
+        const data = await this.httpService.DashBoard_GetCarrierPerformanceOnTime(clientID, dateFrom, dateTo, isIncludeSubClient);
         return data;
     }
 }

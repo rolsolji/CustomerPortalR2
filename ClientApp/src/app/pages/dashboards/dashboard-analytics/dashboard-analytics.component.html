@@ -148,18 +148,24 @@
     [chartWidth]="widthOfMissedDeliverysChart" gdColumn="1 / 1" gdColumn.lt-md="1 / -1" gdColumn.lt-sm="1">
   </vex-widget-bar-chart>
 
+  <vex-widget-bar-chart [series]="SeriesOfTopVendorsByVolumeChart" [labels]="labelsOfTopVendorsByVolumeChart"
+  [titleName]="chart6Name" [barHeight]="barHeightOfTopVendorsByVolumeChart" gdColumn="-1 / 2" gdColumn.lt-md="1 / -1"
+  gdColumn.lt-sm="1"></vex-widget-bar-chart>
+
   <vex-widget-bar-chart [series]="SeriesOfMissedPickupsChart" [labels]="labelsOfMissedPickupsChart"
-    [titleName]="chart8Name" [barHeight]="barHeightOfMissedPickupsChart" gdColumn="-1 / 2" gdColumn.lt-md="1 / -1"
+    [titleName]="chart8Name" [barHeight]="barHeightOfMissedPickupsChart" gdColumn="1 / 1" gdColumn.lt-md="1 / -1"
     gdColumn.lt-sm="1"></vex-widget-bar-chart>
 
-  <vex-widget-bar-chart [series]="SeriesOfTopVendorsByVolumeChart" [labels]="labelsOfTopVendorsByVolumeChart"
-    [titleName]="chart6Name" [barHeight]="barHeightOfTopVendorsByVolumeChart" gdColumn="1 / 1" gdColumn.lt-md="1 / -1"
+  <vex-widget-bar-chart [series]="SeriesOfMissedPickupsOnTimeChart" [labels]="labelsOfMissedPickupsOnTimeChart"
+    [titleName]="chart11Name" [barHeight]="barHeightOfMissedPickupsOnTimeChart" gdColumn="-1 / 2" gdColumn.lt-md="1 / -1"
     gdColumn.lt-sm="1"></vex-widget-bar-chart>
 
   <vex-widget-bar-chart [series]="SeriesOfCarrierPerformanceChart" [labels]="labelsOfCarrierPerformanceChart"
-    [titleName]="chart9Name" [barHeight]="barHeightOfCarrierPerformanceChart" gdColumn="-1 / 2" gdColumn.lt-md="1 / -1"
+    [titleName]="chart9Name" [barHeight]="barHeightOfCarrierPerformanceChart" gdColumn="1 / 1" gdColumn.lt-md="1 / -1"
     gdColumn.lt-sm="1"></vex-widget-bar-chart>
 
-
+  <vex-widget-bar-chart [series]="SeriesOfCarrierPerformanceOnTimeChart" [labels]="labelsOfCarrierPerformanceOnTimeChart"
+    [titleName]="chart12Name" [barHeight]="barHeightOfCarrierPerformanceOnTimeChart" gdColumn="-1 / 2" gdColumn.lt-md="1 / -1"
+    gdColumn.lt-sm="1"></vex-widget-bar-chart>
 
 </div>

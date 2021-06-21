@@ -82,15 +82,25 @@ export class DashboardAnalyticsComponent implements OnInit {
   heightOfMissedDeliverysChart: number = 550;
   widthOfMissedDeliverysChart: number = 580;
 
-  chart8Name: string = "Missed Pickups";
+  chart8Name: string = "Missed Pickups - Late";
   SeriesOfMissedPickupsChart: ApexAxisChartSeries = [];
   labelsOfMissedPickupsChart: any;
   barHeightOfMissedPickupsChart: string = "50";
 
-  chart9Name: string = "On Time Performance By Carrier";
+  chart11Name: string = "Missed Pickups - On Time";
+  SeriesOfMissedPickupsOnTimeChart: ApexAxisChartSeries = [];
+  labelsOfMissedPickupsOnTimeChart: any;
+  barHeightOfMissedPickupsOnTimeChart: string = "50";
+
+  chart9Name: string = "Performance By Carrier - Late";
   SeriesOfCarrierPerformanceChart: ApexAxisChartSeries = [];
   labelsOfCarrierPerformanceChart: any;
   barHeightOfCarrierPerformanceChart: string = "50";
+
+  chart12Name: string = "Performance By Carrier - On Time";
+  SeriesOfCarrierPerformanceOnTimeChart: ApexAxisChartSeries = [];
+  labelsOfCarrierPerformanceOnTimeChart: any;
+  barHeightOfCarrierPerformanceOnTimeChart: string = "50";
 
   chart10Name: string = "Top Carriers By Shipment Value";
   SeriesOfTopCarriersByShipmentValueChart: ApexAxisChartSeries = [];
@@ -150,7 +160,9 @@ export class DashboardAnalyticsComponent implements OnInit {
   topVendorsByVolume: weightcostCompareModel[] = [];
   missedDeliveryDetails: CarrierPerformanceModel[] = [];
   missedPickupDetails: DashBoardMissedPickupModel[] = [];
+  missedPickupDetailsOnTime: DashBoardMissedPickupModel[] = [];
   carrierPerformanceDetails: CarrierPerformanceModel[] = [];
+  carrierPerformanceDetailsOnTime: CarrierPerformanceModel[] = [];
   topCarriersByShipmentValueDetails: CarrierPerformanceModel[] = [];
 
   icGroup = icGroup;
@@ -208,13 +220,21 @@ export class DashboardAnalyticsComponent implements OnInit {
     this.GetDetailsForMissedDeliveryChart();
     /* END */
 
-    /* Start Details of Missed Pickup Chart. */
+    /* Start Details of Missed Pickup On Late Chart. */
     this.GetDetailsForMissedPickupChart();
     /* END */
 
-    /* Start Details of On Time Carrier Performance Chart. */
+    /* Start Details of Missed Pickup On Time Chart. */
+    this.GetDetailsForMissedPickupOnTimeChart();
+    /* END */
+
+    /* Start Details of Carrier Performance On Late Chart. */
     this.GetDetailsForOnTimeCarrierPerformanceChart();
     /* END */    
+
+    /* Start Details of Carrier Performance On Time Chart. */
+    this.GetDetailsForCarrierPerformanceOnTimeChart();
+    /* END */
   }
 
   async GetDetailsForTotalShipmentsChartAndTable() {
@@ -632,8 +652,7 @@ export class DashboardAnalyticsComponent implements OnInit {
 
   PrepareDetailsForMissedPickupChart() {
 
-    var costOfSeries1: number[] = [];
-    var costOfSeries2: number[] = [];
+    var costOfSeries1: number[] = [];    
     var labelOfMissedPickup: string[] = [];
 
     if (this.missedPickupDetails && this.missedPickupDetails.length > 0) {
@@ -659,8 +678,7 @@ export class DashboardAnalyticsComponent implements OnInit {
       ).slice(0, 10);
 
       for (let i = 0; i < this.missedPickupDetails.length; i++) {
-        costOfSeries1.push(this.missedPickupDetails[i].LatePickupTime);
-        costOfSeries2.push(this.missedPickupDetails[i].OnTimePickup);
+        costOfSeries1.push(this.missedPickupDetails[i].LatePickupTime);        
         labelOfMissedPickup.push(this.missedPickupDetails[i].CarrierName.trim());
       }
 
@@ -668,27 +686,21 @@ export class DashboardAnalyticsComponent implements OnInit {
         {
           name: "Late",
           data: costOfSeries1
-        },
-        {
-          name: "OnTime",
-          data: costOfSeries2
         }
       ];
       this.labelsOfMissedPickupsChart = labelOfMissedPickup;
-      this.barHeightOfMissedPickupsChart = "100";
+      this.barHeightOfMissedPickupsChart = "60";
     }
   }
 
   async GetDetailsForOnTimeCarrierPerformanceChart() {
     this.carrierPerformanceDetails = await this.dashBoardService.DashBoard_GetCarrierPerformance(this.authenticationService.getDefaultClientFromStorage().ClientID, this.dateFrom, this.dateTo, this.isIncludeSubClient);
-    this.PrepareDetailsForOnTimeCarrierPerformanceChart();
-    this.showSpinnerOnDateChanges = false;
+    this.PrepareDetailsForOnTimeCarrierPerformanceChart();    
   }
 
   PrepareDetailsForOnTimeCarrierPerformanceChart() {
 
-    var costOfSeries1: number[] = [];
-    var costOfSeries2: number[] = [];
+    var costOfSeries1: number[] = [];    
     var labelOfCarrierPerformance: string[] = [];
     var finalData: DashBoardMissedPickupModel[] = [];
 
@@ -709,10 +721,13 @@ export class DashboardAnalyticsComponent implements OnInit {
         if (this.carrierPerformanceDetails[i].DeliveryStatus === 'Late') {
           oldItem.LatePickupTime = this.carrierPerformanceDetails[i].ShipmentCount;
         }
-        else {
-          oldItem.OnTimePickup = this.carrierPerformanceDetails[i].ShipmentCount;
-        }
       }
+
+      finalData = finalData.sort(
+        function (a, b) {
+          return b.LatePickupTime - a.LatePickupTime;
+        }
+      );
 
       for (let i = 0; i < finalData.length; i++) {
         if (finalData[i].LatePickupTime) {
@@ -720,12 +735,6 @@ export class DashboardAnalyticsComponent implements OnInit {
         }
         else {
           costOfSeries1.push(0);
-        }
-        if (finalData[i].OnTimePickup) {
-          costOfSeries2.push(finalData[i].OnTimePickup);
-        }
-        else {
-          costOfSeries2.push(0);
         }
 
         labelOfCarrierPerformance.push(finalData[i].CarrierName.trim());
@@ -735,14 +744,10 @@ export class DashboardAnalyticsComponent implements OnInit {
         {
           name: "Late",
           data: costOfSeries1
-        },
-        {
-          name: "On Time",
-          data: costOfSeries2
         }
       ];
       this.labelsOfCarrierPerformanceChart = labelOfCarrierPerformance;
-      this.barHeightOfCarrierPerformanceChart = "100";
+      this.barHeightOfCarrierPerformanceChart = "60";
     }
   }
 
@@ -816,5 +821,114 @@ export class DashboardAnalyticsComponent implements OnInit {
 
   changedValueOfIsIncludeSubClient() {
     this.prepareDetailsOfAllCharts();
+  }
+
+  async GetDetailsForMissedPickupOnTimeChart() {
+    this.missedPickupDetailsOnTime = await this.dashBoardService.DashBoard_GetMissedPickupOnTime(this.authenticationService.getDefaultClientFromStorage().ClientID, this.dateFrom, this.dateTo, this.isIncludeSubClient);
+    this.PrepareDetailsForMissedPickupOnTimeChart();
+  }
+
+  PrepareDetailsForMissedPickupOnTimeChart() {
+    
+    var costOfSeries2: number[] = [];
+    var labelOfMissedPickupOnTime: string[] = [];
+
+    if (this.missedPickupDetailsOnTime && this.missedPickupDetailsOnTime.length > 0) {
+
+      const calculated = this.missedPickupDetailsOnTime.reduce((acc, item) => {
+        let accItem = acc.find(ai => ai.CarrierName === item.CarrierName)
+        if (accItem) {
+          accItem.ClientName = item.ClientName,
+            accItem.LatePickupTime += item.LatePickupTime,
+            accItem.OnTimePickup += item.OnTimePickup
+        } else {
+          acc.push(item)
+        }
+        return acc;
+      }, [])
+
+      this.missedPickupDetailsOnTime = calculated;
+
+      this.missedPickupDetailsOnTime = this.missedPickupDetailsOnTime.sort(
+        function (a, b) {
+          return b.OnTimePickup - a.OnTimePickup;
+        }
+      ).slice(0, 10);
+
+      for (let i = 0; i < this.missedPickupDetailsOnTime.length; i++) {
+        costOfSeries2.push(this.missedPickupDetailsOnTime[i].OnTimePickup);
+        labelOfMissedPickupOnTime.push(this.missedPickupDetailsOnTime[i].CarrierName.trim());
+      }
+
+      this.SeriesOfMissedPickupsOnTimeChart = [        
+        {
+          name: "OnTime",
+          data: costOfSeries2
+        }
+      ];
+      this.labelsOfMissedPickupsOnTimeChart = labelOfMissedPickupOnTime;
+      this.barHeightOfMissedPickupsChart = "60";
+    }
+  }
+
+  async GetDetailsForCarrierPerformanceOnTimeChart() {
+    this.carrierPerformanceDetailsOnTime = await this.dashBoardService.DashBoard_GetCarrierPerformanceOnTime(this.authenticationService.getDefaultClientFromStorage().ClientID, this.dateFrom, this.dateTo, this.isIncludeSubClient);
+    this.PrepareDetailsForCarrierPerformanceOnTimeChart();
+    this.showSpinnerOnDateChanges = false;
+  }
+
+  PrepareDetailsForCarrierPerformanceOnTimeChart() {
+    
+    var costOfSeries2: number[] = [];
+    var labelOfCarrierPerformanceOnTime: string[] = [];
+    var finalData: DashBoardMissedPickupModel[] = [];
+
+    if (this.carrierPerformanceDetailsOnTime && this.carrierPerformanceDetailsOnTime.length > 0) {
+
+      for (let i = 0; i < this.carrierPerformanceDetailsOnTime.length; i++) {
+        let temp = <DashBoardMissedPickupModel>{};
+        let oldItem = finalData.find(ai => ai.CarrierName === this.carrierPerformanceDetailsOnTime[i].CarrierName.trim())
+        if (oldItem) { }
+        else {
+          temp.CarrierName = this.carrierPerformanceDetailsOnTime[i].CarrierName.trim();
+          finalData.push(temp);
+        }
+      }      
+
+      for (let i = 0; i < this.carrierPerformanceDetailsOnTime.length; i++) {
+        let oldItem = finalData.find(ai => ai.CarrierName === this.carrierPerformanceDetailsOnTime[i].CarrierName.trim())
+        if (this.carrierPerformanceDetailsOnTime[i].DeliveryStatus === 'Late') {          
+        }
+        else {
+          oldItem.OnTimePickup = this.carrierPerformanceDetailsOnTime[i].ShipmentCount;
+        }
+      }    
+      
+      finalData = finalData.sort(
+        function (a, b) {
+          return b.OnTimePickup - a.OnTimePickup;
+        }
+      );
+
+      for (let i = 0; i < finalData.length; i++) {        
+        if (finalData[i].OnTimePickup) {
+          costOfSeries2.push(finalData[i].OnTimePickup);
+        }
+        else {
+          costOfSeries2.push(0);
+        }
+
+        labelOfCarrierPerformanceOnTime.push(finalData[i].CarrierName.trim());
+      }
+
+      this.SeriesOfCarrierPerformanceOnTimeChart = [        
+        {
+          name: "On Time",
+          data: costOfSeries2
+        }
+      ];
+      this.labelsOfCarrierPerformanceOnTimeChart = labelOfCarrierPerformanceOnTime;
+      this.barHeightOfCarrierPerformanceOnTimeChart = "60";
+    }
   }
 }

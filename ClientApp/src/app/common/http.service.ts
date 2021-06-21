@@ -462,10 +462,22 @@ export class HttpService {
         ).toPromise();
     }
 
+    public DashBoard_GetMissedPickupOnTime(clientID: number, dateFrom: string, dateTo: string, isIncludeSubClient: boolean) {
+        return this.http.get<DashBoardMissedPickupModel[]>(
+            this.baseEndpoint + 'Services/DashBoardService.svc/json/DashBoard_GetMissedPickup?clientId=' + clientID + '&pickupDateFrom=' + dateFrom + '&pickupDateTo=' + dateTo + '&IsIncludeSubClient=' + isIncludeSubClient
+        ).toPromise();
+    }
+
     public DashBoard_GetCarrierPerformance(clientID: number, dateFrom: string, dateTo: string, isIncludeSubClient: boolean) {
         return this.http.get<CarrierPerformanceModel[]>(
             this.baseEndpoint + 'Services/DashBoardService.svc/json/DashBoard_GetCarrierPerformanceByDate?clientid=' + clientID + '&shipFromdate=' + dateFrom + '&shipTodate=' + dateTo + '&IsIncludeSubClient=' + isIncludeSubClient
             // 'http://localhost:63784/Services/DashBoardService.svc/json/DashBoard_GetCarrierPerformanceByDate?clientid=' + clientID + '&IsIncludeSubClient=' + isIncludeSubClient
+        ).toPromise();
+    }
+
+    public DashBoard_GetCarrierPerformanceOnTime(clientID: number, dateFrom: string, dateTo: string, isIncludeSubClient: boolean) {
+        return this.http.get<CarrierPerformanceModel[]>(
+            this.baseEndpoint + 'Services/DashBoardService.svc/json/DashBoard_GetCarrierPerformanceByDate?clientid=' + clientID + '&shipFromdate=' + dateFrom + '&shipTodate=' + dateTo + '&IsIncludeSubClient=' + isIncludeSubClient
         ).toPromise();
     }
     /* END */

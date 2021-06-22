@@ -10,6 +10,55 @@
   <div gdColumn="-1 / 1" gdColumn.lt-md="-1 / 1" gdColumn.lt-sm="1">
     <div class="card" fxLayout="column">
       <div fxLayout="row" fxLayout.lt-md="column" class="ml-5 dashboardFilters">
+        <div fxFlex="60%">
+          <div fxLayout="row" fxLayout.lt-md="column">
+            <div fxFlex="25%" class="py-4 mr-4" fxLayoutAlign="start center">
+              <mat-form-field style="width: 100%;" appearance="outline">
+                <mat-label>Pickup Date From</mat-label>
+                <input (click)="fromPickupDatePicker.open()" (focus)="fromPickupDatePicker.open()" name="pickupDateFrom"
+                  [matDatepicker]="fromPickupDatePicker" [(ngModel)]="pickupDateFromDatePicker" matInput readonly>
+                <mat-datepicker-toggle [for]="fromPickupDatePicker" matSuffix></mat-datepicker-toggle>
+                <mat-datepicker #fromPickupDatePicker></mat-datepicker>
+              </mat-form-field>
+            </div>
+            <div fxFlex="25%" class="py-4 mr-4" fxLayoutAlign="start center">
+              <mat-form-field style="width: 100%;" appearance="outline">
+                <mat-label>Pickup Date To</mat-label>
+                <input (click)="toPickupDatePicker.open()" (focus)="toPickupDatePicker.open()" name="pickupDateTo"
+                  [matDatepicker]="toPickupDatePicker" [(ngModel)]="pickupDateToDatePicker" matInput readonly>
+                <mat-datepicker-toggle [for]="toPickupDatePicker" matSuffix></mat-datepicker-toggle>
+                <mat-datepicker #toPickupDatePicker></mat-datepicker>
+              </mat-form-field>
+            </div>                       
+          </div>
+        </div>
+        <div fxFlex="7%">
+          <div fxLayout="row" fxLayout.lt-md="column">
+          </div>
+        </div>
+        <div fxFlex="32%">
+          <div fxLayout="row" fxLayout.lt-md="column" style="padding-top: 9px;">
+            <div fxFlex="45%" class="py-4 mr-4" fxLayoutAlign="start center">
+              <button color="primary" (click)="exportKPIDetailReportClick()" 
+                [disabled]="pickupDateFromDatePicker == null || pickupDateFromDatePicker == undefined || pickupDateToDatePicker == null || pickupDateToDatePicker == undefined" 
+                mat-raised-button>Export KPI Detail Report</button>
+            </div>
+            <div fxFlex="53%" class="py-4 mr-4" fxLayoutAlign="start center">
+              <button color="primary" (click)="accessorialSummaryReportClick()"
+                [disabled]="pickupDateFromDatePicker == null || pickupDateFromDatePicker == undefined || pickupDateToDatePicker == null || pickupDateToDatePicker == undefined" 
+                mat-raised-button>Accessorial Summary Report</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="p-gutter" style="padding-bottom: 0px;" vexContainer>
+  <div gdColumn="-1 / 1" gdColumn.lt-md="-1 / 1" gdColumn.lt-sm="1">
+    <div class="card" fxLayout="column">
+      <div fxLayout="row" fxLayout.lt-md="column" class="ml-5 dashboardFilters">
         <div fxFlex="20%" class="py-4 mr-4" fxLayoutAlign="start center">
           <mat-form-field appearance="outline" class="vex-flex-form-field matFormField" color="primary">
             <mat-label>Date Range</mat-label>

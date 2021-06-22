@@ -17,7 +17,8 @@ import { TopLanes } from 'src/app/Entities/TopLanes';
 import { formatCurrency } from '@angular/common';
 import { ChartType } from 'ng-apexcharts';
 import { DashBoardMissedPickupModel } from 'src/app/Entities/DashBoardMissedPickupModel';
-import { DatePipe } from '@angular/common'
+import { DatePipe } from '@angular/common';
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'vex-dashboard-analytics',
@@ -33,6 +34,12 @@ export class DashboardAnalyticsComponent implements OnInit {
   dateFromForDatePicker: Date = null;
   dateToForDatePicker: Date = null;
   showSpinnerOnDateChanges: boolean = false;
+  pickupDateFromDatePicker: Date = null;
+  pickupDateToDatePicker: Date = null;
+  pickupDateFrom: string = null;
+  pickupDateTo: string = null;
+  private baseEndpoint: string;
+  securityToken: string;
 
   chart1Name: string = "Total Shipments By Mode";
   SeriesOfTotalShipmentsChart: ApexNonAxisChartSeries = [];
@@ -180,7 +187,10 @@ export class DashboardAnalyticsComponent implements OnInit {
   icMoreVert = icMoreVert;
 
   constructor(private cd: ChangeDetectorRef, private dashBoardService: DashBoardService, public datepipe: DatePipe,
-    private authenticationService: AuthenticationService) { }
+    private authenticationService: AuthenticationService) {
+      this.baseEndpoint = environment.baseEndpoint;
+      this.securityToken = this.authenticationService.ticket$.value;
+    }
 
   async ngOnInit() {
     setTimeout(() => {
@@ -1018,6 +1028,45 @@ export class DashboardAnalyticsComponent implements OnInit {
             colors: ["#000"]
         }
       };
+    }
+  }
+
+  accessorialSummaryReportClick() {
+    if(this.pickupDateFromDatePicker !== null && this.pickupDateFromDatePicker !== undefined 
+      && this.pickupDateToDatePicker !== null && this.pickupDateToDatePicker !== undefined) {
+
+      this.pickupDateFrom = this.datepipe.transform(this.pickupDateFromDatePicker, 'MM/dd/yyyy');
+      this.pickupDateTo = this.datepipe.transform(this.pickupDateToDatePicker, 'MM/dd/yyyy');
+      var selectedClientID = this.authenticationService.getDefaultClientFromStorage().ClientID;
+      var ReportHanderUrl = "";
+  
+      ReportHanderUrl = this.baseEndpoint + "Handlers/AccessorialSummaryByLoadClientAndBranchHandler.ashx?ClientID=" + selectedClientID;
+      ReportHanderUrl = ReportHanderUrl + "&FromPickupDate=" + this.pickupDateFrom + "&ToPickupDate=" + this.pickupDateTo;
+      ReportHanderUrl = ReportHanderUrl + "&IsIncludeSubClient=true";	        
+      ReportHanderUrl = ReportHanderUrl + "&Ticket=" + this.securityToken;
+  
+      if (ReportHanderUrl !== null && ReportHanderUrl !== undefined && ReportHanderUrl !== "") {
+        window.open(ReportHanderUrl);
+      }
+    }
+  }
+
+  exportKPIDetailReportClick() {    
+    if(this.pickupDateFromDatePicker !== null && this.pickupDateFromDatePicker !== undefined 
+      && this.pickupDateToDatePicker !== null && this.pickupDateToDatePicker !== undefined) {        
+      this.pickupDateFrom = this.datepipe.transform(this.pickupDateFromDatePicker, 'MM/dd/yyyy');
+      this.pickupDateTo = this.datepipe.transform(this.pickupDateToDatePicker, 'MM/dd/yyyy');
+      var selectedClientID = this.authenticationService.getDefaultClientFromStorage().ClientID;
+      var ReportHanderUrl = "";
+  
+      ReportHanderUrl = this.baseEndpoint + "Handlers/TPLShipmentDetailHandler.ashx?ClientID=" + selectedClientID;
+      ReportHanderUrl = ReportHanderUrl + "&FromPickupDate=" + this.pickupDateFrom + "&ToPickupDate=" + this.pickupDateTo;
+      ReportHanderUrl = ReportHanderUrl + "&IsIncludeSubClient=true";	        
+      ReportHanderUrl = ReportHanderUrl + "&Ticket=" + this.securityToken;
+  
+      if (ReportHanderUrl !== null && ReportHanderUrl !== undefined && ReportHanderUrl !== "") {
+        window.open(ReportHanderUrl);
+      }
     }
   }
 }

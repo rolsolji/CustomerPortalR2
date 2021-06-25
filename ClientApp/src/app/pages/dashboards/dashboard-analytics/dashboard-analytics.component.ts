@@ -92,13 +92,13 @@ export class DashboardAnalyticsComponent implements OnInit {
   widthOfMissedDeliverysChart: number = 580;
   DataLabelsOfMissedDeliverysChart: ApexDataLabels;
 
-  chart8Name: string = "Missed Pickups - Late";
+  chart8Name: string = "Missed Pickups";
   SeriesOfMissedPickupsChart: ApexAxisChartSeries = [];
   labelsOfMissedPickupsChart: any;
   barHeightOfMissedPickupsChart: string = "50";
   DataLabelsOfMissedPickupsChart: ApexDataLabels;
 
-  chart11Name: string = "Missed Pickups - On Time";
+  chart11Name: string = "On Time Pickups";
   SeriesOfMissedPickupsOnTimeChart: ApexAxisChartSeries = [];
   labelsOfMissedPickupsOnTimeChart: any;
   barHeightOfMissedPickupsOnTimeChart: string = "50";
@@ -331,10 +331,11 @@ export class DashboardAnalyticsComponent implements OnInit {
         footer: totalWeight.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
       },
       {
-        label: 'Cost Per Pound',
+        label: '$ Cost Per Pound',
         property: 'CostPerPound',
         type: 'text',
-        footer: totalCostPerPound.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+        cssClasses: ['font-medium'],
+        footer: "$" + totalCostPerPound.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
       },
       {
         label: '$ Total Spend',

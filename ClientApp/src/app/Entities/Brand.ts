@@ -12,4 +12,5 @@ export interface Brand{
     BannerLogoImage: any;
     ReportLogoImage: any;
     PromotionImage: any;
+    PromotionPreference: string;
 }

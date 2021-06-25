@@ -124,6 +124,7 @@ export class FormQuickQuoteComponent implements OnInit {
 
   keyId = '1593399730488';
   ClientID = this.authenticationService.getDefaultClient().ClientID;
+  promotionPreference : string;
   clientDefaultData: ClientDefaultData;
   clientPCFDefaultData: PCFClientDefaults;
   clientTLWeightLimit: string;
@@ -310,27 +311,118 @@ export class FormQuickQuoteComponent implements OnInit {
     //   this.htmlContentByClient = htmlMsgByClientObj[0].HtmlMsg2;
     // }
     
-    var videoPath = await this.httpService.GetPromotionVideoByClientID(this.ClientID, this.keyId);
-    if(videoPath == null || videoPath == undefined || videoPath == "")
-    {      
-      videoPath = await this.httpService.GetPromotionVideoByClientID(8473, this.keyId);
-      if(videoPath == null || videoPath == undefined || videoPath == "")
-      {
-        this.IsVideoShowingOrNot = false;
+    /* Start 25/06/2021 */
+    // var videoPath = await this.httpService.GetPromotionVideoByClientID(this.ClientID, this.keyId);
+    // if(videoPath == null || videoPath == undefined || videoPath == "")
+    // {      
+    //   videoPath = await this.httpService.GetPromotionVideoByClientID(8473, this.keyId);
+    //   if(videoPath == null || videoPath == undefined || videoPath == "")
+    //   {
+    //     this.IsVideoShowingOrNot = false;
+    //   }
+    //   else
+    //   {
+    //     this.IsVideoShowingOrNot = true;
+    //   }
+    // }
+    // else
+    // {
+    //   this.IsVideoShowingOrNot = true;
+    // }
+    let masBrandsSetup = await this.authenticationService.getMasBrandsByClientID(this.ClientID);        
+    if(masBrandsSetup && masBrandsSetup.length > 0){
+      let proPref = masBrandsSetup[0].PromotionPreference;
+      if (proPref !== null && proPref !== ''){
+        this.promotionPreference = proPref;
       }
-      else
-      {
-        this.IsVideoShowingOrNot = true;
-      }
-    }
-    else
-    {
-      this.IsVideoShowingOrNot = true;
     }
 
-    this.promotionImageByClient = environment.baseEndpoint + `Handlers/PromotionImageHandler.ashx?ClientID=${this.authenticationService.getDefaultClient().ClientID}&id=e(${Math.random().toString().slice(2,11)})/&Ticket=${this.securityToken}`;        
-    this.promotionVideoImageByClient = environment.baseEndpoint +  `Handlers/DownloadVideoHandler.ashx?ClientID=${this.authenticationService.getDefaultClient().ClientID}&id=e(${Math.random().toString().slice(2,11)})/&Ticket=${this.securityToken}`;    
+    var videoPath;
+    var imagePath;    
+
+    if(this.promotionPreference != null && this.promotionPreference != undefined && this.promotionPreference != ""){
+      if(this.promotionPreference == "Video"){
+        videoPath = await this.httpService.GetPromotionVideoByClientID(this.ClientID, this.keyId);
+        if(videoPath != null && videoPath != undefined && videoPath != "") {
+          this.IsVideoShowingOrNot = true;
+          this.promotionVideoImageByClient = environment.baseEndpoint + `Handlers/DownloadVideoHandler.ashx?ClientID=${this.authenticationService.getDefaultClient().ClientID}&id=e(${Math.random().toString().slice(2,11)})/&Ticket=${this.securityToken}`;    
+        }
+        else{
+          imagePath = await this.httpService.GetPromotionImageByClientID(this.ClientID, this.keyId);
+          if(imagePath == true){
+            this.IsVideoShowingOrNot = false;
+            this.promotionImageByClient = environment.baseEndpoint + `Handlers/PromotionImageHandler.ashx?ClientID=${this.authenticationService.getDefaultClient().ClientID}&id=e(${Math.random().toString().slice(2,11)})/&Ticket=${this.securityToken}`;        
+          }
+          else{
+            videoPath = await this.httpService.GetPromotionVideoByClientID(8473, this.keyId);
+            if(videoPath != null && videoPath != undefined && videoPath != "") {
+              this.IsVideoShowingOrNot = true;
+              this.promotionVideoImageByClient = environment.baseEndpoint + `Handlers/DownloadVideoHandler.ashx?ClientID=8473&id=e(${Math.random().toString().slice(2,11)})/&Ticket=${this.securityToken}`;    
+            }
+            else{
+              this.IsVideoShowingOrNot = false;
+              this.promotionImageByClient = environment.baseEndpoint + `Handlers/PromotionImageHandler.ashx?ClientID=8473&id=e(${Math.random().toString().slice(2,11)})/&Ticket=${this.securityToken}`;        
+            }
+          }
+        }
+      }
+      else{
+        imagePath = await this.httpService.GetPromotionImageByClientID(this.ClientID, this.keyId);
+        if(imagePath == true){
+          this.IsVideoShowingOrNot = false;
+          this.promotionImageByClient = environment.baseEndpoint + `Handlers/PromotionImageHandler.ashx?ClientID=${this.authenticationService.getDefaultClient().ClientID}&id=e(${Math.random().toString().slice(2,11)})/&Ticket=${this.securityToken}`;        
+        }
+        else{
+          videoPath = await this.httpService.GetPromotionVideoByClientID(this.ClientID, this.keyId);
+          if(videoPath != null && videoPath != undefined && videoPath != "") {
+            this.IsVideoShowingOrNot = true;
+            this.promotionVideoImageByClient = environment.baseEndpoint + `Handlers/DownloadVideoHandler.ashx?ClientID=${this.authenticationService.getDefaultClient().ClientID}&id=e(${Math.random().toString().slice(2,11)})/&Ticket=${this.securityToken}`;    
+          }
+          else{
+            imagePath = await this.httpService.GetPromotionImageByClientID(8473, this.keyId);
+            if(imagePath == true){
+              this.IsVideoShowingOrNot = false;
+              this.promotionImageByClient = environment.baseEndpoint + `Handlers/PromotionImageHandler.ashx?ClientID=8473&id=e(${Math.random().toString().slice(2,11)})/&Ticket=${this.securityToken}`;        
+            }
+            else{
+              this.IsVideoShowingOrNot = true;
+              this.promotionVideoImageByClient = environment.baseEndpoint + `Handlers/DownloadVideoHandler.ashx?ClientID=8473&id=e(${Math.random().toString().slice(2,11)})/&Ticket=${this.securityToken}`;    
+            }
+          }
+        }
+      }
+    }
+    else{
+      videoPath = await this.httpService.GetPromotionVideoByClientID(this.ClientID, this.keyId);
+      if(videoPath != null && videoPath != undefined && videoPath != "") {
+         this.IsVideoShowingOrNot = true;
+         this.promotionVideoImageByClient = environment.baseEndpoint + `Handlers/DownloadVideoHandler.ashx?ClientID=${this.authenticationService.getDefaultClient().ClientID}&id=e(${Math.random().toString().slice(2,11)})/&Ticket=${this.securityToken}`;    
+      }
+      else{
+        imagePath = await this.httpService.GetPromotionImageByClientID(this.ClientID, this.keyId);
+        if(imagePath == true){
+          this.IsVideoShowingOrNot = false;
+          this.promotionImageByClient = environment.baseEndpoint + `Handlers/PromotionImageHandler.ashx?ClientID=${this.authenticationService.getDefaultClient().ClientID}&id=e(${Math.random().toString().slice(2,11)})/&Ticket=${this.securityToken}`;        
+        }
+        else{
+          videoPath = await this.httpService.GetPromotionVideoByClientID(8473, this.keyId);
+          if(videoPath != null && videoPath != undefined && videoPath != "") {
+            this.IsVideoShowingOrNot = true;
+            this.promotionVideoImageByClient = environment.baseEndpoint + `Handlers/DownloadVideoHandler.ashx?ClientID=8473&id=e(${Math.random().toString().slice(2,11)})/&Ticket=${this.securityToken}`;    
+          }
+          else{
+            this.IsVideoShowingOrNot = false;
+            this.promotionImageByClient = environment.baseEndpoint + `Handlers/PromotionImageHandler.ashx?ClientID=8473&id=e(${Math.random().toString().slice(2,11)})/&Ticket=${this.securityToken}`;        
+          }
+        }
+      }
+    }
+
+    // this.promotionImageByClient = environment.baseEndpoint + `Handlers/PromotionImageHandler.ashx?ClientID=${this.authenticationService.getDefaultClient().ClientID}&id=e(${Math.random().toString().slice(2,11)})/&Ticket=${this.securityToken}`;        
+    // this.promotionVideoImageByClient = environment.baseEndpoint +  `Handlers/DownloadVideoHandler.ashx?ClientID=${this.authenticationService.getDefaultClient().ClientID}&id=e(${Math.random().toString().slice(2,11)})/&Ticket=${this.securityToken}`;    
    
+    /* End 25/06/2021 */
+
     this.promotionImageTitle = this.authenticationService.getDefaultClient().ClientName;
     const responseData = await this.httpService.getCountryList(this.keyId);
     this.clientDefaultData = await this.httpService.getClientDefaultsByClient(this.ClientID, this.keyId);

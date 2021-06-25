@@ -488,4 +488,11 @@ export class HttpService {
             ).toPromise();
     }
     /* End 18/06/2021 */
+
+    /* Start 25/06/2021 */
+    public GetPromotionImageByClientID(clientId: number, keyId:string) {
+        return this.http.get<Boolean>(String.Format(this.baseEndpoint + 'Services/MasBrandsService.svc/json/GetPromotionImageByClientID?ClientID={0}&_={1}',clientId, keyId)        
+            ).toPromise();
+    }
+    /* End 25/06/2021 */
 }

@@ -230,7 +230,7 @@ export class AuthenticationService {
   }
 
   public async getMasBrandsByClientID(clientID: number) {
-    return this.http.get<Brand[]>(`${this.baseEndpoint}Services/MasBrandsService.svc/json/GetMasBrandsDataByClientID?ClientID=${clientID}`
+    return this.http.get<Brand[]>(`${this.baseEndpoint}Services/MasBrandsService.svc/json/GetMasBrandsDataByClientID?ClientID=${clientID}`    
     ).toPromise();
   }
 

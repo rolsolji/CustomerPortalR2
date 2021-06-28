@@ -9,7 +9,9 @@ import {
   ApexDataLabels,
   ApexXAxis,
   ApexPlotOptions,
-  ApexStroke 
+  ApexStroke,
+  ApexGrid, 
+  ApexYAxis
 } from "ng-apexcharts";
 
 export type ChartOptions = {
@@ -19,6 +21,8 @@ export type ChartOptions = {
   plotOptions: ApexPlotOptions;
   xaxis: ApexXAxis;
   stroke: ApexStroke;
+  grid: ApexGrid;
+  yaxis: ApexYAxis;
 };
 
 @Component({
@@ -90,8 +94,23 @@ export class WidgetBarChartComponent implements OnInit, OnChanges {
       },
       xaxis: {
         type: 'category',
-        categories: this.labels
-      }   
+        categories: this.labels,        
+      },
+      yaxis:{        
+        labels:{
+          show:true,
+          align:'left',
+          minWidth:150
+        }
+      },
+      // grid:{
+      //   padding: {
+      //     top: 0,
+      //     right: 0,
+      //     bottom: 0,
+      //     left: 7
+      //   }
+      // }   
     };
   }
 

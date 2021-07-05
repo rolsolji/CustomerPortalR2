@@ -416,8 +416,8 @@ export class FormAddShipComponent implements OnInit {
       statuscode: [null],
       specialinstructions: [null],
       internalnote: [{ value: null, disabled: true }],
-      reference4: [null],
-      reference5: [null],
+      reference4: [{ value: null, disabled: true }],
+      reference5: [{ value: null, disabled: true }],
     });
     // --
 
@@ -3506,18 +3506,21 @@ export class FormAddShipComponent implements OnInit {
     else{ // If we can't get fields from API then set R2 fields as default
       this.ReferenceByClientField1 = 'Customer Ref #';
       this.ReferenceByClientField2 = 'R2 Order #';
-      this.ReferenceByClientField3 = 'R2 Pro number';
+      this.ReferenceByClientField3 = 'Aljex Pro #';
       /* Start 15/06/2021 */
-      this.ReferenceByClientField4 = 'Ref # 4';
-      this.ReferenceByClientField5 = 'Ref # 5';
+      this.ReferenceByClientField4 = 'Carrier Ref #';
+      this.ReferenceByClientField5 = 'Saas Order #';
       /* End 15/06/2021 */
     }
 
+    if(this.ReferenceByClientField3 == null || this.ReferenceByClientField3 == undefined || this.ReferenceByClientField3 == ""){
+      this.ReferenceByClientField3 = 'Aljex Pro #';
+    }
     if(this.ReferenceByClientField4 == null || this.ReferenceByClientField4 == undefined || this.ReferenceByClientField4 == ""){
-      this.ReferenceByClientField4 = 'Ref # 4';
+      this.ReferenceByClientField4 = 'Carrier Ref #';
     }
     if(this.ReferenceByClientField5 == null || this.ReferenceByClientField5 == undefined || this.ReferenceByClientField5 == ""){
-      this.ReferenceByClientField5 = 'Ref # 5';
+      this.ReferenceByClientField5 = 'Saas Order #';
     }
   }
 

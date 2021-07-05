@@ -42,5 +42,43 @@
                         [item]="item"
                         [level]="0"></vex-sidenav-item>
     </div>
+    <div class="sidenav-items subheading">
+      <div fxLayout="row" fxLayoutGap="3px">
+        <div fxFlex="25%" style="text-align: left;">
+          <label>Contact</label>
+        </div>
+        <div fxFlex="2%">
+          <label>:</label>
+        </div>
+        <div fxFlex="60%">
+          <label>{{contactName}}</label>
+        </div>
+      </div>
+
+      <div fxLayout="row" fxLayoutGap="3px" style="margin-top:3px;">
+        <div fxFlex="25%" style="text-align: left;">
+          <label>Phone</label>
+        </div>
+        <div fxFlex="2%">
+          <label>:</label>
+        </div>
+        <div fxFlex="60%">
+          <label>{{contactPhone}}</label>
+        </div>
+      </div>
+
+      <div fxLayout="row" fxLayoutGap="3px" style="margin-top:3px;">
+        <div fxFlex="25%" style="text-align: left;">
+          <label>Email</label>
+        </div>
+        <div fxFlex="2%">
+          <label>:</label>
+        </div>
+        <div fxFlex="60%">
+          <label><u>{{contactEmail}}</u></label>
+        </div>
+      </div>      
+      
+    </div>
   </vex-scrollbar>
 </div>

@@ -33,6 +33,10 @@ export class SidenavComponent implements OnInit {
   private clientImage: string;
   private securityToken: string;
 
+  contactName: string = "";
+  contactPhone: string = "";
+  contactEmail: string = "";
+
   defaultClient: Client;
   filteredOptions: Observable<Client[]>;
   clientsForm: FormGroup;
@@ -70,6 +74,10 @@ export class SidenavComponent implements OnInit {
         return this._filter(val || '')
       })
     )
+
+    this.contactName = this.defaultClient.ContactName;
+    this.contactPhone = this.defaultClient.ContactPhone;
+    this.contactEmail = this.defaultClient.ContactEmail;
   }
 
   private _filter(value: string): Observable<Client[]> {

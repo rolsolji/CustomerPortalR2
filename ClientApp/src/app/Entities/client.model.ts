@@ -13,6 +13,7 @@ export class Client {
   MasUserDto: any;
   ShortName: string;
   UserName: string;
+  ContactName: string;
 
   constructor(client?: any) {
     this.AccountID = client && client.AccountID ? client.AccountID : null;
@@ -29,6 +30,7 @@ export class Client {
     this.MasUserDto = client && client.MasUserDto ? client.MasUserDto : null;
     this.ShortName = client && client.ShortName ? client.ShortName : null;
     this.UserName = client && client.UserName ? client.UserName : null;
+    this.ContactName = client && client.ContactName ? client.ContactName : null;
   }
 
 }

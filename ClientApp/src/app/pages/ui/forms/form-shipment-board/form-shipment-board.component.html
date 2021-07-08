@@ -351,7 +351,7 @@
                                     </div>
                                     <hr class="horizontal-title-line">    
                                     <div class="div-container div-container-content">
-                                        <p *ngIf="shipmentInformation != null">Tracking Number: {{shipmentInformation.TrackingNumber}}</p>
+                                        <p *ngIf="shipmentInformation != null">Tracking Number : {{shipmentInformation.TrackingNumber}}</p>
                                         <p *ngIf="TrackingDetailsLists != null && TrackingDetailsLists.length > 0">Current Status: {{TrackingDetailsLists[0].CurrentStatus}}</p>
                                         <div *ngIf="TrackingDetailsLists != null && TrackingDetailsLists.length > 0" class="TrackingDetailsTable">
                                             <table mat-table [dataSource]=dataSourceTracking  *ngIf="TrackingDetailsLists != null && TrackingDetailsLists.length > 0">
@@ -378,13 +378,13 @@
                                     </div>
                                     <hr class="horizontal-title-line">
                                     <div class="div-container div-container-content">
-                                        <p *ngIf="shipmentInformation != null">Pro Number: {{row.ProNumber}}</p>
-                                        <p *ngIf="shipmentInformation != null">Pickup Number: {{shipmentInformation.PickupNumber}}</p> 
-                                        <p *ngIf="shipmentInformation != null">R2 Ref.No: {{shipmentInformation.BrokerReferenceNo}}</p>
-                                        <p *ngIf="shipmentInformation != null">Exp Ship Date: {{shipmentInformation.RequestedPickupDateFromWithFormat}}</p> 
-                                        <p *ngIf="shipmentInformation != null">Actual Ship Date: {{shipmentInformation.PickupDateWithFormat}}</p>
-                                        <p *ngIf="shipmentInformation != null">Actual Del Date: {{shipmentInformation.DeliveryDateWithFormat}}</p>
-                                        <p *ngIf="shipmentInformation != null">Expected Del Date: {{shipmentInformation.RequestedDeliveryDateWithFormat}}</p>
+                                        <p *ngIf="shipmentInformation != null">Pro Number : {{row.ProNumber}}</p>
+                                        <p *ngIf="shipmentInformation != null">Pickup Number : {{shipmentInformation.PickupNumber}}</p> 
+                                        <p *ngIf="shipmentInformation != null">R2 Ref.No : {{shipmentInformation.BrokerReferenceNo}}</p>
+                                        <p *ngIf="shipmentInformation != null">Exp Ship Date : {{shipmentInformation.RequestedPickupDateFromWithFormat}}</p> 
+                                        <p *ngIf="shipmentInformation != null">Actual Ship Date : {{shipmentInformation.PickupDateWithFormat}}</p>
+                                        <p *ngIf="shipmentInformation != null">Actual Del Date : {{shipmentInformation.DeliveryDateWithFormat}}</p>
+                                        <p *ngIf="shipmentInformation != null">Expected Del Date : {{shipmentInformation.RequestedDeliveryDateWithFormat}}</p>
                                     </div>
                                 </div>
                                 <div class="vertical-line"></div>
@@ -397,8 +397,9 @@
                                     <div class="div-container div-container-content">
                                         <p *ngIf="shipmentInformation != null">{{ReferenceByClientField1}}{{shipmentInformation.Ref1Value}}</p>
                                         <p *ngIf="shipmentInformation != null">{{ReferenceByClientField2}}{{shipmentInformation.Ref2Value}}</p> 
-                                        <p *ngIf="shipmentInformation != null">{{ReferenceByClientField3}}{{shipmentInformation.Ref3Value}}</p>
+                                        <p *ngIf="shipmentInformation != null">Aljex Pro # : {{shipmentInformation.Ref3Value}}</p>
                                         <p *ngIf="shipmentInformation != null">{{ReferenceByClientField4}}{{shipmentInformation.Ref4Value}}</p>
+                                        <p *ngIf="shipmentInformation != null">{{ReferenceByClientField5}}{{shipmentInformation.Ref5Value}}</p>
                                     </div>
                                     <hr class="horizontal-separator-line">
                                     <div class="div-container div-container-title">

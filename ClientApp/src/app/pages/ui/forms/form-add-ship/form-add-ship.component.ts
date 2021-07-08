@@ -416,8 +416,8 @@ export class FormAddShipComponent implements OnInit {
       statuscode: [null],
       specialinstructions: [null],
       internalnote: [{ value: null, disabled: true }],
-      reference4: [{ value: null, disabled: true }],
-      reference5: [{ value: null, disabled: true }],
+      reference4: [null],
+      reference5: [null],
     });
     // --
 

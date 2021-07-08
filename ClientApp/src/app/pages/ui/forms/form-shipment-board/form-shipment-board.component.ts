@@ -207,6 +207,7 @@ export class FormShipmentBoardComponent implements OnInit {
   ReferenceByClientField2 = '';
   ReferenceByClientField3 = '';
   ReferenceByClientField4 = '';
+  ReferenceByClientField5 = '';
 
   visible = true;
   selectable = true;
@@ -682,24 +683,42 @@ export class FormShipmentBoardComponent implements OnInit {
 
     this.ReferenceByClientOptions = await this.httpService.GetReferenceByClient(this.shipmentInformation.ClientId, this.keyId);
     if (this.ReferenceByClientOptions != null && this.ReferenceByClientOptions.length > 0){
-      this.ReferenceByClientField1 = String.Format('{0}: ',this.ReferenceByClientOptions[0].Description.trim()) ;
+      this.ReferenceByClientField1 = String.Format('{0} : ',this.ReferenceByClientOptions[0].Description.trim()) ;
 
       if (this.ReferenceByClientOptions.length > 1){
-        this.ReferenceByClientField2 =  String.Format('{0}: ',this.ReferenceByClientOptions[1].Description.trim());
+        this.ReferenceByClientField2 =  String.Format('{0} : ',this.ReferenceByClientOptions[1].Description.trim());
       }
 
       if (this.ReferenceByClientOptions.length > 2){
-        this.ReferenceByClientField3 = String.Format('{0}: ',this.ReferenceByClientOptions[2].Description.trim());
+        this.ReferenceByClientField3 = String.Format('{0} : ',this.ReferenceByClientOptions[2].Description.trim());
       }
 
       if (this.ReferenceByClientOptions.length > 3){
-        this.ReferenceByClientField4 = String.Format('{0}: ',this.ReferenceByClientOptions[3].Description.trim());
+        this.ReferenceByClientField4 = String.Format('{0} : ',this.ReferenceByClientOptions[3].Description.trim());
+      }
+
+      if (this.ReferenceByClientOptions.length > 4){
+        this.ReferenceByClientField5 = String.Format('{0} : ',this.ReferenceByClientOptions[4].Description.trim());
       }
     }
     else{ // If we can't get fields from API then set R2 fields as default
-      this.ReferenceByClientField1 = 'Customer Ref #: ';
-      this.ReferenceByClientField2 = 'R2 Order #: ';
-      this.ReferenceByClientField3 = 'R2 Pro number: ';
+      this.ReferenceByClientField1 = 'Customer Ref # : ';
+      this.ReferenceByClientField2 = 'R2 Order # : ';
+      this.ReferenceByClientField3 = 'Aljex Pro # : ';
+      /* Start 08/07/2021 */
+      this.ReferenceByClientField4 = 'Carrier Ref # : ';
+      this.ReferenceByClientField5 = 'Saas Order # : ';
+      /* End 08/07/2021 */
+    }
+
+    if(this.ReferenceByClientField3 == null || this.ReferenceByClientField3 == undefined || this.ReferenceByClientField3 == ""){
+      this.ReferenceByClientField3 = 'Aljex Pro # : ';
+    }
+    if(this.ReferenceByClientField4 == null || this.ReferenceByClientField4 == undefined || this.ReferenceByClientField4 == ""){
+      this.ReferenceByClientField4 = 'Carrier Ref # : ';
+    }
+    if(this.ReferenceByClientField5 == null || this.ReferenceByClientField5 == undefined || this.ReferenceByClientField5 == ""){
+      this.ReferenceByClientField5 = 'Saas Order # : ';
     }
 
     if (this.shipmentInformation.BolDocumentsList != null && this.shipmentInformation.BolDocumentsList.length > 0)

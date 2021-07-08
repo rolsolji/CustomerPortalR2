@@ -389,20 +389,27 @@
           </mat-expansion-panel>
           </mat-accordion>
 
-          <div fxLayout="row" fxLayoutAlign="end center" fxLayoutGap="8px" class="py-2 pr-5">
-            
+          <div fxLayout="row" fxLayoutAlign="end center" fxLayoutGap="8px" class="py-2 pr-5">            
             <button [disabled]=showSpinner (click)="clearQuoteAndFields()" mat-button type="button">Clear</button>
-                <button [disabled]=showSpinner (click)="getQuote()" color="warn" mat-raised-button type="button" [disabled]="!myForm.valid" >Get Quote</button>
-                <mat-form-field appearance="outline" class="vex-flex-form-field" color="primary" fxFlex=18>
-                  <mat-label>Show top Carriers</mat-label>
-                  <input matInput type="number" maxlength="2" min="1" max="25" formControlName="showCarriers" required>
-                </mat-form-field>                 
-                <div *ngIf="showSpinner" class="spinnerSection">
-                  <div class="center-me">
-                    <mat-progress-spinner diameter="20" color="warn" mode="indeterminate"></mat-progress-spinner>
-                  </div>
-                </div>
+            <button [disabled]=showSpinner (click)="getQuote()" color="warn" mat-raised-button type="button" [disabled]="!myForm.valid" >Get Quote</button>
+            <mat-form-field appearance="outline" class="vex-flex-form-field" color="primary" fxFlex=18>
+              <mat-label>Show top Carriers</mat-label>
+              <input matInput type="number" maxlength="2" min="1" max="25" formControlName="showCarriers" required>
+            </mat-form-field>                 
+            <!-- <div *ngIf="showSpinner" class="spinnerSection">
+              <div class="center-me">
+                <mat-progress-spinner diameter="20" color="warn" mode="indeterminate"></mat-progress-spinner>
+              </div>
+            </div> -->
           </div>
+          <!--Start 08/07/2021-->
+          <div fxLayout="row" fxLayoutGap="8px" class="py-2 pr-5" style="margin-right: 0px; padding-right: 0px;">
+            <div fxFlex="2%"></div>
+            <div fxFlex="98%" style="text-align: left;">
+              <label>For Expedited/Time critical quotes, Volume LTL, Truckload or any other specialty quotes, please contact your R2 rep or LTL@r2logistics.com</label>
+            </div>            
+          </div>
+          <!--End 08/07/2021-->
         </div>
       </form>
     </div>

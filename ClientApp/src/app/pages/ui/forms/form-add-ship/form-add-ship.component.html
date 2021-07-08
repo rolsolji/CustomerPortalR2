@@ -627,7 +627,23 @@
                         <input name="r2order" formControlName="r2order" matInput >
                       </mat-form-field>
                     </div>                                 
-                  </div>                  
+                  </div>
+                  <!--Start 07/07/2021-->
+                  <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="5px">
+                    <div fxFlex="50%">
+                      <mat-form-field>
+                        <mat-label>{{ReferenceByClientField4}}</mat-label>
+                        <input name="reference4" formControlName="reference4" matInput >
+                      </mat-form-field>
+                    </div>
+                    <div fxFlex="50%">
+                      <mat-form-field>
+                        <mat-label>{{ReferenceByClientField5}}</mat-label>
+                        <input name="reference5" formControlName="reference5" matInput >
+                      </mat-form-field>
+                    </div>                                 
+                  </div>
+                  <!--End 07/07/2021-->                  
                   <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="5px">                  
                     <div fxFlex="50%">
                       <mat-form-field>
@@ -701,27 +717,12 @@
                     </div>             
                     <div fxFlex="50%">
                       <mat-form-field>
-                        <mat-label>{{ReferenceByClientField3}}</mat-label>
+                        <!-- <mat-label>{{ReferenceByClientField3}}</mat-label> -->
+                        <mat-label>Aljex Pro #</mat-label>
                         <input name="r2pronumber" formControlName="r2pronumber" matInput >
                       </mat-form-field>
                     </div>                                           
-                  </div>     
-                  <!--Start 05/07/2021-->
-                  <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="5px">
-                    <div fxFlex="50%">
-                      <mat-form-field>
-                        <mat-label>{{ReferenceByClientField4}}</mat-label>
-                        <input name="reference4" formControlName="reference4" matInput >
-                      </mat-form-field>
-                    </div>
-                    <div fxFlex="50%">
-                      <mat-form-field>
-                        <mat-label>{{ReferenceByClientField5}}</mat-label>
-                        <input name="reference5" formControlName="reference5" matInput >
-                      </mat-form-field>
-                    </div>                                 
-                  </div>
-                  <!--End 05/07/2021-->
+                  </div>                  
                   <!-- <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="5px">
                     <div fxFlex="75%">
                       <mat-form-field>

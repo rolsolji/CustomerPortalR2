@@ -77,6 +77,9 @@ import { TrackingDetails } from '../../../../Entities/TrackingDetails';
 import { importType } from '@angular/compiler/src/output/output_ast';
 import { TotalStatusRecords }  from '../../../../Entities/TotalStatusRecords';
 import { UtilitiesService } from '../../../../common/utilities.service';
+import { FormAllDocumentsDialogComponent } from "../form-shipment-board/form-alldocuments-dialog/form-alldocuments-dialog.component";
+import { MatDialog, MatDialogConfig } from '@angular/material/dialog';
+import { Documents } from '../../../../Entities/Documents';
 
 @Component({
   selector: 'vex-form-shipment-board',
@@ -112,7 +115,8 @@ export class FormShipmentBoardComponent implements OnInit {
     public datepipe: DatePipe,
     private authenticationService: AuthenticationService,
     private snackbar: MatSnackBar,
-    private utilitiesService: UtilitiesService
+    private utilitiesService: UtilitiesService,
+    private dialog: MatDialog
   ) {
     this.securityToken = this.authenticationService.ticket$.value;
     this.user = this.authenticationService.getUserFromStorage();
@@ -248,6 +252,13 @@ export class FormShipmentBoardComponent implements OnInit {
 
   rwtDocumentURL: string;
   rwtDocumentURLIsEnabled: boolean = false;
+
+  icDocumentURL: string;
+  icDocumentURLIsEnabled: boolean = false;
+  
+  allDocumentButtonIsEnabled: boolean = false;
+
+  allDocuments: Documents[];  
 
   notesList:[];
   notesIsEnabled: boolean = false;
@@ -646,12 +657,31 @@ export class FormShipmentBoardComponent implements OnInit {
     if (rowSelected == null){
       this.expandedQuote = String.Empty;
       return;
-    }
+    }    
+
     this.showSpinnerGrid = true;
     this.quoteSelected = rowSelected;
     this.expandedQuote = this.expandedQuote === rowSelected.ClientLadingNo ? String.Empty : rowSelected.ClientLadingNo;
     this.shipmentInformation = await this.httpService.GetShipmentByLadingID(rowSelected.LadingID.toString(), this.keyId);
     if (this.shipmentInformation != null){
+
+      this.bolDocumentURL = "";
+      this.bolDocumentURLIsEnabled = false;
+  
+      this.podDocumentURL = "";
+      this.podDocumentURLIsEnabled = false;
+  
+      this.rwtDocumentURL = "";
+      this.rwtDocumentURLIsEnabled = false;
+  
+      this.othDocumentURL = "";
+      this.othDocumentURLIsEnabled = false;
+  
+      this.icDocumentURL = "";
+      this.icDocumentURLIsEnabled = false;
+
+      this.allDocumentButtonIsEnabled = false;
+
       if (this.shipmentInformation.RequestedPickupDateFrom != null && !String.IsNullOrWhiteSpace(this.shipmentInformation.RequestedPickupDateFrom.toString())){
         //this.shipmentInformation.RequestedPickupDateFromWithFormat = this.datepipe.transform(this.shipmentInformation.RequestedPickupDateFrom.toString().replace(/(^.*\()|([+-].*$)/g, ''),'MM/dd/yyyy');
         this.shipmentInformation.RequestedPickupDateFromWithFormat = this.utilitiesService.ConverteJsonDateToLocalTimeZone(this.shipmentInformation.RequestedPickupDateFrom.toString());
@@ -719,7 +749,7 @@ export class FormShipmentBoardComponent implements OnInit {
     }
     if(this.ReferenceByClientField5 == null || this.ReferenceByClientField5 == undefined || this.ReferenceByClientField5 == ""){
       this.ReferenceByClientField5 = 'Saas Order # : ';
-    }
+    }    
 
     if (this.shipmentInformation.BolDocumentsList != null && this.shipmentInformation.BolDocumentsList.length > 0)
     {
@@ -728,6 +758,7 @@ export class FormShipmentBoardComponent implements OnInit {
         this.bolDocumentURL = String.Format(environment.baseEndpoint + 'Handlers/DownLoadPODHandler.ashx?userToken={0}&clientID={1}&imageName={2}&docType={3}&TMWUrl={4}&Ticket={5}',
                                               this.user.TokenString,this.shipmentInformation.ShortName,BOLDocument.FilePath,BOLDocument.DocType,BOLDocument.TMWUrl,this.securityToken);
         this.bolDocumentURLIsEnabled = true;
+        this.allDocumentButtonIsEnabled = true;
       }
       
       const PODDocument = this.shipmentInformation.BolDocumentsList.find(d => d.DocType === 'POD');
@@ -735,6 +766,9 @@ export class FormShipmentBoardComponent implements OnInit {
         this.podDocumentURL = String.Format(environment.baseEndpoint + 'Handlers/DownLoadPODHandler.ashx?userToken={0}&clientID={1}&imageName={2}&docType={3}&TMWUrl={4}&Ticket={5}',
                                               this.user.TokenString,this.shipmentInformation.ShortName,PODDocument.FilePath,PODDocument.DocType,PODDocument.TMWUrl,this.securityToken);
         this.podDocumentURLIsEnabled = true;
+        if(this.allDocumentButtonIsEnabled == false){
+          this.allDocumentButtonIsEnabled = true;
+        }
       }
 
       const RWTDocument = this.shipmentInformation.BolDocumentsList.find(d => d.DocType === 'RWT');
@@ -742,6 +776,9 @@ export class FormShipmentBoardComponent implements OnInit {
         this.rwtDocumentURL = String.Format(environment.baseEndpoint + 'Handlers/DownLoadPODHandler.ashx?userToken={0}&clientID={1}&imageName={2}&docType={3}&TMWUrl={4}&Ticket={5}',
                                               this.user.TokenString,this.shipmentInformation.ShortName,RWTDocument.FilePath,RWTDocument.DocType,RWTDocument.TMWUrl,this.securityToken);
         this.rwtDocumentURLIsEnabled = true;
+        if(this.allDocumentButtonIsEnabled == false){
+          this.allDocumentButtonIsEnabled = true;
+        }
       }
 
       const OTHDocument = this.shipmentInformation.BolDocumentsList.find(d => d.DocType === 'OTH');
@@ -749,6 +786,19 @@ export class FormShipmentBoardComponent implements OnInit {
         this.othDocumentURL = String.Format(environment.baseEndpoint + 'Handlers/DownLoadPODHandler.ashx?userToken={0}&clientID={1}&imageName={2}&docType={3}&TMWUrl={4}&Ticket={5}',
                                               this.user.TokenString,this.shipmentInformation.ShortName,OTHDocument.FilePath,OTHDocument.DocType,OTHDocument.TMWUrl,this.securityToken);
         this.othDocumentURLIsEnabled = true;
+        if(this.allDocumentButtonIsEnabled == false){
+          this.allDocumentButtonIsEnabled = true;
+        }
+      }
+
+      const ICDocument = this.shipmentInformation.BolDocumentsList.find(d => d.DocType === 'IC');
+      if (ICDocument !== null && ICDocument !== undefined){
+        this.icDocumentURL = String.Format(environment.baseEndpoint + 'Handlers/DownLoadPODHandler.ashx?userToken={0}&clientID={1}&imageName={2}&docType={3}&TMWUrl={4}&Ticket={5}',
+                                              this.user.TokenString,this.shipmentInformation.ShortName,ICDocument.FilePath,ICDocument.DocType,ICDocument.TMWUrl,this.securityToken);
+        this.icDocumentURLIsEnabled = true;
+        if(this.allDocumentButtonIsEnabled == false){
+          this.allDocumentButtonIsEnabled = true;
+        }
       }
     }
 
@@ -965,6 +1015,38 @@ export class FormShipmentBoardComponent implements OnInit {
   OthDocumentsButtonClick() {
     if(this.othDocumentURL !== null && this.othDocumentURL !== undefined && this.othDocumentURL !== ""){
       window.open(this.othDocumentURL);
+    }
+  }
+
+  ICDocumentsButtonClick() {
+    if(this.icDocumentURL !== null && this.icDocumentURL !== undefined && this.icDocumentURL !== ""){
+      window.open(this.icDocumentURL);
+    }
+  }
+
+  ALLDocumentsButtonClick(){
+    this.allDocuments = [];    
+
+    if (this.shipmentInformation.BolDocumentsList != null && this.shipmentInformation.BolDocumentsList.length > 0) {
+      
+      for(let i=0; i< this.shipmentInformation.BolDocumentsList.length; i++){
+        let document : Documents = {
+          FilePath : this.shipmentInformation.BolDocumentsList[i].FilePath,
+          DocType : this.shipmentInformation.BolDocumentsList[i].DocType,
+          DateRetrival : this.shipmentInformation.BolDocumentsList[i].DateRetrival == null ? '' : this.utilitiesService.ConverteJsonDateToLocalTimeZone(this.shipmentInformation.BolDocumentsList[i].DateRetrival),
+          ShortName:this.shipmentInformation.ShortName,
+          TMWUrl:this.shipmentInformation.BolDocumentsList[i].TMWUrl
+        };        
+        this.allDocuments.push(document);
+      }
+      
+      this.dialog.open(FormAllDocumentsDialogComponent, {
+        width:'750px',
+        height:'400px',
+        data: {
+          documents:this.allDocuments          
+        }
+      }).afterClosed().subscribe();
     }
   }
 }

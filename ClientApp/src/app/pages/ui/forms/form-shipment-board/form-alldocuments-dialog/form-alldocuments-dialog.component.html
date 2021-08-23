@@ -1,0 +1,45 @@
+<div fxLayout="row" fxLayoutAlign="start center" mat-dialog-title style="text-align: center;">
+    <h2 class="headline m-0" fxFlex="auto">Documents</h2>
+</div>
+
+<div fxLayout="row" fxLayoutAlign="flex-start center" style="margin-top: 5px; margin-bottom: 5px;">
+    <button color="primary" style="width:80px;" mat-raised-button (click)="GetAllDocuments()">ALL</button>
+    <button color="primary" style="width:80px; margin-left: 5px;" mat-raised-button (click)="GetBolDocuments()">BOL</button>
+    <button color="primary" style="width:80px; margin-left: 5px;" mat-raised-button (click)="GetPodDocuments()">POD</button>
+    <button color="primary" style="width:80px; margin-left: 5px;" mat-raised-button (click)="GetRwtDocuments()">RWT</button>
+    <button color="primary" style="width:80px; margin-left: 5px;" mat-raised-button (click)="GetICDocuments()">IC</button>
+    <button color="primary" style="width:80px; margin-left: 5px;" mat-raised-button (click)="GetOthDocuments()">OTHER</button>
+</div>
+
+<mat-divider class="-mx-6 text-border"></mat-divider>
+
+<div class="col-md-12" style="margin-top: 10px; height: 150px; overflow: scroll;">
+    <div class="col-md-12 noMargin ">
+        <div class="row noMargin smallMargintop">
+            <div class="col-md-12 noMargin">
+                <table border="1" style="width:100%">
+                    <thead>
+                        <tr style="text-align: left; background-color: grey; color: white;">
+                           <th>Document</th>
+                           <th>DocType</th>
+                           <th>Scan Date</th>
+                        </tr>
+                     </thead>
+                     <tbody>
+                         <tr style="text-align: left; cursor: pointer;" *ngFor="let item of selectedDocumentslist" (click)="GetSelectedDocument(item)">
+                            <td>{{ item.FilePath }}</td>
+                            <td>{{ item.DocType }}</td>
+                            <td>{{ item.DateRetrival }}</td>
+                         </tr>
+                     </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<mat-divider class="-mx-6 text-border" style="margin-top: 10px;"></mat-divider>
+
+<div fxLayout="row" fxLayoutAlign="flex-end center" style="margin-top: 50px;">
+    <button color="accent" style="width:80px;" mat-raised-button (click)="CloseDialogClick()">Close</button>
+</div>

@@ -408,32 +408,64 @@
                                     <hr class="horizontal-title-line">
                                     <div>
                                         <div class="div-container-three-column">
-                                            <button mat-icon-button matTooltip="Print BOL document" [class.disabled]="!bolDocumentURLIsEnabled" (click)="BolDocumentsButtonClick()">                                                
+                                            <button mat-icon-button matTooltip="Print BOL document" *ngIf="!bolDocumentURLIsEnabled" [class.disabled]="!bolDocumentURLIsEnabled" (click)="BolDocumentsButtonClick()">                                                
                                                 <mat-icon [icIcon]="outlineTextSnippet" color="black"></mat-icon>
+                                            </button>
+                                            <button mat-icon-button matTooltip="Print BOL document" *ngIf="bolDocumentURLIsEnabled" (click)="BolDocumentsButtonClick()">                                                
+                                                <mat-icon [icIcon]="outlineTextSnippet" color="blue"></mat-icon>
                                             </button>
                                             <p class="document-label"><a mat-flat-button [class.disabled]="!bolDocumentURLIsEnabled" href="{{bolDocumentURL}}" target="_blank">BOL</a></p>
                                         </div>
                                         <div class="div-container-three-column">
-                                            <button mat-icon-button matTooltip="Print POD document" [class.disabled]="!podDocumentURLIsEnabled" (click)="PodDocumentsButtonClick()">
+                                            <button mat-icon-button matTooltip="Print POD document" *ngIf="!podDocumentURLIsEnabled" [class.disabled]="!podDocumentURLIsEnabled" (click)="PodDocumentsButtonClick()">
                                                 <mat-icon [icIcon]="outlineTextSnippet" color="black">POD</mat-icon>
+                                            </button>
+                                            <button mat-icon-button matTooltip="Print POD document" *ngIf="podDocumentURLIsEnabled" (click)="PodDocumentsButtonClick()">
+                                                <mat-icon [icIcon]="outlineTextSnippet" color="blue">POD</mat-icon>
                                             </button>
                                             <p class="document-label"><a mat-flat-button [class.disabled]="!podDocumentURLIsEnabled" href="{{podDocumentURL}}" target="_blank">POD</a></p>
                                         </div>
                                         <div class="div-container-three-column">
-                                            <button mat-icon-button matTooltip="Print RWT document" [class.disabled]="!rwtDocumentURLIsEnabled" (click)="RwtDocumentsButtonClick()">
+                                            <button mat-icon-button matTooltip="Print RWT document" *ngIf="!rwtDocumentURLIsEnabled" [class.disabled]="!rwtDocumentURLIsEnabled" (click)="RwtDocumentsButtonClick()">
                                                 <mat-icon [icIcon]="outlineTextSnippet" color="black">RWT</mat-icon>
+                                            </button>
+                                            <button mat-icon-button matTooltip="Print RWT document" *ngIf="rwtDocumentURLIsEnabled" (click)="RwtDocumentsButtonClick()">
+                                                <mat-icon [icIcon]="outlineTextSnippet" color="blue">RWT</mat-icon>
                                             </button>
                                             <p class="document-label"><a mat-flat-button [class.disabled]="!rwtDocumentURLIsEnabled" href="{{rwtDocumentURL}}" target="_blank">RWT</a></p>
                                         </div>
                                         <div class="div-container-three-column">
-                                            <button mat-icon-button matTooltip="Print OTHER document" [class.disabled]="!othDocumentURLIsEnabled" (click)="OthDocumentsButtonClick()">
-                                                <mat-icon [icIcon]="outlineTextSnippet" color="black">OTHER</mat-icon>
+                                            <button mat-icon-button matTooltip="Print IC document" *ngIf="!icDocumentURLIsEnabled" [class.disabled]="!icDocumentURLIsEnabled" (click)="ICDocumentsButtonClick()">
+                                                <mat-icon [icIcon]="outlineTextSnippet" color="black">IC</mat-icon>
                                             </button>
-                                            <p class="document-label"><a mat-flat-button [class.disabled]="!othDocumentURLIsEnabled" href="{{othDocumentURL}}" target="_blank">OTHER</a></p>
-                                        </div>  
+                                            <button mat-icon-button matTooltip="Print IC document" *ngIf="icDocumentURLIsEnabled" (click)="ICDocumentsButtonClick()">
+                                                <mat-icon [icIcon]="outlineTextSnippet" color="blue">IC</mat-icon>
+                                            </button>
+                                            <p class="document-label"><a mat-flat-button [class.disabled]="!icDocumentURLIsEnabled" href="{{icDocumentURL}}" target="_blank">IC</a></p>
+                                        </div>                                         
                                     </div>
                                     <div>
-                                        <div class="div-container-two-column">
+                                        <div class="div-container-three-column">
+                                            <button mat-icon-button matTooltip="Print OTHER document" *ngIf="!othDocumentURLIsEnabled" [class.disabled]="!othDocumentURLIsEnabled" (click)="OthDocumentsButtonClick()">
+                                                <mat-icon [icIcon]="outlineTextSnippet" color="black">OTHER</mat-icon>
+                                            </button>
+                                            <button mat-icon-button matTooltip="Print OTHER document" *ngIf="othDocumentURLIsEnabled" (click)="OthDocumentsButtonClick()">
+                                                <mat-icon [icIcon]="outlineTextSnippet" color="blue">OTHER</mat-icon>
+                                            </button>
+                                            <p class="document-label"><a mat-flat-button [class.disabled]="!othDocumentURLIsEnabled" href="{{othDocumentURL}}" target="_blank">OTHER</a></p>
+                                        </div> 
+
+                                        <div class="div-container-three-column">
+                                            <button mat-icon-button matTooltip="Print ALL document" *ngIf="!allDocumentButtonIsEnabled" [class.disabled]="!allDocumentButtonIsEnabled">
+                                                <mat-icon [icIcon]="outlineTextSnippet" color="black">ALL</mat-icon>
+                                            </button>
+                                            <button mat-icon-button matTooltip="Print ALL document" *ngIf="allDocumentButtonIsEnabled" (click)="ALLDocumentsButtonClick()">
+                                                <mat-icon [icIcon]="outlineTextSnippet" color="blue">ALL</mat-icon>
+                                            </button>
+                                            <p class="document-label"><a mat-flat-button [class.disabled]="!allDocumentButtonIsEnabled" (click)="ALLDocumentsButtonClick()" target="_blank">ALL</a></p>
+                                        </div>
+                                        
+                                        <!-- <div class="div-container-two-column">
                                             <button mat-icon-button matTooltip="Print OTHER document" [class.disabled]="!notesIsEnabled">
                                                 <mat-icon [icIcon]="outlineTextSnippet" color="black">NOTES</mat-icon>
                                             </button>
@@ -444,7 +476,7 @@
                                                 <mat-icon [icIcon]="outlineTextSnippet" color="black">AUDIT LOG</mat-icon>
                                             </button>
                                             <p class="document-label"><a mat-flat-button [class.disabled]="!auditLogIsEnabled" href="{{auditLog}}" target="_blank">AUDIT LOG</a></p>
-                                        </div>
+                                        </div> -->
                                     </div>
                                 </div>
                                 <div class="vertical-line"></div>

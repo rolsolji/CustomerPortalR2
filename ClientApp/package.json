@@ -36,7 +36,7 @@
     "apexcharts": "^3.23.1",
     "date-fns": "^2.12.0",
     "highlight.js": "^10.0.0",
-    "luxon": "^1.23.0",
+    "luxon": "^1.28.1",
     "mat-video": "^2.8.1",
     "moment": "^2.29.1",
     "ng-apexcharts": "^1.5.6",
